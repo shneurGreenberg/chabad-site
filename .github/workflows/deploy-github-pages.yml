@@ -24,7 +24,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter build web --release --base-href /chabad-house-web/ --no-tree-shake-icons --no-wasm-dry-run
+      - run: flutter build web --release --base-href /chabad-site/ --no-tree-shake-icons --no-wasm-dry-run
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
@@ -38,3 +38,4 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
