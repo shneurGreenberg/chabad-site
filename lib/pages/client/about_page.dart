@@ -1,0 +1,192 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../data/repository.dart';
+import '../../l10n/strings.dart';
+import '../../models.dart';
+import '../../theme.dart';
+import '../../widgets/common.dart';
+import '../../widgets/site_scaffold.dart';
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    return SiteScaffold(
+      currentRoute: '/about',
+      children: [
+        PageHero(
+          title: loc.t('nav.about'),
+          subtitle: loc.t('about.subtitle'),
+          icon: Icons.info_outline,
+        ),
+        Section(
+          child: LayoutBuilder(builder: (context, c) {
+            final info = _infoCards(context, repo, loc);
+            final map = _map(context, loc);
+            if (c.maxWidth < 860) {
+              return Column(children: [info, const SizedBox(height: 20), map]);
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 2, child: info),
+                const SizedBox(width: 24),
+                Expanded(flex: 3, child: map),
+              ],
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _infoCards(BuildContext context, AppRepository repo, LocaleController loc) {
+    return Column(
+      children: [
+        _card(
+          icon: Icons.access_time,
+          title: loc.t('about.hours'),
+          child: Column(
+            children: [
+              for (final h in repo.contact.hours)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(children: [
+                    Text(trLoc(h.key, loc.lang),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const Spacer(),
+                    Text(h.value, style: const TextStyle(color: Colors.black54)),
+                  ]),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _card(
+          icon: Icons.contact_phone_outlined,
+          title: loc.t('about.contact'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _row(Icons.location_on_outlined, trLoc(repo.contact.address, loc.lang)),
+              _row(Icons.phone_outlined, repo.contact.phone),
+              _row(Icons.email_outlined, repo.contact.email),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _card(
+      {required IconData icon, required String title, required Widget child}) {
+    return Builder(builder: (context) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Icon(icon, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Text(title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 17)),
+            ]),
+            const Divider(height: 22),
+            child,
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _row(IconData icon, String text) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(icon, size: 18, color: Colors.black45),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: const TextStyle(height: 1.4))),
+        ]),
+      );
+
+  Widget _map(BuildContext context, LocaleController loc) {
+    return Container(
+      height: 360,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFDCE7F5), Color(0xFFEFF3FB)],
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _MapPainter()),
+          ),
+          const Center(
+            child: Icon(Icons.location_on, color: AppColors.primary, size: 54),
+          ),
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10)
+                ],
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.place, color: AppColors.accent, size: 18),
+                const SizedBox(width: 8),
+                Text(loc.t('about.address'),
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = const Color(0xFFBBCBE6)
+      ..strokeWidth = 8
+      ..style = PaintingStyle.stroke;
+    for (double x = 0; x < size.width; x += 60) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), p);
+    }
+    for (double y = 0; y < size.height; y += 60) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
+    }
+    final road = Paint()
+      ..color = const Color(0xFF94A9CC)
+      ..strokeWidth = 14
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(0, size.height * 0.6),
+        Offset(size.width, size.height * 0.35), road);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
