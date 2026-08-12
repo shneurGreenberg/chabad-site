@@ -127,6 +127,11 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Shabbat meals',
     'ru': 'Субботних трапез'
   },
+  'home.explore': {
+    'he': 'מה מחפשים?',
+    'en': 'Explore',
+    'ru': 'Разделы'
+  },
   'home.reach.title': {
     'he': 'גרתם פעם בעיר?',
     'en': 'Once lived here?',

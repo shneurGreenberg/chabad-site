@@ -26,7 +26,7 @@ class ChabadApp extends StatelessWidget {
       child: Consumer<LocaleController>(
         builder: (context, locale, _) {
           return MaterialApp.router(
-            title: 'Chabad House',
+            title: 'בית חב״ד ליובאוויטש',
             debugShowCheckedModeBanner: false,
             theme: buildAppTheme(),
             routerConfig: appRouter,

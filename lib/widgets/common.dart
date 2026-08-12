@@ -62,10 +62,10 @@ class SectionHeader extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .headlineMedium
-                ?.copyWith(fontSize: 30)),
-        const SizedBox(height: 10),
+                ?.copyWith(fontSize: 32, height: 1.2, letterSpacing: -0.4)),
+        const SizedBox(height: 12),
         Container(
-          width: 64,
+          width: 72,
           height: 4,
           decoration: BoxDecoration(
             gradient: AppColors.goldGradient,
@@ -119,24 +119,44 @@ class GradientImage extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               base,
-              Color.alphaBlend(Colors.black.withValues(alpha: 0.35), base),
+              Color.alphaBlend(Colors.black.withValues(alpha: 0.28), base),
+              Color.alphaBlend(AppColors.primaryDark.withValues(alpha: 0.45), base),
             ],
           ),
         ),
         child: Stack(
           children: [
             Positioned(
-              right: -20,
-              bottom: -20,
-              child: Icon(Icons.star,
-                  size: 120, color: Colors.white.withValues(alpha: 0.06)),
+              right: -30,
+              top: -24,
+              child: Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            Positioned(
+              left: -18,
+              bottom: -28,
+              child: Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.12), width: 8),
+                ),
+              ),
             ),
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (icon != null)
-                    Icon(icon, size: 46, color: Colors.white.withValues(alpha: 0.92)),
+                    Icon(icon, size: 46, color: Colors.white.withValues(alpha: 0.95)),
                   if (label != null) ...[
                     const SizedBox(height: 8),
                     Padding(
@@ -153,7 +173,8 @@ class GradientImage extends StatelessWidget {
                 ],
               ),
             ),
-            if (badge != null) Positioned(top: 10, left: 10, child: badge!),
+            if (badge != null)
+              PositionedDirectional(top: 10, start: 10, child: badge!),
           ],
         ),
       ),
@@ -210,11 +231,12 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,17 +245,20 @@ class StatCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: color),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(value,
               style: const TextStyle(
-                  fontSize: 26, fontWeight: FontWeight.w800, color: AppColors.ink)),
-          const SizedBox(height: 4),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  height: 1)),
+          const SizedBox(height: 6),
           Text(label,
-              style: const TextStyle(color: Colors.black54, fontSize: 13)),
+              style: const TextStyle(color: AppColors.muted, fontSize: 13, height: 1.3)),
         ],
       ),
     );
@@ -298,33 +323,70 @@ class PageHero extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: MaxWidthBox(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
+      child: Stack(
+        children: [
+          Positioned(
+            left: -40,
+            top: -50,
+            child: Container(
+              width: 180,
+              height: 180,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.18), width: 18),
               ),
-              child: Icon(icon, color: AppColors.accent, size: 28),
             ),
-            const SizedBox(height: 16),
-            Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800)),
-            const SizedBox(height: 10),
-            Text(subtitle,
-                style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    fontSize: 16,
-                    height: 1.4)),
-          ],
-        ),
+          ),
+          Positioned(
+            right: 40,
+            bottom: -60,
+            child: Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 52),
+            child: MaxWidthBox(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: AppColors.accent.withValues(alpha: 0.35)),
+                    ),
+                    child: Icon(icon, color: AppColors.accentSoft, size: 28),
+                  ),
+                  const SizedBox(height: 18),
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w800,
+                          height: 1.15)),
+                  const SizedBox(height: 10),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 640),
+                    child: Text(subtitle,
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.86),
+                            fontSize: 16.5,
+                            height: 1.5)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -20,7 +20,12 @@ class NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Card(
       child: InkWell(
         onTap: () => context.go('/news'),
         child: Column(
@@ -71,6 +76,7 @@ class NewsCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -82,7 +88,12 @@ class ProgramCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final color = Color(program.color);
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -139,6 +150,7 @@ class ProgramCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

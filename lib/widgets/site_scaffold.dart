@@ -67,7 +67,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
   final String currentRoute;
 
   @override
-  Size get preferredSize => const Size.fromHeight(68);
+  Size get preferredSize => const Size.fromHeight(76);
 
   @override
   Widget build(BuildContext context) {
@@ -76,12 +76,14 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
     final compact = isTablet(context);
     return Material(
       color: Colors.white,
-      elevation: 1,
-      shadowColor: Colors.black26,
+      elevation: 0,
       child: SafeArea(
         bottom: false,
-        child: SizedBox(
-          height: 68,
+        child: Column(
+          children: [
+            Container(height: 3, decoration: const BoxDecoration(gradient: AppColors.goldGradient)),
+            SizedBox(
+          height: 72,
           child: MaxWidthBox(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -159,6 +161,9 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
+            ),
+            Container(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+          ],
         ),
       ),
     );
@@ -179,13 +184,14 @@ class _Logo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 gradient: AppColors.heroGradient,
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.accent.withValues(alpha: 0.55), width: 1.4),
               ),
-              child: const Icon(Icons.synagogue, color: AppColors.accent, size: 24),
+              child: const Icon(Icons.synagogue, color: AppColors.accentSoft, size: 24),
             ),
             const SizedBox(width: 10),
             if (!isTablet(context))
@@ -226,14 +232,29 @@ class _NavLink extends StatelessWidget {
         onPressed: () => context.go(item.route),
         style: TextButton.styleFrom(
           foregroundColor: active ? AppColors.primary : AppColors.ink,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
-        child: Text(
-          loc.t(item.labelKey),
-          style: TextStyle(
-            fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-            fontSize: 14.5,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              loc.t(item.labelKey),
+              style: TextStyle(
+                fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 14.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              height: 3,
+              width: active ? 22 : 0,
+              decoration: BoxDecoration(
+                gradient: AppColors.goldGradient,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -441,8 +462,12 @@ class _SiteFooter extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(gradient: AppColors.heroGradient),
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      child: MaxWidthBox(
+      child: Column(
+        children: [
+          Container(height: 3, decoration: const BoxDecoration(gradient: AppColors.goldGradient)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 44),
+            child: MaxWidthBox(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -513,6 +538,9 @@ class _SiteFooter extends StatelessWidget {
             ),
           ],
         ),
+            ),
+          ),
+        ],
       ),
     );
   }

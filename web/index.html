@@ -1,46 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="בית חב״ד ליובאוויטש — בית חם לכל יהודי. חדשות, זמנים, תוכניות, תרומות ועוד.">
+  <meta name="theme-color" content="#0B1C3A">
 
-  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="flutter_app">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="בית חב״ד">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>flutter_app</title>
+  <title>בית חב״ד ליובאוויטש</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #0B1C3A;
+      font-family: Heebo, sans-serif;
+    }
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #E8D48A;
+      gap: 14px;
+      letter-spacing: 0.04em;
+    }
+    .splash .mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #16356F, #1E4A8C);
+      border: 1px solid rgba(232, 212, 138, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .splash p { margin: 0; color: #F6F1E8; font-weight: 700; font-size: 18px; }
+    .splash span { color: rgba(232, 212, 138, 0.8); font-size: 13px; }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <div class="splash" id="splash">
+    <div class="mark">✡</div>
+    <p>בית חב״ד ליובאוויטש</p>
+    <span>טוען…</span>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
