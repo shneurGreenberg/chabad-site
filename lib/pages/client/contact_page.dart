@@ -32,6 +32,12 @@ class _ContactPageState extends State<ContactPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _topic = _topics.first;
+  }
+
+  @override
   void dispose() {
     _name.dispose();
     _email.dispose();
@@ -44,7 +50,6 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.read<AppRepository>();
-    _topic ??= _topics.first;
     return SiteScaffold(
       currentRoute: '/contact',
       children: [
@@ -147,8 +152,12 @@ class _ContactPageState extends State<ContactPage> {
         prefixIcon: icon == null ? null : Icon(icon),
       ),
       validator: (v) {
-        if (required && (v == null || v.trim().isEmpty)) return '•';
-        if (email && v != null && v.isNotEmpty && !v.contains('@')) return '•';
+        if (required && (v == null || v.trim().isEmpty)) {
+          return context.loc.t('common.required');
+        }
+        if (email && v != null && v.isNotEmpty && !v.contains('@')) {
+          return context.loc.t('common.emailInvalid');
+        }
         return null;
       },
     );

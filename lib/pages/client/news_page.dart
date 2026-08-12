@@ -47,10 +47,12 @@ class _NewsPageState extends State<NewsPage> {
         ),
         Section(
           padTop: 8,
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 3),
-            children: [for (final a in items) NewsCard(a)],
-          ),
+          child: items.isEmpty
+              ? const EmptyHint(icon: Icons.article_outlined)
+              : ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [for (final a in items) NewsCard(a)],
+                ),
         ),
       ],
     );

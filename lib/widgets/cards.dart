@@ -210,20 +210,23 @@ class ProductCard extends StatelessWidget {
                           fontSize: 18,
                           color: AppColors.primary)),
                   const Spacer(),
-                  FilledButton(
-                    onPressed: () {
-                      repo.addToCart(product.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(trLoc(product.name, loc.lang)),
-                          duration: const Duration(milliseconds: 900),
-                        ),
-                      );
-                    },
-                    style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10)),
-                    child: const Icon(Icons.add_shopping_cart, size: 18),
+                  Tooltip(
+                    message: loc.t('store.addToCart'),
+                    child: FilledButton(
+                      onPressed: () {
+                        repo.addToCart(product.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(trLoc(product.name, loc.lang)),
+                            duration: const Duration(milliseconds: 900),
+                          ),
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10)),
+                      child: const Icon(Icons.add_shopping_cart, size: 18),
+                    ),
                   ),
                 ]),
               ],

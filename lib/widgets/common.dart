@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -230,6 +229,8 @@ class Pill extends StatelessWidget {
             const SizedBox(width: 6),
           ],
           Text(text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   color: c, fontWeight: FontWeight.w600, fontSize: 12.5)),
         ],
@@ -356,8 +357,8 @@ class PageHero extends StatelessWidget {
         children: [
           BannerFill(banner: banner),
           if (!banner.hasImage) ...[
-            Positioned(
-              left: -40,
+            PositionedDirectional(
+              start: -40,
               top: -50,
               child: Container(
                 width: 180,
@@ -369,8 +370,8 @@ class PageHero extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              right: 40,
+            PositionedDirectional(
+              end: 40,
               bottom: -60,
               child: Container(
                 width: 160,
@@ -388,21 +389,15 @@ class PageHero extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.28),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                              color: AppColors.accent.withValues(alpha: 0.5)),
-                        ),
-                        child: Icon(icon, color: AppColors.accentSoft, size: 28),
-                      ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xCC0B1C3A),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: AppColors.accent.withValues(alpha: 0.5)),
                     ),
+                    child: Icon(icon, color: AppColors.accentSoft, size: 28),
                   ),
                   const SizedBox(height: 18),
                   Text(title,
@@ -460,13 +455,37 @@ class BannerFill extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x660B1C3A),
-                  Color(0x990B1C3A),
+                  Color(0x8A0B1C3A),
+                  Color(0xC20B1C3A),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Placeholder shown when a list or grid has no matching items.
+class EmptyHint extends StatelessWidget {
+  const EmptyHint({super.key, this.icon = Icons.inbox_outlined});
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 36),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(icon, size: 40, color: AppColors.muted.withValues(alpha: 0.7)),
+            const SizedBox(height: 10),
+            Text(loc.t('common.empty'),
+                style: const TextStyle(color: AppColors.muted, fontSize: 15)),
+          ],
+        ),
       ),
     );
   }

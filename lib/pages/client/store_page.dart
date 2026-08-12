@@ -43,10 +43,12 @@ class _StorePageState extends State<StorePage> {
           padTop: 16,
           child: LayoutBuilder(builder: (context, c) {
             final wide = c.maxWidth > 900;
-            final grid = ResponsiveGrid(
-              columns: wide ? 3 : gridColumns(context, max: 3),
-              children: [for (final p in products) ProductCard(p)],
-            );
+            final grid = products.isEmpty
+                ? const EmptyHint(icon: Icons.storefront_outlined)
+                : ResponsiveGrid(
+                    columns: wide ? 3 : gridColumns(context, max: 3),
+                    children: [for (final p in products) ProductCard(p)],
+                  );
             if (!wide) {
               return Column(children: [
                 _CartPanel(repo: repo),

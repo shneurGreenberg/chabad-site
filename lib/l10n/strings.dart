@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/web_prefs.dart';
+
 /// Supported UI languages. Hebrew is the primary (RTL) language.
 const supportedLangs = ['he', 'en', 'ru'];
 
@@ -9,9 +11,15 @@ const langNames = {
   'ru': 'Русский',
 };
 
+String _savedLang() {
+  final saved = readPref('lang');
+  if (saved != null && supportedLangs.contains(saved)) return saved;
+  return 'he';
+}
+
 /// Holds the currently selected language and exposes translation lookup.
 class LocaleController extends ChangeNotifier {
-  LocaleController([this._lang = 'he']);
+  LocaleController([String? lang]) : _lang = lang ?? _savedLang();
 
   String _lang;
   String get lang => _lang;
@@ -23,6 +31,7 @@ class LocaleController extends ChangeNotifier {
   void setLang(String lang) {
     if (_lang == lang || !supportedLangs.contains(lang)) return;
     _lang = lang;
+    writePref('lang', lang);
     notifyListeners();
   }
 
@@ -153,6 +162,25 @@ const Map<String, Map<String, String>> _strings = {
   'common.viewAll': {'he': 'לכל', 'en': 'View all', 'ru': 'Смотреть все'},
   'common.search': {'he': 'חיפוש', 'en': 'Search', 'ru': 'Поиск'},
   'common.all': {'he': 'הכל', 'en': 'All', 'ru': 'Все'},
+  'common.required': {
+    'he': 'שדה חובה',
+    'en': 'Required',
+    'ru': 'Обязательное поле'
+  },
+  'common.emailInvalid': {
+    'he': 'כתובת אימייל לא תקינה',
+    'en': 'Enter a valid email',
+    'ru': 'Некорректный email'
+  },
+  'common.empty': {
+    'he': 'אין פריטים להצגה',
+    'en': 'Nothing to show yet',
+    'ru': 'Пока ничего нет'
+  },
+  'common.password': {'he': 'סיסמה', 'en': 'Password', 'ru': 'Пароль'},
+  'common.previous': {'he': 'הקודם', 'en': 'Previous', 'ru': 'Назад'},
+  'common.next': {'he': 'הבא', 'en': 'Next', 'ru': 'Далее'},
+  'common.language': {'he': 'שפה', 'en': 'Language', 'ru': 'Язык'},
   'common.send': {'he': 'שליחה', 'en': 'Send', 'ru': 'Отправить'},
   'common.save': {'he': 'שמירה', 'en': 'Save', 'ru': 'Сохранить'},
   'common.cancel': {'he': 'ביטול', 'en': 'Cancel', 'ru': 'Отмена'},
@@ -430,6 +458,22 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Запустить'
   },
   'admin.bots.enabled': {'he': 'פעיל', 'en': 'Enabled', 'ru': 'Включён'},
+  'admin.lead.fresh': {'he': 'חדש', 'en': 'New', 'ru': 'Новый'},
+  'admin.lead.contacted': {
+    'he': 'נוצר קשר',
+    'en': 'Contacted',
+    'ru': 'Связались'
+  },
+  'admin.lead.member': {
+    'he': 'חבר קהילה',
+    'en': 'Member',
+    'ru': 'Участник'
+  },
+  'admin.bots.posted': {
+    'he': 'פורסם בפייסבוק, אינסטגרם, X ו-VK',
+    'en': 'Posted to FB · IG · X · VK',
+    'ru': 'Опубликовано в FB · IG · X · VK'
+  },
   'admin.stats.leads': {'he': 'נרשמים', 'en': 'Leads', 'ru': 'Заявки'},
   'admin.stats.donations': {
     'he': 'תרומות',
@@ -591,6 +635,13 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'המיקום נשמר, אבל עדכון הזמנים נכשל. נסו שוב.',
     'en': 'Location saved, but updating times failed. Try again.',
     'ru': 'Место сохранено, но времена не обновились. Попробуйте снова.'
+  },
+  'admin.settings.lat': {'he': 'קו רוחב', 'en': 'Latitude', 'ru': 'Широта'},
+  'admin.settings.lon': {'he': 'קו אורך', 'en': 'Longitude', 'ru': 'Долгота'},
+  'admin.settings.tz': {
+    'he': 'אזור זמן',
+    'en': 'Timezone',
+    'ru': 'Часовой пояс'
   },
   'zmanim.forCity': {
     'he': 'זמנים לפי',

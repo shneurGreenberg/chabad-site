@@ -98,7 +98,7 @@ class _AdminLoginState extends State<AdminLogin> {
                       controller: _password,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: loc.t('common.password'),
                         prefixIcon: const Icon(Icons.lock_outline),
                       ),
                     ),
@@ -216,12 +216,20 @@ class _AdminShellState extends State<AdminShell> {
               ),
             ]),
           ),
-          for (int i = 0; i < sections.length; i++)
-            _railTile(context, sections[i], i, inDrawer),
-          const Spacer(),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                for (int i = 0; i < sections.length; i++)
+                  _railTile(context, sections[i], i, inDrawer),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Text(context.read<AuthController>().email,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
           ),
@@ -268,13 +276,17 @@ class _AdminShellState extends State<AdminShell> {
           if (narrow)
             Builder(
               builder: (context) => IconButton(
+                tooltip: loc.t('nav.menu'),
                 icon: const Icon(Icons.menu),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
-          Text(title,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-          const Spacer(),
+          Expanded(
+            child: Text(title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+          ),
           const LanguageSwitcher(),
           const SizedBox(width: 8),
           if (!narrow)
@@ -282,18 +294,34 @@ class _AdminShellState extends State<AdminShell> {
               onPressed: () => context.go('/'),
               icon: const Icon(Icons.open_in_new, size: 16),
               label: Text(loc.t('admin.viewSite')),
+            )
+          else
+            IconButton(
+              tooltip: loc.t('admin.viewSite'),
+              onPressed: () => context.go('/'),
+              icon: const Icon(Icons.open_in_new),
             ),
           const SizedBox(width: 8),
-          FilledButton.icon(
-            onPressed: () {
-              auth.logout();
-              context.go('/');
-            },
-            style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444)),
-            icon: const Icon(Icons.logout, size: 16),
-            label: Text(loc.t('admin.logout')),
-          ),
+          if (!narrow)
+            FilledButton.icon(
+              onPressed: () {
+                auth.logout();
+                context.go('/');
+              },
+              style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFEF4444)),
+              icon: const Icon(Icons.logout, size: 16),
+              label: Text(loc.t('admin.logout')),
+            )
+          else
+            IconButton(
+              tooltip: loc.t('admin.logout'),
+              onPressed: () {
+                auth.logout();
+                context.go('/');
+              },
+              icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
+            ),
         ]),
       ),
     );
@@ -367,10 +395,16 @@ Widget _panelCard({required String title, required Widget child, List<Widget>? a
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(children: [
-          Text(title,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-          const Spacer(),
-          ...?actions,
+          Expanded(
+            child: Text(title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+          ),
+          if (actions != null) ...[
+            const SizedBox(width: 8),
+            ...actions,
+          ],
         ]),
         const Divider(height: 24),
         child,
@@ -384,10 +418,11 @@ class _LeadStatusChip extends StatelessWidget {
   final LeadStatus status;
   @override
   Widget build(BuildContext context) {
+    final loc = context.locWatch;
     final map = {
-      LeadStatus.fresh: (const Color(0xFF2563EB), 'New'),
-      LeadStatus.contacted: (const Color(0xFFC9A227), 'Contacted'),
-      LeadStatus.member: (const Color(0xFF0D9488), 'Member'),
+      LeadStatus.fresh: (const Color(0xFF2563EB), loc.t('admin.lead.fresh')),
+      LeadStatus.contacted: (const Color(0xFFC9A227), loc.t('admin.lead.contacted')),
+      LeadStatus.member: (const Color(0xFF0D9488), loc.t('admin.lead.member')),
     };
     final (color, label) = map[status]!;
     return Pill(label, color: color);
@@ -433,7 +468,7 @@ class ManageNewsPanel extends StatelessWidget {
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 if (a.source == NewsSource.telegram)
                   const Padding(
-                    padding: EdgeInsets.only(right: 6),
+                    padding: EdgeInsetsDirectional.only(end: 6),
                     child: Icon(Icons.send, size: 16, color: Color(0xFF0EA5E9)),
                   ),
                 IconButton(
@@ -1157,11 +1192,20 @@ class CrmPanel extends StatelessWidget {
                 DataCell(
                   PopupMenuButton<LeadStatus>(
                     onSelected: (s) => repo.setLeadStatus(lead, s),
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: LeadStatus.fresh, child: Text('New')),
-                      PopupMenuItem(value: LeadStatus.contacted, child: Text('Contacted')),
-                      PopupMenuItem(value: LeadStatus.member, child: Text('Member')),
-                    ],
+                    itemBuilder: (context) {
+                      final loc = context.read<LocaleController>();
+                      return [
+                        PopupMenuItem(
+                            value: LeadStatus.fresh,
+                            child: Text(loc.t('admin.lead.fresh'))),
+                        PopupMenuItem(
+                            value: LeadStatus.contacted,
+                            child: Text(loc.t('admin.lead.contacted'))),
+                        PopupMenuItem(
+                            value: LeadStatus.member,
+                            child: Text(loc.t('admin.lead.member'))),
+                      ];
+                    },
                     child: _LeadStatusChip(status: lead.status),
                   ),
                 ),
@@ -1194,7 +1238,7 @@ class BotsPanel extends StatelessWidget {
           onRun: () {
             repo.runSocialPush();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Posted to FB · IG · X · VK')),
+              SnackBar(content: Text(loc.t('admin.bots.posted'))),
             );
           },
         ),

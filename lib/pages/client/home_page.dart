@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -142,7 +140,8 @@ class _Hero extends StatelessWidget {
                 fontSize: wide ? 52 : 40,
                 height: 1.08,
                 fontWeight: FontWeight.w900,
-                letterSpacing: -0.6),
+                letterSpacing: -0.6,
+                shadows: const [Shadow(color: Colors.black54, blurRadius: 14)]),
           ),
         ),
         const SizedBox(height: 16),
@@ -151,9 +150,10 @@ class _Hero extends StatelessWidget {
           child: Text(
             loc.t('site.tagline'),
             style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: Colors.white.withValues(alpha: 0.92),
                 fontSize: 19,
-                height: 1.55),
+                height: 1.55,
+                shadows: const [Shadow(color: Colors.black45, blurRadius: 10)]),
           ),
         ),
         const SizedBox(height: 28),
@@ -202,8 +202,8 @@ class _Hero extends StatelessWidget {
         children: [
           BannerFill(banner: banner),
           if (!banner.hasImage) ...[
-          Positioned(
-            right: -80,
+          PositionedDirectional(
+            end: -80,
             top: -70,
             child: Container(
               width: 280,
@@ -215,8 +215,8 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            left: 40,
+          PositionedDirectional(
+            start: 40,
             bottom: -90,
             child: Container(
               width: 220,
@@ -267,26 +267,22 @@ class _ShabbatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.32),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.55), width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.22),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xF20B1C3A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+            color: AppColors.accent.withValues(alpha: 0.7), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
-          child: Column(
+        ],
+      ),
+      child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
@@ -323,8 +319,6 @@ class _ShabbatCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 

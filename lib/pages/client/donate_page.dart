@@ -20,6 +20,12 @@ class _DonatePageState extends State<DonatePage> {
   final _presets = [54, 100, 180, 360, 1000];
 
   @override
+  void initState() {
+    super.initState();
+    _campaign = context.read<AppRepository>().campaigns.first;
+  }
+
+  @override
   void dispose() {
     _name.dispose();
     _amount.dispose();
@@ -30,7 +36,6 @@ class _DonatePageState extends State<DonatePage> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    _campaign ??= repo.campaigns.first;
     return SiteScaffold(
       currentRoute: '/donate',
       children: [

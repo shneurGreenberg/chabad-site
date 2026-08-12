@@ -67,17 +67,30 @@ class _ShiurCard extends StatelessWidget {
                         style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 16)),
                     const SizedBox(height: 6),
-                    Row(children: [
-                      const Icon(Icons.person_outline, size: 14, color: Colors.black45),
-                      const SizedBox(width: 4),
-                      Text(trLoc(shiur.rabbi, loc.lang),
-                          style: const TextStyle(color: Colors.black54, fontSize: 13)),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.timer_outlined, size: 14, color: Colors.black45),
-                      const SizedBox(width: 4),
-                      Text('${shiur.durationMinutes} ${loc.t('library.minutes')}',
-                          style: const TextStyle(color: Colors.black54, fontSize: 13)),
-                    ]),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 6,
+                      children: [
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.person_outline, size: 14, color: Colors.black45),
+                          const SizedBox(width: 4),
+                          Text(trLoc(shiur.rabbi, loc.lang),
+                              style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                        ]),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.timer_outlined, size: 14, color: Colors.black45),
+                          const SizedBox(width: 4),
+                          Text('${shiur.durationMinutes} ${loc.t('library.minutes')}',
+                              style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                        ]),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton.icon(
+                      onPressed: () => _play(context),
+                      icon: const Icon(Icons.play_circle_outline, size: 18),
+                      label: Text(loc.t('library.watch')),
+                    ),
                   ],
                 ),
               ),

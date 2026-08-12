@@ -105,15 +105,12 @@ class _SiteShellState extends State<SiteShell> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 180),
                 switchInCurve: Curves.easeOut,
                 layoutBuilder: (currentChild, _) =>
                     currentChild ?? const SizedBox.shrink(),
                 transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
+                  return FadeTransition(opacity: animation, child: child);
                 },
                 child: KeyedSubtree(
                   key: ValueKey(widget.currentRoute),
@@ -155,6 +152,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
           child: MaxWidthBox(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const _Logo(),
                 if (!mobile) ...[
@@ -164,6 +162,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           for (final item in primaryNav)
                             if (!(compact &&
@@ -186,7 +185,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   if (!compact) ...[
                     OutlinedButton.icon(
                       onPressed: () => context.go('/contact'),
-                      icon: const Icon(Icons.mail_outline, size: 18),
+                      icon: const Icon(Icons.app_registration, size: 18),
                       label: Text(loc.t('nav.contact')),
                     ),
                     const SizedBox(width: 8),
@@ -203,7 +202,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                     IconButton(
                       tooltip: loc.t('nav.contact'),
                       onPressed: () => context.go('/contact'),
-                      icon: const Icon(Icons.mail_outline),
+                      icon: const Icon(Icons.app_registration),
                     ),
                     IconButton(
                       tooltip: loc.t('nav.donate'),
@@ -222,7 +221,9 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   const LanguageSwitcher(),
                   Builder(
                     builder: (context) => IconButton(
+                      tooltip: loc.t('nav.menu'),
                       icon: const Icon(Icons.menu),
+                      visualDensity: VisualDensity.compact,
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
                   ),
@@ -252,7 +253,10 @@ class _Logo extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
+            Semantics(
+              label: loc.t('site.name'),
+              image: true,
+              child: Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
@@ -262,6 +266,7 @@ class _Logo extends StatelessWidget {
               ),
               child: const Icon(Icons.synagogue, color: AppColors.accentSoft, size: 24),
             ),
+            ),
             const SizedBox(width: 10),
             if (!isTablet(context))
               Column(
@@ -269,6 +274,7 @@ class _Logo extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(loc.t('site.name'),
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -295,33 +301,58 @@ class _NavLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: TextButton(
-        onPressed: () => context.go(item.route),
-        style: TextButton.styleFrom(
-          foregroundColor: active ? AppColors.primary : AppColors.ink,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+    return _NavChrome(
+      icon: item.icon,
+      label: loc.t(item.labelKey),
+      active: active,
+      onTap: () => context.go(item.route),
+    );
+  }
+}
+
+/// Shared nav-item chrome so "Menu" sits on the same baseline as the links.
+class _NavChrome extends StatelessWidget {
+  const _NavChrome({
+    required this.icon,
+    required this.label,
+    required this.active,
+    this.onTap,
+    this.trailing,
+  });
+  final IconData icon;
+  final String label;
+  final bool active;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? AppColors.primary : AppColors.ink;
+    final body = SizedBox(
+      height: 52,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(item.icon,
-                    size: 16,
-                    color: active ? AppColors.primary : AppColors.ink),
+                Icon(icon, size: 16, color: color),
                 const SizedBox(width: 5),
                 Text(
-                  loc.t(item.labelKey),
+                  label,
                   style: TextStyle(
                     fontWeight: active ? FontWeight.w800 : FontWeight.w600,
                     fontSize: 14.5,
+                    color: color,
+                    height: 1.1,
                   ),
                 ),
+                if (trailing != null) ...[
+                  const SizedBox(width: 2),
+                  trailing!,
+                ],
               ],
             ),
             const SizedBox(height: 4),
@@ -336,6 +367,15 @@ class _NavLink extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+    if (onTap == null) return body;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: body,
       ),
     );
   }
@@ -354,58 +394,31 @@ class _MoreMenu extends StatelessWidget {
         : const <NavItem>[];
     final moreItems = [...extras, ...moreNav];
     final moreActive = moreItems.any((i) => i.route == currentRoute);
-    return PopupMenuButton<String>(
-      tooltip: '',
-      padding: EdgeInsets.zero,
-      onSelected: (route) => context.go(route),
-      position: PopupMenuPosition.under,
-      itemBuilder: (context) => [
-        for (final item in moreItems)
-          PopupMenuItem(
-            value: item.route,
-            child: Row(children: [
-              Icon(item.icon, size: 18, color: AppColors.primary),
-              const SizedBox(width: 10),
-              Text(loc.t(item.labelKey)),
-            ]),
-          ),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.menu,
-                    size: 16,
-                    color: moreActive ? AppColors.primary : AppColors.ink),
-                const SizedBox(width: 5),
-                Text(
-                  loc.t('nav.menu'),
-                  style: TextStyle(
-                    fontWeight: moreActive ? FontWeight.w800 : FontWeight.w600,
-                    fontSize: 14.5,
-                    color: moreActive ? AppColors.primary : AppColors.ink,
-                  ),
-                ),
-                Icon(Icons.expand_more,
-                    size: 18,
-                    color: moreActive ? AppColors.primary : AppColors.ink),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: PopupMenuButton<String>(
+        tooltip: loc.t('nav.menu'),
+        padding: EdgeInsets.zero,
+        onSelected: (route) => context.go(route),
+        position: PopupMenuPosition.under,
+        itemBuilder: (context) => [
+          for (final item in moreItems)
+            PopupMenuItem(
+              value: item.route,
+              child: Row(children: [
+                Icon(item.icon, size: 18, color: AppColors.primary),
+                const SizedBox(width: 10),
+                Text(loc.t(item.labelKey)),
               ]),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                height: 3,
-                width: moreActive ? 22 : 0,
-                decoration: BoxDecoration(
-                  gradient: AppColors.goldGradient,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ],
-          ),
+            ),
+        ],
+        child: _NavChrome(
+          icon: Icons.menu,
+          label: loc.t('nav.menu'),
+          active: moreActive,
+          trailing: Icon(Icons.expand_more,
+              size: 16,
+              color: moreActive ? AppColors.primary : AppColors.ink),
         ),
       ),
     );
@@ -418,7 +431,7 @@ class LanguageSwitcher extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     return PopupMenuButton<String>(
-      tooltip: 'Language',
+      tooltip: loc.t('common.language'),
       onSelected: loc.setLang,
       position: PopupMenuPosition.under,
       itemBuilder: (context) => [
@@ -436,7 +449,7 @@ class LanguageSwitcher extends StatelessWidget {
           ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black.withValues(alpha: 0.12)),
           borderRadius: BorderRadius.circular(10),
@@ -445,7 +458,8 @@ class LanguageSwitcher extends StatelessWidget {
           const Icon(Icons.language, size: 18),
           const SizedBox(width: 6),
           Text(loc.lang.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              style: const TextStyle(
+                  fontWeight: FontWeight.w700, fontSize: 13, height: 1)),
         ]),
       ),
     );
@@ -457,16 +471,18 @@ class _CartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = context.watch<AppRepository>().cartCount;
+    final loc = context.locWatch;
     return Stack(
       clipBehavior: Clip.none,
       children: [
         IconButton(
+          tooltip: loc.t('store.cart'),
           onPressed: () => context.go('/store'),
           icon: const Icon(Icons.shopping_cart_outlined),
         ),
         if (count > 0)
-          Positioned(
-            right: 4,
+          PositionedDirectional(
+            end: 4,
             top: 4,
             child: Container(
               padding: const EdgeInsets.all(4),
@@ -608,6 +624,12 @@ class _SiteFooter extends StatelessWidget {
                               color: Colors.white.withValues(alpha: 0.8),
                               height: 1.5)),
                       const SizedBox(height: 14),
+                      Text(loc.t('footer.follow'),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13)),
+                      const SizedBox(height: 10),
                       Row(children: [
                         _social(Icons.facebook),
                         _social(Icons.telegram),
@@ -656,7 +678,7 @@ class _SiteFooter extends StatelessWidget {
   }
 
   Widget _social(IconData icon) => Padding(
-        padding: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsetsDirectional.only(end: 8),
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(

@@ -39,21 +39,28 @@ class _GalleryPageState extends State<GalleryPage> {
         Section(child: _faceSearch(context, repo, loc)),
         Section(
           padTop: 20,
-          child: Row(children: [
-            Text('${photos.length} ${loc.t('gallery.results')}',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            const Spacer(),
-            _yearFilter(loc, years),
-          ]),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            alignment: WrapAlignment.spaceBetween,
+            children: [
+              Text('${photos.length} ${loc.t('gallery.results')}',
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+              _yearFilter(loc, years),
+            ],
+          ),
         ),
         Section(
           padTop: 12,
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 3),
-            children: [
-              for (final p in photos) PhotoCard(p, highlightFace: _face),
-            ],
-          ),
+          child: photos.isEmpty
+              ? const EmptyHint(icon: Icons.photo_library_outlined)
+              : ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [
+                    for (final p in photos) PhotoCard(p, highlightFace: _face),
+                  ],
+                ),
         ),
       ],
     );

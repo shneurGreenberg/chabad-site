@@ -53,10 +53,12 @@ class _FamousPageState extends State<FamousPage> {
         ),
         Section(
           padTop: 16,
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 3),
-            children: [for (final p in people) PersonCard(p)],
-          ),
+          child: people.isEmpty
+              ? const EmptyHint(icon: Icons.star_outline)
+              : ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [for (final p in people) PersonCard(p)],
+                ),
         ),
       ],
     );

@@ -18,8 +18,8 @@ class AppColors {
   );
 
   static const LinearGradient goldGradient = LinearGradient(
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
+    begin: AlignmentDirectional.centerStart,
+    end: AlignmentDirectional.centerEnd,
     colors: [Color(0xFFB8891A), Color(0xFFE8D48A), Color(0xFFC9A227)],
   );
 

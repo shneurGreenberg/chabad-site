@@ -206,16 +206,16 @@ class _TourDialogState extends State<_TourDialog> {
                       color: Colors.white.withValues(alpha: 0.85), size: 54),
                 ),
               ),
-              Positioned(
+              PositionedDirectional(
                 top: 8,
-                right: 8,
+                end: 8,
                 child: IconButton(
                   icon: const Icon(Icons.close, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
-              Positioned(
-                left: 12,
+              PositionedDirectional(
+                start: 12,
                 bottom: 12,
                 child: Pill('${_i + 1} / ${widget.stops.length}',
                     color: Colors.black.withValues(alpha: 0.5)),
@@ -237,18 +237,20 @@ class _TourDialogState extends State<_TourDialog> {
                     OutlinedButton.icon(
                       onPressed: _i > 0 ? () => setState(() => _i--) : null,
                       icon: const Icon(Icons.chevron_left),
-                      label: const Text('◀'),
+                      label: Text(loc.t('common.previous')),
                     ),
                     const Spacer(),
                     FilledButton.icon(
                       onPressed: _i < widget.stops.length - 1
                           ? () => setState(() => _i++)
                           : () => Navigator.pop(context),
-                      icon: Icon(_i < widget.stops.length - 1
-                          ? Icons.chevron_right
-                          : Icons.check),
+                      icon: Icon(
+                        _i < widget.stops.length - 1
+                            ? Icons.chevron_right
+                            : Icons.check,
+                      ),
                       label: Text(_i < widget.stops.length - 1
-                          ? '▶'
+                          ? loc.t('common.next')
                           : loc.t('common.close')),
                     ),
                   ]),

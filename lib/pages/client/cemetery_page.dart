@@ -46,10 +46,12 @@ class _CemeteryPageState extends State<CemeteryPage> {
         ),
         Section(
           padTop: 16,
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 2),
-            children: [for (final g in graves) _GraveCard(g)],
-          ),
+          child: graves.isEmpty
+              ? const EmptyHint(icon: Icons.search_off)
+              : ResponsiveGrid(
+                  columns: gridColumns(context, max: 2),
+                  children: [for (final g in graves) _GraveCard(g)],
+                ),
         ),
       ],
     );

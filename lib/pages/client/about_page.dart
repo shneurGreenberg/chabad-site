@@ -138,8 +138,8 @@ class AboutPage extends StatelessWidget {
           const Center(
             child: Icon(Icons.location_on, color: AppColors.primary, size: 54),
           ),
-          Positioned(
-            left: 16,
+          PositionedDirectional(
+            start: 16,
             bottom: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

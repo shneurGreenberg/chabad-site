@@ -40,17 +40,23 @@ class ZmanimPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  const Icon(Icons.local_fire_department, color: AppColors.accent),
-                  const SizedBox(width: 8),
-                  Text(loc.t('zmanim.shabbat'),
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 20)),
-                  const Spacer(),
-                  Pill(parasha, color: AppColors.accent),
-                ]),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.local_fire_department, color: AppColors.accent),
+                      const SizedBox(width: 8),
+                      Text(loc.t('zmanim.shabbat'),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 20)),
+                    ]),
+                    Pill(parasha, color: AppColors.accent),
+                  ],
+                ),
                 const SizedBox(height: 18),
                 Wrap(
                   spacing: 30,

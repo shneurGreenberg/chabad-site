@@ -180,9 +180,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
               style: const TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
           _kv(loc.t('admin.settings.city'), site.cityName),
-          _kv('Latitude', site.latitude.toStringAsFixed(4)),
-          _kv('Longitude', site.longitude.toStringAsFixed(4)),
-          _kv('Timezone', site.timezone),
+          _kv(loc.t('admin.settings.lat'), site.latitude.toStringAsFixed(4)),
+          _kv(loc.t('admin.settings.lon'), site.longitude.toStringAsFixed(4)),
+          _kv(loc.t('admin.settings.tz'), site.timezone),
           if (_saving)
             const Padding(
               padding: EdgeInsets.only(top: 12),
