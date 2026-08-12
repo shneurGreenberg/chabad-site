@@ -20,12 +20,10 @@ class HomePage extends StatelessWidget {
       currentRoute: '/',
       children: [
         const _Hero(),
-        Transform.translate(
-          offset: const Offset(0, -36),
-          child: Section(
-            padTop: 0,
-            padBottom: 0,
-            child: ResponsiveGrid(
+        Section(
+          padTop: 24,
+          padBottom: 0,
+          child: ResponsiveGrid(
               columns: gridColumns(context, max: 4) < 2
                   ? 2
                   : gridColumns(context, max: 4),
@@ -52,7 +50,6 @@ class HomePage extends StatelessWidget {
                     color: AppColors.accent),
               ],
             ),
-          ),
         ),
         Section(
           padTop: 8,

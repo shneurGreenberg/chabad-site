@@ -31,8 +31,9 @@ const moreNav = [
   NavItem('/about', 'nav.about', Icons.info_outline),
 ];
 
-/// The shared client-facing page wrapper: sticky header, scrolling body and
-/// footer. Pages pass their content sections via [children].
+/// Shared client chrome: sticky header, scrolling body, footer.
+/// Pages pass their sections via [children]; the shell in [appRouter]
+/// keeps this chrome mounted so navigation does not rebuild the header.
 class SiteScaffold extends StatelessWidget {
   const SiteScaffold({
     super.key,
@@ -44,15 +45,38 @@ class SiteScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
+    );
+  }
+}
+
+/// Persistent site frame used by [ShellRoute]. Scroll position resets
+/// whenever the route changes, so pages always open from the top.
+class SiteShell extends StatelessWidget {
+  const SiteShell({
+    super.key,
+    required this.currentRoute,
+    required this.child,
+  });
+  final String currentRoute;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     final mobile = isMobile(context);
     return Scaffold(
       appBar: _SiteHeader(currentRoute: currentRoute),
       drawer: mobile ? _SiteDrawer(currentRoute: currentRoute) : null,
       body: SingleChildScrollView(
+        key: ValueKey(currentRoute),
+        primary: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ...children,
+            child,
             const SizedBox(height: 40),
             const _SiteFooter(),
           ],
@@ -93,8 +117,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      reverse: true,
-                      padding: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -232,7 +255,9 @@ class _NavLink extends StatelessWidget {
         onPressed: () => context.go(item.route),
         style: TextButton.styleFrom(
           foregroundColor: active ? AppColors.primary : AppColors.ink,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

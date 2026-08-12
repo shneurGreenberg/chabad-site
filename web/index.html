@@ -22,9 +22,17 @@
   <style>
     html, body {
       height: 100%;
+      width: 100%;
       margin: 0;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
       background: #0B1C3A;
       font-family: Heebo, sans-serif;
+    }
+    flutter-view, flt-glass-pane {
+      height: 100%;
+      width: 100%;
     }
     .splash {
       position: fixed;
@@ -58,6 +66,21 @@
     <p>בית חב״ד ליובאוויטש</p>
     <span>טוען…</span>
   </div>
+  <script>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    function resetWindowScroll() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+    window.addEventListener('hashchange', resetWindowScroll);
+    window.addEventListener('popstate', resetWindowScroll);
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (splash) splash.remove();
+      resetWindowScroll();
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
