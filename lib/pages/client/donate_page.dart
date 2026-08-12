@@ -187,9 +187,10 @@ class _DonatePageState extends State<DonatePage> {
         content: Text('\$${amount.toStringAsFixed(0)} · ${trLoc(_campaign!, loc.lang)}',
             textAlign: TextAlign.center),
         actions: [
-          FilledButton(
+          FilledButton.icon(
             onPressed: () => Navigator.pop(context),
-            child: Text(loc.t('common.close')),
+            icon: const Icon(Icons.check, size: 18),
+            label: Text(loc.t('common.close')),
           ),
         ],
       ),

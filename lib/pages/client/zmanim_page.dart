@@ -16,10 +16,19 @@ class ZmanimPage extends StatelessWidget {
     return SiteScaffold(
       currentRoute: '/zmanim',
       children: [
-        PageHero(
+          PageHero(
           title: loc.t('nav.zmanim'),
           subtitle: loc.t('zmanim.subtitle'),
           icon: Icons.schedule,
+        ),
+        Section(
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Pill(
+              '${loc.t('zmanim.forCity')} ${repo.location.cityName}',
+              icon: Icons.place_outlined,
+            ),
+          ),
         ),
         Section(
           child: Container(

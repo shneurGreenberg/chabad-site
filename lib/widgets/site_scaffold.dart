@@ -184,17 +184,19 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   const _CartButton(),
                   const SizedBox(width: 4),
                   if (!compact) ...[
-                    OutlinedButton(
+                    OutlinedButton.icon(
                       onPressed: () => context.go('/contact'),
-                      child: Text(loc.t('nav.contact')),
+                      icon: const Icon(Icons.mail_outline, size: 18),
+                      label: Text(loc.t('nav.contact')),
                     ),
                     const SizedBox(width: 8),
-                    FilledButton(
+                    FilledButton.icon(
                       onPressed: () => context.go('/donate'),
                       style: FilledButton.styleFrom(
                           backgroundColor: AppColors.accent,
                           foregroundColor: AppColors.primaryDark),
-                      child: Text(loc.t('nav.donate')),
+                      icon: const Icon(Icons.favorite_outline, size: 18),
+                      label: Text(loc.t('nav.donate')),
                     ),
                     const SizedBox(width: 4),
                   ] else ...[
@@ -306,12 +308,21 @@ class _NavLink extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              loc.t(item.labelKey),
-              style: TextStyle(
-                fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                fontSize: 14.5,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(item.icon,
+                    size: 16,
+                    color: active ? AppColors.primary : AppColors.ink),
+                const SizedBox(width: 5),
+                Text(
+                  loc.t(item.labelKey),
+                  style: TextStyle(
+                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 14.5,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 4),
             AnimatedContainer(
@@ -367,6 +378,10 @@ class _MoreMenu extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.menu,
+                    size: 16,
+                    color: moreActive ? AppColors.primary : AppColors.ink),
+                const SizedBox(width: 5),
                 Text(
                   loc.t('nav.menu'),
                   style: TextStyle(
@@ -655,7 +670,7 @@ class _SiteFooter extends StatelessWidget {
   Widget _footerLinks(BuildContext context, String title, List<NavItem> items) {
     final loc = context.read<LocaleController>();
     return SizedBox(
-      width: 160,
+      width: 190,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -670,10 +685,20 @@ class _SiteFooter extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
                 onTap: () => context.go(item.route),
-                child: Text(loc.t(item.labelKey),
-                    style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 13.5)),
+                child: Row(
+                  children: [
+                    Icon(item.icon,
+                        size: 14,
+                        color: Colors.white.withValues(alpha: 0.75)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(loc.t(item.labelKey),
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 13.5)),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],

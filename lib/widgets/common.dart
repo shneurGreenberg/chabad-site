@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -100,6 +103,7 @@ class GradientImage extends StatelessWidget {
     this.height,
     this.borderRadius = 0,
     this.badge,
+    this.bytes,
   });
   final int color;
   final IconData? icon;
@@ -107,9 +111,27 @@ class GradientImage extends StatelessWidget {
   final double? height;
   final double borderRadius;
   final Widget? badge;
+  final Uint8List? bytes;
 
   @override
   Widget build(BuildContext context) {
+    if (bytes != null && bytes!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.memory(bytes!, fit: BoxFit.cover, gaplessPlayback: true),
+              if (badge != null)
+                PositionedDirectional(top: 10, start: 10, child: badge!),
+            ],
+          ),
+        ),
+      );
+    }
     final base = Color(color);
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
@@ -366,15 +388,21 @@ class PageHero extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                          color: AppColors.accent.withValues(alpha: 0.35)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.28),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                              color: AppColors.accent.withValues(alpha: 0.5)),
+                        ),
+                        child: Icon(icon, color: AppColors.accentSoft, size: 28),
+                      ),
                     ),
-                    child: Icon(icon, color: AppColors.accentSoft, size: 28),
                   ),
                   const SizedBox(height: 18),
                   Text(title,

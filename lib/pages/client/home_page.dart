@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -103,13 +105,10 @@ class HomePage extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: SectionHeader(title: title)),
-        TextButton(
+        TextButton.icon(
           onPressed: () => context.go(route),
-          child: Row(children: [
-            Text(loc.t('common.viewAll')),
-            const SizedBox(width: 4),
-            const Icon(Icons.arrow_forward, size: 18),
-          ]),
+          icon: const Icon(Icons.arrow_forward, size: 18),
+          label: Text(loc.t('common.viewAll')),
         ),
       ],
     );
@@ -268,55 +267,63 @@ class _ShabbatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.45)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            const Icon(Icons.local_fire_department, color: AppColors.accentSoft),
-            const SizedBox(width: 8),
-            Text(loc.t('zmanim.shabbat'),
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 18)),
-          ]),
-          const SizedBox(height: 8),
-          Text(parasha,
-              style: TextStyle(
-                  color: AppColors.accentSoft.withValues(alpha: 0.95),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14.5)),
-          const SizedBox(height: 18),
-          _row(loc.t('zmanim.candle'), candle),
-          const SizedBox(height: 10),
-          _row(loc.t('zmanim.havdala'), havdala),
-          const SizedBox(height: 18),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => context.go('/zmanim'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.32),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+                color: AppColors.accent.withValues(alpha: 0.55), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
               ),
-              child: Text(loc.t('home.zmanim.title')),
-            ),
+            ],
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                const Icon(Icons.local_fire_department, color: AppColors.accentSoft),
+                const SizedBox(width: 8),
+                Text(loc.t('zmanim.shabbat'),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18)),
+              ]),
+              const SizedBox(height: 8),
+              Text(parasha,
+                  style: TextStyle(
+                      color: AppColors.accentSoft.withValues(alpha: 0.95),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14.5)),
+              const SizedBox(height: 18),
+              _row(loc.t('zmanim.candle'), candle),
+              const SizedBox(height: 10),
+              _row(loc.t('zmanim.havdala'), havdala),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/zmanim'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.45)),
+                  ),
+                  icon: const Icon(Icons.schedule, size: 18),
+                  label: Text(loc.t('home.zmanim.title')),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -325,7 +332,7 @@ class _ShabbatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(children: [
@@ -414,30 +421,35 @@ class _ZmanimStrip extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.schedule, color: AppColors.primary),
               ),
-              child: const Icon(Icons.schedule, color: AppColors.primary),
-            ),
-            const SizedBox(width: 10),
-            Text(loc.t('home.zmanim.title'),
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontSize: 20)),
-            const Spacer(),
-            TextButton(
-              onPressed: () => context.go('/zmanim'),
-              child: Row(children: [
-                Text(loc.t('common.viewAll')),
-                const Icon(Icons.arrow_forward, size: 16),
-              ]),
-            ),
-          ]),
+              Text(loc.t('home.zmanim.title'),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontSize: 20)),
+              Pill(
+                '${loc.t('zmanim.forCity')} ${repo.location.cityName}',
+                icon: Icons.place_outlined,
+              ),
+              TextButton.icon(
+                onPressed: () => context.go('/zmanim'),
+                icon: const Icon(Icons.arrow_forward, size: 16),
+                label: Text(loc.t('common.viewAll')),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12,

@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../models.dart';
+import '../services/location_zmanim.dart';
+import '../services/telegram.dart';
+import '../services/web_prefs.dart';
 
 /// In-memory data store with mock content for the whole site.
 ///
@@ -10,6 +14,16 @@ import '../models.dart';
 /// client sides can be demonstrated end-to-end. Admin edits update the same
 /// store the client reads, so changes appear live.
 class AppRepository extends ChangeNotifier {
+  AppRepository() {
+    TelegramService.instance.loadSaved();
+    _restoreLocation();
+    Future<void>.microtask(() async {
+      try {
+        await refreshTimes();
+      } catch (_) {}
+    });
+  }
+
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
 
@@ -128,6 +142,89 @@ class AppRepository extends ChangeNotifier {
       source: NewsSource.telegram,
     ),
   ];
+
+  // ---------------------------------------------------------------------------
+  // Location + live zmanim / parasha
+  // ---------------------------------------------------------------------------
+  SiteLocation location = SiteLocation.jerusalem();
+
+  void _restoreLocation() {
+    final raw = readPref('chabad_site_location');
+    if (raw == null || raw.isEmpty) return;
+    try {
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      location = SiteLocation(
+        cityName: m['city'] as String? ?? location.cityName,
+        query: m['query'] as String? ?? location.query,
+        latitude: (m['lat'] as num?)?.toDouble() ?? location.latitude,
+        longitude: (m['lon'] as num?)?.toDouble() ?? location.longitude,
+        timezone: m['tz'] as String? ?? location.timezone,
+      );
+    } catch (_) {}
+  }
+
+  void _persistLocation() {
+    writePref(
+      'chabad_site_location',
+      jsonEncode({
+        'city': location.cityName,
+        'query': location.query,
+        'lat': location.latitude,
+        'lon': location.longitude,
+        'tz': location.timezone,
+      }),
+    );
+  }
+
+  Future<void> setLocation(SiteLocation next) async {
+    location = next;
+    _persistLocation();
+    await refreshTimes();
+  }
+
+  Future<void> refreshTimes() async {
+    final data = await LocationZmanimApi.fetchTimes(location);
+    zmanim
+      ..clear()
+      ..addAll(data.zmanim);
+    shabbat
+      ..clear()
+      ..addAll(data.shabbat);
+    notifyListeners();
+  }
+
+  int importTelegramPosts(List<TelegramPost> posts) {
+    var added = 0;
+    for (final p in posts) {
+      if (news.any((n) => n.telegramMessageId == p.messageId)) continue;
+      final text = p.text.trim();
+      final first = text.isEmpty
+          ? 'פוסט מהטלגרם'
+          : text.split('\n').first.trim();
+      news.insert(
+        0,
+        NewsArticle(
+          id: _newId(),
+          title: {'he': first, 'en': first, 'ru': first},
+          body: {'he': text, 'en': text, 'ru': text},
+          date: p.date,
+          category: {'he': 'טלגרם', 'en': 'Telegram', 'ru': 'Telegram'},
+          imageColor: 0xFF0EA5E9,
+          icon: Icons.send,
+          source: NewsSource.telegram,
+          imageBytes: p.imageBytes,
+          telegramMessageId: p.messageId,
+        ),
+      );
+      added++;
+    }
+    if (added > 0) {
+      telegramBot.lastSync = DateTime.now();
+      telegramBot.itemsSynced += added;
+      notifyListeners();
+    }
+    return added;
+  }
 
   // ---------------------------------------------------------------------------
   // Zmanim
@@ -498,32 +595,22 @@ class AppRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Simulates the Telegram bot importing a fresh news item.
-  NewsArticle runTelegramImport() {
-    final n = news.length + 1;
-    final a = NewsArticle(
-      id: _newId(),
-      title: {
-        'he': 'עדכון מהטלגרם #$n',
-        'en': 'Telegram update #$n',
-        'ru': 'Обновление из Telegram #$n',
-      },
-      body: {
-        'he': 'פריט חדשות זה נמשך אוטומטית מערוץ הטלגרם של הקהילה.',
-        'en': 'This news item was imported automatically from the community Telegram channel.',
-        'ru': 'Эта новость импортирована автоматически из Telegram-канала общины.',
-      },
-      date: DateTime.now(),
-      category: {'he': 'טלגרם', 'en': 'Telegram', 'ru': 'Telegram'},
-      imageColor: 0xFF0EA5E9,
-      icon: Icons.send,
-      source: NewsSource.telegram,
-    );
-    news.insert(0, a);
-    telegramBot.lastSync = DateTime.now();
-    telegramBot.itemsSynced += 1;
+  GalleryPhoto newBlankGallery() => GalleryPhoto(
+        id: _newId(),
+        event: {'he': '', 'en': '', 'ru': ''},
+        year: DateTime.now().year,
+        tags: const [],
+        color: 0xFF1D4ED8,
+      );
+
+  void addGalleryPhoto(GalleryPhoto p) {
+    gallery.insert(0, p);
     notifyListeners();
-    return a;
+  }
+
+  void deleteGalleryPhoto(String id) {
+    gallery.removeWhere((e) => e.id == id);
+    notifyListeners();
   }
 
   /// Simulates the social bot pushing the latest news to social networks.

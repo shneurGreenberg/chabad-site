@@ -178,9 +178,10 @@ class _ContactPageState extends State<ContactPage> {
         icon: const Icon(Icons.check_circle, color: Color(0xFF0D9488), size: 46),
         title: Text(loc.t('contact.thanks')),
         actions: [
-          FilledButton(
+          FilledButton.icon(
             onPressed: () => Navigator.pop(context),
-            child: Text(loc.t('common.close')),
+            icon: const Icon(Icons.check, size: 18),
+            label: Text(loc.t('common.close')),
           ),
         ],
       ),

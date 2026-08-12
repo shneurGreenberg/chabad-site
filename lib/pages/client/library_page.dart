@@ -124,9 +124,10 @@ class _ShiurCard extends StatelessWidget {
                     const SizedBox(height: 14),
                     Align(
                       alignment: AlignmentDirectional.centerEnd,
-                      child: FilledButton(
+                      child: FilledButton.icon(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(loc.t('common.close')),
+                        icon: const Icon(Icons.check, size: 18),
+                        label: Text(loc.t('common.close')),
                       ),
                     ),
                   ],

@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 /// A piece of text available in the three supported languages.
-
-/// A piece of text available in the three supported languages.
 ///
 /// Keys are locale codes: `he`, `en`, `ru`.
 typedef Loc = Map<String, String>;
@@ -30,6 +28,8 @@ class NewsArticle {
     this.icon = Icons.article_outlined,
     this.source = NewsSource.manual,
     this.published = true,
+    this.imageBytes,
+    this.telegramMessageId,
   });
 
   final String id;
@@ -41,6 +41,32 @@ class NewsArticle {
   IconData icon;
   NewsSource source;
   bool published;
+  Uint8List? imageBytes;
+  int? telegramMessageId;
+}
+
+class SiteLocation {
+  SiteLocation({
+    required this.cityName,
+    required this.latitude,
+    required this.longitude,
+    required this.timezone,
+    this.query = '',
+  });
+
+  String cityName;
+  String query;
+  double latitude;
+  double longitude;
+  String timezone;
+
+  static SiteLocation jerusalem() => SiteLocation(
+        cityName: 'ירושלים',
+        query: 'ירושלים',
+        latitude: 31.7683,
+        longitude: 35.2137,
+        timezone: 'Asia/Jerusalem',
+      );
 }
 
 class Zman {
@@ -59,6 +85,7 @@ class Program {
     required this.audience,
     this.icon = Icons.groups_outlined,
     this.color = 0xFF0EA5E9,
+    this.imageBytes,
   });
   final String id;
   Loc title;
@@ -67,6 +94,7 @@ class Program {
   Loc audience;
   IconData icon;
   int color;
+  Uint8List? imageBytes;
 }
 
 class GalleryPhoto {
@@ -77,6 +105,7 @@ class GalleryPhoto {
     required this.tags,
     required this.color,
     this.icon = Icons.photo_camera_back_outlined,
+    this.imageBytes,
   });
   final String id;
   Loc event;
@@ -84,6 +113,7 @@ class GalleryPhoto {
   List<String> tags; // tagged person names (used by "AI face search")
   int color;
   IconData icon;
+  Uint8List? imageBytes;
 }
 
 enum Era { present, past }
@@ -165,6 +195,7 @@ class Product {
     required this.category,
     this.color = 0xFF059669,
     this.icon = Icons.shopping_bag_outlined,
+    this.imageBytes,
   });
   final String id;
   Loc name;
@@ -173,6 +204,7 @@ class Product {
   ProductCategory category;
   int color;
   IconData icon;
+  Uint8List? imageBytes;
 }
 
 class Shiur {

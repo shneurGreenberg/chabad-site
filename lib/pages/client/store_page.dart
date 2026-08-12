@@ -174,12 +174,13 @@ class _CartPanel extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         actions: [
-          FilledButton(
+          FilledButton.icon(
             onPressed: () {
               repo.clearCart();
               Navigator.pop(context);
             },
-            child: Text(loc.t('common.close')),
+            icon: const Icon(Icons.check, size: 18),
+            label: Text(loc.t('common.close')),
           ),
         ],
       ),

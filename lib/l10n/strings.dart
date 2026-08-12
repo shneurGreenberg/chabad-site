@@ -195,6 +195,11 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Audience',
     'ru': 'Аудитория'
   },
+  'programs.schedule': {
+    'he': 'לוח זמנים',
+    'en': 'Schedule',
+    'ru': 'Расписание'
+  },
   'programs.register': {
     'he': 'הרשמה לתוכנית',
     'en': 'Register for program',
@@ -504,4 +509,202 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Последняя активность'
   },
   'admin.newItem': {'he': 'פריט חדש', 'en': 'New item', 'ru': 'Новый элемент'},
+  'admin.translate': {
+    'he': 'תרגום אוטומטי',
+    'en': 'Auto-translate',
+    'ru': 'Автоперевод'
+  },
+  'admin.translate.ok': {
+    'he': 'התרגום מולא בשדות הריקים',
+    'en': 'Empty fields were filled from Hebrew',
+    'ru': 'Пустые поля заполнены с иврита'
+  },
+  'admin.translate.skip': {
+    'he': 'אין שדות ריקים למילוי',
+    'en': 'Nothing empty to fill',
+    'ru': 'Нет пустых полей'
+  },
+  'admin.translate.error': {
+    'he': 'התרגום נכשל. נסו שוב בעוד רגע.',
+    'en': 'Translation failed. Try again in a moment.',
+    'ru': 'Перевод не удался. Попробуйте позже.'
+  },
+  'admin.image': {'he': 'תמונה', 'en': 'Photo', 'ru': 'Фото'},
+  'admin.image.choose': {
+    'he': 'בחירת תמונה',
+    'en': 'Choose photo',
+    'ru': 'Выбрать фото'
+  },
+  'admin.image.remove': {
+    'he': 'הסרת תמונה',
+    'en': 'Remove photo',
+    'ru': 'Удалить фото'
+  },
+  'admin.image.preview': {
+    'he': 'תצוגה מקדימה (חיתוך כמו בכרטיס)',
+    'en': 'Preview (cropped as on the card)',
+    'ru': 'Превью (обрезка как на карточке)'
+  },
+  'admin.settings': {'he': 'הגדרות', 'en': 'Settings', 'ru': 'Настройки'},
+  'admin.settings.subtitle': {
+    'he': 'כתבו את שם העיר של בית חב"ד. הזמנים והפרשה באתר יתעדכנו לפי המקום הזה.',
+    'en': 'Enter the city of this Chabad house. Times and the weekly Torah portion will update for that place.',
+    'ru': 'Введите город дома Хабада. Времена и недельная глава обновятся по этому месту.'
+  },
+  'admin.settings.city': {
+    'he': 'עיר או כתובת',
+    'en': 'City or address',
+    'ru': 'Город или адрес'
+  },
+  'admin.settings.search': {'he': 'חפש', 'en': 'Search', 'ru': 'Найти'},
+  'admin.settings.useGps': {
+    'he': 'שימוש במיקום הנוכחי',
+    'en': 'Use current location',
+    'ru': 'Использовать моё место'
+  },
+  'admin.settings.resolved': {
+    'he': 'המקום שנשמר',
+    'en': 'Saved place',
+    'ru': 'Сохранённое место'
+  },
+  'admin.settings.saved': {
+    'he': 'המיקום נשמר. הזמנים מתעדכנים.',
+    'en': 'Location saved. Times are updating.',
+    'ru': 'Место сохранено. Времена обновляются.'
+  },
+  'admin.settings.noResults': {
+    'he': 'לא נמצאה עיר. נסו שם אחר.',
+    'en': 'No city found. Try another name.',
+    'ru': 'Город не найден. Попробуйте другое имя.'
+  },
+  'admin.settings.error': {
+    'he': 'החיפוש נכשל. בדקו את החיבור לאינטרנט.',
+    'en': 'Search failed. Check your internet connection.',
+    'ru': 'Поиск не удался. Проверьте интернет.'
+  },
+  'admin.settings.geoError': {
+    'he': 'לא הצלחנו לקרוא את המיקום. אשרו גישה למיקום בדפדפן.',
+    'en': 'Could not read your location. Allow location access in the browser.',
+    'ru': 'Не удалось определить место. Разрешите геолокацию в браузере.'
+  },
+  'admin.settings.timesError': {
+    'he': 'המיקום נשמר, אבל עדכון הזמנים נכשל. נסו שוב.',
+    'en': 'Location saved, but updating times failed. Try again.',
+    'ru': 'Место сохранено, но времена не обновились. Попробуйте снова.'
+  },
+  'zmanim.forCity': {
+    'he': 'זמנים לפי',
+    'en': 'Times for',
+    'ru': 'Времена для'
+  },
+  'admin.tg.subtitle': {
+    'he': 'חברו את ערוץ הטלגרם של הקהילה — הפוסטים יופיעו בחדשות.',
+    'en': 'Connect the community Telegram channel — posts will appear in News.',
+    'ru': 'Подключите Telegram-канал общины — посты появятся в новостях.'
+  },
+  'admin.tg.guideTitle': {
+    'he': 'איך מחברים, שלב אחרי שלב',
+    'en': 'How to connect, step by step',
+    'ru': 'Как подключить, шаг за шагом'
+  },
+  'admin.tg.step1': {
+    'he': 'פתחו את טלגרם בטלפון.',
+    'en': 'Open Telegram on your phone.',
+    'ru': 'Откройте Telegram на телефоне.'
+  },
+  'admin.tg.step2': {
+    'he': 'חפשו @BotFather והקישו Start.',
+    'en': 'Search @BotFather and tap Start.',
+    'ru': 'Найдите @BotFather и нажмите Start.'
+  },
+  'admin.tg.step3': {
+    'he': 'שלחו /newbot, בחרו שם, ואז שם משתמש שמסתיים ב-bot.',
+    'en': 'Send /newbot, pick a name, then a username ending with bot.',
+    'ru': 'Отправьте /newbot, выберите имя, затем имя пользователя с bot.'
+  },
+  'admin.tg.step4': {
+    'he': 'BotFather שולח קוד (טוקן) — העתיקו אותו. הוא נראה כמו 123456:ABC...',
+    'en': 'BotFather sends a token — copy it. It looks like 123456:ABC...',
+    'ru': 'BotFather пришлёт токен — скопируйте. Вид: 123456:ABC...'
+  },
+  'admin.tg.step5': {
+    'he': 'הדביקו את הקוד בשדה כאן.',
+    'en': 'Paste the token in the field here.',
+    'ru': 'Вставьте токен в поле здесь.'
+  },
+  'admin.tg.step6': {
+    'he': 'פתחו את ערוץ הקהילה והוסיפו את הבוט כמנהל (כדי שיוכל לקרוא פוסטים).',
+    'en': 'Open the community channel and add the bot as administrator (so it can read posts).',
+    'ru': 'Откройте канал общины и добавьте бота администратором.'
+  },
+  'admin.tg.step7': {
+    'he': 'הדביקו את שם הערוץ (למשל @mychannel).',
+    'en': 'Paste the channel username (e.g. @mychannel).',
+    'ru': 'Вставьте имя канала (например @mychannel).'
+  },
+  'admin.tg.step8': {
+    'he': 'לחצו «בדיקת חיבור» — אמור להופיע שם הבוט.',
+    'en': 'Tap “Check connection” — the bot name should appear.',
+    'ru': 'Нажмите «Проверить связь» — должно появиться имя бота.'
+  },
+  'admin.tg.step9': {
+    'he': 'לחצו «משיכת חדשות» — פוסטים חדשים יופיעו בעמוד החדשות.',
+    'en': 'Tap “Pull news” — new channel posts appear on the News page.',
+    'ru': 'Нажмите «Загрузить новости» — новые посты появятся на странице новостей.'
+  },
+  'admin.tg.token': {
+    'he': 'קוד הבוט (טוקן)',
+    'en': 'Bot token',
+    'ru': 'Токен бота'
+  },
+  'admin.tg.channel': {
+    'he': 'שם הערוץ',
+    'en': 'Channel username',
+    'ru': 'Имя канала'
+  },
+  'admin.tg.connect': {
+    'he': 'בדיקת חיבור',
+    'en': 'Check connection',
+    'ru': 'Проверить связь'
+  },
+  'admin.tg.pull': {
+    'he': 'משיכת חדשות עכשיו',
+    'en': 'Pull news now',
+    'ru': 'Загрузить новости'
+  },
+  'admin.tg.connected': {
+    'he': 'מחובר',
+    'en': 'Connected',
+    'ru': 'Подключено'
+  },
+  'admin.tg.imported': {
+    'he': 'נמשכו {n} כתבות חדשות',
+    'en': 'Imported {n} new articles',
+    'ru': 'Загружено {n} новых записей'
+  },
+  'admin.tg.noPosts': {
+    'he': 'אין פוסטים חדשים. פרסמו בערוץ ואז לחצו שוב. הבוט קורא פוסטים אחרי שמוסיפים אותו כמנהל.',
+    'en': 'No new posts. Publish in the channel, then tap again. The bot reads posts after you add it as admin.',
+    'ru': 'Нет новых постов. Опубликуйте в канале и нажмите снова. Бот читает посты после назначения админом.'
+  },
+  'admin.tg.err.proxy': {
+    'he': 'לא הצלחנו לדבר עם טלגרם מהדפדפן. נסו לרענן, או לכבות חוסם פרסומות, או לנסות שוב בעוד דקה.',
+    'en': 'Could not reach Telegram from the browser. Refresh, pause an ad blocker, or try again in a minute.',
+    'ru': 'Не удалось связаться с Telegram из браузера. Обновите страницу, отключите блокировщик рекламы или попробуйте позже.'
+  },
+  'admin.tg.err.token': {
+    'he': 'הקוד לא נכון. העתיקו שוב מ-BotFather (בלי רווחים).',
+    'en': 'The token is not correct. Copy it again from BotFather (no spaces).',
+    'ru': 'Токен неверный. Скопируйте снова у BotFather (без пробелов).'
+  },
+  'admin.tg.err.channel': {
+    'he': 'חסר שם ערוץ. כתבו למשל @mychannel.',
+    'en': 'Channel username is missing. Enter e.g. @mychannel.',
+    'ru': 'Нет имени канала. Введите, например, @mychannel.'
+  },
+  'admin.tg.err.generic': {
+    'he': 'משהו לא עבד. בדקו את הקוד ואת שם הערוץ ונסו שוב.',
+    'en': 'Something went wrong. Check the token and channel name, then try again.',
+    'ru': 'Что-то пошло не так. Проверьте токен и имя канала.'
+  },
 };

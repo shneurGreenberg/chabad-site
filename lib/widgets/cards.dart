@@ -35,6 +35,7 @@ class NewsCard extends StatelessWidget {
               color: article.imageColor,
               icon: article.icon,
               height: 150,
+              bytes: article.imageBytes,
               badge: article.source == NewsSource.telegram
                   ? const Pill('Telegram', color: Color(0xFF0EA5E9), icon: Icons.send)
                   : null,
@@ -94,63 +95,77 @@ class ProgramCard extends StatelessWidget {
         boxShadow: AppColors.cardShadow,
       ),
       child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(program.icon, color: color, size: 26),
+            GradientImage(
+              color: program.color,
+              icon: program.icon,
+              height: 120,
+              bytes: program.imageBytes,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(program.icon, color: color, size: 26),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(trLoc(program.title, loc.lang),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700)),
+                    ),
+                  ]),
+                  const SizedBox(height: 12),
+                  Text(trLoc(program.description, loc.lang),
+                      style: const TextStyle(color: Colors.black54, height: 1.4)),
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    const Icon(Icons.schedule, size: 15, color: Colors.black45),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(trLoc(program.schedule, loc.lang),
+                          style: const TextStyle(
+                              fontSize: 13, color: Colors.black54)),
+                    ),
+                  ]),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    const Icon(Icons.people_outline, size: 15, color: Colors.black45),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(trLoc(program.audience, loc.lang),
+                          style: const TextStyle(
+                              fontSize: 13, color: Colors.black54)),
+                    ),
+                  ]),
+                  const SizedBox(height: 14),
+                  OutlinedButton.icon(
+                    onPressed: () => context.go('/contact'),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(42),
+                      foregroundColor: color,
+                      side: BorderSide(color: color),
+                    ),
+                    icon: const Icon(Icons.how_to_reg, size: 18),
+                    label: Text(loc.t('programs.register')),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(trLoc(program.title, loc.lang),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700)),
-              ),
-            ]),
-            const SizedBox(height: 12),
-            Text(trLoc(program.description, loc.lang),
-                style: const TextStyle(color: Colors.black54, height: 1.4)),
-            const SizedBox(height: 14),
-            Row(children: [
-              const Icon(Icons.schedule, size: 15, color: Colors.black45),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(trLoc(program.schedule, loc.lang),
-                    style: const TextStyle(fontSize: 13, color: Colors.black54)),
-              ),
-            ]),
-            const SizedBox(height: 6),
-            Row(children: [
-              const Icon(Icons.people_outline, size: 15, color: Colors.black45),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(trLoc(program.audience, loc.lang),
-                    style: const TextStyle(fontSize: 13, color: Colors.black54)),
-              ),
-            ]),
-            const SizedBox(height: 14),
-            OutlinedButton(
-              onPressed: () => context.go('/contact'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size.fromHeight(42),
-                foregroundColor: color,
-                side: BorderSide(color: color),
-              ),
-              child: Text(loc.t('programs.register')),
             ),
           ],
         ),
-      ),
       ),
     );
   }
@@ -168,7 +183,10 @@ class ProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GradientImage(
-              color: product.color, icon: product.icon, height: 130),
+              color: product.color,
+              icon: product.icon,
+              height: 130,
+              bytes: product.imageBytes),
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -278,6 +296,7 @@ class PhotoCard extends StatelessWidget {
             color: photo.color,
             icon: photo.icon,
             height: 160,
+            bytes: photo.imageBytes,
             badge: Pill('${photo.year}', color: Colors.black.withValues(alpha: 0.4)),
           ),
           Padding(
