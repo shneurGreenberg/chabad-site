@@ -94,6 +94,7 @@ class _SiteShellState extends State<SiteShell> {
   Widget build(BuildContext context) {
     final mobile = isMobile(context);
     return Scaffold(
+      backgroundColor: AppColors.surface,
       appBar: _SiteHeader(currentRoute: widget.currentRoute),
       drawer: mobile ? _SiteDrawer(currentRoute: widget.currentRoute) : null,
       body: PrimaryScrollController.none(
@@ -103,7 +104,22 @@ class _SiteShellState extends State<SiteShell> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              widget.child,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.easeOut,
+                layoutBuilder: (currentChild, _) =>
+                    currentChild ?? const SizedBox.shrink(),
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+                child: KeyedSubtree(
+                  key: ValueKey(widget.currentRoute),
+                  child: widget.child,
+                ),
+              ),
               const SizedBox(height: 40),
               const _SiteFooter(),
             ],

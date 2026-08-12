@@ -19,16 +19,8 @@ import 'widgets/site_scaffold.dart';
 GoRoute _route(String path, Widget child) {
   return GoRoute(
     path: path,
-    pageBuilder: (context, state) => CustomTransitionPage<void>(
+    pageBuilder: (context, state) => NoTransitionPage<void>(
       key: state.pageKey,
-      transitionDuration: const Duration(milliseconds: 220),
-      reverseTransitionDuration: const Duration(milliseconds: 180),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
-          child: child,
-        );
-      },
       child: child,
     ),
   );
