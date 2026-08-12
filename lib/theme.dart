@@ -117,5 +117,27 @@ ThemeData buildAppTheme() {
         color: AppColors.ink,
       ),
     ),
+    pageTransitionsTheme: PageTransitionsTheme(
+      builders: {
+        for (final platform in TargetPlatform.values)
+          platform: const InstantPageTransitionsBuilder(),
+      },
+    ),
   );
+}
+
+/// No slide/fade between routes — avoids the jumpy web transition.
+class InstantPageTransitionsBuilder extends PageTransitionsBuilder {
+  const InstantPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
+  }
 }

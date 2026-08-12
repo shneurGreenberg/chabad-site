@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'pages/admin/admin.dart';
 import 'pages/client/about_page.dart';
@@ -15,6 +16,16 @@ import 'pages/client/store_page.dart';
 import 'pages/client/zmanim_page.dart';
 import 'widgets/site_scaffold.dart';
 
+GoRoute _route(String path, Widget child) {
+  return GoRoute(
+    path: path,
+    pageBuilder: (context, state) => NoTransitionPage<void>(
+      key: state.pageKey,
+      child: child,
+    ),
+  );
+}
+
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
@@ -26,29 +37,21 @@ final appRouter = GoRouter(
         );
       },
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomePage()),
-        GoRoute(path: '/news', builder: (context, state) => const NewsPage()),
-        GoRoute(path: '/zmanim', builder: (context, state) => const ZmanimPage()),
-        GoRoute(
-            path: '/programs',
-            builder: (context, state) => const ProgramsPage()),
-        GoRoute(
-            path: '/gallery', builder: (context, state) => const GalleryPage()),
-        GoRoute(
-            path: '/cemetery',
-            builder: (context, state) => const CemeteryPage()),
-        GoRoute(path: '/famous', builder: (context, state) => const FamousPage()),
-        GoRoute(
-            path: '/history', builder: (context, state) => const HistoryPage()),
-        GoRoute(path: '/store', builder: (context, state) => const StorePage()),
-        GoRoute(
-            path: '/library', builder: (context, state) => const LibraryPage()),
-        GoRoute(path: '/donate', builder: (context, state) => const DonatePage()),
-        GoRoute(
-            path: '/contact', builder: (context, state) => const ContactPage()),
-        GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
+        _route('/', const HomePage()),
+        _route('/news', const NewsPage()),
+        _route('/zmanim', const ZmanimPage()),
+        _route('/programs', const ProgramsPage()),
+        _route('/gallery', const GalleryPage()),
+        _route('/cemetery', const CemeteryPage()),
+        _route('/famous', const FamousPage()),
+        _route('/history', const HistoryPage()),
+        _route('/store', const StorePage()),
+        _route('/library', const LibraryPage()),
+        _route('/donate', const DonatePage()),
+        _route('/contact', const ContactPage()),
+        _route('/about', const AboutPage()),
       ],
     ),
-    GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
+    _route('/admin', const AdminPage()),
   ],
 );

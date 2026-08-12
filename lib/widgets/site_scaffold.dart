@@ -53,9 +53,10 @@ class SiteScaffold extends StatelessWidget {
   }
 }
 
-/// Persistent site frame used by [ShellRoute]. Scroll position resets
-/// whenever the route changes, so pages always open from the top.
-class SiteShell extends StatelessWidget {
+/// Persistent site frame used by [ShellRoute].
+/// Uses a dedicated scroll controller (not the Scaffold primary one) so
+/// the previous page's offset is never applied to the next page.
+class SiteShell extends StatefulWidget {
   const SiteShell({
     super.key,
     required this.currentRoute,
@@ -65,21 +66,48 @@ class SiteShell extends StatelessWidget {
   final Widget child;
 
   @override
+  State<SiteShell> createState() => _SiteShellState();
+}
+
+class _SiteShellState extends State<SiteShell> {
+  late ScrollController _scroll = ScrollController();
+
+  @override
+  void didUpdateWidget(SiteShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentRoute != widget.currentRoute) {
+      final previous = _scroll;
+      _scroll = ScrollController();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        previous.dispose();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final mobile = isMobile(context);
     return Scaffold(
-      appBar: _SiteHeader(currentRoute: currentRoute),
-      drawer: mobile ? _SiteDrawer(currentRoute: currentRoute) : null,
-      body: SingleChildScrollView(
-        key: ValueKey(currentRoute),
-        primary: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            child,
-            const SizedBox(height: 40),
-            const _SiteFooter(),
-          ],
+      appBar: _SiteHeader(currentRoute: widget.currentRoute),
+      drawer: mobile ? _SiteDrawer(currentRoute: widget.currentRoute) : null,
+      body: PrimaryScrollController.none(
+        child: SingleChildScrollView(
+          controller: _scroll,
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              widget.child,
+              const SizedBox(height: 40),
+              const _SiteFooter(),
+            ],
+          ),
         ),
       ),
     );
