@@ -348,6 +348,18 @@ class DashboardPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+          ),
+          child: Text(loc.t('admin.persist.note'),
+              style: const TextStyle(color: AppColors.muted, height: 1.45)),
+        ),
         ResponsiveGrid(
           columns: gridColumns(context, max: 4) < 2 ? 2 : gridColumns(context, max: 4),
           children: [
@@ -1161,58 +1173,88 @@ class CrmPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    return _panelCard(
-      title: loc.t('admin.crm'),
-      actions: [
-        Flexible(
-          child: Text(loc.t('admin.crm.note'),
-              textAlign: TextAlign.end,
-              style: const TextStyle(color: Colors.black45, fontSize: 12)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _panelCard(
+          title: loc.t('admin.crm'),
+          actions: [
+            Flexible(
+              child: Text(loc.t('admin.crm.note'),
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(color: Colors.black45, fontSize: 12)),
+            ),
+          ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: [
+                DataColumn(label: Text(loc.t('common.name'))),
+                DataColumn(label: Text(loc.t('common.email'))),
+                DataColumn(label: Text(loc.t('common.phone'))),
+                DataColumn(label: Text(loc.t('common.topic'))),
+                DataColumn(label: Text(loc.t('common.date'))),
+                DataColumn(label: Text(loc.t('common.status'))),
+              ],
+              rows: [
+                for (final lead in repo.leads)
+                  DataRow(cells: [
+                    DataCell(Text(lead.name)),
+                    DataCell(Text(lead.email)),
+                    DataCell(Text(lead.phone)),
+                    DataCell(Text(trLoc(lead.topic, loc.lang))),
+                    DataCell(Text(DateFormat.yMMMd(loc.lang).format(lead.date))),
+                    DataCell(
+                      PopupMenuButton<LeadStatus>(
+                        onSelected: (s) => repo.setLeadStatus(lead, s),
+                        itemBuilder: (context) {
+                          final loc = context.read<LocaleController>();
+                          return [
+                            PopupMenuItem(
+                                value: LeadStatus.fresh,
+                                child: Text(loc.t('admin.lead.fresh'))),
+                            PopupMenuItem(
+                                value: LeadStatus.contacted,
+                                child: Text(loc.t('admin.lead.contacted'))),
+                            PopupMenuItem(
+                                value: LeadStatus.member,
+                                child: Text(loc.t('admin.lead.member'))),
+                          ];
+                        },
+                        child: _LeadStatusChip(status: lead.status),
+                      ),
+                    ),
+                  ]),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _panelCard(
+          title: loc.t('admin.newsletter'),
+          child: repo.subscribers.isEmpty
+              ? Text(loc.t('admin.newsletter.empty'),
+                  style: const TextStyle(color: AppColors.muted))
+              : Column(
+                  children: [
+                    for (final s in repo.subscribers)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.mail_outline,
+                            color: AppColors.primary),
+                        title: Text(s.email),
+                        subtitle: Text(
+                            DateFormat.yMMMd(loc.lang).add_Hm().format(s.date)),
+                        trailing: IconButton(
+                          tooltip: loc.t('common.delete'),
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => repo.removeSubscriber(s.email),
+                        ),
+                      ),
+                  ],
+                ),
         ),
       ],
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columns: [
-            DataColumn(label: Text(loc.t('common.name'))),
-            DataColumn(label: Text(loc.t('common.email'))),
-            DataColumn(label: Text(loc.t('common.phone'))),
-            DataColumn(label: Text(loc.t('common.topic'))),
-            DataColumn(label: Text(loc.t('common.date'))),
-            DataColumn(label: Text(loc.t('common.status'))),
-          ],
-          rows: [
-            for (final lead in repo.leads)
-              DataRow(cells: [
-                DataCell(Text(lead.name)),
-                DataCell(Text(lead.email)),
-                DataCell(Text(lead.phone)),
-                DataCell(Text(trLoc(lead.topic, loc.lang))),
-                DataCell(Text(DateFormat.yMMMd(loc.lang).format(lead.date))),
-                DataCell(
-                  PopupMenuButton<LeadStatus>(
-                    onSelected: (s) => repo.setLeadStatus(lead, s),
-                    itemBuilder: (context) {
-                      final loc = context.read<LocaleController>();
-                      return [
-                        PopupMenuItem(
-                            value: LeadStatus.fresh,
-                            child: Text(loc.t('admin.lead.fresh'))),
-                        PopupMenuItem(
-                            value: LeadStatus.contacted,
-                            child: Text(loc.t('admin.lead.contacted'))),
-                        PopupMenuItem(
-                            value: LeadStatus.member,
-                            child: Text(loc.t('admin.lead.member'))),
-                      ];
-                    },
-                    child: _LeadStatusChip(status: lead.status),
-                  ),
-                ),
-              ]),
-          ],
-        ),
-      ),
     );
   }
 }

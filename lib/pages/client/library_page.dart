@@ -8,7 +8,8 @@ import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 
 class LibraryPage extends StatelessWidget {
-  const LibraryPage({super.key});
+  const LibraryPage({super.key, this.highlightId});
+  final String? highlightId;
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
@@ -24,7 +25,14 @@ class LibraryPage extends StatelessWidget {
         Section(
           child: ResponsiveGrid(
             columns: gridColumns(context, max: 2),
-            children: [for (final s in repo.shiurim) _ShiurCard(s)],
+            children: [
+              for (final s in repo.shiurim)
+                HighlightAnchor(
+                  id: s.id,
+                  highlightId: highlightId,
+                  child: _ShiurCard(s),
+                ),
+            ],
           ),
         ),
       ],

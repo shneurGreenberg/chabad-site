@@ -8,19 +8,40 @@ import 'router.dart';
 import 'state/auth.dart';
 import 'theme.dart';
 
+final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 void main() {
   runApp(const ChabadApp());
 }
 
-class ChabadApp extends StatelessWidget {
+class ChabadApp extends StatefulWidget {
   const ChabadApp({super.key});
+
+  @override
+  State<ChabadApp> createState() => _ChabadAppState();
+}
+
+class _ChabadAppState extends State<ChabadApp> {
+  late final AppRepository _repo = AppRepository();
+
+  @override
+  void initState() {
+    super.initState();
+    _repo.onPersistWarning = (message) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        appMessengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      });
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LocaleController()),
-        ChangeNotifierProvider(create: (_) => AppRepository()),
+        ChangeNotifierProvider.value(value: _repo),
         ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: Consumer<LocaleController>(
@@ -30,6 +51,7 @@ class ChabadApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: buildAppTheme(),
             routerConfig: appRouter,
+            scaffoldMessengerKey: appMessengerKey,
             locale: locale.locale,
             supportedLocales: const [Locale('he'), Locale('en'), Locale('ru')],
             localizationsDelegates: const [

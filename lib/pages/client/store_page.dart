@@ -9,7 +9,8 @@ import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 
 class StorePage extends StatefulWidget {
-  const StorePage({super.key});
+  const StorePage({super.key, this.highlightId});
+  final String? highlightId;
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -21,8 +22,12 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final products =
-        repo.products.where((p) => _cat == null || p.category == _cat).toList();
+    final products = repo.products
+        .where((p) =>
+            (widget.highlightId != null && p.id == widget.highlightId) ||
+            _cat == null ||
+            p.category == _cat)
+        .toList();
     return SiteScaffold(
       currentRoute: '/store',
       children: [
@@ -47,7 +52,14 @@ class _StorePageState extends State<StorePage> {
                 ? const EmptyHint(icon: Icons.storefront_outlined)
                 : ResponsiveGrid(
                     columns: wide ? 3 : gridColumns(context, max: 3),
-                    children: [for (final p in products) ProductCard(p)],
+                    children: [
+                      for (final p in products)
+                        HighlightAnchor(
+                          id: p.id,
+                          highlightId: widget.highlightId,
+                          child: ProductCard(p),
+                        ),
+                    ],
                   );
             if (!wide) {
               return Column(children: [

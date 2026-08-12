@@ -7,6 +7,7 @@ import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/newsletter.dart';
 import '../../widgets/site_scaffold.dart';
 
 class HomePage extends StatelessWidget {
@@ -94,6 +95,10 @@ class HomePage extends StatelessWidget {
           ),
         ),
         const Section(child: _ReconnectBand()),
+        const Section(
+          padTop: 8,
+          child: _HomeNewsletter(),
+        ),
       ],
     );
   }
@@ -530,6 +535,23 @@ class _ReconnectBand extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _HomeNewsletter extends StatelessWidget {
+  const _HomeNewsletter();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: const NewsletterSignup(),
     );
   }
 }

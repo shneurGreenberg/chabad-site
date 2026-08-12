@@ -376,6 +376,7 @@ const Map<String, Map<String, String>> _strings = {
   'about.hours': {'he': 'שעות פתיחה', 'en': 'Opening hours', 'ru': 'Часы работы'},
   'about.address': {'he': 'כתובת', 'en': 'Address', 'ru': 'Адрес'},
   'about.contact': {'he': 'צור קשר', 'en': 'Contact', 'ru': 'Контакты'},
+  'about.map': {'he': 'מפה', 'en': 'Map', 'ru': 'Карта'},
 
   // Footer
   'footer.quicklinks': {
@@ -393,6 +394,83 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'הרשמה לעדכונים',
     'en': 'Newsletter',
     'ru': 'Рассылка'
+  },
+  'newsletter.hint': {
+    'he': 'קבלו חדשות, זמנים ואירועים ישירות למייל',
+    'en': 'Get news, times and events in your inbox',
+    'ru': 'Новости, времена и события на почту'
+  },
+  'newsletter.join': {
+    'he': 'הרשמה',
+    'en': 'Subscribe',
+    'ru': 'Подписаться'
+  },
+  'newsletter.thanks': {
+    'he': 'נרשמתם בהצלחה. תודה!',
+    'en': 'You are subscribed. Thank you!',
+    'ru': 'Вы подписались. Спасибо!'
+  },
+  'newsletter.duplicate': {
+    'he': 'כתובת זו כבר רשומה',
+    'en': 'This email is already subscribed',
+    'ru': 'Этот адрес уже подписан'
+  },
+  'search.hint': {
+    'he': 'חיפוש בחדשות, תוכניות, חנות ועוד',
+    'en': 'Search news, programs, store and more',
+    'ru': 'Поиск по новостям, программам, магазину'
+  },
+  'search.empty': {
+    'he': 'לא נמצאו תוצאות',
+    'en': 'No results',
+    'ru': 'Ничего не найдено'
+  },
+  'search.group.news': {'he': 'חדשות', 'en': 'News', 'ru': 'Новости'},
+  'search.group.programs': {
+    'he': 'תוכניות',
+    'en': 'Programs',
+    'ru': 'Программы'
+  },
+  'search.group.products': {'he': 'חנות', 'en': 'Store', 'ru': 'Магазин'},
+  'search.group.famous': {
+    'he': 'יהודים מפורסמים',
+    'en': 'Notable Jews',
+    'ru': 'Известные евреи'
+  },
+  'search.group.cemetery': {
+    'he': 'בית החיים',
+    'en': 'Cemetery',
+    'ru': 'Кладбище'
+  },
+  'search.group.library': {
+    'he': 'שיעורי תורה',
+    'en': 'Torah Library',
+    'ru': 'Уроки Торы'
+  },
+  'admin.persist.note': {
+    'he': 'התוכן נשמר בדפדפן זה (לא בשרת). בעתיד אפשר לחבר Firebase — אין צורך במפתח API כדי שהשמירה תעבוד.',
+    'en': 'Content is saved in this browser (not on a server). Firebase can be added later — no API key is required for saving to work.',
+    'ru': 'Содержимое хранится в этом браузере (не на сервере). Позже можно подключить Firebase — ключ API для сохранения не нужен.'
+  },
+  'admin.settings.mapsKey': {
+    'he': 'מפתח Google Maps (רשות)',
+    'en': 'Google Maps API key (optional)',
+    'ru': 'Ключ Google Maps (необязательно)'
+  },
+  'admin.settings.mapsHint': {
+    'he': 'אם אין מפתח, תוצג מפת OpenStreetMap אמיתית לפי הכתובת והמיקום.',
+    'en': 'Without a key, a real OpenStreetMap is shown from the address and location.',
+    'ru': 'Без ключа показывается настоящая карта OpenStreetMap по адресу и месту.'
+  },
+  'admin.newsletter': {
+    'he': 'נרשמים לעדכונים',
+    'en': 'Newsletter subscribers',
+    'ru': 'Подписчики рассылки'
+  },
+  'admin.newsletter.empty': {
+    'he': 'עדיין אין נרשמים',
+    'en': 'No subscribers yet',
+    'ru': 'Подписчиков пока нет'
   },
 
   // Admin

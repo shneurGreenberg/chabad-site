@@ -17,6 +17,7 @@ class SettingsPanel extends StatefulWidget {
 
 class _SettingsPanelState extends State<SettingsPanel> {
   final _query = TextEditingController();
+  final _mapsKey = TextEditingController();
   List<GeoPlace> _results = const [];
   bool _searching = false;
   bool _locating = false;
@@ -25,12 +26,15 @@ class _SettingsPanelState extends State<SettingsPanel> {
   @override
   void initState() {
     super.initState();
-    _query.text = context.read<AppRepository>().location.query;
+    final repo = context.read<AppRepository>();
+    _query.text = repo.location.query;
+    _mapsKey.text = repo.googleMapsApiKey;
   }
 
   @override
   void dispose() {
     _query.dispose();
+    _mapsKey.dispose();
     super.dispose();
   }
 
@@ -125,6 +129,17 @@ class _SettingsPanelState extends State<SettingsPanel> {
           const SizedBox(height: 8),
           Text(loc.t('admin.settings.subtitle'),
               style: const TextStyle(color: AppColors.muted, height: 1.45)),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(loc.t('admin.persist.note'),
+                style: const TextStyle(color: AppColors.muted, height: 1.45, fontSize: 13.5)),
+          ),
           const SizedBox(height: 18),
           TextField(
             controller: _query,
@@ -183,6 +198,19 @@ class _SettingsPanelState extends State<SettingsPanel> {
           _kv(loc.t('admin.settings.lat'), site.latitude.toStringAsFixed(4)),
           _kv(loc.t('admin.settings.lon'), site.longitude.toStringAsFixed(4)),
           _kv(loc.t('admin.settings.tz'), site.timezone),
+          const Divider(height: 32),
+          TextField(
+            controller: _mapsKey,
+            decoration: InputDecoration(
+              labelText: loc.t('admin.settings.mapsKey'),
+              prefixIcon: const Icon(Icons.map_outlined),
+            ),
+            onChanged: (v) =>
+                context.read<AppRepository>().setGoogleMapsApiKey(v),
+          ),
+          const SizedBox(height: 8),
+          Text(loc.t('admin.settings.mapsHint'),
+              style: const TextStyle(color: AppColors.muted, height: 1.4, fontSize: 13)),
           if (_saving)
             const Padding(
               padding: EdgeInsets.only(top: 12),

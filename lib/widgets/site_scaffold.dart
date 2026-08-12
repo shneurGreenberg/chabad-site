@@ -6,6 +6,8 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'newsletter.dart';
+import 'site_search.dart';
 
 class NavItem {
   const NavItem(this.route, this.labelKey, this.icon);
@@ -167,7 +169,8 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                           for (final item in primaryNav)
                             if (!(compact &&
                                 (item.route == '/store' ||
-                                    item.route == '/gallery')))
+                                    item.route == '/gallery' ||
+                                    item.route == '/zmanim')))
                               _NavLink(
                                 item: item,
                                 active: currentRoute == item.route,
@@ -177,6 +180,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                   ),
+                  const HeaderSearch(),
                   const SizedBox(width: 8),
                   const LanguageSwitcher(),
                   const SizedBox(width: 4),
@@ -217,6 +221,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ] else ...[
                   const Spacer(),
+                  const HeaderSearch(),
                   const _CartButton(),
                   const LanguageSwitcher(),
                   Builder(
@@ -390,7 +395,9 @@ class _MoreMenu extends StatelessWidget {
     final compact = isTablet(context);
     final extras = compact
         ? primaryNav.where((i) =>
-            i.route == '/store' || i.route == '/gallery')
+            i.route == '/store' ||
+            i.route == '/gallery' ||
+            i.route == '/zmanim')
         : const <NavItem>[];
     final moreItems = [...extras, ...moreNav];
     final moreActive = moreItems.any((i) => i.route == currentRoute);
@@ -656,6 +663,8 @@ class _SiteFooter extends StatelessWidget {
                           trLoc(repo.contact.address, loc.lang)),
                       _contactRow(Icons.phone_outlined, repo.contact.phone),
                       _contactRow(Icons.email_outlined, repo.contact.email),
+                      const SizedBox(height: 18),
+                      const NewsletterSignup(light: true, compact: true),
                     ],
                   ),
                 ),

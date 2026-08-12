@@ -264,6 +264,29 @@ class Donation {
   DateTime date;
 }
 
+class NewsletterSubscriber {
+  NewsletterSubscriber({required this.email, required this.date});
+  final String email;
+  final DateTime date;
+}
+
+enum SubscribeResult { ok, invalid, duplicate }
+
+class SearchHit {
+  SearchHit({
+    required this.groupKey,
+    required this.title,
+    required this.subtitle,
+    required this.route,
+    required this.icon,
+  });
+  final String groupKey;
+  final String title;
+  final String subtitle;
+  final String route;
+  final IconData icon;
+}
+
 class BotConfig {
   BotConfig({
     required this.name,
@@ -285,8 +308,8 @@ class ContactInfo {
     required this.address,
     required this.phone,
     required this.email,
-    required this.hours,
-  });
+    required List<MapEntry<Loc, String>> hours,
+  }) : hours = List<MapEntry<Loc, String>>.of(hours);
   Loc name;
   Loc address;
   String phone;

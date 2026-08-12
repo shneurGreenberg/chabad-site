@@ -505,3 +505,70 @@ class Section extends StatelessWidget {
     );
   }
 }
+
+/// Wraps a search result so it can be highlighted and scrolled into view.
+class HighlightAnchor extends StatefulWidget {
+  const HighlightAnchor({
+    super.key,
+    required this.id,
+    required this.highlightId,
+    required this.child,
+  });
+  final String id;
+  final String? highlightId;
+  final Widget child;
+
+  @override
+  State<HighlightAnchor> createState() => _HighlightAnchorState();
+}
+
+class _HighlightAnchorState extends State<HighlightAnchor> {
+  @override
+  void initState() {
+    super.initState();
+    _maybeScroll();
+  }
+
+  @override
+  void didUpdateWidget(HighlightAnchor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.highlightId != widget.highlightId) _maybeScroll();
+  }
+
+  void _maybeScroll() {
+    if (widget.highlightId != widget.id) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Scrollable.ensureVisible(
+        context,
+        alignment: 0.15,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final on = widget.highlightId != null && widget.highlightId == widget.id;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: on ? AppColors.accent : Colors.transparent,
+          width: on ? 2.5 : 0,
+        ),
+        boxShadow: on
+            ? [
+                BoxShadow(
+                  color: AppColors.accent.withValues(alpha: 0.28),
+                  blurRadius: 16,
+                ),
+              ]
+            : null,
+      ),
+      child: widget.child,
+    );
+  }
+}

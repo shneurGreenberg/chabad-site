@@ -6,7 +6,8 @@ import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 
 class ProgramsPage extends StatelessWidget {
-  const ProgramsPage({super.key});
+  const ProgramsPage({super.key, this.highlightId});
+  final String? highlightId;
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
@@ -22,7 +23,14 @@ class ProgramsPage extends StatelessWidget {
         Section(
           child: ResponsiveGrid(
             columns: gridColumns(context, max: 3),
-            children: [for (final p in repo.programs) ProgramCard(p)],
+            children: [
+              for (final p in repo.programs)
+                HighlightAnchor(
+                  id: p.id,
+                  highlightId: highlightId,
+                  child: ProgramCard(p),
+                ),
+            ],
           ),
         ),
       ],

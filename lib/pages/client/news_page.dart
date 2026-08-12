@@ -7,7 +7,8 @@ import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 
 class NewsPage extends StatefulWidget {
-  const NewsPage({super.key});
+  const NewsPage({super.key, this.highlightId});
+  final String? highlightId;
   @override
   State<NewsPage> createState() => _NewsPageState();
 }
@@ -25,7 +26,9 @@ class _NewsPageState extends State<NewsPage> {
     final items = repo.news
         .where((a) =>
             a.published &&
-            (_category == 'all' || trLoc(a.category, loc.lang) == _category))
+            (widget.highlightId == a.id ||
+                _category == 'all' ||
+                trLoc(a.category, loc.lang) == _category))
         .toList();
     return SiteScaffold(
       currentRoute: '/news',
@@ -51,7 +54,14 @@ class _NewsPageState extends State<NewsPage> {
               ? const EmptyHint(icon: Icons.article_outlined)
               : ResponsiveGrid(
                   columns: gridColumns(context, max: 3),
-                  children: [for (final a in items) NewsCard(a)],
+                  children: [
+                    for (final a in items)
+                      HighlightAnchor(
+                        id: a.id,
+                        highlightId: widget.highlightId,
+                        child: NewsCard(a),
+                      ),
+                  ],
                 ),
         ),
       ],

@@ -16,15 +16,17 @@ import 'pages/client/store_page.dart';
 import 'pages/client/zmanim_page.dart';
 import 'widgets/site_scaffold.dart';
 
-GoRoute _route(String path, Widget child) {
+GoRoute _route(String path, Widget Function(GoRouterState state) builder) {
   return GoRoute(
     path: path,
     pageBuilder: (context, state) => NoTransitionPage<void>(
       key: state.pageKey,
-      child: child,
+      child: builder(state),
     ),
   );
 }
+
+String? _h(GoRouterState state) => state.uri.queryParameters['h'];
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -37,21 +39,21 @@ final appRouter = GoRouter(
         );
       },
       routes: [
-        _route('/', const HomePage()),
-        _route('/news', const NewsPage()),
-        _route('/zmanim', const ZmanimPage()),
-        _route('/programs', const ProgramsPage()),
-        _route('/gallery', const GalleryPage()),
-        _route('/cemetery', const CemeteryPage()),
-        _route('/famous', const FamousPage()),
-        _route('/history', const HistoryPage()),
-        _route('/store', const StorePage()),
-        _route('/library', const LibraryPage()),
-        _route('/donate', const DonatePage()),
-        _route('/contact', const ContactPage()),
-        _route('/about', const AboutPage()),
+        _route('/', (_) => const HomePage()),
+        _route('/news', (s) => NewsPage(highlightId: _h(s))),
+        _route('/zmanim', (_) => const ZmanimPage()),
+        _route('/programs', (s) => ProgramsPage(highlightId: _h(s))),
+        _route('/gallery', (_) => const GalleryPage()),
+        _route('/cemetery', (s) => CemeteryPage(highlightId: _h(s))),
+        _route('/famous', (s) => FamousPage(highlightId: _h(s))),
+        _route('/history', (_) => const HistoryPage()),
+        _route('/store', (s) => StorePage(highlightId: _h(s))),
+        _route('/library', (s) => LibraryPage(highlightId: _h(s))),
+        _route('/donate', (_) => const DonatePage()),
+        _route('/contact', (_) => const ContactPage()),
+        _route('/about', (_) => const AboutPage()),
       ],
     ),
-    _route('/admin', const AdminPage()),
+    _route('/admin', (_) => const AdminPage()),
   ],
 );

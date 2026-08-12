@@ -7,7 +7,8 @@ import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 
 class CemeteryPage extends StatefulWidget {
-  const CemeteryPage({super.key});
+  const CemeteryPage({super.key, this.highlightId});
+  final String? highlightId;
   @override
   State<CemeteryPage> createState() => _CemeteryPageState();
 }
@@ -21,6 +22,7 @@ class _CemeteryPageState extends State<CemeteryPage> {
     final repo = context.watch<AppRepository>();
     final q = _query.trim().toLowerCase();
     final graves = repo.graves.where((g) {
+      if (widget.highlightId != null && g.id == widget.highlightId) return true;
       if (q.isEmpty) return true;
       return g.name.toLowerCase().contains(q) ||
           g.hebrewName.contains(_query.trim()) ||
@@ -50,7 +52,14 @@ class _CemeteryPageState extends State<CemeteryPage> {
               ? const EmptyHint(icon: Icons.search_off)
               : ResponsiveGrid(
                   columns: gridColumns(context, max: 2),
-                  children: [for (final g in graves) _GraveCard(g)],
+                  children: [
+                    for (final g in graves)
+                      HighlightAnchor(
+                        id: g.id,
+                        highlightId: widget.highlightId,
+                        child: _GraveCard(g),
+                      ),
+                  ],
                 ),
         ),
       ],

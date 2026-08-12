@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../models.dart';
 import '../services/location_zmanim.dart';
+import '../services/persist.dart';
 import '../services/telegram.dart';
 import '../services/web_prefs.dart';
+import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
 ///
@@ -17,18 +20,41 @@ class AppRepository extends ChangeNotifier {
   AppRepository() {
     TelegramService.instance.loadSaved();
     _restoreLocation();
-    Future<void>.microtask(() async {
-      try {
-        await refreshTimes();
-      } catch (_) {}
-    });
+    Future<void>.microtask(_boot);
   }
+
+  static const _snapKey = 'chabad_site_snapshot';
+  static const _quotaHe =
+      'השמירה נכשלה — התמונות גדולות מדי לדפדפן. התוכן נשמר בלי התמונות הכבדות.';
 
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
+  bool _hydrated = false;
+  Timer? _saveDebounce;
+  void Function(String message)? onPersistWarning;
 
   /// Notify listeners after mutating a field directly (used by admin toggles).
   void refresh() => notifyListeners();
+
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    if (_hydrated) _schedulePersist();
+  }
+
+  @override
+  void dispose() {
+    _saveDebounce?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _boot() async {
+    await _hydrate();
+    _hydrated = true;
+    try {
+      await refreshTimes();
+    } catch (_) {}
+  }
 
   // ---------------------------------------------------------------------------
   // Contact / about
@@ -50,10 +76,17 @@ class AppRepository extends ChangeNotifier {
       MapEntry({'he': 'ראשון–חמישי', 'en': 'Sun–Thu', 'ru': 'Вс–Чт'},
           '09:00 – 20:00'),
       MapEntry({'he': 'שישי', 'en': 'Friday', 'ru': 'Пятница'}, '08:00 – 14:00'),
-      MapEntry({'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
+      MapEntry({'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суבбота'},
           '—'),
     ],
   );
+
+  String googleMapsApiKey = '';
+
+  void setGoogleMapsApiKey(String key) {
+    googleMapsApiKey = key.trim();
+    notifyListeners();
+  }
 
   // ---------------------------------------------------------------------------
   // News
@@ -459,6 +492,31 @@ class AppRepository extends ChangeNotifier {
     Donation(id: _newId(), donor: 'A. Fishman', amount: 180, campaign: campaigns[1], date: DateTime.now().subtract(const Duration(days: 4))),
   ];
 
+  final List<NewsletterSubscriber> subscribers = [];
+
+  static final _emailRe = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+  SubscribeResult subscribeNewsletter(String raw) {
+    final email = raw.trim().toLowerCase();
+    if (email.isEmpty || !_emailRe.hasMatch(email)) {
+      return SubscribeResult.invalid;
+    }
+    if (subscribers.any((s) => s.email == email)) {
+      return SubscribeResult.duplicate;
+    }
+    subscribers.insert(
+      0,
+      NewsletterSubscriber(email: email, date: DateTime.now()),
+    );
+    notifyListeners();
+    return SubscribeResult.ok;
+  }
+
+  void removeSubscriber(String email) {
+    subscribers.removeWhere((s) => s.email == email);
+    notifyListeners();
+  }
+
   // ---------------------------------------------------------------------------
   // Bots
   // ---------------------------------------------------------------------------
@@ -646,5 +704,250 @@ class AppRepository extends ChangeNotifier {
   void clearBanner(String route) {
     banners[route] = PageBanner();
     notifyListeners();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Site search
+  // ---------------------------------------------------------------------------
+  bool _locHas(Loc map, String q) =>
+      map.values.any((v) => v.toLowerCase().contains(q));
+
+  List<SearchHit> searchSite(String query, String lang) {
+    final q = query.trim().toLowerCase();
+    if (q.length < 2) return const [];
+    final hits = <SearchHit>[];
+
+    for (final a in news) {
+      if (!a.published) continue;
+      if (_locHas(a.title, q) || _locHas(a.body, q) || _locHas(a.category, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.news',
+          title: trLoc(a.title, lang),
+          subtitle: trLoc(a.body, lang),
+          route: '/news?h=${a.id}',
+          icon: Icons.article_outlined,
+        ));
+      }
+    }
+    for (final p in programs) {
+      if (_locHas(p.title, q) ||
+          _locHas(p.description, q) ||
+          _locHas(p.audience, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.programs',
+          title: trLoc(p.title, lang),
+          subtitle: trLoc(p.description, lang),
+          route: '/programs?h=${p.id}',
+          icon: Icons.groups_outlined,
+        ));
+      }
+    }
+    for (final p in products) {
+      if (_locHas(p.name, q) || _locHas(p.description, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.products',
+          title: trLoc(p.name, lang),
+          subtitle: trLoc(p.description, lang),
+          route: '/store?h=${p.id}',
+          icon: Icons.storefront_outlined,
+        ));
+      }
+    }
+    for (final p in famous) {
+      if (_locHas(p.name, q) ||
+          _locHas(p.profession, q) ||
+          _locHas(p.bio, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.famous',
+          title: trLoc(p.name, lang),
+          subtitle: trLoc(p.profession, lang),
+          route: '/famous?h=${p.id}',
+          icon: Icons.star_outline,
+        ));
+      }
+    }
+    for (final g in graves) {
+      if (g.name.toLowerCase().contains(q) ||
+          g.hebrewName.toLowerCase().contains(q) ||
+          _locHas(g.notes, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.cemetery',
+          title: g.hebrewName.isEmpty ? g.name : g.hebrewName,
+          subtitle: g.name,
+          route: '/cemetery?h=${g.id}',
+          icon: Icons.grid_view_outlined,
+        ));
+      }
+    }
+    for (final s in shiurim) {
+      if (_locHas(s.title, q) || _locHas(s.rabbi, q) || _locHas(s.topic, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.library',
+          title: trLoc(s.title, lang),
+          subtitle: trLoc(s.rabbi, lang),
+          route: '/library?h=${s.id}',
+          icon: Icons.menu_book_outlined,
+        ));
+      }
+    }
+    if (hits.length > 24) return hits.sublist(0, 24);
+    return hits;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Persistence (IndexedDB / localStorage)
+  // ---------------------------------------------------------------------------
+  void _noteId(String id) {
+    final n = int.tryParse(id.replaceFirst(RegExp(r'^id'), ''));
+    if (n != null && n >= _seq) _seq = n + 1;
+  }
+
+  void _schedulePersist() {
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(const Duration(milliseconds: 300), () {
+      unawaited(_persistNow());
+    });
+  }
+
+  Future<void> _hydrate() async {
+    final raw = await persistGet(_snapKey);
+    if (raw == null || raw.isEmpty) return;
+    try {
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      _applySnapshot(m);
+    } catch (_) {}
+  }
+
+  Map<String, dynamic> _encodeSnapshot({required bool includeImages}) => {
+        'v': 1,
+        'seq': _seq,
+        'mapsKey': googleMapsApiKey,
+        'location': locationToJson(location),
+        'contact': contactToJson(contact),
+        'news': [
+          for (final a in news) newsToJson(a, includeImages: includeImages),
+        ],
+        'programs': [
+          for (final p in programs) programToJson(p, includeImages: includeImages),
+        ],
+        'products': [
+          for (final p in products) productToJson(p, includeImages: includeImages),
+        ],
+        'gallery': [
+          for (final p in gallery) galleryToJson(p, includeImages: includeImages),
+        ],
+        'banners': {
+          for (final e in banners.entries)
+            e.key: bannerToJson(e.value, includeImages: includeImages),
+        },
+        'cart': _cart,
+        'leads': [for (final l in leads) leadToJson(l)],
+        'donations': [for (final d in donations) donationToJson(d)],
+        'subscribers': [for (final s in subscribers) subscriberToJson(s)],
+        'telegramBot': botToJson(telegramBot),
+        'socialBot': botToJson(socialBot),
+        'lang': readPref('lang') ?? 'he',
+      };
+
+  void _applySnapshot(Map<String, dynamic> m) {
+    googleMapsApiKey = '${m['mapsKey'] ?? googleMapsApiKey}';
+    location = locationFromJson(m['location'], location);
+    _persistLocation();
+    contactFromJson(contact, m['contact']);
+
+    if (m['news'] is List) {
+      news
+        ..clear()
+        ..addAll((m['news'] as List).map(newsFromJson));
+    }
+    if (m['programs'] is List) {
+      programs
+        ..clear()
+        ..addAll((m['programs'] as List).map(programFromJson));
+    }
+    if (m['products'] is List) {
+      products
+        ..clear()
+        ..addAll((m['products'] as List).map(productFromJson));
+    }
+    if (m['gallery'] is List) {
+      gallery
+        ..clear()
+        ..addAll((m['gallery'] as List).map(galleryFromJson));
+    }
+    if (m['banners'] is Map) {
+      final raw = Map<String, dynamic>.from(m['banners'] as Map);
+      for (final e in raw.entries) {
+        banners[e.key] = bannerFromJson(e.value);
+      }
+    }
+    if (m['cart'] is Map) {
+      _cart
+        ..clear()
+        ..addAll({
+          for (final e in (m['cart'] as Map).entries)
+            '${e.key}': (e.value as num?)?.toInt() ?? 0,
+        });
+      _cart.removeWhere((_, qty) => qty <= 0);
+    }
+    if (m['leads'] is List) {
+      leads
+        ..clear()
+        ..addAll((m['leads'] as List).map(leadFromJson));
+    }
+    if (m['donations'] is List) {
+      donations
+        ..clear()
+        ..addAll((m['donations'] as List).map(donationFromJson));
+    }
+    if (m['subscribers'] is List) {
+      subscribers
+        ..clear()
+        ..addAll((m['subscribers'] as List).map(subscriberFromJson));
+    }
+    botFromJson(telegramBot, m['telegramBot']);
+    botFromJson(socialBot, m['socialBot']);
+
+    final seq = (m['seq'] as num?)?.toInt();
+    if (seq != null && seq > _seq) _seq = seq;
+    for (final a in news) {
+      _noteId(a.id);
+    }
+    for (final p in programs) {
+      _noteId(p.id);
+    }
+    for (final p in products) {
+      _noteId(p.id);
+    }
+    for (final p in gallery) {
+      _noteId(p.id);
+    }
+    for (final l in leads) {
+      _noteId(l.id);
+    }
+    for (final d in donations) {
+      _noteId(d.id);
+    }
+  }
+
+  Future<void> _persistNow() async {
+    Future<void> write(bool includeImages) async {
+      final json = jsonEncode(_encodeSnapshot(includeImages: includeImages));
+      await persistPut(_snapKey, json);
+    }
+
+    try {
+      await write(true);
+    } catch (e) {
+      if (!isQuotaExceeded(e)) return;
+      try {
+        await write(false);
+        onPersistWarning?.call(_quotaHe);
+      } catch (e2) {
+        if (isQuotaExceeded(e2)) {
+          onPersistWarning?.call(_quotaHe);
+        }
+      }
+    }
   }
 }
