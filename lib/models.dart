@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+
+/// A piece of text available in the three supported languages.
 
 /// A piece of text available in the three supported languages.
 ///
@@ -257,3 +261,42 @@ class ContactInfo {
   String email;
   List<MapEntry<Loc, String>> hours; // day -> hours
 }
+
+/// A photo that replaces the default blue banner on a page.
+class PageBanner {
+  PageBanner({this.bytes, this.alignX = 0, this.alignY = 0});
+  Uint8List? bytes;
+  double alignX;
+  double alignY;
+
+  bool get hasImage => bytes != null && bytes!.isNotEmpty;
+  Alignment get alignment => Alignment(alignX, alignY);
+}
+
+class BannerSlot {
+  const BannerSlot({
+    required this.route,
+    required this.labelKey,
+    this.tall = false,
+  });
+  final String route;
+  final String labelKey;
+  final bool tall;
+}
+
+const bannerSlots = [
+  BannerSlot(route: '/', labelKey: 'nav.home', tall: true),
+  BannerSlot(route: '/news', labelKey: 'nav.news'),
+  BannerSlot(route: '/zmanim', labelKey: 'nav.zmanim'),
+  BannerSlot(route: '/programs', labelKey: 'nav.programs'),
+  BannerSlot(route: '/gallery', labelKey: 'nav.gallery'),
+  BannerSlot(route: '/store', labelKey: 'nav.store'),
+  BannerSlot(route: '/cemetery', labelKey: 'nav.cemetery'),
+  BannerSlot(route: '/famous', labelKey: 'nav.famous'),
+  BannerSlot(route: '/history', labelKey: 'nav.history'),
+  BannerSlot(route: '/library', labelKey: 'nav.library'),
+  BannerSlot(route: '/donate', labelKey: 'nav.donate'),
+  BannerSlot(route: '/contact', labelKey: 'nav.contact'),
+  BannerSlot(route: '/about', labelKey: 'nav.about'),
+];
+

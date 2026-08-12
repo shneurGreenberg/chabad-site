@@ -193,11 +193,16 @@ class _Hero extends StatelessWidget {
       havdala: repo.shabbat['havdala']!,
     );
 
+    final banner = repo.bannerFor('/');
     return Container(
-      decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      decoration: banner.hasImage
+          ? const BoxDecoration(color: AppColors.primaryDark)
+          : const BoxDecoration(gradient: AppColors.heroGradient),
       width: double.infinity,
       child: Stack(
         children: [
+          BannerFill(banner: banner),
+          if (!banner.hasImage) ...[
           Positioned(
             right: -80,
             top: -70,
@@ -223,6 +228,7 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ),
+          ],
           MaxWidthBox(
             padding: EdgeInsets.fromLTRB(20, wide ? 72 : 48, 20, 72),
             child: wide

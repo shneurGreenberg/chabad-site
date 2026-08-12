@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../data/repository.dart';
 
 /// Convenience access to the current [LocaleController].
 extension LocContext on BuildContext {
@@ -307,6 +309,7 @@ int gridColumns(BuildContext context, {int max = 3}) {
 String localeName(BuildContext context, Loc map) => trLoc(map, context.lang);
 
 /// Gradient banner shown at the top of interior pages.
+/// If the admin uploaded a photo for this route, it replaces the blue fill.
 class PageHero extends StatelessWidget {
   const PageHero({
     super.key,
@@ -320,36 +323,43 @@ class PageHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final path = GoRouterState.of(context).uri.path;
+    final banner = context.watch<AppRepository>().bannerFor(path);
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      decoration: banner.hasImage
+          ? const BoxDecoration(color: AppColors.primaryDark)
+          : const BoxDecoration(gradient: AppColors.heroGradient),
       child: Stack(
         children: [
-          Positioned(
-            left: -40,
-            top: -50,
-            child: Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.18), width: 18),
+          BannerFill(banner: banner),
+          if (!banner.hasImage) ...[
+            Positioned(
+              left: -40,
+              top: -50,
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.18), width: 18),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            right: 40,
-            bottom: -60,
-            child: Container(
-              width: 160,
-              height: 160,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+            Positioned(
+              right: 40,
+              bottom: -60,
+              child: Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.05),
+                ),
               ),
             ),
-          ),
+          ],
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 52),
             child: MaxWidthBox(
@@ -372,16 +382,58 @@ class PageHero extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 36,
                           fontWeight: FontWeight.w800,
-                          height: 1.15)),
+                          height: 1.15,
+                          shadows: [
+                            Shadow(color: Colors.black54, blurRadius: 12)
+                          ])),
                   const SizedBox(height: 10),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 640),
                     child: Text(subtitle,
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.86),
+                            color: Colors.white.withValues(alpha: 0.92),
                             fontSize: 16.5,
-                            height: 1.5)),
+                            height: 1.5,
+                            shadows: const [
+                              Shadow(color: Colors.black45, blurRadius: 8)
+                            ])),
                   ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Photo (cover-cropped) or empty — sits behind hero content.
+class BannerFill extends StatelessWidget {
+  const BannerFill({super.key, required this.banner});
+  final PageBanner banner;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!banner.hasImage) return const SizedBox.shrink();
+    return Positioned.fill(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.memory(
+            banner.bytes!,
+            fit: BoxFit.cover,
+            alignment: banner.alignment,
+            gaplessPlayback: true,
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0x660B1C3A),
+                  Color(0x990B1C3A),
                 ],
               ),
             ),

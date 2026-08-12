@@ -325,12 +325,15 @@ class _MoreMenu extends StatelessWidget {
         ? primaryNav.where((i) =>
             i.route == '/store' || i.route == '/gallery')
         : const <NavItem>[];
+    final moreItems = [...extras, ...moreNav];
+    final moreActive = moreItems.any((i) => i.route == currentRoute);
     return PopupMenuButton<String>(
       tooltip: '',
+      padding: EdgeInsets.zero,
       onSelected: (route) => context.go(route),
       position: PopupMenuPosition.under,
       itemBuilder: (context) => [
-        for (final item in [...extras, ...moreNav])
+        for (final item in moreItems)
           PopupMenuItem(
             value: item.route,
             child: Row(children: [
@@ -341,15 +344,38 @@ class _MoreMenu extends StatelessWidget {
           ),
       ],
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Text(loc.t('nav.menu'),
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14.5,
-                  color: AppColors.ink)),
-          const Icon(Icons.expand_more, size: 18, color: AppColors.ink),
-        ]),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                  loc.t('nav.menu'),
+                  style: TextStyle(
+                    fontWeight: moreActive ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 14.5,
+                    color: moreActive ? AppColors.primary : AppColors.ink,
+                  ),
+                ),
+                Icon(Icons.expand_more,
+                    size: 18,
+                    color: moreActive ? AppColors.primary : AppColors.ink),
+              ]),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                height: 3,
+                width: moreActive ? 22 : 0,
+                decoration: BoxDecoration(
+                  gradient: AppColors.goldGradient,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import '../../state/auth.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
+import 'banners_panel.dart';
 
 /// Entry point for /admin — shows the login screen or the admin shell.
 class AdminPage extends StatelessWidget {
@@ -143,6 +144,8 @@ class _AdminShellState extends State<AdminShell> {
     final sections = <_AdminSection>[
       _AdminSection(loc.t('admin.dashboard'), Icons.dashboard_outlined,
           const DashboardPanel()),
+      _AdminSection(loc.t('admin.banners'), Icons.image_outlined,
+          const BannersPanel()),
       _AdminSection(loc.t('admin.manage.news'), Icons.article_outlined,
           const ManageNewsPanel()),
       _AdminSection(loc.t('admin.manage.programs'), Icons.groups_outlined,

@@ -453,6 +453,51 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Manage Gallery',
     'ru': 'Галерея'
   },
+  'admin.banners': {
+    'he': 'באנרים ותמונות',
+    'en': 'Banners & photos',
+    'ru': 'Баннеры'
+  },
+  'admin.banners.subtitle': {
+    'he': 'העלו תמונה במקום הבאנר הכחול. בתצוגה המקדימה רואים בדיוק איך היא תיחתך באתר.',
+    'en': 'Upload a photo instead of the blue banner. The preview shows exactly how it will be cropped.',
+    'ru': 'Загрузите фото вместо синего баннера. В превью видно, как оно обрежется.'
+  },
+  'admin.banners.upload': {
+    'he': 'בחירת תמונה',
+    'en': 'Choose photo',
+    'ru': 'Выбрать фото'
+  },
+  'admin.banners.remove': {
+    'he': 'הסרת תמונה',
+    'en': 'Remove photo',
+    'ru': 'Удалить фото'
+  },
+  'admin.banners.preview': {
+    'he': 'תצוגה מקדימה (חיתוך כמו באתר)',
+    'en': 'Preview (cropped as on the site)',
+    'ru': 'Превью (обрезка как на сайте)'
+  },
+  'admin.banners.alignX': {
+    'he': 'מיקוד אופקי',
+    'en': 'Horizontal focus',
+    'ru': 'Горизонталь'
+  },
+  'admin.banners.alignY': {
+    'he': 'מיקוד אנכי',
+    'en': 'Vertical focus',
+    'ru': 'Вертикаль'
+  },
+  'admin.banners.empty': {
+    'he': 'באנר כחול כברירת מחדל',
+    'en': 'Default blue banner',
+    'ru': 'Синий баннер по умолчанию'
+  },
+  'admin.banners.hint': {
+    'he': 'גררו את המחוונים כדי לבחור איזה חלק מהתמונה יוצג. מה שמחוץ למסגרת ייחתך.',
+    'en': 'Drag the sliders to choose which part of the photo is shown. Anything outside the frame is cropped.',
+    'ru': 'Ползунки выбирают видимую часть фото. Всё за рамкой обрезается.'
+  },
   'admin.recent': {
     'he': 'פעילות אחרונה',
     'en': 'Recent activity',

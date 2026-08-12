@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import '../models.dart';
 
@@ -528,6 +530,34 @@ class AppRepository extends ChangeNotifier {
   void runSocialPush() {
     socialBot.lastSync = DateTime.now();
     socialBot.itemsSynced += 3;
+    notifyListeners();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Page banners (replace the default blue hero)
+  // ---------------------------------------------------------------------------
+  final Map<String, PageBanner> banners = {
+    for (final slot in bannerSlots) slot.route: PageBanner(),
+  };
+
+  PageBanner bannerFor(String route) =>
+      banners[route] ?? banners['/'] ?? PageBanner();
+
+  void setBannerImage(String route, Uint8List bytes) {
+    final current = banners.putIfAbsent(route, PageBanner.new);
+    current.bytes = bytes;
+    notifyListeners();
+  }
+
+  void setBannerAlign(String route, {double? x, double? y}) {
+    final current = banners.putIfAbsent(route, PageBanner.new);
+    if (x != null) current.alignX = x;
+    if (y != null) current.alignY = y;
+    notifyListeners();
+  }
+
+  void clearBanner(String route) {
+    banners[route] = PageBanner();
     notifyListeners();
   }
 }
