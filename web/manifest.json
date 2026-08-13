@@ -1,11 +1,11 @@
 {
-    "name": "בית חב״ד ליובאוויטש",
-    "short_name": "בית חב״ד",
+    "name": "בית חב״ד בית מנחם",
+    "short_name": "בית מנחם",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0B1C3A",
     "theme_color": "#0B1C3A",
-    "description": "אתר קהילת בית חב״ד — חדשות, זמנים, תוכניות ותרומות",
+    "description": "בית חב״ד ובית הכנסת בית מנחם בנובוסיבירסק",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

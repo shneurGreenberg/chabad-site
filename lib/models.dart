@@ -69,6 +69,14 @@ class SiteLocation {
         longitude: 35.2137,
         timezone: 'Asia/Jerusalem',
       );
+
+  static SiteLocation novosibirsk() => SiteLocation(
+        cityName: 'נובוסיבירסק',
+        query: 'Novosibirsk',
+        latitude: 55.0284,
+        longitude: 82.9283,
+        timezone: 'Asia/Novosibirsk',
+      );
 }
 
 class Zman {

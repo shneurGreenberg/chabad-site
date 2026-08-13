@@ -46,19 +46,19 @@ class LocaleController extends ChangeNotifier {
 /// All UI chrome strings keyed by string id, then locale code.
 const Map<String, Map<String, String>> _strings = {
   'site.name': {
-    'he': 'בית חב"ד ליובאוויטש',
-    'en': 'Chabad Lubavitch Center',
-    'ru': 'Центр Хабад Любавич',
+    'he': 'בית חב״ד בית מנחם',
+    'en': 'Chabad Beit Menachem',
+    'ru': 'Хабад Бейт Менахем',
   },
   'site.city': {
-    'he': 'העיר שלנו',
-    'en': 'Our City',
-    'ru': 'Наш город',
+    'he': 'נובוסיבירסק',
+    'en': 'Novosibirsk',
+    'ru': 'Новосибирск',
   },
   'site.tagline': {
-    'he': 'בית חם לכל יהודי — קרוב, מזמין ומחבר',
-    'en': 'A warm home for every Jew — welcoming and connecting',
-    'ru': 'Тёплый дом для каждого еврея — гостеприимный и объединяющий',
+    'he': 'בית הכנסת והמרכז הקהילתי היהודי היחיד בנובוסיבירסק — בית חם לכל יהודי סיביר',
+    'en': 'The only synagogue and Jewish community center in Novosibirsk — a home for every Jew in Siberia',
+    'ru': 'Единственная синагога и еврейский общинный центр Новосибирска — дом для каждого еврея Сибири',
   },
   // Navigation
   'nav.home': {'he': 'בית', 'en': 'Home', 'ru': 'Главная'},
@@ -117,24 +117,24 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Предстоящие события'
   },
   'home.stats.families': {
-    'he': 'משפחות בקהילה',
-    'en': 'Community families',
-    'ru': 'Семьи в общине'
+    'he': 'יהודים באזור',
+    'en': 'Jews in the region',
+    'ru': 'Евреев в регионе'
   },
   'home.stats.events': {
-    'he': 'אירועים בשנה',
-    'en': 'Events per year',
-    'ru': 'Событий в год'
+    'he': 'חנוכת בית מנחם',
+    'en': 'Beit Menachem opened',
+    'ru': 'Открытие Бейт Менахем'
   },
   'home.stats.years': {
-    'he': 'שנות פעילות',
-    'en': 'Years of activity',
-    'ru': 'Лет деятельности'
+    'he': 'שנות שליחות חב״ד',
+    'en': 'Years of Chabad shlichut',
+    'ru': 'Лет миссии Хабада'
   },
   'home.stats.meals': {
-    'he': 'ארוחות שבת',
-    'en': 'Shabbat meals',
-    'ru': 'Субботних трапез'
+    'he': 'ליד אור אבנר',
+    'en': 'Or Avner school since',
+    'ru': 'Лицей Ор Авнер с'
   },
   'home.explore': {
     'he': 'מה מחפשים?',
@@ -142,17 +142,17 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Разделы'
   },
   'home.reach.title': {
-    'he': 'גרתם פעם בעיר?',
-    'en': 'Once lived here?',
-    'ru': 'Когда-то жили здесь?'
+    'he': 'יהודי נובוסיבירסק בעולם?',
+    'en': 'Novosibirsk Jews abroad?',
+    'ru': 'Евреи Новосибирска в мире?'
   },
   'home.reach.body': {
     'he':
-        'אנחנו מחפשים יהודים שגרו בעיר ועברו לגור במקום אחר בעולם. השאירו פרטים ונשמור על קשר.',
+        'אם גדלתם בנובוסיבירסק, למדתם באור אבנר, או משפחתכם מהקהילה — השאירו פרטים. בית מנחם נשאר הבית שלכם.',
     'en':
-        'We are reconnecting with Jews who once lived here and moved elsewhere in the world. Leave your details and we will keep in touch.',
+        'If you grew up in Novosibirsk, studied at Or Avner, or your family is from the community — leave your details. Beit Menachem is still your home.',
     'ru':
-        'Мы восстанавливаем связь с евреями, которые жили здесь и переехали. Оставьте данные, и мы будем на связи.'
+        'Если вы выросли в Новосибирске, учились в «Ор Авнер» или ваша семья из общины — оставьте контакты. Бейт Менахем по-прежнему ваш дом.'
   },
   'common.readMore': {
     'he': 'קראו עוד',
@@ -214,9 +214,9 @@ const Map<String, Map<String, String>> _strings = {
 
   // Programs
   'programs.subtitle': {
-    'he': 'שיעורים, חוגים ופעילויות לכל המשפחה',
-    'en': 'Classes, clubs and activities for the whole family',
-    'ru': 'Уроки, кружки и мероприятия для всей семьи'
+    'he': 'בית כנסת, אור אבנר, מרכז לב, נוער, מקווה וחסד בבית מנחם',
+    'en': 'Synagogue, Or Avner, Lev, youth, mikveh and chesed at Beit Menachem',
+    'ru': 'Синагога, Ор Авнер, Лев, молодёжь, миква и хесед в Бейт Менахем'
   },
   'programs.audience': {
     'he': 'קהל יעד',
@@ -264,9 +264,9 @@ const Map<String, Map<String, String>> _strings = {
 
   // Cemetery
   'cemetery.subtitle': {
-    'he': 'מאגר המצבות מבית החיים היהודי',
-    'en': 'Jewish cemetery gravestone database',
-    'ru': 'База надгробий еврейского кладбища'
+    'he': 'מאגר מצבות — יעודכן עם שמות מבית החיים היהודי בנובוסיבירסק. אפשר להוסיף מהמנהל.',
+    'en': 'Gravestone database — to be filled with names from the Jewish cemetery in Novosibirsk. Add them in admin.',
+    'ru': 'База надгробий — будет заполнена именами с еврейского кладбища Новосибирска. Добавляйте в админке.'
   },
   'cemetery.search': {
     'he': 'חיפוש לפי שם',
@@ -280,18 +280,18 @@ const Map<String, Map<String, String>> _strings = {
 
   // Famous
   'famous.subtitle': {
-    'he': 'יהודים שהשאירו חותם בעיר — בהווה ובעבר',
-    'en': 'Jews who left a mark on the city — present and past',
-    'ru': 'Евреи, оставившие след в городе — в настоящем и прошлом'
+    'he': 'שליחי חב״ד וראשי הקהילה היהודית בנובוסיבירסק',
+    'en': 'Chabad emissaries and leaders of the Novosibirsk Jewish community',
+    'ru': 'Посланники Хабада и лидеры еврейской общины Новосибирска'
   },
   'famous.present': {'he': 'בהווה', 'en': 'Present', 'ru': 'Настоящее'},
   'famous.past': {'he': 'בעבר', 'en': 'Past', 'ru': 'Прошлое'},
 
   // History
   'history.subtitle': {
-    'he': 'ההיסטוריה היהודית של העיר',
-    'en': 'The Jewish history of the city',
-    'ru': 'Еврейская история города'
+    'he': 'מהקהילה ב־1893 ועד בית מנחם — הסיפור היהודי של נובוסיבירסק',
+    'en': 'From the 1893 community to Beit Menachem — the Jewish story of Novosibirsk',
+    'ru': 'От общины 1893 года до Бейт Менахем — еврейская история Новосибирска'
   },
   'history.tour': {
     'he': 'סיור וירטואלי',
@@ -306,9 +306,9 @@ const Map<String, Map<String, String>> _strings = {
 
   // Store
   'store.subtitle': {
-    'he': 'יודאיקה, ספרים ואוכל כשר — משלוח מהחנות המרכזית',
-    'en': 'Judaica, books and kosher food — shipped from the central store',
-    'ru': 'Иудаика, книги и кошерная еда — доставка с центрального склада'
+    'he': 'החנות הכשרה בבית מנחם — יודאיקה, ספרים ומזון כשר',
+    'en': 'The kosher shop at Beit Menachem — judaica, books and kosher food',
+    'ru': 'Кошерный магазин в Бейт Менахем — иудаика, книги и кошерные продукты'
   },
   'store.judaica': {'he': 'יודאיקה', 'en': 'Judaica', 'ru': 'Иудаика'},
   'store.books': {'he': 'ספרים', 'en': 'Books', 'ru': 'Книги'},
@@ -329,9 +329,9 @@ const Map<String, Map<String, String>> _strings = {
 
   // Library
   'library.subtitle': {
-    'he': 'ספריית שיעורי תורה של הרב',
-    'en': "The Rabbi's Torah class library",
-    'ru': 'Библиотека уроков Торы раввина'
+    'he': 'שיעורי תורה של הרב שניאור זלמן זקלס — בית מנחם נובוסיבירסק',
+    'en': 'Torah classes by Rabbi Shneur Zalman Zaklos — Beit Menachem Novosibirsk',
+    'ru': 'Уроки Торы раввина Шнеура Залмана Заклоса — Бейт Менахем Новосибирск'
   },
   'library.watch': {'he': 'צפייה', 'en': 'Watch', 'ru': 'Смотреть'},
   'library.minutes': {'he': 'דקות', 'en': 'min', 'ru': 'мин'},
@@ -369,9 +369,22 @@ const Map<String, Map<String, String>> _strings = {
 
   // About
   'about.subtitle': {
-    'he': 'פרטים, שעות פתיחה וכתובת',
-    'en': 'Details, opening hours and address',
-    'ru': 'Детали, часы работы и адрес'
+    'he': 'בית הכנסת בית מנחם, רחוב שצ׳טינקינה 68, נובוסיבירסק',
+    'en': 'Beit Menachem synagogue, 68 Shchetinkina St., Novosibirsk',
+    'ru': 'Синагога Бейт Менахем, ул. Щетинкина, 68, Новосибирск'
+  },
+  'about.story': {
+    'he': 'אודות הקהילה',
+    'en': 'About the community',
+    'ru': 'Об общине'
+  },
+  'about.story.body': {
+    'he':
+        'בית מנחם הוא המרכז הקהילתי היהודי ובית הכנסת היחיד בנובוסיבירסק. הוא נקרא על שם הרבי מליובאוויטש, רבי מנחם מנדל שניאורסון. בראש הקהילה עומדים שליחי חב״ד הרב שניאור זלמן זקלס ורעייתו הרבנית מרים. המבנה נחנך ב־28 באוגוסט 2013: בית כנסת, מקווה לגברים ולנשים, ספרייה, אולם אירועים, חנות כשרה ומרכז ילדים. ליד הקהילה פועלים ליד אור אבנר (משנת 2000) ומרכז «לב» לילדים עם צרכים מיוחדים.',
+    'en':
+        'Beit Menachem is the Jewish community center and the only synagogue in Novosibirsk, named for the Lubavitcher Rebbe, Rabbi Menachem Mendel Schneerson. It is led by Chabad emissaries Rabbi Shneur Zalman Zaklos and Rebbetzin Miriam. The building opened on 28 August 2013: sanctuary, men\'s and women\'s mikveh, library, banquet hall, kosher shop and children\'s center. The community also runs Or Avner school (since 2000) and the Lev center for children with special needs.',
+    'ru':
+        '«Бейт Менахем» — еврейский общинный центр и единственная синагога Новосибирска, названная в честь Любавичского Ребе Менахема-Мендла Шнеерсона. Общину возглавляют посланники Хабада раввин Шнеур Залман Заклос и раббанит Мириам. Здание открыто 28 августа 2013 года: синагога, мужская и женская миквы, библиотека, праздничный зал, кошерный магазин и детский центр. При общине работают лицей «Ор Авнер» (с 2000) и центр «Лев» для детей с особыми потребностями.'
   },
   'about.hours': {'he': 'שעות פתיחה', 'en': 'Opening hours', 'ru': 'Часы работы'},
   'about.address': {'he': 'כתובת', 'en': 'Address', 'ru': 'Адрес'},

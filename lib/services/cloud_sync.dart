@@ -96,6 +96,7 @@ class CloudSync {
 
       await db.collection('site').doc('content').set({
         'v': 3,
+        'seed': snapshot['seed'],
         'seq': snapshot['seq'],
         'updatedAt': now,
         'mapsKey': snapshot['mapsKey'],

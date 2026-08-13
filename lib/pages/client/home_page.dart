@@ -31,24 +31,24 @@ class HomePage extends StatelessWidget {
                   : gridColumns(context, max: 4),
               children: [
                 StatCard(
-                    value: '480+',
+                    value: '12,000+',
                     label: loc.t('home.stats.families'),
                     icon: Icons.family_restroom,
                     color: AppColors.primary),
                 StatCard(
-                    value: '120',
+                    value: '2013',
                     label: loc.t('home.stats.events'),
-                    icon: Icons.event,
+                    icon: Icons.synagogue,
                     color: const Color(0xFFC2410C)),
                 StatCard(
-                    value: '34',
+                    value: '27',
                     label: loc.t('home.stats.years'),
                     icon: Icons.verified,
                     color: const Color(0xFF0F766E)),
                 StatCard(
-                    value: '5,200',
+                    value: '2000',
                     label: loc.t('home.stats.meals'),
-                    icon: Icons.restaurant,
+                    icon: Icons.school,
                     color: AppColors.accent),
               ],
             ),

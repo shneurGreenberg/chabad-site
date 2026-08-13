@@ -25,6 +25,7 @@ class AppRepository extends ChangeNotifier {
     Future<void>.microtask(_boot);
   }
 
+  static const _contentSeed = 5;
   static const _snapKey = 'chabad_site_snapshot';
   static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
@@ -77,23 +78,24 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   final ContactInfo contact = ContactInfo(
     name: {
-      'he': 'בית חב"ד ליובאוויטש',
-      'en': 'Chabad Lubavitch Center',
-      'ru': 'Центр Хабад Любавич',
+      'he': 'בית חב״ד בית מנחם',
+      'en': 'Chabad Beit Menachem',
+      'ru': 'Хабад Бейт Менахем',
     },
     address: {
-      'he': 'רחוב הרצל 12, מרכז העיר',
-      'en': '12 Herzl St., City Center',
-      'ru': 'ул. Герцля 12, центр города',
+      'he': 'רחוב שצ׳טינקינה 68, נובוסיבירסק, רוסיה 630099',
+      'en': '68 Shchetinkina St., Novosibirsk, Russia 630099',
+      'ru': 'ул. Щетинкина, 68, Новосибирск, 630099',
     },
-    phone: '+972-3-555-0182',
-    email: 'info@chabad-city.org',
+    phone: '+7 (383) 222-20-23',
+    email: 'chabad.nsk@gmail.com',
     hours: [
-      MapEntry({'he': 'ראשון–חמישי', 'en': 'Sun–Thu', 'ru': 'Вс–Чт'},
-          '09:00 – 20:00'),
-      MapEntry({'he': 'שישי', 'en': 'Friday', 'ru': 'Пятница'}, '08:00 – 14:00'),
-      MapEntry({'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суבбота'},
-          '—'),
+      MapEntry({'he': 'תפילות', 'en': 'Prayers', 'ru': 'Молитвы'},
+          'יומיות / Daily'),
+      MapEntry({'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
+          'לפי הזמנים / By zmanim'),
+      MapEntry({'he': 'מקווה', 'en': 'Mikveh', 'ru': 'Миква'},
+          'בתיאום / By appointment'),
     ],
   );
 
@@ -111,100 +113,104 @@ class AppRepository extends ChangeNotifier {
     NewsArticle(
       id: _newId(),
       title: {
-        'he': 'סעודת שבת קהילתית לכל המשפחה',
-        'en': 'Community Shabbat dinner for the whole family',
-        'ru': 'Общинный субботний ужин для всей семьи',
+        'he': 'בית מנחם — בית הכנסת היחיד בנובוסיבירסק',
+        'en': 'Beit Menachem — the only synagogue in Novosibirsk',
+        'ru': 'Бейт Менахем — единственная синагога Новосибирска',
       },
       body: {
         'he':
-            'בשבת הקרובה נקיים סעודת שבת חגיגית בבית חב"ד. מוזמנים כל בני הקהילה, אורחים וסטודנטים. נא להירשם מראש.',
+            'ב־28 באוגוסט 2013 נחנך המרכז הקהילתי בית מנחם ברחוב שצ׳טינקינה 68. בטקס השתתפו הרב הראשי לרוסיה ברל לזר, ראש העיר דאז ולדימיר גורודצקי, ויותר מאלף אורחים. הבניין (~3,400 מ״ר) כולל בית כנסת, מקווה, ספרייה, אולם אירועים וחנות כשרה.',
         'en':
-            'This Shabbat we host a festive community dinner at the Chabad house. All members, guests and students are welcome. Please register in advance.',
+            'On 28 August 2013 the Beit Menachem community center opened at 68 Shchetinkina Street. Russia\'s Chief Rabbi Berel Lazar, then-mayor Vladimir Gorodetsky and more than a thousand guests attended. The ~3,400 m² building holds a synagogue, mikveh, library, hall and kosher shop.',
         'ru':
-            'В эту субботу мы проводим праздничный ужин в доме Хабада. Приглашаются все члены общины, гости и студенты. Просьба зарегистрироваться заранее.',
+            '28 августа 2013 года открыт общинный центр «Бейт Менахем» на ул. Щетинкина, 68. На церемонии были главный раввин России Берл Лазар, мэр Владимир Городецкий и более тысячи гостей. В здании (~3400 м²) — синагога, миква, библиотека, зал и кошерный магазин.',
       },
-      date: DateTime.now().subtract(const Duration(days: 1)),
-      category: {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
+      date: DateTime(2013, 8, 28),
+      category: {'he': 'קהילה', 'en': 'Community', 'ru': 'Община'},
       imageColor: 0xFF1D4ED8,
-      icon: Icons.dinner_dining,
+      icon: Icons.synagogue,
     ),
     NewsArticle(
       id: _newId(),
       title: {
-        'he': 'חלוקת מצות לקראת פסח',
-        'en': 'Matzah distribution ahead of Passover',
-        'ru': 'Раздача мацы к Песаху',
+        'he': 'ליד אור אבנר — חינוך יהודי בנובוסיבירסק',
+        'en': 'Or Avner — Jewish education in Novosibirsk',
+        'ru': 'Лицей «Ор Авнер» — еврейское образование',
       },
       body: {
         'he':
-            'מתנדבי בית חב"ד יצאו לחלק מצות שמורות לכל משפחות הקהילה. ניתן לבקש חבילה גם דרך האתר.',
+            'מאז ספטמבר 2000 פועל ליד אור אבנר עם גן לגילאי 3–6, ביוזמת הרב זקלס. הילדים משתתפים בכל חגי הקהילה, ובוגרים ממשיכים ללימודים ברוסיה ובישראל. כתובת: רחוב שקספיר 9ב.',
         'en':
-            'Chabad volunteers are distributing handmade matzah to community families. You can also request a package through the website.',
+            'Since September 2000 Or Avner school and a preschool for ages 3–6 have operated at Rabbi Zaklos\'s initiative. Children take part in every communal holiday; graduates continue studies in Russia and Israel. Address: 9b Shakspira St.',
         'ru':
-            'Волонтёры Хабада раздают мацу семьям общины. Пакет можно заказать и через сайт.',
+            'С сентября 2000 года работает лицей «Ор Авнер» с дошкольной группой 3–6 лет. Дети участвуют во всех праздниках общины; выпускники учатся в вузах России и Израиля. Адрес: ул. Шекспира, 9Б.',
       },
-      date: DateTime.now().subtract(const Duration(days: 4)),
-      category: {'he': 'חגים', 'en': 'Holidays', 'ru': 'Праздники'},
-      imageColor: 0xFF9333EA,
-      icon: Icons.bakery_dining,
-      source: NewsSource.telegram,
-    ),
-    NewsArticle(
-      id: _newId(),
-      title: {
-        'he': 'שיעור חדש בתניא בכל יום שלישי',
-        'en': 'New Tanya class every Tuesday',
-        'ru': 'Новый урок Тании по вторникам',
-      },
-      body: {
-        'he':
-            'הרב פותח מחזור שיעורים חדש בספר התניא. השיעור מתאים למתחילים ולמתקדמים כאחד.',
-        'en':
-            'The Rabbi is opening a new cycle of Tanya classes, suitable for beginners and advanced students alike.',
-        'ru':
-            'Раввин открывает новый цикл уроков Тании — подойдёт и новичкам, и продвинутым.',
-      },
-      date: DateTime.now().subtract(const Duration(days: 7)),
-      category: {'he': 'שיעורים', 'en': 'Classes', 'ru': 'Уроки'},
+      date: DateTime(2000, 9, 1),
+      category: {'he': 'חינוך', 'en': 'Education', 'ru': 'Образование'},
       imageColor: 0xFF0D9488,
-      icon: Icons.menu_book,
+      icon: Icons.school,
     ),
     NewsArticle(
       id: _newId(),
       title: {
-        'he': 'מבצע תפילין במרכז העיר',
-        'en': 'Tefillin campaign in the city center',
-        'ru': 'Акция тфилин в центре города',
+        'he': 'מרכז «לב» לילדים עם צרכים מיוחדים',
+        'en': 'Lev center for children with special needs',
+        'ru': 'Центр «Лев» для детей с особыми потребностями',
       },
       body: {
         'he':
-            'הנחנו תפילין עם עשרות יהודים שעברו ברחוב הראשי. הצטרפו אלינו למבצע הבא.',
+            'הקהילה מפעילה את מרכז האינטגרציה «לב» ברחוב שקספיר 9א — כולל בריכה ותוכניות חינוך משלים (Smart J) לילדים ולנוער עם מוגבלות.',
         'en':
-            'We helped dozens of Jews put on tefillin in the main street. Join us for the next campaign.',
+            'The community runs the Lev integration center at 9a Shakspira Street, including a pool and extra education (Smart J) for children and youth with disabilities.',
         'ru':
-            'Мы помогли десяткам евреев возложить тфилин на главной улице. Присоединяйтесь к следующей акции.',
+            'При общине работает интеграционный центр «Лев» (ул. Шекспира, 9А) — бассейн и доп. образование Smart J для детей и молодёжи с ОВЗ.',
       },
-      date: DateTime.now().subtract(const Duration(days: 11)),
-      category: {'he': 'מבצעים', 'en': 'Outreach', 'ru': 'Акции'},
+      date: DateTime(2019, 1, 1),
+      category: {'he': 'חסד', 'en': 'Chesed', 'ru': 'Хесед'},
       imageColor: 0xFFDB2777,
+      icon: Icons.favorite,
+    ),
+    NewsArticle(
+      id: _newId(),
+      title: {
+        'he': 'שליחות חב״ד בנובוסיבירסק מאז 1999',
+        'en': 'Chabad shlichut in Novosibirsk since 1999',
+        'ru': 'Миссия Хабада в Новосибирске с 1999 года',
+      },
+      body: {
+        'he':
+            'בסוף 1999 הגיע לעיר הרב שניאור זלמן זקלס, שליח הרבי ובוגר ישיבות בניו יורק, מילאנו וברזיל. יחד עם הרבנית מרים הם חידשו את החיים היהודיים בסיביר: תפילות, חגים, חסד וחינוך.',
+        'en':
+            'In late 1999 Rabbi Shneur Zalman Zaklos, a Chabad emissary trained in New York, Milan and Brazil, arrived in the city. Together with Rebbetzin Miriam they revived Jewish life in Siberia: prayer, holidays, chesed and education.',
+        'ru':
+            'В конце 1999 года в город прибыл раввин Шнеур Залман Заклос, посланник Ребе, учившийся в Нью-Йорке, Милане и Бразилии. Вместе с раббанит Мириам они возродили еврейскую жизнь Сибири.',
+      },
+      date: DateTime(1999, 12, 1),
+      category: {'he': 'קהילה', 'en': 'Community', 'ru': 'Община'},
+      imageColor: 0xFF9333EA,
       icon: Icons.volunteer_activism,
-      source: NewsSource.telegram,
     ),
   ];
 
   // ---------------------------------------------------------------------------
   // Location + live zmanim / parasha
   // ---------------------------------------------------------------------------
-  SiteLocation location = SiteLocation.jerusalem();
+  SiteLocation location = SiteLocation.novosibirsk();
 
   void _restoreLocation() {
     final raw = readPref('chabad_site_location');
     if (raw == null || raw.isEmpty) return;
     try {
       final m = jsonDecode(raw) as Map<String, dynamic>;
+      final city = m['city'] as String? ?? '';
+      final query = m['query'] as String? ?? '';
+      if (city.contains('ירושלים') ||
+          query.toLowerCase().contains('jerusalem')) {
+        return;
+      }
       location = SiteLocation(
-        cityName: m['city'] as String? ?? location.cityName,
-        query: m['query'] as String? ?? location.query,
+        cityName: city.isEmpty ? location.cityName : city,
+        query: query.isEmpty ? location.query : query,
         latitude: (m['lat'] as num?)?.toDouble() ?? location.latitude,
         longitude: (m['lon'] as num?)?.toDouble() ?? location.longitude,
         timezone: m['tz'] as String? ?? location.timezone,
@@ -313,80 +319,80 @@ class AppRepository extends ChangeNotifier {
   late final List<Program> programs = [
     Program(
       id: _newId(),
-      title: {'he': 'גן ילדים חב"ד', 'en': 'Chabad Kindergarten', 'ru': 'Детский сад Хабад'},
+      title: {'he': 'בית הכנסת בית מנחם', 'en': 'Beit Menachem synagogue', 'ru': 'Синагога Бейт Менахем'},
       description: {
-        'he': 'גן חם ואוהב עם חינוך יהודי ערכי לגילאי 2–5.',
-        'en': 'A warm, loving kindergarten with values-based Jewish education, ages 2–5.',
-        'ru': 'Тёплый детский сад с еврейским воспитанием, 2–5 лет.',
+        'he': 'בית הכנסת היחיד בנובוסיבירסק. תפילות יומיות, שבתות וחגים בלב המרכז הקהילתי.',
+        'en': 'The only synagogue in Novosibirsk. Daily prayers, Shabbat and holidays at the heart of the community center.',
+        'ru': 'Единственная синагога Новосибирска. Ежедневные молитвы, субботы и праздники.',
       },
-      schedule: {'he': 'א׳–ה׳ 08:00–14:00', 'en': 'Sun–Thu 08:00–14:00', 'ru': 'Вс–Чт 08:00–14:00'},
-      audience: {'he': 'גילאי 2–5', 'en': 'Ages 2–5', 'ru': '2–5 лет'},
-      icon: Icons.child_care,
-      color: 0xFFF59E0B,
+      schedule: {'he': 'תפילות יומיות', 'en': 'Daily prayers', 'ru': 'Ежедневные молитвы'},
+      audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
+      icon: Icons.synagogue,
+      color: 0xFF1D4ED8,
     ),
     Program(
       id: _newId(),
-      title: {'he': 'בית ספר לעברית', 'en': 'Hebrew School', 'ru': 'Школа иврита'},
+      title: {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
       description: {
-        'he': 'לימודי עברית, תפילה ומסורת לילדי הקהילה.',
-        'en': 'Hebrew, prayer and tradition studies for community children.',
-        'ru': 'Иврит, молитва и традиции для детей общины.',
+        'he': 'בית ספר יהודי עם גן לגילאי 3–6. פועל מאז 2000 ברחוב שקספיר 9ב.',
+        'en': 'Jewish school with preschool for ages 3–6. Operating since 2000 at 9b Shakspira St.',
+        'ru': 'Еврейский лицей с дошкольной группой 3–6 лет. С 2000 года, ул. Шекспира, 9Б.',
       },
-      schedule: {'he': 'יום ראשון 10:00', 'en': 'Sunday 10:00', 'ru': 'Воскресенье 10:00'},
-      audience: {'he': 'גילאי 6–13', 'en': 'Ages 6–13', 'ru': '6–13 лет'},
+      schedule: {'he': 'ימי לימוד', 'en': 'School days', 'ru': 'Учебные дни'},
+      audience: {'he': 'ילדים', 'en': 'Children', 'ru': 'Дети'},
       icon: Icons.school,
       color: 0xFF3B82F6,
     ),
     Program(
       id: _newId(),
-      title: {'he': 'ארגון נשים', 'en': "Women's Circle", 'ru': 'Женский клуб'},
+      title: {'he': 'מרכז לב', 'en': 'Lev center', 'ru': 'Центр Лев'},
       description: {
-        'he': 'מפגשי נשים, שיעורים והכנות לחגים.',
-        'en': 'Women gatherings, classes and holiday preparations.',
-        'ru': 'Встречи женщин, уроки и подготовка к праздникам.',
+        'he': 'מרכז אינטגרציה לילדים ולנוער עם צרכים מיוחדים, כולל בריכה וחינוך משלים Smart J. רחוב שקספיר 9א.',
+        'en': 'Integration center for children and youth with special needs, including a pool and Smart J. 9a Shakspira St.',
+        'ru': 'Интеграционный центр для детей и молодёжи с ОВЗ, бассейн и Smart J. Ул. Шекспира, 9А.',
       },
-      schedule: {'he': 'יום שלישי 20:00', 'en': 'Tuesday 20:00', 'ru': 'Вторник 20:00'},
-      audience: {'he': 'נשים', 'en': 'Women', 'ru': 'Женщины'},
-      icon: Icons.diversity_1,
+      schedule: {'he': 'לפי תוכניות', 'en': 'By program', 'ru': 'По программам'},
+      audience: {'he': 'ילדים ומשפחות', 'en': 'Children & families', 'ru': 'Дети и семьи'},
+      icon: Icons.favorite,
       color: 0xFFEC4899,
     ),
     Program(
       id: _newId(),
-      title: {'he': 'כולל אברכים', 'en': 'Kollel', 'ru': 'Колель'},
+      title: {'he': 'נוער — Yahad Stars ו־EnerJew', 'en': 'Youth — Yahad Stars & EnerJew', 'ru': 'Молодёжь — Yahad Stars и EnerJew'},
       description: {
-        'he': 'לימוד תורה מעמיק לאברכים בשעות הבוקר.',
-        'en': 'In-depth Torah study for young men in the mornings.',
-        'ru': 'Углублённое изучение Торы по утрам.',
-      },
-      schedule: {'he': 'א׳–ו׳ 09:00', 'en': 'Sun–Fri 09:00', 'ru': 'Вс–Пт 09:00'},
-      audience: {'he': 'גברים', 'en': 'Men', 'ru': 'Мужчины'},
-      icon: Icons.auto_stories,
-      color: 0xFF0D9488,
-    ),
-    Program(
-      id: _newId(),
-      title: {'he': 'סטודנטים וצעירים', 'en': 'Students & Young Pros', 'ru': 'Студенты и молодёжь'},
-      description: {
-        'he': 'ארוחות שבת, טיולים ומפגשים חברתיים.',
-        'en': 'Shabbat meals, trips and social meetups.',
-        'ru': 'Субботние трапезы, поездки и встречи.',
+        'he': 'מועדוני נוער בבית מנחם: מפגשים, שבתות ופרויקטים לצעירים.',
+        'en': 'Youth clubs at Beit Menachem: meetups, Shabbat and projects for young people.',
+        'ru': 'Молодёжные клубы в Бейт Менахем: встречи, субботы и проекты.',
       },
       schedule: {'he': 'לפי לוח אירועים', 'en': 'Per events calendar', 'ru': 'По расписанию'},
-      audience: {'he': 'גילאי 18–30', 'en': 'Ages 18–30', 'ru': '18–30 лет'},
+      audience: {'he': 'נוער וסטודנטים', 'en': 'Youth & students', 'ru': 'Молодёжь и студенты'},
       icon: Icons.groups_2,
       color: 0xFF8B5CF6,
     ),
     Program(
       id: _newId(),
-      title: {'he': 'ביקורי חסד', 'en': 'Chesed Visits', 'ru': 'Визиты хеседа'},
+      title: {'he': 'מקווה', 'en': 'Mikveh', 'ru': 'Миква'},
       description: {
-        'he': 'ביקורים אצל קשישים, חולים ובודדים בקהילה.',
-        'en': 'Visits to the elderly, sick and lonely in the community.',
-        'ru': 'Визиты к пожилым, больным и одиноким.',
+        'he': 'מקווה לגברים ולנשים בתוך המרכז הקהילתי, רחוב שצ׳טינקינה 68.',
+        'en': 'Men\'s and women\'s mikveh inside the community center, 68 Shchetinkina St.',
+        'ru': 'Мужская и женская миквы в общинном центре, ул. Щетинкина, 68.',
       },
-      schedule: {'he': 'לאורך השבוע', 'en': 'Throughout the week', 'ru': 'В течение недели'},
+      schedule: {'he': 'בתיאום', 'en': 'By appointment', 'ru': 'По записи'},
+      audience: {'he': 'נשים וגברים', 'en': 'Women and men', 'ru': 'Женщины и мужчины'},
+      icon: Icons.water_drop,
+      color: 0xFF0D9488,
+    ),
+    Program(
+      id: _newId(),
+      title: {'he': 'חסד וסיוע הומניטרי', 'en': 'Chesed & humanitarian aid', 'ru': 'Хесед и гуманитарная помощь'},
+      description: {
+        'he': 'חלוקת מזון, בגדים ומצות לפסח לקשישים ולמשפחות נזקקות בקהילה.',
+        'en': 'Food, clothing and Passover matzah for elderly and families in need.',
+        'ru': 'Продукты, одежда и маца к Песаху для пожилых и нуждающихся семей.',
+      },
+      schedule: {'he': 'לאורך השנה', 'en': 'Year-round', 'ru': 'В течение года'},
       audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
-      icon: Icons.favorite,
+      icon: Icons.volunteer_activism,
       color: 0xFFEF4444,
     ),
   ];
@@ -395,67 +401,52 @@ class AppRepository extends ChangeNotifier {
   // Gallery + face tags
   // ---------------------------------------------------------------------------
   final List<String> faces = [
-    'Rabbi Mendel',
-    'Rebbetzin Chana',
-    'David Katz',
-    'Sarah Levin',
-    'Yosef Cohen',
-    'Miriam Gold',
+    'Rabbi Zaklos',
+    'Rebbetzin Miriam',
+    'Sender Kruglov',
   ];
 
   late final List<GalleryPhoto> gallery = [
-    GalleryPhoto(id: _newId(), event: {'he': 'הדלקת נר חנוכה מרכזית', 'en': 'Grand Menorah lighting', 'ru': 'Зажигание меноры'}, year: 2025, tags: ['Rabbi Mendel', 'David Katz', 'Yosef Cohen'], color: 0xFF1D4ED8, icon: Icons.local_fire_department),
-    GalleryPhoto(id: _newId(), event: {'he': 'סעודת פורים', 'en': 'Purim feast', 'ru': 'Пуримская трапеза'}, year: 2025, tags: ['Rebbetzin Chana', 'Sarah Levin', 'Miriam Gold'], color: 0xFFDB2777, icon: Icons.celebration),
-    GalleryPhoto(id: _newId(), event: {'he': 'סדר פסח ציבורי', 'en': 'Public Passover Seder', 'ru': 'Общественный седер'}, year: 2024, tags: ['Rabbi Mendel', 'Rebbetzin Chana', 'David Katz'], color: 0xFF9333EA, icon: Icons.wine_bar),
-    GalleryPhoto(id: _newId(), event: {'he': 'ל"ג בעומר', 'en': 'Lag BaOmer bonfire', 'ru': 'Костёр Лаг ба-Омер'}, year: 2024, tags: ['Yosef Cohen', 'David Katz'], color: 0xFFF59E0B, icon: Icons.forest),
-    GalleryPhoto(id: _newId(), event: {'he': 'הכנסת ספר תורה', 'en': 'Torah dedication', 'ru': 'Внесение свитка Торы'}, year: 2023, tags: ['Rabbi Mendel', 'Yosef Cohen', 'Sarah Levin'], color: 0xFF0D9488, icon: Icons.auto_stories),
-    GalleryPhoto(id: _newId(), event: {'he': 'מחנה קיץ לילדים', 'en': 'Kids summer camp', 'ru': 'Летний лагерь'}, year: 2023, tags: ['Miriam Gold', 'Sarah Levin'], color: 0xFF10B981, icon: Icons.beach_access),
-    GalleryPhoto(id: _newId(), event: {'he': 'חתונה קהילתית', 'en': 'Community wedding', 'ru': 'Общинная свадьба'}, year: 2022, tags: ['Rabbi Mendel', 'Rebbetzin Chana'], color: 0xFF6366F1, icon: Icons.favorite),
-    GalleryPhoto(id: _newId(), event: {'he': 'ראש השנה', 'en': 'Rosh Hashanah', 'ru': 'Рош ха-Шана'}, year: 2022, tags: ['David Katz', 'Miriam Gold', 'Yosef Cohen'], color: 0xFFF97316, icon: Icons.music_note),
-    GalleryPhoto(id: _newId(), event: {'he': 'בר מצווה', 'en': 'Bar Mitzvah', 'ru': 'Бар-мицва'}, year: 2021, tags: ['Rabbi Mendel', 'David Katz'], color: 0xFF0EA5E9, icon: Icons.cake),
+    GalleryPhoto(id: _newId(), event: {'he': 'חנוכת בית מנחם', 'en': 'Beit Menachem opening', 'ru': 'Открытие Бейт Менахем'}, year: 2013, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFF1D4ED8, icon: Icons.synagogue),
+    GalleryPhoto(id: _newId(), event: {'he': 'הכנסת ספר תורה', 'en': 'Torah dedication', 'ru': 'Внесение свитка Торы'}, year: 2014, tags: ['Rabbi Zaklos'], color: 0xFF0D9488, icon: Icons.auto_stories),
+    GalleryPhoto(id: _newId(), event: {'he': 'חנוכה בנובוסיבירסק', 'en': 'Chanukah in Novosibirsk', 'ru': 'Ханука в Новосибирске'}, year: 2024, tags: ['Rabbi Zaklos', 'Sender Kruglov'], color: 0xFFF59E0B, icon: Icons.local_fire_department),
+    GalleryPhoto(id: _newId(), event: {'he': 'ראש השנה בבית מנחם', 'en': 'Rosh Hashanah at Beit Menachem', 'ru': 'Рош ха-Шана в Бейт Менахем'}, year: 2024, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFFF97316, icon: Icons.music_note),
+    GalleryPhoto(id: _newId(), event: {'he': 'ילדי אור אבנר בחג', 'en': 'Or Avner children at a holiday', 'ru': 'Дети Ор Авнер на празднике'}, year: 2023, tags: ['Rebbetzin Miriam'], color: 0xFF10B981, icon: Icons.child_care),
+    GalleryPhoto(id: _newId(), event: {'he': 'סדר פסח קהילתי', 'en': 'Community Passover Seder', 'ru': 'Общинный седер Песаха'}, year: 2024, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam', 'Sender Kruglov'], color: 0xFF9333EA, icon: Icons.wine_bar),
   ];
 
   // ---------------------------------------------------------------------------
   // Famous Jews
   // ---------------------------------------------------------------------------
   late final List<FamousPerson> famous = [
-    FamousPerson(id: _newId(), name: {'he': 'ד"ר אברהם רוזן', 'en': 'Dr. Avraham Rosen', 'ru': 'Д-р Авраам Розен'}, profession: {'he': 'רופא ומנתח בכיר', 'en': 'Senior physician & surgeon', 'ru': 'Ведущий врач и хирург'}, bio: {'he': 'ניהל את המחלקה הכירורגית בבית החולים המרכזי במשך 30 שנה.', 'en': 'Led the surgical department of the central hospital for 30 years.', 'ru': 'Возглавлял хирургическое отделение центральной больницы 30 лет.'}, era: Era.present, color: 0xFF2563EB, initials: 'AR'),
-    FamousPerson(id: _newId(), name: {'he': 'המהנדס יעקב שטרן', 'en': 'Eng. Yaakov Stern', 'ru': 'Инж. Яаков Штерн'}, profession: {'he': 'מהנדס גשרים', 'en': 'Bridge engineer', 'ru': 'Инженер мостов'}, bio: {'he': 'תכנן את הגשר הגדול בעיר, סמל הנדסי מוכר.', 'en': 'Designed the city\'s great bridge, a recognized engineering landmark.', 'ru': 'Спроектировал большой городской мост.'}, era: Era.present, color: 0xFF0D9488, initials: 'YS'),
-    FamousPerson(id: _newId(), name: {'he': 'פרופ׳ לאה גולדברג', 'en': 'Prof. Lea Goldberg', 'ru': 'Проф. Лея Гольдберг'}, profession: {'he': 'חוקרת ומרצה', 'en': 'Researcher & lecturer', 'ru': 'Исследователь и лектор'}, bio: {'he': 'מובילה מחקר בתחום ההיסטוריה היהודית של האזור.', 'en': 'Leads research on the Jewish history of the region.', 'ru': 'Ведёт исследования еврейской истории региона.'}, era: Era.present, color: 0xFFDB2777, initials: 'LG'),
-    FamousPerson(id: _newId(), name: {'he': 'הרב שלמה זלמן', 'en': 'Rabbi Shlomo Zalman', 'ru': 'Раввин Шломо Залман'}, profession: {'he': 'רבה של העיר (1890–1955)', 'en': 'City Rabbi (1890–1955)', 'ru': 'Раввин города (1890–1955)'}, bio: {'he': 'עמד בראש הקהילה בתקופות קשות ושמר על גחלת היהדות.', 'en': 'Led the community through difficult times and kept Judaism alive.', 'ru': 'Возглавлял общину в трудные времена.'}, era: Era.past, color: 0xFF7C3AED, initials: 'SZ'),
-    FamousPerson(id: _newId(), name: {'he': 'מרים לוין', 'en': 'Miriam Levin', 'ru': 'Мириам Левин'}, profession: {'he': 'סופרת (1901–1978)', 'en': 'Author (1901–1978)', 'ru': 'Писательница (1901–1978)'}, bio: {'he': 'כתבה על חיי היהודים בעיר לפני המלחמה.', 'en': 'Wrote about Jewish life in the city before the war.', 'ru': 'Писала о еврейской жизни до войны.'}, era: Era.past, color: 0xFFB45309, initials: 'ML'),
-    FamousPerson(id: _newId(), name: {'he': 'ד"ר יצחק פרל', 'en': 'Dr. Yitzchak Perl', 'ru': 'Д-р Ицхак Перл'}, profession: {'he': 'רופא הקהילה (1875–1943)', 'en': 'Community doctor (1875–1943)', 'ru': 'Врач общины (1875–1943)'}, bio: {'he': 'טיפל בכל בני הקהילה ללא תמורה במשך עשורים.', 'en': 'Cared for the entire community free of charge for decades.', 'ru': 'Десятилетиями лечил общину бесплатно.'}, era: Era.past, color: 0xFF475569, initials: 'YP'),
+    FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם ליד אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
+    FamousPerson(id: _newId(), name: {'he': 'הרבנית מרים זקלס', 'en': 'Rebbetzin Miriam Zaklos', 'ru': 'Раббанит Мириам Заклос'}, profession: {'he': 'שליחת חב״ד', 'en': 'Chabad emissary', 'ru': 'Посланница Хабада'}, bio: {'he': 'שותפה לשליחות בנובוסיבירסק מאז 1999. מובילה חינוך, חגים וחיי הקהילה לצד הרב.', 'en': 'Partner in the Novosibirsk shlichut since 1999. Leads education, holidays and community life alongside the Rabbi.', 'ru': 'Вместе с раввином на миссии с 1999 года. Образование, праздники и жизнь общины.'}, era: Era.present, color: 0xFFDB2777, initials: 'MZ'),
+    FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'יו״ר הקהילה היהודית', 'en': 'Community chairman', 'ru': 'Председатель общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 יו״ר קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since 2019 chairman of Beit Menachem.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с 2019 председатель общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
   ];
 
   // ---------------------------------------------------------------------------
   // Cemetery
   // ---------------------------------------------------------------------------
-  late final List<Grave> graves = [
-    Grave(id: _newId(), name: 'Shlomo Zalman Ha-Levi', hebrewName: 'שלמה זלמן הלוי', birthYear: 1890, deathYear: 1955, section: 'A', row: '3', notes: {'he': 'רבה של העיר', 'en': 'City Rabbi', 'ru': 'Раввин города'}),
-    Grave(id: _newId(), name: 'Yitzchak Perl', hebrewName: 'יצחק פרל', birthYear: 1875, deathYear: 1943, section: 'A', row: '5', notes: {'he': 'רופא הקהילה', 'en': 'Community doctor', 'ru': 'Врач общины'}),
-    Grave(id: _newId(), name: 'Chana Bracha', hebrewName: 'חנה ברכה', birthYear: 1902, deathYear: 1969, section: 'B', row: '1', notes: {'he': 'מייסדת ארגון הנשים', 'en': 'Founder of the women\'s circle', 'ru': 'Основательница женского клуба'}),
-    Grave(id: _newId(), name: 'Menachem Weiss', hebrewName: 'מנחם ווייס', birthYear: 1888, deathYear: 1951, section: 'B', row: '4', notes: {'he': 'שוחט ובודק', 'en': 'Shochet', 'ru': 'Резник'}),
-    Grave(id: _newId(), name: 'Rivka Stern', hebrewName: 'רבקה שטרן', birthYear: 1910, deathYear: 1994, section: 'C', row: '2', notes: {'he': 'מורה בבית הספר', 'en': 'School teacher', 'ru': 'Учитель'}),
-    Grave(id: _newId(), name: 'Aharon Gold', hebrewName: 'אהרן גולד', birthYear: 1866, deathYear: 1932, section: 'A', row: '1', notes: {'he': 'גבאי בית הכנסת', 'en': 'Synagogue gabbai', 'ru': 'Габай синагоги'}),
-  ];
+  late final List<Grave> graves = [];
 
   // ---------------------------------------------------------------------------
   // History + tour
   // ---------------------------------------------------------------------------
   final List<HistoryEvent> history = [
-    HistoryEvent(year: '1740', title: {'he': 'ראשית הקהילה', 'en': 'First community', 'ru': 'Первая община'}, description: {'he': 'משפחות יהודיות ראשונות מתיישבות בעיר ומקימות מניין.', 'en': 'The first Jewish families settle and form a minyan.', 'ru': 'Первые еврейские семьи основывают миньян.'}),
-    HistoryEvent(year: '1812', title: {'he': 'בית הכנסת הגדול', 'en': 'The Great Synagogue', 'ru': 'Большая синагога'}, description: {'he': 'נבנה בית הכנסת המרכזי ששרד עד היום.', 'en': 'The central synagogue, still standing today, is built.', 'ru': 'Построена центральная синагога.'}),
-    HistoryEvent(year: '1901', title: {'he': 'תור הזהב', 'en': 'Golden age', 'ru': 'Золотой век'}, description: {'he': 'הקהילה מונה אלפי יהודים, בתי ספר וארגוני חסד.', 'en': 'The community numbers thousands, with schools and charities.', 'ru': 'Община насчитывает тысячи человек.'}),
-    HistoryEvent(year: '1941', title: {'he': 'שנות המלחמה', 'en': 'The war years', 'ru': 'Военные годы'}, description: {'he': 'הקהילה נפגעה קשות בתקופת השואה.', 'en': 'The community suffered greatly during the Holocaust.', 'ru': 'Община сильно пострадала в годы Холокоста.'}),
-    HistoryEvent(year: '1991', title: {'he': 'התחדשות', 'en': 'Renewal', 'ru': 'Возрождение'}, description: {'he': 'עם נפילת המסך פותח מחדש בית חב"ד בעיר.', 'en': 'After the Iron Curtain, Chabad reopens in the city.', 'ru': 'После падения «железного занавеса» Хабад вновь открывается.'}),
-    HistoryEvent(year: 'today', title: {'he': 'קהילה חיה', 'en': 'A living community', 'ru': 'Живая община'}, description: {'he': 'מאות משפחות, גן, בית ספר ופעילות ענפה.', 'en': 'Hundreds of families, a kindergarten, school and vibrant activity.', 'ru': 'Сотни семей, сад, школа и активная жизнь.'}),
+    HistoryEvent(year: '1893', title: {'he': 'ראשית הקהילה', 'en': 'Community founded', 'ru': 'Основание общины'}, description: {'he': 'הקהילה היהודית בנובו־ניקולאייבסק (לימים נובוסיבירסק) נוסדת. בין החברים: סוחרים, בעלי מלאכה וגולים.', 'en': 'The Jewish community of Novo-Nikolayevsk (later Novosibirsk) is formed — merchants, craftsmen and exiles.', 'ru': 'Еврейская община Новониколаевска (затем Новосибирск) образована: купцы, мастеровые и ссыльные.'}),
+    HistoryEvent(year: '1926', title: {'he': 'נובוסיבירסק', 'en': 'The city is renamed', 'ru': 'Город переименован'}, description: {'he': 'שם העיר משתנה לנובוסיבירסק. החיים היהודיים ממשיכים תחת לחץ סובייטי גובר.', 'en': 'The city is renamed Novosibirsk. Jewish life continues under growing Soviet pressure.', 'ru': 'Город получает имя Новосибирск. Еврейская жизнь — под нарастающим советским давлением.'}),
+    HistoryEvent(year: '1990s', title: {'he': 'התחדשות', 'en': 'Revival', 'ru': 'Возрождение'}, description: {'he': 'עם הפשרה הפוליטית הקהילה מתחדשת ומצטרפת לפדרציית הקהילות היהודיות ברוסיה (FEOR). פועלים גם הסוכנות היהודית וחסד «אתיקווה».', 'en': 'With political thaw the community revives and joins FEOR. The Jewish Agency and Hesed Atikva also operate in the city.', 'ru': 'С оттепелью община возрождается и входит в ФЕОР. Работают Сохнут и хесед «Атиква».'}),
+    HistoryEvent(year: '1999', title: {'he': 'שליחות חב״ד', 'en': 'Chabad arrives', 'ru': 'Приезд Хабада'}, description: {'he': 'הרב שניאור זלמן זקלס מגיע לעיר כרב מוסמך ראשון בהיסטוריה של נובוסיבירסק, שליח הרבי מליובאוויטש. העירייה מקצה קרקע במרכז העיר לבית כנסת.', 'en': 'Rabbi Shneur Zalman Zaklos arrives as the first ordained rabbi in the city\'s history, a Chabad emissary. The municipality grants land downtown for a synagogue.', 'ru': 'Раввин Шнеур Залман Заклос — первый дипломированный раввин в истории города, посланник Ребе. Мэрия выделяет участок в центре под синагогу.'}),
+    HistoryEvent(year: '2000', title: {'he': 'אור אבנר', 'en': 'Or Avner', 'ru': 'Ор Авнер'}, description: {'he': 'נפתח הליד היהודי אור אבנר עם גן לגיל הרך.', 'en': 'Or Avner Jewish school and preschool open.', 'ru': 'Открывается еврейский лицей «Ор Авнер» с дошкольной группой.'}),
+    HistoryEvent(year: '2013', title: {'he': 'חנוכת בית מנחם', 'en': 'Beit Menachem opens', 'ru': 'Открытие Бейт Менахем'}, description: {'he': 'ב־28 באוגוסט נחנך המרכז (~3,400 מ״ר) ברחוב שצ׳טינקינה 68, על שם הרבי. בטקס: הרב ברל לזר, ראש העיר גורודצקי, ויותר מאלף אורחים. הבנייה נמשכה כ־13 שנה מתרומות.', 'en': 'On 28 August the ~3,400 m² center at 68 Shchetinkina St. opens, named for the Rebbe. Chief Rabbi Berel Lazar, Mayor Gorodetsky and 1,000+ guests attend. Construction took about 13 years, funded by donations.', 'ru': '28 августа открыт центр (~3400 м²) на ул. Щетинкина, 68, в честь Ребе. Берл Лазар, мэр Городецкий и более тысячи гостей. Строительство около 13 лет на пожертвования.'}),
+    HistoryEvent(year: 'today', title: {'he': 'קהילה חיה בסיביר', 'en': 'A living community in Siberia', 'ru': 'Живая община Сибири'}, description: {'he': 'תפילות יומיות, מקווה, חנות כשרה, נוער, אור אבנר ומרכז לב. באזור כ־12,000 יהודים. בית מנחם הוא הבית הרוחני של יהדות נובוסיבירסק.', 'en': 'Daily prayers, mikveh, kosher shop, youth, Or Avner and Lev. About 12,000 Jews in the region. Beit Menachem is the spiritual home of Novosibirsk Jewry.', 'ru': 'Ежедневные молитвы, миква, кошерный магазин, молодёжь, «Ор Авнер» и «Лев». Около 12 000 евреев в регионе. Бейт Менахем — духовный дом евреев Новосибирска.'}),
   ];
 
   late final List<TourStop> tour = [
-    TourStop(id: _newId(), name: {'he': 'בית הכנסת הגדול', 'en': 'The Great Synagogue', 'ru': 'Большая синагога'}, description: {'he': 'לב הקהילה מזה מאתיים שנה.', 'en': 'The heart of the community for two centuries.', 'ru': 'Сердце общины уже два века.'}, color: 0xFF1D4ED8, icon: Icons.synagogue),
-    TourStop(id: _newId(), name: {'he': 'הרובע היהודי', 'en': 'The Jewish quarter', 'ru': 'Еврейский квартал'}, description: {'he': 'סמטאות עתיקות ובתים היסטוריים.', 'en': 'Ancient alleys and historic homes.', 'ru': 'Древние улочки и исторические дома.'}, color: 0xFFB45309, icon: Icons.location_city),
-    TourStop(id: _newId(), name: {'he': 'בית החיים הישן', 'en': 'The old cemetery', 'ru': 'Старое кладбище'}, description: {'he': 'מצבות בנות מאות שנים.', 'en': 'Gravestones centuries old.', 'ru': 'Надгробия многовековой давности.'}, color: 0xFF475569, icon: Icons.park),
-    TourStop(id: _newId(), name: {'he': 'המקווה ההיסטורי', 'en': 'The historic mikveh', 'ru': 'Историческая миква'}, description: {'he': 'שוקם ופועל עד היום.', 'en': 'Restored and still in use today.', 'ru': 'Восстановлена и действует.'}, color: 0xFF0D9488, icon: Icons.water_drop),
+    TourStop(id: _newId(), name: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, description: {'he': 'בית הכנסת והמרכז הקהילתי, רחוב שצ׳טינקינה 68. כיפה ומגן דוד — לב יהדות נובוסיבירסק.', 'en': 'Synagogue and community center, 68 Shchetinkina St. Dome and Star of David — the heart of Novosibirsk Jewry.', 'ru': 'Синагога и общинный центр, ул. Щетинкина, 68. Купол и звезда Давида — сердце еврейского Новосибирска.'}, color: 0xFF1D4ED8, icon: Icons.synagogue),
+    TourStop(id: _newId(), name: {'he': 'מקווה וחנות כשרה', 'en': 'Mikveh & kosher shop', 'ru': 'Миква и кошерный магазин'}, description: {'he': 'בתוך אותו בניין: מקווה לגברים ולנשים, חנות כשרה ואולם אירועים.', 'en': 'In the same building: men\'s and women\'s mikveh, kosher shop and banquet hall.', 'ru': 'В том же здании: миквы, кошерный магазин и праздничный зал.'}, color: 0xFF0D9488, icon: Icons.water_drop),
+    TourStop(id: _newId(), name: {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'}, description: {'he': 'בית הספר היהודי וגן הילדים, רחוב שקספיר 9ב.', 'en': 'The Jewish school and preschool, 9b Shakspira St.', 'ru': 'Еврейский лицей и детская группа, ул. Шекспира, 9Б.'}, color: 0xFF3B82F6, icon: Icons.school),
+    TourStop(id: _newId(), name: {'he': 'מרכז לב', 'en': 'Lev center', 'ru': 'Центр Лев'}, description: {'he': 'מרכז לילדים עם צרכים מיוחדים ובריכה, רחוב שקספיר 9א.', 'en': 'Center for children with special needs and a pool, 9a Shakspira St.', 'ru': 'Центр для детей с ОВЗ и бассейн, ул. Шекспира, 9А.'}, color: 0xFFEC4899, icon: Icons.favorite),
   ];
 
   // ---------------------------------------------------------------------------
@@ -476,10 +467,10 @@ class AppRepository extends ChangeNotifier {
   // Torah library
   // ---------------------------------------------------------------------------
   late final List<Shiur> shiurim = [
-    Shiur(id: _newId(), title: {'he': 'פרשת השבוע למעשה', 'en': 'The weekly parasha in practice', 'ru': 'Недельная глава на практике'}, rabbi: {'he': 'הרב מנדל', 'en': 'Rabbi Mendel', 'ru': 'Раввин Мендл'}, topic: {'he': 'פרשה', 'en': 'Parasha', 'ru': 'Глава'}, durationMinutes: 42, date: DateTime.now().subtract(const Duration(days: 2))),
-    Shiur(id: _newId(), title: {'he': 'יסודות התניא — שער א׳', 'en': 'Foundations of Tanya — Gate 1', 'ru': 'Основы Тании — врата 1'}, rabbi: {'he': 'הרב מנדל', 'en': 'Rabbi Mendel', 'ru': 'Раввин Мендл'}, topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'}, durationMinutes: 55, date: DateTime.now().subtract(const Duration(days: 9))),
-    Shiur(id: _newId(), title: {'he': 'הלכות שבת למעשה', 'en': 'Practical laws of Shabbat', 'ru': 'Законы субботы на практике'}, rabbi: {'he': 'הרב מנדל', 'en': 'Rabbi Mendel', 'ru': 'Раввин Мендл'}, topic: {'he': 'הלכה', 'en': 'Halacha', 'ru': 'Алаха'}, durationMinutes: 38, date: DateTime.now().subtract(const Duration(days: 16))),
-    Shiur(id: _newId(), title: {'he': 'סיפורי צדיקים', 'en': 'Stories of the Tzaddikim', 'ru': 'Истории праведников'}, rabbi: {'he': 'הרב מנדל', 'en': 'Rabbi Mendel', 'ru': 'Раввин Мендл'}, topic: {'he': 'מחשבה', 'en': 'Thought', 'ru': 'Мысль'}, durationMinutes: 30, date: DateTime.now().subtract(const Duration(days: 23))),
+    Shiur(id: _newId(), title: {'he': 'פרשת השבוע למעשה', 'en': 'The weekly parasha in practice', 'ru': 'Недельная глава на практике'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'פרשה', 'en': 'Parasha', 'ru': 'Глава'}, durationMinutes: 42, date: DateTime.now().subtract(const Duration(days: 2))),
+    Shiur(id: _newId(), title: {'he': 'יסודות התניא', 'en': 'Foundations of Tanya', 'ru': 'Основы Тании'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'}, durationMinutes: 55, date: DateTime.now().subtract(const Duration(days: 9))),
+    Shiur(id: _newId(), title: {'he': 'הלכות שבת למעשה', 'en': 'Practical laws of Shabbat', 'ru': 'Законы субботы на практике'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'הלכה', 'en': 'Halacha', 'ru': 'Алаха'}, durationMinutes: 38, date: DateTime.now().subtract(const Duration(days: 16))),
+    Shiur(id: _newId(), title: {'he': 'כולל תורה', 'en': 'Kollel Torah', 'ru': 'Колель Тора'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'גמרא', 'en': 'Gemara', 'ru': 'Гемара'}, durationMinutes: 60, date: DateTime.now().subtract(const Duration(days: 23))),
   ];
 
   // ---------------------------------------------------------------------------
@@ -496,10 +487,10 @@ class AppRepository extends ChangeNotifier {
   // Donations
   // ---------------------------------------------------------------------------
   final List<Loc> campaigns = [
-    {'he': 'החזקת בית חב"ד', 'en': 'General fund', 'ru': 'Общий фонд'},
-    {'he': 'סעודות שבת', 'en': 'Shabbat meals', 'ru': 'Субботние трапезы'},
-    {'he': 'חינוך ילדים', 'en': "Children's education", 'ru': 'Образование детей'},
-    {'he': 'חבילות לנזקקים', 'en': 'Packages for the needy', 'ru': 'Помощь нуждающимся'},
+    {'he': 'החזקת בית מנחם', 'en': 'Beit Menachem upkeep', 'ru': 'Содержание Бейт Менахем'},
+    {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
+    {'he': 'מרכז לב', 'en': 'Lev special-needs center', 'ru': 'Центр Лев'},
+    {'he': 'חסד ומצות לפסח', 'en': 'Chesed & Passover matzah', 'ru': 'Хесед и маца к Песаху'},
   ];
 
   late final List<Donation> donations = [
@@ -536,8 +527,8 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // Bots
   // ---------------------------------------------------------------------------
-  final BotConfig telegramBot = BotConfig(name: 'Telegram News', handle: '@chabad_city_news', enabled: true, lastSync: DateTime.now().subtract(const Duration(hours: 2)), itemsSynced: 128);
-  final BotConfig socialBot = BotConfig(name: 'Social Auto-Post', handle: 'FB · IG · X · VK', enabled: true, lastSync: DateTime.now().subtract(const Duration(hours: 5)), itemsSynced: 342);
+  final BotConfig telegramBot = BotConfig(name: 'Telegram News', handle: '@jewishsib', enabled: true, lastSync: DateTime.now().subtract(const Duration(hours: 2)), itemsSynced: 0);
+  final BotConfig socialBot = BotConfig(name: 'Social Auto-Post', handle: 'VK jewishsib', enabled: true, lastSync: DateTime.now().subtract(const Duration(hours: 5)), itemsSynced: 0);
 
   // ---------------------------------------------------------------------------
   // Shopping cart
@@ -828,6 +819,7 @@ class AppRepository extends ChangeNotifier {
 
   Map<String, dynamic> _encodeSnapshot() => {
         'v': 3,
+        'seed': _contentSeed,
         'seq': _seq,
         'updatedAt': DateTime.now().toIso8601String(),
         'mapsKey': googleMapsApiKey,
@@ -936,6 +928,8 @@ class AppRepository extends ChangeNotifier {
     if (raw == null || raw.isEmpty) return;
     try {
       final m = jsonDecode(raw) as Map<String, dynamic>;
+      final seed = (m['seed'] as num?)?.toInt() ?? 0;
+      if (seed < _contentSeed) return;
       _applySnapshot(m);
       await _hydrateLocalImages(m);
     } catch (_) {}
@@ -1018,6 +1012,8 @@ class AppRepository extends ChangeNotifier {
   Future<void> _pullCloud() async {
     final cloud = await CloudSync.instance.pull();
     if (cloud == null) return;
+    final seed = (cloud.snapshot['seed'] as num?)?.toInt() ?? 0;
+    if (seed < _contentSeed) return;
     final localImages = _collectImages();
     _applySnapshot(cloud.snapshot);
     for (final e in cloud.images.entries) {

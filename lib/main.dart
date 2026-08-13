@@ -50,7 +50,7 @@ class _ChabadAppState extends State<ChabadApp> {
       child: Consumer<LocaleController>(
         builder: (context, locale, _) {
           return MaterialApp.router(
-            title: 'בית חב״ד ליובאוויטש',
+            title: 'בית חב״ד בית מנחם — נובוסיבירסק',
             debugShowCheckedModeBanner: false,
             theme: buildAppTheme(),
             routerConfig: appRouter,

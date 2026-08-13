@@ -23,6 +23,14 @@ class AboutPage extends StatelessWidget {
           icon: Icons.info_outline,
         ),
         Section(
+          child: _card(
+            icon: Icons.synagogue,
+            title: loc.t('about.story'),
+            child: Text(loc.t('about.story.body'),
+                style: const TextStyle(height: 1.55, fontSize: 15.5)),
+          ),
+        ),
+        Section(
           child: LayoutBuilder(builder: (context, c) {
             final info = _infoCards(context, repo, loc);
             final map = _map(context, repo, loc);
