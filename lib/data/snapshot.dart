@@ -288,6 +288,14 @@ Map<String, dynamic> contactToJson(ContactInfo c) => {
       'hours': [
         for (final h in c.hours) {'day': locTo(h.key), 'hours': h.value},
       ],
+      'staff': [
+        for (final s in c.staff)
+          {
+            'name': locTo(s.name),
+            'role': locTo(s.role),
+            'phone': s.phone,
+          },
+      ],
     };
 
 void contactFromJson(ContactInfo target, dynamic raw) {
@@ -307,6 +315,20 @@ void contactFromJson(ContactInfo target, dynamic raw) {
         for (final h in hours)
           if (h is Map)
             MapEntry(locFrom(h['day']), '${h['hours'] ?? ''}'),
+      ]);
+  }
+  final staff = m['staff'];
+  if (staff is List && staff.isNotEmpty) {
+    target.staff
+      ..clear()
+      ..addAll([
+        for (final s in staff)
+          if (s is Map)
+            StaffContact(
+              name: locFrom(s['name']),
+              role: locFrom(s['role']),
+              phone: '${s['phone'] ?? ''}',
+            ),
       ]);
   }
 }

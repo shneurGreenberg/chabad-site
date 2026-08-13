@@ -214,9 +214,9 @@ const Map<String, Map<String, String>> _strings = {
 
   // Programs
   'programs.subtitle': {
-    'he': 'בית כנסת, אור אבנר, מרכז לב, נוער, מקווה וחסד בבית מנחם',
-    'en': 'Synagogue, Or Avner, Lev, youth, mikveh and chesed at Beit Menachem',
-    'ru': 'Синагога, Ор Авнер, Лев, молодёжь, миква и хесед в Бейт Менахем'
+    'he': 'בית כנסת, סעודת שבת, פעילות ילדים ביום ראשון, אור אבנר, מרכז לב, נוער, מקווה וחסד',
+    'en': 'Synagogue, Shabbat meal, Sunday children, Or Avner, Lev, youth, mikveh and chesed',
+    'ru': 'Синагога, субботняя трапеза, детская программа в воскресенье, Ор Авнер, Лев, молодёжь, миква и хесед'
   },
   'programs.audience': {
     'he': 'קהל יעד',
@@ -264,9 +264,14 @@ const Map<String, Map<String, String>> _strings = {
 
   // Cemetery
   'cemetery.subtitle': {
-    'he': 'מאגר מצבות — יעודכן עם שמות מבית החיים היהודי בנובוסיבירסק. אפשר להוסיף מהמנהל.',
-    'en': 'Gravestone database — to be filled with names from the Jewish cemetery in Novosibirsk. Add them in admin.',
-    'ru': 'База надгробий — будет заполнена именами с еврейского кладбища Новосибирска. Добавляйте в админке.'
+    'he': 'שמות מבית החיים היהודי בנובוסיבירסק, לפי מאגר הקדיש של בית מנחם. חיפוש לפי שם בעברית או ברוסית.',
+    'en': 'Names from the Jewish cemetery in Novosibirsk, from the Beit Menachem kaddish registry. Search by Hebrew or Russian name.',
+    'ru': 'Имена с еврейского кладбища Новосибирска — реестр кадиша Бейт Менахем. Поиск по имени на иврите или русском.'
+  },
+  'cemetery.source': {
+    'he': 'מאגר הקדיש המלא בנובוסיבירסק',
+    'en': 'Full Novosibirsk kaddish registry',
+    'ru': 'Полный реестр кадиша Новосибирска'
   },
   'cemetery.search': {
     'he': 'חיפוש לפי שם',

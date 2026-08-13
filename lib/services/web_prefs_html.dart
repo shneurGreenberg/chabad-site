@@ -9,3 +9,7 @@ String? readPref(String key) => web.window.localStorage.getItem(key);
 void removePref(String key) {
   web.window.localStorage.removeItem(key);
 }
+
+void openUrl(String url) {
+  web.window.open(url, '_blank');
+}

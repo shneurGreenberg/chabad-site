@@ -161,15 +161,42 @@ class Grave {
     required this.section,
     required this.row,
     required this.notes,
+    this.photoUrl,
+    this.deathMonth,
+    this.deathDay,
   });
   final String id;
   String name;
   String hebrewName;
   int? birthYear;
   int deathYear;
+  int? deathMonth;
+  int? deathDay;
   String section;
   String row;
   Loc notes;
+  String? photoUrl;
+
+  String get deathLabel {
+    if (deathYear <= 0) return '';
+    if (deathDay != null && deathMonth != null) {
+      final d = deathDay.toString().padLeft(2, '0');
+      final m = deathMonth.toString().padLeft(2, '0');
+      return '$d.$m.$deathYear';
+    }
+    return '$deathYear';
+  }
+}
+
+class StaffContact {
+  StaffContact({
+    required this.name,
+    required this.role,
+    required this.phone,
+  });
+  Loc name;
+  Loc role;
+  String phone;
 }
 
 class HistoryEvent {
@@ -325,12 +352,15 @@ class ContactInfo {
     required this.phone,
     required this.email,
     required List<MapEntry<Loc, String>> hours,
-  }) : hours = List<MapEntry<Loc, String>>.of(hours);
+    List<StaffContact>? staff,
+  })  : hours = List<MapEntry<Loc, String>>.of(hours),
+        staff = List<StaffContact>.of(staff ?? const []);
   Loc name;
   Loc address;
   String phone;
   String email;
   List<MapEntry<Loc, String>> hours; // day -> hours
+  List<StaffContact> staff;
 }
 
 /// A photo that replaces the default blue banner on a page.

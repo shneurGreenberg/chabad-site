@@ -82,6 +82,14 @@ class AboutPage extends StatelessWidget {
               _row(Icons.location_on_outlined, trLoc(repo.contact.address, loc.lang)),
               _row(Icons.phone_outlined, repo.contact.phone),
               _row(Icons.email_outlined, repo.contact.email),
+              for (final s in repo.contact.staff) ...[
+                const SizedBox(height: 6),
+                _row(
+                  Icons.badge_outlined,
+                  '${trLoc(s.name, loc.lang)} · ${trLoc(s.role, loc.lang)}',
+                ),
+                _row(Icons.phone_outlined, s.phone),
+              ],
             ],
           ),
         ),

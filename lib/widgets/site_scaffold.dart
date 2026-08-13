@@ -5,6 +5,7 @@ import '../data/repository.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
+import 'brand.dart';
 import 'common.dart';
 import 'hover.dart';
 import 'newsletter.dart';
@@ -96,10 +97,14 @@ class _SiteShellState extends State<SiteShell> {
   @override
   Widget build(BuildContext context) {
     final mobile = isMobile(context);
+    // Public hamburger sits at the end of the header row.
+    final fromEnd = menuDrawerFromEnd(context, leadingButton: false);
+    final menu = mobile ? _SiteDrawer(currentRoute: widget.currentRoute) : null;
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: _SiteHeader(currentRoute: widget.currentRoute),
-      drawer: mobile ? _SiteDrawer(currentRoute: widget.currentRoute) : null,
+      drawer: fromEnd ? null : menu,
+      endDrawer: fromEnd ? menu : null,
       body: PrimaryScrollController.none(
         child: SingleChildScrollView(
           controller: _scroll,
@@ -122,14 +127,26 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
   const _SiteHeader({required this.currentRoute});
   final String currentRoute;
 
+  static const _gold = 3.0;
+  static const _hairline = 1.0;
+  static const _row = 88.0;
+
   @override
-  Size get preferredSize => const Size.fromHeight(76);
+  Size get preferredSize => const Size.fromHeight(_gold + _row + _hairline);
 
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final mobile = isMobile(context);
     final compact = isTablet(context);
+    final navItems = [
+      for (final item in primaryNav)
+        if (!(compact &&
+            (item.route == '/store' ||
+                item.route == '/gallery' ||
+                item.route == '/zmanim')))
+          item,
+    ];
     return Material(
       color: Colors.white,
       elevation: 0,
@@ -137,106 +154,109 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
         bottom: false,
         child: Column(
           children: [
-            Container(height: 3, decoration: const BoxDecoration(gradient: AppColors.goldGradient)),
+            Container(
+              height: _gold,
+              decoration: const BoxDecoration(gradient: AppColors.goldGradient),
+            ),
             SizedBox(
-          height: 72,
-          child: MaxWidthBox(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const _Logo(),
-                const SizedBox(width: 8),
-                const HeaderSearch(),
-                const SizedBox(width: 4),
-                const LanguageSwitcher(),
-                if (!mobile) ...[
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          for (final item in primaryNav)
-                            if (!(compact &&
-                                (item.route == '/store' ||
-                                    item.route == '/gallery' ||
-                                    item.route == '/zmanim')))
-                              _NavLink(
-                                item: item,
-                                active: currentRoute == item.route,
+              height: _row,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const _Logo(),
+                    const SizedBox(width: 12),
+                    const HeaderSearch(),
+                    const SizedBox(width: 10),
+                    const LanguageSwitcher(),
+                    if (!mobile) ...[
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              for (final item in navItems)
+                                Expanded(
+                                  child: _NavLink(
+                                    item: item,
+                                    active: currentRoute == item.route,
+                                  ),
+                                ),
+                              Expanded(
+                                child: _MoreMenu(currentRoute: currentRoute),
                               ),
-                          _MoreMenu(currentRoute: currentRoute),
-                        ],
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const _CartButton(),
-                  const SizedBox(width: 4),
-                  if (!compact) ...[
-                    HoverLift(
-                      child: OutlinedButton.icon(
-                        onPressed: () => context.go('/contact'),
-                        icon: const Icon(Icons.app_registration, size: 18),
-                        label: Text(loc.t('nav.contact')),
+                      const _CartButton(),
+                      const SizedBox(width: 8),
+                      if (!compact) ...[
+                        HoverLift(
+                          child: OutlinedButton.icon(
+                            onPressed: () => context.go('/contact'),
+                            icon: const Icon(Icons.app_registration, size: 18),
+                            label: Text(loc.t('nav.contact')),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        HoverLift(
+                          child: FilledButton.icon(
+                            onPressed: () => context.go('/donate'),
+                            style: FilledButton.styleFrom(
+                                backgroundColor: AppColors.accent,
+                                foregroundColor: AppColors.primaryDark),
+                            icon: const Icon(Icons.favorite_outline, size: 18),
+                            label: Text(loc.t('nav.donate')),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ] else ...[
+                        HoverScale(
+                          child: IconButton(
+                            tooltip: loc.t('nav.contact'),
+                            onPressed: () => context.go('/contact'),
+                            icon: const Icon(Icons.app_registration),
+                          ),
+                        ),
+                        HoverScale(
+                          child: IconButton(
+                            tooltip: loc.t('nav.donate'),
+                            onPressed: () => context.go('/donate'),
+                            icon: const Icon(Icons.favorite_outline),
+                          ),
+                        ),
+                      ],
+                      HoverScale(
+                        child: IconButton(
+                          tooltip: loc.t('nav.admin'),
+                          onPressed: () => context.go('/admin'),
+                          icon: const Icon(Icons.admin_panel_settings_outlined),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    HoverLift(
-                      child: FilledButton.icon(
-                        onPressed: () => context.go('/donate'),
-                        style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.accent,
-                            foregroundColor: AppColors.primaryDark),
-                        icon: const Icon(Icons.favorite_outline, size: 18),
-                        label: Text(loc.t('nav.donate')),
+                    ] else ...[
+                      const Spacer(),
+                      const _CartButton(),
+                      Builder(
+                        builder: (context) => HoverScale(
+                          child: IconButton(
+                            tooltip: loc.t('nav.menu'),
+                            icon: const Icon(Icons.menu),
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => openMenuDrawer(
+                              context,
+                              leadingButton: false,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                  ] else ...[
-                    HoverScale(
-                      child: IconButton(
-                        tooltip: loc.t('nav.contact'),
-                        onPressed: () => context.go('/contact'),
-                        icon: const Icon(Icons.app_registration),
-                      ),
-                    ),
-                    HoverScale(
-                      child: IconButton(
-                        tooltip: loc.t('nav.donate'),
-                        onPressed: () => context.go('/donate'),
-                        icon: const Icon(Icons.favorite_outline),
-                      ),
-                    ),
+                    ],
                   ],
-                  HoverScale(
-                    child: IconButton(
-                      tooltip: loc.t('nav.admin'),
-                      onPressed: () => context.go('/admin'),
-                      icon: const Icon(Icons.admin_panel_settings_outlined),
-                    ),
-                  ),
-                ] else ...[
-                  const Spacer(),
-                  const _CartButton(),
-                  Builder(
-                    builder: (context) => HoverScale(
-                      child: IconButton(
-                        tooltip: loc.t('nav.menu'),
-                        icon: const Icon(Icons.menu),
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+                ),
+              ),
             ),
-          ),
-            ),
-            Container(height: 1, color: Colors.black.withValues(alpha: 0.06)),
+            Container(height: _hairline, color: Colors.black.withValues(alpha: 0.06)),
           ],
         ),
       ),
@@ -690,6 +710,11 @@ class _SiteFooter extends StatelessWidget {
                           trLoc(repo.contact.address, loc.lang)),
                       _contactRow(Icons.phone_outlined, repo.contact.phone),
                       _contactRow(Icons.email_outlined, repo.contact.email),
+                      for (final s in repo.contact.staff)
+                        _contactRow(
+                          Icons.phone_outlined,
+                          '${trLoc(s.name, loc.lang)} · ${trLoc(s.role, loc.lang)} · ${s.phone}',
+                        ),
                       const SizedBox(height: 18),
                       const NewsletterSignup(light: true, compact: true),
                     ],

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
+import '../../services/web_prefs.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class CemeteryPage extends StatefulWidget {
@@ -16,18 +18,27 @@ class CemeteryPage extends StatefulWidget {
 class _CemeteryPageState extends State<CemeteryPage> {
   String _query = '';
 
+  static const _kaddishUrl =
+      'https://synagogue-kadish-shneur.amvera.io/s/novosibirsk';
+
+  bool _matches(Grave g, String q, String raw, String lang) {
+    if (widget.highlightId != null && g.id == widget.highlightId) return true;
+    if (q.isEmpty) return true;
+    return g.name.toLowerCase().contains(q) ||
+        g.name.contains(raw) ||
+        g.hebrewName.toLowerCase().contains(q) ||
+        g.hebrewName.contains(raw) ||
+        g.deathLabel.contains(raw) ||
+        trLoc(g.notes, lang).toLowerCase().contains(q);
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final q = _query.trim().toLowerCase();
-    final graves = repo.graves.where((g) {
-      if (widget.highlightId != null && g.id == widget.highlightId) return true;
-      if (q.isEmpty) return true;
-      return g.name.toLowerCase().contains(q) ||
-          g.hebrewName.contains(_query.trim()) ||
-          trLoc(g.notes, loc.lang).toLowerCase().contains(q);
-    }).toList();
+    final raw = _query.trim();
+    final q = raw.toLowerCase();
+    final graves = repo.graves.where((g) => _matches(g, q, raw, loc.lang)).toList();
 
     return SiteScaffold(
       currentRoute: '/cemetery',
@@ -38,12 +49,23 @@ class _CemeteryPageState extends State<CemeteryPage> {
           icon: Icons.grid_view_outlined,
         ),
         Section(
-          child: TextField(
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
-              hintText: loc.t('cemetery.search'),
-            ),
-            onChanged: (v) => setState(() => _query = v),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextButton.icon(
+                onPressed: () => openUrl(_kaddishUrl),
+                icon: const Icon(Icons.open_in_new, size: 18),
+                label: Text(loc.t('cemetery.source')),
+              ).hoverLift(),
+              const SizedBox(height: 8),
+              TextField(
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: loc.t('cemetery.search'),
+                ),
+                onChanged: (v) => setState(() => _query = v),
+              ),
+            ],
           ),
         ),
         Section(
@@ -70,61 +92,101 @@ class _CemeteryPageState extends State<CemeteryPage> {
 class _GraveCard extends StatelessWidget {
   const _GraveCard(this.grave);
   final Grave grave;
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    final title = grave.hebrewName.isNotEmpty ? grave.hebrewName : grave.name;
+    final subtitle = grave.hebrewName.isNotEmpty ? grave.name : '';
+    final notes = trLoc(grave.notes, loc.lang);
+    final death = grave.deathLabel;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 56,
-              height: 72,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF64748B), Color(0xFF334155)],
-                ),
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(28), bottom: Radius.circular(6)),
-              ),
-              child: const Icon(Icons.star, color: Colors.white54, size: 20),
-            ),
+            _GravePhoto(url: grave.photoUrl),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(grave.hebrewName,
+                  Text(title,
                       style: const TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 17)),
-                  Text(grave.name,
-                      style: const TextStyle(color: Colors.black54, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  Text(trLoc(grave.notes, loc.lang),
-                      style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13)),
+                  if (subtitle.isNotEmpty)
+                    Text(subtitle,
+                        style: const TextStyle(
+                            color: Colors.black54, fontSize: 13)),
+                  if (notes.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(notes,
+                        style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13)),
+                  ],
                   const SizedBox(height: 10),
                   Wrap(spacing: 8, runSpacing: 8, children: [
-                    Pill(
-                        '${loc.t('cemetery.born')} ${grave.birthYear ?? '—'}',
-                        color: const Color(0xFF0D9488)),
-                    Pill('${loc.t('cemetery.passed')} ${grave.deathYear}',
-                        color: const Color(0xFF64748B)),
-                    Pill('${loc.t('cemetery.section')} ${grave.section} · ${loc.t('cemetery.row')} ${grave.row}',
-                        color: AppColors.primary,
-                        icon: Icons.place_outlined),
+                    if (grave.birthYear != null)
+                      Pill(
+                          '${loc.t('cemetery.born')} ${grave.birthYear}',
+                          color: const Color(0xFF0D9488)),
+                    if (death.isNotEmpty)
+                      Pill('${loc.t('cemetery.passed')} $death',
+                          color: const Color(0xFF64748B)),
+                    if (grave.section.isNotEmpty || grave.row.isNotEmpty)
+                      Pill(
+                          [
+                            if (grave.section.isNotEmpty)
+                              '${loc.t('cemetery.section')} ${grave.section}',
+                            if (grave.row.isNotEmpty)
+                              '${loc.t('cemetery.row')} ${grave.row}',
+                          ].join(' · '),
+                          color: AppColors.primary,
+                          icon: Icons.place_outlined),
                   ]),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _GravePhoto extends StatelessWidget {
+  const _GravePhoto({this.url});
+  final String? url;
+
+  Widget _fallback() => Container(
+        width: 72,
+        height: 96,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF64748B), Color(0xFF334155)],
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Icon(Icons.star, color: Colors.white54, size: 20),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final src = url?.trim() ?? '';
+    if (src.isEmpty) return _fallback();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Image.network(
+        src,
+        width: 72,
+        height: 96,
+        fit: BoxFit.cover,
+        errorBuilder: (_, error, stackTrace) => _fallback(),
       ),
     );
   }

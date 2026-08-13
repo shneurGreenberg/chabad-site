@@ -20,6 +20,22 @@ bool isMobile(BuildContext context) =>
 bool isTablet(BuildContext context) =>
     MediaQuery.sizeOf(context).width < 1280;
 
+/// Physical-right drawer: Flutter web's [Scaffold.drawer] always slides from
+/// the left, even in RTL. Use [endDrawer] when the hamburger sits on the right.
+bool menuDrawerFromEnd(BuildContext context, {required bool leadingButton}) {
+  final rtl = Directionality.of(context) == TextDirection.rtl;
+  return leadingButton ? rtl : !rtl;
+}
+
+void openMenuDrawer(BuildContext context, {required bool leadingButton}) {
+  final scaffold = Scaffold.of(context);
+  if (menuDrawerFromEnd(context, leadingButton: leadingButton)) {
+    scaffold.openEndDrawer();
+  } else {
+    scaffold.openDrawer();
+  }
+}
+
 /// Centered, width-constrained content column.
 class MaxWidthBox extends StatelessWidget {
   const MaxWidthBox({
@@ -137,6 +153,9 @@ class GradientImage extends StatelessWidget {
       );
     }
     if (url != null && url!.isNotEmpty) {
+      final img = url!.startsWith('assets/')
+          ? Image.asset(url!, fit: BoxFit.cover)
+          : Image.network(url!, fit: BoxFit.cover);
       return ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: SizedBox(
@@ -145,7 +164,7 @@ class GradientImage extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(url!, fit: BoxFit.cover),
+              img,
               if (badge != null)
                 PositionedDirectional(top: 10, start: 10, child: badge!),
             ],
@@ -477,11 +496,17 @@ class BannerFill extends StatelessWidget {
               gaplessPlayback: true,
             )
           else if (url != null && url.isNotEmpty)
-            Image.network(
-              url,
-              fit: BoxFit.cover,
-              alignment: banner.alignment,
-            ),
+            url.startsWith('assets/')
+                ? Image.asset(
+                    url,
+                    fit: BoxFit.cover,
+                    alignment: banner.alignment,
+                  )
+                : Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                    alignment: banner.alignment,
+                  ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(

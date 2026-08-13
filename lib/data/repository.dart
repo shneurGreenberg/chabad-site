@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models.dart';
 import '../services/cloud_sync.dart';
 import '../services/image_compress.dart';
@@ -25,7 +25,7 @@ class AppRepository extends ChangeNotifier {
     Future<void>.microtask(_boot);
   }
 
-  static const _contentSeed = 5;
+  static const _contentSeed = 6;
   static const _snapKey = 'chabad_site_snapshot';
   static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
@@ -66,7 +66,9 @@ class AppRepository extends ChangeNotifier {
   Future<void> _boot() async {
     await CloudSync.instance.init();
     await _hydrate();
+    await _loadKaddishGraves();
     _hydrated = true;
+    _notifyUi();
     try {
       await refreshTimes();
     } catch (_) {}
@@ -90,12 +92,62 @@ class AppRepository extends ChangeNotifier {
     phone: '+7 (383) 222-20-23',
     email: 'chabad.nsk@gmail.com',
     hours: [
-      MapEntry({'he': 'תפילות', 'en': 'Prayers', 'ru': 'Молитвы'},
-          'יומיות / Daily'),
-      MapEntry({'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
-          'לפי הזמנים / By zmanim'),
-      MapEntry({'he': 'מקווה', 'en': 'Mikveh', 'ru': 'Миква'},
-          'בתיאום / By appointment'),
+      MapEntry(
+        {'he': 'שני וחמישי', 'en': 'Monday & Thursday', 'ru': 'Понедельник и четверг'},
+        'תפילה בבית הכנסת 09:30',
+      ),
+      MapEntry(
+        {'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
+        'תפילה 10:00 · סעודת שבת 13:00',
+      ),
+      MapEntry(
+        {'he': 'המבנה', 'en': 'Building', 'ru': 'Здание'},
+        'פתוח כל יום 09:00–17:00',
+      ),
+      MapEntry(
+        {'he': 'סיורים', 'en': 'Tours', 'ru': 'Экскурсии'},
+        'בתיאום מראש',
+      ),
+      MapEntry(
+        {'he': 'יום ראשון', 'en': 'Sunday', 'ru': 'Воскресенье'},
+        'פעילות ילדים בבית הכנסת',
+      ),
+      MapEntry(
+        {'he': 'מקווה גברים', 'en': "Men's mikveh", 'ru': 'Мужская миква'},
+        'בבוקר',
+      ),
+      MapEntry(
+        {'he': 'מקווה נשים', 'en': "Women's mikveh", 'ru': 'Женская миква'},
+        'בתיאום מראש',
+      ),
+    ],
+    staff: [
+      StaffContact(
+        name: {
+          'he': 'סנדר קרוגלוב',
+          'en': 'Sender Kruglov',
+          'ru': 'Сендер Круглов',
+        },
+        role: {
+          'he': 'נשיא הקהילה',
+          'en': 'President of the community',
+          'ru': 'Президент общины',
+        },
+        phone: '+7 913 770-79-78',
+      ),
+      StaffContact(
+        name: {
+          'he': 'זויה',
+          'en': 'Zoya',
+          'ru': 'Зоя',
+        },
+        role: {
+          'he': 'מזכירה',
+          'en': 'Secretary',
+          'ru': 'Секретарь',
+        },
+        phone: '+7 903 900-43-20',
+      ),
     ],
   );
 
@@ -321,14 +373,45 @@ class AppRepository extends ChangeNotifier {
       id: _newId(),
       title: {'he': 'בית הכנסת בית מנחם', 'en': 'Beit Menachem synagogue', 'ru': 'Синагога Бейт Менахем'},
       description: {
-        'he': 'בית הכנסת היחיד בנובוסיבירסק. תפילות יומיות, שבתות וחגים בלב המרכז הקהילתי.',
-        'en': 'The only synagogue in Novosibirsk. Daily prayers, Shabbat and holidays at the heart of the community center.',
-        'ru': 'Единственная синагога Новосибирска. Ежедневные молитвы, субботы и праздники.',
+        'he': 'בית הכנסת היחיד בנובוסיבירסק. תפילה בשני וחמישי ב־09:30, בשבת ב־10:00, והמבנה פתוח כל יום 09:00–17:00. סיורים בתיאום מראש.',
+        'en': 'The only synagogue in Novosibirsk. Prayer Monday and Thursday at 09:30, Shabbat at 10:00. Building open daily 09:00–17:00. Tours by appointment.',
+        'ru': 'Единственная синагога Новосибирска. Молитва в понедельник и четверг в 09:30, в субботу в 10:00. Здание открыто каждый день 09:00–17:00. Экскурсии по записи.',
       },
-      schedule: {'he': 'תפילות יומיות', 'en': 'Daily prayers', 'ru': 'Ежедневные молитвы'},
+      schedule: {
+        'he': 'שני וחמישי 09:30 · שבת 10:00 · המבנה כל יום 09:00–17:00',
+        'en': 'Mon & Thu 09:30 · Shabbat 10:00 · building daily 09:00–17:00',
+        'ru': 'Пн и Чт 09:30 · Шаббат 10:00 · здание ежедневно 09:00–17:00',
+      },
       audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
       icon: Icons.synagogue,
       color: 0xFF1D4ED8,
+      imageUrl: 'assets/images/beit-menachem-1.jpg',
+    ),
+    Program(
+      id: _newId(),
+      title: {'he': 'פעילות ילדים ביום ראשון', 'en': 'Sunday children\'s activity', 'ru': 'Детская программа в воскресенье'},
+      description: {
+        'he': 'פעילות לילדים בבית הכנסת ביום ראשון.',
+        'en': 'Children\'s activity at the synagogue on Sunday.',
+        'ru': 'Детская программа в синагоге по воскресеньям.',
+      },
+      schedule: {'he': 'יום ראשון בבית הכנסת', 'en': 'Sunday at the synagogue', 'ru': 'Воскресенье в синагоге'},
+      audience: {'he': 'ילדים', 'en': 'Children', 'ru': 'Дети'},
+      icon: Icons.child_care,
+      color: 0xFFF59E0B,
+    ),
+    Program(
+      id: _newId(),
+      title: {'he': 'סעודת שבת', 'en': 'Shabbat meal', 'ru': 'Субботняя трапеза'},
+      description: {
+        'he': 'סעודת שבת קהילתית בבית מנחם אחרי התפילה.',
+        'en': 'Community Shabbat meal at Beit Menachem after prayer.',
+        'ru': 'Общинная субботняя трапеза в Бейт Менахем после молитвы.',
+      },
+      schedule: {'he': 'שבת 13:00', 'en': 'Shabbat 13:00', 'ru': 'Шаббат 13:00'},
+      audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
+      icon: Icons.restaurant,
+      color: 0xFFC2410C,
     ),
     Program(
       id: _newId(),
@@ -373,11 +456,15 @@ class AppRepository extends ChangeNotifier {
       id: _newId(),
       title: {'he': 'מקווה', 'en': 'Mikveh', 'ru': 'Миква'},
       description: {
-        'he': 'מקווה לגברים ולנשים בתוך המרכז הקהילתי, רחוב שצ׳טינקינה 68.',
-        'en': 'Men\'s and women\'s mikveh inside the community center, 68 Shchetinkina St.',
-        'ru': 'Мужская и женская миквы в общинном центре, ул. Щетинкина, 68.',
+        'he': 'מקווה לגברים ולנשים בתוך המרכז הקהילתי, רחוב שצ׳טינקינה 68. לגברים בבוקר; לנשים בתיאום מראש.',
+        'en': 'Men\'s and women\'s mikveh inside the community center, 68 Shchetinkina St. Men in the morning; women by appointment.',
+        'ru': 'Мужская и женская миквы в общинном центре, ул. Щетинкина, 68. Для мужчин утром; для женщин по записи.',
       },
-      schedule: {'he': 'בתיאום', 'en': 'By appointment', 'ru': 'По записи'},
+      schedule: {
+        'he': 'גברים: בבוקר · נשים: בתיאום מראש',
+        'en': 'Men: morning · Women: by appointment',
+        'ru': 'Мужчины: утром · Женщины: по записи',
+      },
       audience: {'he': 'נשים וגברים', 'en': 'Women and men', 'ru': 'Женщины и мужчины'},
       icon: Icons.water_drop,
       color: 0xFF0D9488,
@@ -407,8 +494,8 @@ class AppRepository extends ChangeNotifier {
   ];
 
   late final List<GalleryPhoto> gallery = [
-    GalleryPhoto(id: _newId(), event: {'he': 'חנוכת בית מנחם', 'en': 'Beit Menachem opening', 'ru': 'Открытие Бейт Менахем'}, year: 2013, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFF1D4ED8, icon: Icons.synagogue),
-    GalleryPhoto(id: _newId(), event: {'he': 'הכנסת ספר תורה', 'en': 'Torah dedication', 'ru': 'Внесение свитка Торы'}, year: 2014, tags: ['Rabbi Zaklos'], color: 0xFF0D9488, icon: Icons.auto_stories),
+    GalleryPhoto(id: _newId(), event: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, year: 2013, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFF1D4ED8, icon: Icons.synagogue, imageUrl: 'assets/images/beit-menachem-1.jpg'),
+    GalleryPhoto(id: _newId(), event: {'he': 'בית הכנסת בית מנחם', 'en': 'Beit Menachem synagogue', 'ru': 'Синагога Бейт Менахем'}, year: 2013, tags: ['Rabbi Zaklos'], color: 0xFF0D9488, icon: Icons.synagogue, imageUrl: 'assets/images/beit-menachem-2.jpg'),
     GalleryPhoto(id: _newId(), event: {'he': 'חנוכה בנובוסיבירסק', 'en': 'Chanukah in Novosibirsk', 'ru': 'Ханука в Новосибирске'}, year: 2024, tags: ['Rabbi Zaklos', 'Sender Kruglov'], color: 0xFFF59E0B, icon: Icons.local_fire_department),
     GalleryPhoto(id: _newId(), event: {'he': 'ראש השנה בבית מנחם', 'en': 'Rosh Hashanah at Beit Menachem', 'ru': 'Рош ха-Шана в Бейт Менахем'}, year: 2024, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFFF97316, icon: Icons.music_note),
     GalleryPhoto(id: _newId(), event: {'he': 'ילדי אור אבנר בחג', 'en': 'Or Avner children at a holiday', 'ru': 'Дети Ор Авнер на празднике'}, year: 2023, tags: ['Rebbetzin Miriam'], color: 0xFF10B981, icon: Icons.child_care),
@@ -421,13 +508,65 @@ class AppRepository extends ChangeNotifier {
   late final List<FamousPerson> famous = [
     FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם ליד אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
     FamousPerson(id: _newId(), name: {'he': 'הרבנית מרים זקלס', 'en': 'Rebbetzin Miriam Zaklos', 'ru': 'Раббанит Мириам Заклос'}, profession: {'he': 'שליחת חב״ד', 'en': 'Chabad emissary', 'ru': 'Посланница Хабада'}, bio: {'he': 'שותפה לשליחות בנובוסיבירסק מאז 1999. מובילה חינוך, חגים וחיי הקהילה לצד הרב.', 'en': 'Partner in the Novosibirsk shlichut since 1999. Leads education, holidays and community life alongside the Rabbi.', 'ru': 'Вместе с раввином на миссии с 1999 года. Образование, праздники и жизнь общины.'}, era: Era.present, color: 0xFFDB2777, initials: 'MZ'),
-    FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'יו״ר הקהילה היהודית', 'en': 'Community chairman', 'ru': 'Председатель общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 יו״ר קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since 2019 chairman of Beit Menachem.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с 2019 председатель общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
+    FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'נשיא הקהילה', 'en': 'President of the community', 'ru': 'Президент общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 נשיא קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since June 2019 president of the Beit Menachem community.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с июня 2019 президент общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
   ];
 
   // ---------------------------------------------------------------------------
-  // Cemetery
+  // Cemetery (loaded from JSON asset — not stored in snapshot)
   // ---------------------------------------------------------------------------
   late final List<Grave> graves = [];
+
+  static const _kaddishAsset = 'assets/data/kaddish_novosibirsk.json';
+  static const _kaddishPhotoBase =
+      'https://synagogue-kadish-shneur.amvera.io/photos/';
+
+  Future<void> _loadKaddishGraves() async {
+    try {
+      final raw = await rootBundle.loadString(_kaddishAsset);
+      final list = jsonDecode(raw);
+      if (list is! List) return;
+      graves
+        ..clear()
+        ..addAll([
+          for (final item in list)
+            if (item is Map) _graveFromKaddish(Map<String, dynamic>.from(item)),
+        ]);
+    } catch (_) {}
+  }
+
+  Grave _graveFromKaddish(Map<String, dynamic> m) {
+    final photo = '${m['photo'] ?? ''}'.trim();
+    final givenUrl = '${m['photoUrl'] ?? ''}'.trim();
+    String? photoUrl;
+    if (givenUrl.isNotEmpty) {
+      photoUrl = givenUrl;
+    } else if (photo.isNotEmpty) {
+      photoUrl = '$_kaddishPhotoBase$photo';
+    }
+    final hebrew = m['hebrew'];
+    var hebrewName = '';
+    if (hebrew is String) {
+      hebrewName = hebrew.trim();
+    } else if (hebrew is Map) {
+      hebrewName = '${hebrew['name'] ?? hebrew['he'] ?? ''}'.trim();
+    }
+    final title = '${m['title'] ?? ''}'.trim();
+    return Grave(
+      id: 'kaddish-${m['id']}',
+      name: '${m['name'] ?? ''}'.trim(),
+      hebrewName: hebrewName,
+      birthYear: (m['birthYear'] as num?)?.toInt(),
+      deathYear: (m['deathYear'] as num?)?.toInt() ?? 0,
+      deathMonth: (m['deathMonth'] as num?)?.toInt(),
+      deathDay: (m['deathDay'] as num?)?.toInt(),
+      section: '${m['section'] ?? ''}'.trim(),
+      row: '${m['row'] ?? ''}'.trim(),
+      notes: title.isEmpty
+          ? const {}
+          : {'he': title, 'en': title, 'ru': title},
+      photoUrl: photoUrl,
+    );
+  }
 
   // ---------------------------------------------------------------------------
   // History + tour
@@ -689,7 +828,12 @@ class AppRepository extends ChangeNotifier {
   // Page banners (replace the default blue hero)
   // ---------------------------------------------------------------------------
   final Map<String, PageBanner> banners = {
-    for (final slot in bannerSlots) slot.route: PageBanner(),
+    for (final slot in bannerSlots)
+      slot.route: PageBanner(
+        imageUrl: slot.route == '/' || slot.route == '/about'
+            ? 'assets/images/beit-menachem-1.jpg'
+            : 'assets/images/beit-menachem-2.jpg',
+      ),
   };
 
   PageBanner bannerFor(String route) =>
