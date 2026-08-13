@@ -58,11 +58,10 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            textAlign: center ? TextAlign.center : null,
+            textAlign: TextAlign.start,
             style: Theme.of(context)
                 .textTheme
                 .headlineMedium
@@ -80,7 +79,7 @@ class SectionHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             subtitle!,
-            textAlign: center ? TextAlign.center : null,
+            textAlign: TextAlign.start,
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
@@ -103,6 +102,7 @@ class GradientImage extends StatelessWidget {
     this.borderRadius = 0,
     this.badge,
     this.bytes,
+    this.url,
   });
   final int color;
   final IconData? icon;
@@ -111,6 +111,7 @@ class GradientImage extends StatelessWidget {
   final double borderRadius;
   final Widget? badge;
   final Uint8List? bytes;
+  final String? url;
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +125,23 @@ class GradientImage extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.memory(bytes!, fit: BoxFit.cover, gaplessPlayback: true),
+              if (badge != null)
+                PositionedDirectional(top: 10, start: 10, child: badge!),
+            ],
+          ),
+        ),
+      );
+    }
+    if (url != null && url!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(url!, fit: BoxFit.cover),
               if (badge != null)
                 PositionedDirectional(top: 10, start: 10, child: badge!),
             ],
@@ -401,6 +419,7 @@ class PageHero extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(title,
+                      textAlign: TextAlign.start,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 36,
@@ -413,6 +432,7 @@ class PageHero extends StatelessWidget {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 640),
                     child: Text(subtitle,
+                        textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.92),
                             fontSize: 16.5,
@@ -439,16 +459,25 @@ class BannerFill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!banner.hasImage) return const SizedBox.shrink();
+    final bytes = banner.bytes;
+    final url = banner.imageUrl;
     return Positioned.fill(
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.memory(
-            banner.bytes!,
-            fit: BoxFit.cover,
-            alignment: banner.alignment,
-            gaplessPlayback: true,
-          ),
+          if (bytes != null && bytes.isNotEmpty)
+            Image.memory(
+              bytes,
+              fit: BoxFit.cover,
+              alignment: banner.alignment,
+              gaplessPlayback: true,
+            )
+          else if (url != null && url.isNotEmpty)
+            Image.network(
+              url,
+              fit: BoxFit.cover,
+              alignment: banner.alignment,
+            ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(

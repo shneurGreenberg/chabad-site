@@ -5,6 +5,7 @@ import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 
 class BannersPanel extends StatelessWidget {
   const BannersPanel({super.key});
@@ -79,13 +80,13 @@ class _BannerEditor extends StatelessWidget {
                 onPressed: () => _pick(context),
                 icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
                 label: Text(loc.t('admin.banners.upload')),
-              ),
+              ).hoverLift(),
               if (banner.hasImage)
                 OutlinedButton.icon(
                   onPressed: () => repo.clearBanner(slot.route),
                   icon: const Icon(Icons.delete_outline, size: 18),
                   label: Text(loc.t('admin.banners.remove')),
-                ),
+                ).hoverLift(),
             ],
           ),
           const SizedBox(height: 6),
@@ -100,12 +101,19 @@ class _BannerEditor extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  if (banner.hasImage)
+                  if (banner.bytes != null && banner.bytes!.isNotEmpty)
                     Image.memory(
                       banner.bytes!,
                       fit: BoxFit.cover,
                       alignment: banner.alignment,
                       gaplessPlayback: true,
+                    )
+                  else if (banner.imageUrl != null &&
+                      banner.imageUrl!.isNotEmpty)
+                    Image.network(
+                      banner.imageUrl!,
+                      fit: BoxFit.cover,
+                      alignment: banner.alignment,
                     )
                   else
                     Container(

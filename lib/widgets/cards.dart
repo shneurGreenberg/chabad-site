@@ -7,6 +7,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'hover.dart';
 
 String fmtDate(BuildContext context, DateTime d) {
   final lang = context.read<LocaleController>().lang;
@@ -20,7 +21,8 @@ class NewsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Container(
+    return HoverLift(
+      child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppColors.cardShadow,
@@ -28,6 +30,7 @@ class NewsCard extends StatelessWidget {
       child: Card(
       child: InkWell(
         onTap: () => context.go('/news'),
+        mouseCursor: SystemMouseCursors.click,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -36,6 +39,7 @@ class NewsCard extends StatelessWidget {
               icon: article.icon,
               height: 150,
               bytes: article.imageBytes,
+              url: article.imageUrl,
               badge: article.source == NewsSource.telegram
                   ? const Pill('Telegram', color: Color(0xFF0EA5E9), icon: Icons.send)
                   : null,
@@ -78,6 +82,7 @@ class NewsCard extends StatelessWidget {
         ),
       ),
       ),
+    ),
     );
   }
 }
@@ -89,7 +94,8 @@ class ProgramCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final color = Color(program.color);
-    return Container(
+    return HoverLift(
+      child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppColors.cardShadow,
@@ -103,6 +109,7 @@ class ProgramCard extends StatelessWidget {
               icon: program.icon,
               height: 120,
               bytes: program.imageBytes,
+              url: program.imageUrl,
             ),
             Padding(
               padding: const EdgeInsets.all(18),
@@ -160,13 +167,14 @@ class ProgramCard extends StatelessWidget {
                     ),
                     icon: const Icon(Icons.how_to_reg, size: 18),
                     label: Text(loc.t('programs.register')),
-                  ),
+                  ).hoverLift(),
                 ],
               ),
             ),
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -178,7 +186,8 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.read<AppRepository>();
-    return Card(
+    return HoverLift(
+      child: Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -186,7 +195,8 @@ class ProductCard extends StatelessWidget {
               color: product.color,
               icon: product.icon,
               height: 130,
-              bytes: product.imageBytes),
+              bytes: product.imageBytes,
+              url: product.imageUrl),
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -226,7 +236,7 @@ class ProductCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10)),
                       child: const Icon(Icons.add_shopping_cart, size: 18),
-                    ),
+                    ).hoverLift(scale: 1.05),
                   ),
                 ]),
               ],
@@ -234,6 +244,7 @@ class ProductCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -245,7 +256,8 @@ class PersonCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final color = Color(person.color);
-    return Card(
+    return HoverLift(
+      child: Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -280,6 +292,7 @@ class PersonCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -291,7 +304,8 @@ class PhotoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Card(
+    return HoverLift(
+      child: Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -300,6 +314,7 @@ class PhotoCard extends StatelessWidget {
             icon: photo.icon,
             height: 160,
             bytes: photo.imageBytes,
+            url: photo.imageUrl,
             badge: Pill('${photo.year}', color: Colors.black.withValues(alpha: 0.4)),
           ),
           Padding(
@@ -334,6 +349,7 @@ class PhotoCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

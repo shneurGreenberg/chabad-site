@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../models.dart';
+import '../services/cloud_sync.dart';
+import '../services/image_compress.dart';
 import '../services/location_zmanim.dart';
 import '../services/persist.dart';
 import '../services/telegram.dart';
@@ -24,8 +26,9 @@ class AppRepository extends ChangeNotifier {
   }
 
   static const _snapKey = 'chabad_site_snapshot';
+  static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
-      'השמירה נכשלה — התמונות גדולות מדי לדפדפן. התוכן נשמר בלי התמונות הכבדות.';
+      'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. אם Firebase מוגדר, התמונות עולות לשרת.';
 
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
@@ -49,11 +52,13 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> _boot() async {
+    await CloudSync.instance.init();
     await _hydrate();
     _hydrated = true;
     try {
       await refreshTimes();
     } catch (_) {}
+    unawaited(_pullCloud());
   }
 
   // ---------------------------------------------------------------------------
@@ -690,7 +695,8 @@ class AppRepository extends ChangeNotifier {
 
   void setBannerImage(String route, Uint8List bytes) {
     final current = banners.putIfAbsent(route, PageBanner.new);
-    current.bytes = bytes;
+    current.bytes = compressSiteImage(bytes);
+    current.imageUrl = null;
     notifyListeners();
   }
 
@@ -809,36 +815,19 @@ class AppRepository extends ChangeNotifier {
     });
   }
 
-  Future<void> _hydrate() async {
-    final raw = await persistGet(_snapKey);
-    if (raw == null || raw.isEmpty) return;
-    try {
-      final m = jsonDecode(raw) as Map<String, dynamic>;
-      _applySnapshot(m);
-    } catch (_) {}
-  }
-
-  Map<String, dynamic> _encodeSnapshot({required bool includeImages}) => {
-        'v': 1,
+  Map<String, dynamic> _encodeSnapshot() => {
+        'v': 2,
         'seq': _seq,
+        'updatedAt': DateTime.now().toIso8601String(),
         'mapsKey': googleMapsApiKey,
         'location': locationToJson(location),
         'contact': contactToJson(contact),
-        'news': [
-          for (final a in news) newsToJson(a, includeImages: includeImages),
-        ],
-        'programs': [
-          for (final p in programs) programToJson(p, includeImages: includeImages),
-        ],
-        'products': [
-          for (final p in products) productToJson(p, includeImages: includeImages),
-        ],
-        'gallery': [
-          for (final p in gallery) galleryToJson(p, includeImages: includeImages),
-        ],
+        'news': [for (final a in news) newsToJson(a)],
+        'programs': [for (final p in programs) programToJson(p)],
+        'products': [for (final p in products) productToJson(p)],
+        'gallery': [for (final p in gallery) galleryToJson(p)],
         'banners': {
-          for (final e in banners.entries)
-            e.key: bannerToJson(e.value, includeImages: includeImages),
+          for (final e in banners.entries) e.key: bannerToJson(e.value),
         },
         'cart': _cart,
         'leads': [for (final l in leads) leadToJson(l)],
@@ -847,6 +836,7 @@ class AppRepository extends ChangeNotifier {
         'telegramBot': botToJson(telegramBot),
         'socialBot': botToJson(socialBot),
         'lang': readPref('lang') ?? 'he',
+        'imageKeys': _collectImages().keys.toList(),
       };
 
   void _applySnapshot(Map<String, dynamic> m) {
@@ -930,24 +920,150 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
-  Future<void> _persistNow() async {
-    Future<void> write(bool includeImages) async {
-      final json = jsonEncode(_encodeSnapshot(includeImages: includeImages));
-      await persistPut(_snapKey, json);
-    }
-
+  Future<void> _hydrate() async {
+    final raw = await persistGet(_snapKey);
+    if (raw == null || raw.isEmpty) return;
     try {
-      await write(true);
-    } catch (e) {
-      if (!isQuotaExceeded(e)) return;
-      try {
-        await write(false);
-        onPersistWarning?.call(_quotaHe);
-      } catch (e2) {
-        if (isQuotaExceeded(e2)) {
-          onPersistWarning?.call(_quotaHe);
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      _applySnapshot(m);
+      await _hydrateLocalImages(m);
+    } catch (_) {}
+  }
+
+  Future<void> _hydrateLocalImages(Map<String, dynamic> m) async {
+    final keys = <String>[
+      if (m['imageKeys'] is List)
+        for (final k in m['imageKeys'] as List) '$k',
+    ];
+    if (keys.isEmpty) {
+      keys.addAll(_collectImages().keys);
+      keys.addAll([
+        for (final e in banners.entries) 'banner:${e.key}',
+        for (final a in news) 'news:${a.id}',
+        for (final p in programs) 'program:${p.id}',
+        for (final p in products) 'product:${p.id}',
+        for (final p in gallery) 'gallery:${p.id}',
+      ]);
+    }
+    for (final key in keys.toSet()) {
+      final raw = await persistGet('$_imgPrefix$key');
+      final bytes = b64ToBytes(raw);
+      if (bytes != null) _applyLocalImage(key, bytes);
+    }
+  }
+
+  Map<String, Uint8List> _collectImages() {
+    final out = <String, Uint8List>{};
+    for (final e in banners.entries) {
+      final b = e.value.bytes;
+      if (b != null && b.isNotEmpty) out['banner:${e.key}'] = b;
+    }
+    for (final a in news) {
+      final b = a.imageBytes;
+      if (b != null && b.isNotEmpty) out['news:${a.id}'] = b;
+    }
+    for (final p in programs) {
+      final b = p.imageBytes;
+      if (b != null && b.isNotEmpty) out['program:${p.id}'] = b;
+    }
+    for (final p in products) {
+      final b = p.imageBytes;
+      if (b != null && b.isNotEmpty) out['product:${p.id}'] = b;
+    }
+    for (final p in gallery) {
+      final b = p.imageBytes;
+      if (b != null && b.isNotEmpty) out['gallery:${p.id}'] = b;
+    }
+    return out;
+  }
+
+  void _applyLocalImage(String key, Uint8List bytes) {
+    final i = key.indexOf(':');
+    if (i <= 0) return;
+    final kind = key.substring(0, i);
+    final id = key.substring(i + 1);
+    switch (kind) {
+      case 'banner':
+        banners.putIfAbsent(id, PageBanner.new).bytes = bytes;
+      case 'news':
+        for (final a in news) {
+          if (a.id == id) a.imageBytes = bytes;
         }
+      case 'program':
+        for (final p in programs) {
+          if (p.id == id) p.imageBytes = bytes;
+        }
+      case 'product':
+        for (final p in products) {
+          if (p.id == id) p.imageBytes = bytes;
+        }
+      case 'gallery':
+        for (final p in gallery) {
+          if (p.id == id) p.imageBytes = bytes;
+        }
+    }
+  }
+
+  void _applyImageUrls(Map<String, dynamic> urls) {
+    for (final e in urls.entries) {
+      final url = '${e.value}';
+      if (url.isEmpty) continue;
+      final key = e.key;
+      final i = key.indexOf(':');
+      if (i <= 0) continue;
+      final kind = key.substring(0, i);
+      final id = key.substring(i + 1);
+      switch (kind) {
+        case 'banner':
+          banners.putIfAbsent(id, PageBanner.new).imageUrl = url;
+        case 'news':
+          for (final a in news) {
+            if (a.id == id) a.imageUrl = url;
+          }
+        case 'program':
+          for (final p in programs) {
+            if (p.id == id) p.imageUrl = url;
+          }
+        case 'product':
+          for (final p in products) {
+            if (p.id == id) p.imageUrl = url;
+          }
+        case 'gallery':
+          for (final p in gallery) {
+            if (p.id == id) p.imageUrl = url;
+          }
       }
     }
+  }
+
+  Future<void> _pullCloud() async {
+    final cloud = await CloudSync.instance.pull();
+    if (cloud == null || cloud.isEmpty) return;
+    final localImages = _collectImages();
+    _applySnapshot(cloud);
+    for (final e in localImages.entries) {
+      _applyLocalImage(e.key, e.value);
+    }
+    final urls = cloud['imageUrls'];
+    if (urls is Map) {
+      _applyImageUrls(Map<String, dynamic>.from(urls));
+    }
+    notifyListeners();
+  }
+
+  Future<void> _persistNow() async {
+    final images = _collectImages();
+    final snap = _encodeSnapshot();
+    try {
+      await persistPut(_snapKey, jsonEncode(snap));
+      for (final e in images.entries) {
+        await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
+      }
+    } catch (e) {
+      if (isQuotaExceeded(e)) {
+        onPersistWarning?.call(_quotaHe);
+      }
+    }
+    unawaited(CloudSync.instance.push(snapshot: snap, images: images));
   }
 }

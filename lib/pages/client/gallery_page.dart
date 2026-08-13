@@ -5,6 +5,7 @@ import '../../l10n/strings.dart';
 import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class GalleryPage extends StatefulWidget {
@@ -122,7 +123,8 @@ class _GalleryPageState extends State<GalleryPage> {
 
   Widget _faceAvatar(String name, bool selected) {
     final color = selected ? AppColors.accent : AppColors.primary;
-    return InkWell(
+    return HoverScale(
+      child: InkWell(
       onTap: () => setState(() => _face = selected ? null : name),
       borderRadius: BorderRadius.circular(30),
       child: Container(
@@ -145,6 +147,7 @@ class _GalleryPageState extends State<GalleryPage> {
           const SizedBox(width: 6),
         ]),
       ),
+    ),
     );
   }
 

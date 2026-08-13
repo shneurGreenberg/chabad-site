@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../models.dart';
 
-const kMaxPersistImageBytes = 350 * 1024;
-
 Loc locFrom(dynamic v) {
   if (v is! Map) return {};
   return {
@@ -16,9 +14,8 @@ Loc locFrom(dynamic v) {
 
 Map<String, String> locTo(Loc loc) => Map<String, String>.from(loc);
 
-String? bytesToB64(Uint8List? bytes, {required bool includeImages}) {
-  if (!includeImages || bytes == null || bytes.isEmpty) return null;
-  if (bytes.lengthInBytes > kMaxPersistImageBytes) return null;
+String? bytesToB64(Uint8List? bytes) {
+  if (bytes == null || bytes.isEmpty) return null;
   return base64Encode(bytes);
 }
 
@@ -41,7 +38,7 @@ IconData iconFrom(dynamic code, IconData fallback) {
 
 int iconTo(IconData icon) => icon.codePoint;
 
-Map<String, dynamic> newsToJson(NewsArticle a, {required bool includeImages}) => {
+Map<String, dynamic> newsToJson(NewsArticle a) => {
       'id': a.id,
       'title': locTo(a.title),
       'body': locTo(a.body),
@@ -51,7 +48,7 @@ Map<String, dynamic> newsToJson(NewsArticle a, {required bool includeImages}) =>
       'icon': iconTo(a.icon),
       'source': a.source.name,
       'published': a.published,
-      'image': bytesToB64(a.imageBytes, includeImages: includeImages),
+      'imageUrl': a.imageUrl,
       'telegramMessageId': a.telegramMessageId,
     };
 
@@ -71,11 +68,14 @@ NewsArticle newsFromJson(dynamic raw) {
     ),
     published: m['published'] != false,
     imageBytes: b64ToBytes(m['image']),
+    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
+        ? '${m['imageUrl']}'
+        : null,
     telegramMessageId: (m['telegramMessageId'] as num?)?.toInt(),
   );
 }
 
-Map<String, dynamic> programToJson(Program p, {required bool includeImages}) => {
+Map<String, dynamic> programToJson(Program p) => {
       'id': p.id,
       'title': locTo(p.title),
       'description': locTo(p.description),
@@ -83,7 +83,7 @@ Map<String, dynamic> programToJson(Program p, {required bool includeImages}) => 
       'audience': locTo(p.audience),
       'icon': iconTo(p.icon),
       'color': p.color,
-      'image': bytesToB64(p.imageBytes, includeImages: includeImages),
+      'imageUrl': p.imageUrl,
     };
 
 Program programFromJson(dynamic raw) {
@@ -97,10 +97,13 @@ Program programFromJson(dynamic raw) {
     icon: iconFrom(m['icon'], Icons.groups_outlined),
     color: (m['color'] as num?)?.toInt() ?? 0xFF0EA5E9,
     imageBytes: b64ToBytes(m['image']),
+    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
+        ? '${m['imageUrl']}'
+        : null,
   );
 }
 
-Map<String, dynamic> productToJson(Product p, {required bool includeImages}) => {
+Map<String, dynamic> productToJson(Product p) => {
       'id': p.id,
       'name': locTo(p.name),
       'description': locTo(p.description),
@@ -108,7 +111,7 @@ Map<String, dynamic> productToJson(Product p, {required bool includeImages}) => 
       'category': p.category.name,
       'color': p.color,
       'icon': iconTo(p.icon),
-      'image': bytesToB64(p.imageBytes, includeImages: includeImages),
+      'imageUrl': p.imageUrl,
     };
 
 Product productFromJson(dynamic raw) {
@@ -125,17 +128,20 @@ Product productFromJson(dynamic raw) {
     color: (m['color'] as num?)?.toInt() ?? 0xFF059669,
     icon: iconFrom(m['icon'], Icons.shopping_bag_outlined),
     imageBytes: b64ToBytes(m['image']),
+    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
+        ? '${m['imageUrl']}'
+        : null,
   );
 }
 
-Map<String, dynamic> galleryToJson(GalleryPhoto p, {required bool includeImages}) => {
+Map<String, dynamic> galleryToJson(GalleryPhoto p) => {
       'id': p.id,
       'event': locTo(p.event),
       'year': p.year,
       'tags': p.tags,
       'color': p.color,
       'icon': iconTo(p.icon),
-      'image': bytesToB64(p.imageBytes, includeImages: includeImages),
+      'imageUrl': p.imageUrl,
     };
 
 GalleryPhoto galleryFromJson(dynamic raw) {
@@ -150,11 +156,14 @@ GalleryPhoto galleryFromJson(dynamic raw) {
     color: (m['color'] as num?)?.toInt() ?? 0xFF1D4ED8,
     icon: iconFrom(m['icon'], Icons.photo_camera_back_outlined),
     imageBytes: b64ToBytes(m['image']),
+    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
+        ? '${m['imageUrl']}'
+        : null,
   );
 }
 
-Map<String, dynamic> bannerToJson(PageBanner b, {required bool includeImages}) => {
-      'image': bytesToB64(b.bytes, includeImages: includeImages),
+Map<String, dynamic> bannerToJson(PageBanner b) => {
+      'url': b.imageUrl,
       'x': b.alignX,
       'y': b.alignY,
     };
@@ -164,6 +173,7 @@ PageBanner bannerFromJson(dynamic raw) {
   final m = Map<String, dynamic>.from(raw);
   return PageBanner(
     bytes: b64ToBytes(m['image']),
+    imageUrl: m['url'] is String && '${m['url']}'.isNotEmpty ? '${m['url']}' : null,
     alignX: (m['x'] as num?)?.toDouble() ?? 0,
     alignY: (m['y'] as num?)?.toDouble() ?? 0,
   );

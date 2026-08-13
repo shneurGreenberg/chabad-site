@@ -5,6 +5,7 @@ import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class LibraryPage extends StatelessWidget {
@@ -46,7 +47,8 @@ class _ShiurCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return Card(
+    return HoverLift(
+      child: Card(
       child: InkWell(
         onTap: () => _play(context),
         child: Padding(
@@ -98,7 +100,7 @@ class _ShiurCard extends StatelessWidget {
                       onPressed: () => _play(context),
                       icon: const Icon(Icons.play_circle_outline, size: 18),
                       label: Text(loc.t('library.watch')),
-                    ),
+                    ).hoverLift(),
                   ],
                 ),
               ),
@@ -106,6 +108,7 @@ class _ShiurCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -149,7 +152,7 @@ class _ShiurCard extends StatelessWidget {
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.check, size: 18),
                         label: Text(loc.t('common.close')),
-                      ),
+                      ).hoverLift(),
                     ),
                   ],
                 ),

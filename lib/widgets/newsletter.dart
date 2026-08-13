@@ -6,6 +6,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'hover.dart';
 
 class NewsletterSignup extends StatefulWidget {
   const NewsletterSignup({
@@ -127,7 +128,7 @@ class _NewsletterSignupState extends State<NewsletterSignup> {
                     light ? AppColors.primaryDark : Colors.white,
               ),
               child: Text(loc.t('newsletter.join')),
-            ),
+            ).hoverLift(),
           ],
         ),
         if (_message != null) ...[

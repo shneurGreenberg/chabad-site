@@ -5,6 +5,7 @@ import '../../data/repository.dart';
 import '../../services/telegram.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 
 class TelegramWizard extends StatefulWidget {
   const TelegramWizard({super.key});
@@ -242,7 +243,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                       )
                     : const Icon(Icons.link, size: 18),
                 label: Text(loc.t('admin.tg.connect')),
-              ),
+              ).hoverLift(),
               FilledButton.icon(
                 onPressed: _pulling ? null : _pull,
                 style: FilledButton.styleFrom(
@@ -256,7 +257,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                       )
                     : const Icon(Icons.download, size: 18),
                 label: Text(loc.t('admin.tg.pull')),
-              ),
+              ).hoverLift(),
             ],
           ),
         ],

@@ -29,6 +29,7 @@ class NewsArticle {
     this.source = NewsSource.manual,
     this.published = true,
     this.imageBytes,
+    this.imageUrl,
     this.telegramMessageId,
   });
 
@@ -42,6 +43,7 @@ class NewsArticle {
   NewsSource source;
   bool published;
   Uint8List? imageBytes;
+  String? imageUrl;
   int? telegramMessageId;
 }
 
@@ -86,6 +88,7 @@ class Program {
     this.icon = Icons.groups_outlined,
     this.color = 0xFF0EA5E9,
     this.imageBytes,
+    this.imageUrl,
   });
   final String id;
   Loc title;
@@ -95,6 +98,7 @@ class Program {
   IconData icon;
   int color;
   Uint8List? imageBytes;
+  String? imageUrl;
 }
 
 class GalleryPhoto {
@@ -106,6 +110,7 @@ class GalleryPhoto {
     required this.color,
     this.icon = Icons.photo_camera_back_outlined,
     this.imageBytes,
+    this.imageUrl,
   });
   final String id;
   Loc event;
@@ -114,6 +119,7 @@ class GalleryPhoto {
   int color;
   IconData icon;
   Uint8List? imageBytes;
+  String? imageUrl;
 }
 
 enum Era { present, past }
@@ -196,6 +202,7 @@ class Product {
     this.color = 0xFF059669,
     this.icon = Icons.shopping_bag_outlined,
     this.imageBytes,
+    this.imageUrl,
   });
   final String id;
   Loc name;
@@ -205,6 +212,7 @@ class Product {
   int color;
   IconData icon;
   Uint8List? imageBytes;
+  String? imageUrl;
 }
 
 class Shiur {
@@ -319,12 +327,15 @@ class ContactInfo {
 
 /// A photo that replaces the default blue banner on a page.
 class PageBanner {
-  PageBanner({this.bytes, this.alignX = 0, this.alignY = 0});
+  PageBanner({this.bytes, this.imageUrl, this.alignX = 0, this.alignY = 0});
   Uint8List? bytes;
+  String? imageUrl;
   double alignX;
   double alignY;
 
-  bool get hasImage => bytes != null && bytes!.isNotEmpty;
+  bool get hasImage =>
+      (bytes != null && bytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty);
   Alignment get alignment => Alignment(alignX, alignY);
 }
 

@@ -7,6 +7,7 @@ import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/newsletter.dart';
 import '../../widgets/site_scaffold.dart';
 
@@ -112,7 +113,7 @@ class HomePage extends StatelessWidget {
           onPressed: () => context.go(route),
           icon: const Icon(Icons.arrow_forward, size: 18),
           label: Text(loc.t('common.viewAll')),
-        ),
+        ).hoverLift(),
       ],
     );
   }
@@ -175,7 +176,7 @@ class _Hero extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
               icon: const Icon(Icons.group_add),
               label: Text(loc.t('home.hero.cta')),
-            ),
+            ).hoverLift(),
             OutlinedButton.icon(
               onPressed: () => context.go('/donate'),
               style: OutlinedButton.styleFrom(
@@ -185,7 +186,7 @@ class _Hero extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 22, vertical: 17)),
               icon: const Icon(Icons.favorite_border),
               label: Text(loc.t('home.hero.donate')),
-            ),
+            ).hoverLift(),
           ],
         ),
       ],
@@ -320,7 +321,7 @@ class _ShabbatCard extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.schedule, size: 18),
                   label: Text(loc.t('home.zmanim.title')),
-                ),
+                ).hoverLift(),
               ),
             ],
           ),
@@ -370,9 +371,11 @@ class _QuickLinks extends StatelessWidget {
       runSpacing: 12,
       children: [
         for (final item in items)
-          InkWell(
+          HoverLift(
+            child: InkWell(
             onTap: () => context.go(item.$3),
             borderRadius: BorderRadius.circular(18),
+            mouseCursor: SystemMouseCursors.click,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
               decoration: BoxDecoration(
@@ -398,6 +401,7 @@ class _QuickLinks extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
       ],
     );
@@ -446,7 +450,7 @@ class _ZmanimStrip extends StatelessWidget {
                 onPressed: () => context.go('/zmanim'),
                 icon: const Icon(Icons.arrow_forward, size: 16),
                 label: Text(loc.t('common.viewAll')),
-              ),
+              ).hoverLift(),
             ],
           ),
           const SizedBox(height: 16),
@@ -532,7 +536,7 @@ class _ReconnectBand extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
             icon: const Icon(Icons.connect_without_contact),
             label: Text(loc.t('home.hero.cta')),
-          ),
+          ).hoverLift(),
         ],
       ),
     );

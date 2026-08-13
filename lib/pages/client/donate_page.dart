@@ -5,6 +5,7 @@ import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class DonatePage extends StatefulWidget {
@@ -88,7 +89,7 @@ class _DonatePageState extends State<DonatePage> {
                   label: Text('\$$p'),
                   selected: _amount.text == '$p',
                   onSelected: (_) => setState(() => _amount.text = '$p'),
-                ),
+                ).hoverScale(scale: 1.04),
             ],
           ),
           const SizedBox(height: 16),
@@ -125,7 +126,7 @@ class _DonatePageState extends State<DonatePage> {
                 minimumSize: const Size.fromHeight(50)),
             icon: const Icon(Icons.favorite),
             label: Text('${loc.t('donate.give')}  \$${_amount.text}'),
-          ),
+          ).hoverLift(),
         ],
       ),
     );

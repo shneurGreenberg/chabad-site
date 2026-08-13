@@ -5,12 +5,15 @@ import 'package:provider/provider.dart';
 import 'data/repository.dart';
 import 'l10n/strings.dart';
 import 'router.dart';
+import 'services/cloud_sync.dart';
 import 'state/auth.dart';
 import 'theme.dart';
 
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CloudSync.instance.init();
   runApp(const ChabadApp());
 }
 

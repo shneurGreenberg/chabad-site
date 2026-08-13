@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -166,7 +167,7 @@ class _TourCard extends StatelessWidget {
                   onPressed: onStart,
                   icon: const Icon(Icons.play_circle_outline, size: 18),
                   label: Text(loc.t('history.tour.cta')),
-                ),
+                ).hoverLift(),
               ],
             ),
           ),
@@ -212,7 +213,7 @@ class _TourDialogState extends State<_TourDialog> {
                 child: IconButton(
                   icon: const Icon(Icons.close, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
-                ),
+                ).hoverScale(),
               ),
               PositionedDirectional(
                 start: 12,
@@ -238,7 +239,7 @@ class _TourDialogState extends State<_TourDialog> {
                       onPressed: _i > 0 ? () => setState(() => _i--) : null,
                       icon: const Icon(Icons.chevron_left),
                       label: Text(loc.t('common.previous')),
-                    ),
+                    ).hoverLift(),
                     const Spacer(),
                     FilledButton.icon(
                       onPressed: _i < widget.stops.length - 1
@@ -252,7 +253,7 @@ class _TourDialogState extends State<_TourDialog> {
                       label: Text(_i < widget.stops.length - 1
                           ? loc.t('common.next')
                           : loc.t('common.close')),
-                    ),
+                    ).hoverLift(),
                   ]),
                 ],
               ),

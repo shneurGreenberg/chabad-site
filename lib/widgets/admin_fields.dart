@@ -5,8 +5,10 @@ import 'package:image_picker/image_picker.dart';
 
 import '../l10n/strings.dart';
 import '../services/auto_translate.dart';
+import '../services/image_compress.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'hover.dart';
 
 /// Trilingual (he / en / ru) fields with an auto-translate button from Hebrew.
 class LocFieldGroup extends StatefulWidget {
@@ -116,7 +118,7 @@ class _LocFieldGroupState extends State<LocFieldGroup> {
                         )
                       : const Icon(Icons.translate, size: 18),
                   label: Text(loc.t('admin.translate')),
-                ),
+                ).hoverLift(),
             ],
           ),
           const SizedBox(height: 8),
@@ -169,7 +171,7 @@ class CoverImagePicker extends StatelessWidget {
       imageQuality: 86,
     );
     if (picked == null) return;
-    onChanged(await picked.readAsBytes());
+    onChanged(compressSiteImage(await picked.readAsBytes()));
   }
 
   @override
@@ -204,13 +206,13 @@ class CoverImagePicker extends StatelessWidget {
               onPressed: _pick,
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
               label: Text(loc.t('admin.image.choose')),
-            ),
+            ).hoverLift(),
             if (has)
               OutlinedButton.icon(
                 onPressed: () => onChanged(null),
                 icon: const Icon(Icons.delete_outline, size: 18),
                 label: Text(loc.t('admin.image.remove')),
-              ),
+              ).hoverLift(),
           ],
         ),
       ],

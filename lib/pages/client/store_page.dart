@@ -6,6 +6,7 @@ import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class StorePage extends StatefulWidget {
@@ -143,7 +144,7 @@ class _CartPanel extends StatelessWidget {
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(46)),
               icon: const Icon(Icons.lock_outline, size: 18),
               label: Text(loc.t('store.checkout')),
-            ),
+            ).hoverLift(),
           ],
         ],
       ),
@@ -164,13 +165,13 @@ class _CartPanel extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           onPressed: () => repo.removeFromCart(id),
           icon: const Icon(Icons.remove_circle_outline, size: 20),
-        ),
+        ).hoverScale(),
         Text('$qty', style: const TextStyle(fontWeight: FontWeight.w700)),
         IconButton(
           visualDensity: VisualDensity.compact,
           onPressed: () => repo.addToCart(id),
           icon: const Icon(Icons.add_circle_outline, size: 20),
-        ),
+        ).hoverScale(),
       ]),
     );
   }

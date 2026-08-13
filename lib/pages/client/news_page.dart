@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../models.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class NewsPage extends StatefulWidget {
@@ -70,10 +71,12 @@ class _NewsPageState extends State<NewsPage> {
 
   Widget _chip(String label, String value) {
     final selected = _category == value;
-    return ChoiceChip(
+    return HoverScale(
+      child: ChoiceChip(
       label: Text(label),
       selected: selected,
       onSelected: (_) => setState(() => _category = value),
+    ),
     );
   }
 }

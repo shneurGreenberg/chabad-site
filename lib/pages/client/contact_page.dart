@@ -5,6 +5,7 @@ import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class ContactPage extends StatefulWidget {
@@ -84,7 +85,7 @@ class _ContactPageState extends State<ContactPage> {
                           label: Text(trLoc(t, loc.lang)),
                           selected: _topic == t,
                           onSelected: (_) => setState(() => _topic = t),
-                        ),
+                        ).hoverScale(scale: 1.04),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -133,7 +134,7 @@ class _ContactPageState extends State<ContactPage> {
                         minimumSize: const Size.fromHeight(50)),
                     icon: const Icon(Icons.send),
                     label: Text(loc.t('common.send')),
-                  ),
+                  ).hoverLift(),
                 ],
               ),
             ),

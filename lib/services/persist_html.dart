@@ -24,7 +24,20 @@ Future<void> persistPut(String key, String value) async {
   } catch (e) {
     if (isQuotaExceeded(e)) rethrow;
   }
+  // localStorage is ~5MB — never dump photos there.
+  if (value.length > 400000) {
+    throw PersistQuotaException('too large for localStorage');
+  }
   _localPut(key, value);
+}
+
+Future<void> persistDelete(String key) async {
+  try {
+    await _idbDelete(key);
+  } catch (_) {}
+  try {
+    web.window.localStorage.removeItem(key);
+  } catch (_) {}
 }
 
 Future<String?> persistGet(String key) async {
@@ -116,4 +129,21 @@ Future<String?> _idbGet(String key) async {
     }
   }.toJS;
   return done.future;
+}
+
+Future<void> _idbDelete(String key) async {
+  final db = await _openDb();
+  final tx = db.transaction(_storeName.toJS, 'readwrite');
+  final store = tx.objectStore(_storeName);
+  final req = store.delete(key.toJS);
+  final done = Completer<void>();
+  req.onsuccess = (web.Event _) {
+    if (!done.isCompleted) done.complete();
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (!done.isCompleted) {
+      done.completeError(req.error ?? Exception('idb delete failed'));
+    }
+  }.toJS;
+  await done.future;
 }

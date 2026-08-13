@@ -12,4 +12,6 @@ Future<void> persistPut(String key, String value) => impl.persistPut(key, value)
 
 Future<String?> persistGet(String key) => impl.persistGet(key);
 
+Future<void> persistDelete(String key) => impl.persistDelete(key);
+
 bool isQuotaExceeded(Object error) => impl.isQuotaExceeded(error);

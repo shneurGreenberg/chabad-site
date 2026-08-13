@@ -6,6 +6,7 @@ class AppColors {
   static const Color primaryDark = Color(0xFF0B1C3A);
   static const Color primaryMid = Color(0xFF1E3F7A);
   static const Color accent = Color(0xFFC9A227);
+  static const Color gold = accent;
   static const Color accentSoft = Color(0xFFE8D48A);
   static const Color surface = Color(0xFFF6F1E8);
   static const Color ink = Color(0xFF12203A);
@@ -30,6 +31,29 @@ class AppColors {
           offset: const Offset(0, 10),
         ),
       ];
+}
+
+WidgetStateProperty<Color?> _goldOverlay() {
+  return WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.pressed)) {
+      return AppColors.gold.withValues(alpha: 0.28);
+    }
+    if (states.contains(WidgetState.hovered) ||
+        states.contains(WidgetState.focused)) {
+      return AppColors.gold.withValues(alpha: 0.16);
+    }
+    return null;
+  });
+}
+
+const _clickCursor = WidgetStatePropertyAll(SystemMouseCursors.click);
+
+WidgetStateProperty<double?> _hoverElevation({double rest = 0, double hover = 3}) {
+  return WidgetStateProperty.resolveWith((states) {
+    if (states.contains(WidgetState.hovered)) return hover;
+    if (states.contains(WidgetState.pressed)) return rest;
+    return rest;
+  });
 }
 
 ThemeData buildAppTheme() {
@@ -72,6 +96,24 @@ ThemeData buildAppTheme() {
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+      ).copyWith(
+        overlayColor: _goldOverlay(),
+        mouseCursor: _clickCursor,
+        elevation: _hoverElevation(),
+        shadowColor: WidgetStatePropertyAll(AppColors.gold.withValues(alpha: 0.35)),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ).copyWith(
+        overlayColor: _goldOverlay(),
+        mouseCursor: _clickCursor,
+        elevation: _hoverElevation(rest: 1, hover: 4),
+        shadowColor: WidgetStatePropertyAll(AppColors.gold.withValues(alpha: 0.35)),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -81,11 +123,33 @@ ThemeData buildAppTheme() {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+      ).copyWith(
+        overlayColor: _goldOverlay(),
+        mouseCursor: _clickCursor,
       ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+      ).copyWith(
+        overlayColor: _goldOverlay(),
+        mouseCursor: _clickCursor,
+      ),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: ButtonStyle(
+        overlayColor: _goldOverlay(),
+        mouseCursor: _clickCursor,
+      ),
+    ),
+    listTileTheme: ListTileThemeData(
+      mouseCursor: WidgetStateMouseCursor.clickable,
     ),
     chipTheme: base.chipTheme.copyWith(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       side: BorderSide(color: Colors.black.withValues(alpha: 0.08)),
+      selectedColor: AppColors.gold.withValues(alpha: 0.22),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,

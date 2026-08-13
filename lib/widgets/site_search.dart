@@ -7,6 +7,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'hover.dart';
 
 /// Compact header search: field on desktop, icon that expands on mobile.
 class HeaderSearch extends StatefulWidget {
@@ -62,14 +63,18 @@ class _HeaderSearchState extends State<HeaderSearch> {
     );
   }
 
+  static const _tapGroup = Object();
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     if (isMobile(context)) {
-      return IconButton(
-        tooltip: loc.t('common.search'),
-        onPressed: _openMobile,
-        icon: const Icon(Icons.search),
+      return HoverScale(
+        child: IconButton(
+          tooltip: loc.t('common.search'),
+          onPressed: _openMobile,
+          icon: const Icon(Icons.search),
+        ),
       );
     }
     final compact = isTablet(context);
@@ -78,27 +83,39 @@ class _HeaderSearchState extends State<HeaderSearch> {
       controller: _portal,
       overlayChildBuilder: (context) {
         final rtl = Directionality.of(context) == TextDirection.rtl;
-        return UnconstrainedBox(
+        // Shrink-wrap so the overlay does not cover/dim the page.
+        return Align(
+          alignment: Alignment.topLeft,
+          widthFactor: 1,
+          heightFactor: 1,
           child: CompositedTransformFollower(
             link: _layerLink,
             showWhenUnlinked: false,
             targetAnchor: rtl ? Alignment.bottomRight : Alignment.bottomLeft,
             followerAnchor: rtl ? Alignment.topRight : Alignment.topLeft,
             offset: const Offset(0, 6),
-            child: _SearchResults(
-              width: compact ? 320 : 380,
-              hits: _hits,
-              onOpen: _open,
+            child: TapRegion(
+              groupId: _tapGroup,
+              onTapOutside: (_) {
+                if (_portal.isShowing) _portal.hide();
+              },
+              child: _SearchResults(
+                width: compact ? 320 : 380,
+                hits: _hits,
+                onOpen: _open,
+              ),
             ),
           ),
         );
       },
       child: CompositedTransformTarget(
         link: _layerLink,
-        child: SizedBox(
-          width: width,
-          height: 40,
-          child: TextField(
+        child: TapRegion(
+          groupId: _tapGroup,
+          child: SizedBox(
+            width: width,
+            height: 40,
+            child: TextField(
             controller: _controller,
             focusNode: _focus,
             onChanged: _onQuery,
@@ -136,6 +153,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );
@@ -268,24 +286,28 @@ class _SearchResults extends StatelessWidget {
                       ),
                     ),
                     for (final hit in group.value)
-                      ListTile(
-                        dense: true,
-                        leading: Icon(hit.icon,
-                            color: AppColors.primary, size: 20),
-                        title: Text(
-                          hit.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                      HoverScale(
+                        scale: 1.02,
+                        child: ListTile(
+                          dense: true,
+                          mouseCursor: SystemMouseCursors.click,
+                          leading: Icon(hit.icon,
+                              color: AppColors.primary, size: 20),
+                          title: Text(
+                            hit.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          subtitle: hit.subtitle.isEmpty
+                              ? null
+                              : Text(
+                                  hit.subtitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                          onTap: () => onOpen(hit),
                         ),
-                        subtitle: hit.subtitle.isEmpty
-                            ? null
-                            : Text(
-                                hit.subtitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                        onTap: () => onOpen(hit),
                       ),
                   ],
                 ],

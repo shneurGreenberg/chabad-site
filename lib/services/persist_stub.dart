@@ -6,6 +6,10 @@ Future<void> persistPut(String key, String value) async {
 
 Future<String?> persistGet(String key) async => _mem[key];
 
+Future<void> persistDelete(String key) async {
+  _mem.remove(key);
+}
+
 bool isQuotaExceeded(Object error) {
   final s = error.toString().toLowerCase();
   return s.contains('quota');

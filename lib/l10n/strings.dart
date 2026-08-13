@@ -448,9 +448,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Уроки Торы'
   },
   'admin.persist.note': {
-    'he': 'התוכן נשמר בדפדפן זה (לא בשרת). בעתיד אפשר לחבר Firebase — אין צורך במפתח API כדי שהשמירה תעבוד.',
-    'en': 'Content is saved in this browser (not on a server). Firebase can be added later — no API key is required for saving to work.',
-    'ru': 'Содержимое хранится в этом браузере (не на сервере). Позже можно подключить Firebase — ключ API для сохранения не нужен.'
+    'he': 'התוכן והתמונות נשמרים בדפדפן (IndexedDB). כדי לשמור גם בשרת: צרו פרויקט Firebase, הפעילו Firestore+Storage+Auth, והעבירו את ה־firebaseConfig ב־dart-define. כתיבה רק למשתמש מחובר.',
+    'en': 'Content and photos are saved in this browser (IndexedDB). For a shared server: create a Firebase project, enable Firestore+Storage+Auth, and pass the web firebaseConfig via dart-define. Writes require a signed-in admin.',
+    'ru': 'Контент и фото хранятся в этом браузере (IndexedDB). Для сервера: создайте проект Firebase, включите Firestore+Storage+Auth и передайте firebaseConfig через dart-define.'
   },
   'admin.settings.mapsKey': {
     'he': 'מפתח Google Maps (רשות)',

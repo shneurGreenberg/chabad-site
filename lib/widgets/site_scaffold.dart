@@ -6,6 +6,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
+import 'hover.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
 
@@ -106,19 +107,7 @@ class _SiteShellState extends State<SiteShell> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 180),
-                switchInCurve: Curves.easeOut,
-                layoutBuilder: (currentChild, _) =>
-                    currentChild ?? const SizedBox.shrink(),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: KeyedSubtree(
-                  key: ValueKey(widget.currentRoute),
-                  child: widget.child,
-                ),
-              ),
+              widget.child,
               const SizedBox(height: 40),
               const _SiteFooter(),
             ],
@@ -187,37 +176,47 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   const _CartButton(),
                   const SizedBox(width: 4),
                   if (!compact) ...[
-                    OutlinedButton.icon(
-                      onPressed: () => context.go('/contact'),
-                      icon: const Icon(Icons.app_registration, size: 18),
-                      label: Text(loc.t('nav.contact')),
+                    HoverLift(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.go('/contact'),
+                        icon: const Icon(Icons.app_registration, size: 18),
+                        label: Text(loc.t('nav.contact')),
+                      ),
                     ),
                     const SizedBox(width: 8),
-                    FilledButton.icon(
-                      onPressed: () => context.go('/donate'),
-                      style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.accent,
-                          foregroundColor: AppColors.primaryDark),
-                      icon: const Icon(Icons.favorite_outline, size: 18),
-                      label: Text(loc.t('nav.donate')),
+                    HoverLift(
+                      child: FilledButton.icon(
+                        onPressed: () => context.go('/donate'),
+                        style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.accent,
+                            foregroundColor: AppColors.primaryDark),
+                        icon: const Icon(Icons.favorite_outline, size: 18),
+                        label: Text(loc.t('nav.donate')),
+                      ),
                     ),
                     const SizedBox(width: 4),
                   ] else ...[
-                    IconButton(
-                      tooltip: loc.t('nav.contact'),
-                      onPressed: () => context.go('/contact'),
-                      icon: const Icon(Icons.app_registration),
+                    HoverScale(
+                      child: IconButton(
+                        tooltip: loc.t('nav.contact'),
+                        onPressed: () => context.go('/contact'),
+                        icon: const Icon(Icons.app_registration),
+                      ),
                     ),
-                    IconButton(
-                      tooltip: loc.t('nav.donate'),
-                      onPressed: () => context.go('/donate'),
-                      icon: const Icon(Icons.favorite_outline),
+                    HoverScale(
+                      child: IconButton(
+                        tooltip: loc.t('nav.donate'),
+                        onPressed: () => context.go('/donate'),
+                        icon: const Icon(Icons.favorite_outline),
+                      ),
                     ),
                   ],
-                  IconButton(
-                    tooltip: loc.t('nav.admin'),
-                    onPressed: () => context.go('/admin'),
-                    icon: const Icon(Icons.admin_panel_settings_outlined),
+                  HoverScale(
+                    child: IconButton(
+                      tooltip: loc.t('nav.admin'),
+                      onPressed: () => context.go('/admin'),
+                      icon: const Icon(Icons.admin_panel_settings_outlined),
+                    ),
                   ),
                 ] else ...[
                   const Spacer(),
@@ -225,11 +224,13 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   const _CartButton(),
                   const LanguageSwitcher(),
                   Builder(
-                    builder: (context) => IconButton(
-                      tooltip: loc.t('nav.menu'),
-                      icon: const Icon(Icons.menu),
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    builder: (context) => HoverScale(
+                      child: IconButton(
+                        tooltip: loc.t('nav.menu'),
+                        icon: const Icon(Icons.menu),
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
                     ),
                   ),
                 ],
@@ -250,10 +251,11 @@ class _Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return InkWell(
-      onTap: () => context.go('/'),
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
+    return HoverScale(
+      child: InkWell(
+        onTap: () => context.go('/'),
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
         padding: const EdgeInsets.all(4),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -293,6 +295,7 @@ class _Logo extends StatelessWidget {
               ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -377,10 +380,15 @@ class _NavChrome extends StatelessWidget {
     if (onTap == null) return body;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: body,
+      child: HoverScale(
+        scale: 1.03,
+        underline: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          mouseCursor: SystemMouseCursors.click,
+          child: body,
+        ),
       ),
     );
   }
@@ -403,7 +411,10 @@ class _MoreMenu extends StatelessWidget {
     final moreActive = moreItems.any((i) => i.route == currentRoute);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: PopupMenuButton<String>(
+      child: HoverScale(
+        scale: 1.03,
+        underline: true,
+        child: PopupMenuButton<String>(
         tooltip: loc.t('nav.menu'),
         padding: EdgeInsets.zero,
         onSelected: (route) => context.go(route),
@@ -428,6 +439,7 @@ class _MoreMenu extends StatelessWidget {
               color: moreActive ? AppColors.primary : AppColors.ink),
         ),
       ),
+      ),
     );
   }
 }
@@ -437,7 +449,8 @@ class LanguageSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    return PopupMenuButton<String>(
+    return HoverScale(
+      child: PopupMenuButton<String>(
       tooltip: loc.t('common.language'),
       onSelected: loc.setLang,
       position: PopupMenuPosition.under,
@@ -469,6 +482,7 @@ class LanguageSwitcher extends StatelessWidget {
                   fontWeight: FontWeight.w700, fontSize: 13, height: 1)),
         ]),
       ),
+    ),
     );
   }
 }
@@ -479,7 +493,8 @@ class _CartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final count = context.watch<AppRepository>().cartCount;
     final loc = context.locWatch;
-    return Stack(
+    return HoverScale(
+      child: Stack(
       clipBehavior: Clip.none,
       children: [
         IconButton(
@@ -505,6 +520,7 @@ class _CartButton extends StatelessWidget {
             ),
           ),
       ],
+    ),
     );
   }
 }
@@ -542,42 +558,54 @@ class _SiteDrawer extends StatelessWidget {
               ]),
             ),
             for (final item in items)
-              ListTile(
-                leading: Icon(item.icon,
-                    color: currentRoute == item.route
-                        ? AppColors.primary
-                        : Colors.black54),
-                title: Text(loc.t(item.labelKey)),
-                selected: currentRoute == item.route,
-                onTap: () {
-                  Navigator.pop(context);
-                  context.go(item.route);
-                },
+              HoverScale(
+                scale: 1.02,
+                child: ListTile(
+                  leading: Icon(item.icon,
+                      color: currentRoute == item.route
+                          ? AppColors.primary
+                          : Colors.black54),
+                  title: Text(loc.t(item.labelKey)),
+                  selected: currentRoute == item.route,
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.go(item.route);
+                  },
+                ),
               ),
             const Divider(),
-            ListTile(
-              leading: const Icon(Icons.app_registration, color: AppColors.primary),
-              title: Text(loc.t('nav.contact')),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/contact');
-              },
+            HoverScale(
+              scale: 1.02,
+              child: ListTile(
+                leading: const Icon(Icons.app_registration, color: AppColors.primary),
+                title: Text(loc.t('nav.contact')),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go('/contact');
+                },
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.favorite, color: AppColors.accent),
-              title: Text(loc.t('nav.donate')),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/donate');
-              },
+            HoverScale(
+              scale: 1.02,
+              child: ListTile(
+                leading: const Icon(Icons.favorite, color: AppColors.accent),
+                title: Text(loc.t('nav.donate')),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go('/donate');
+                },
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.admin_panel_settings_outlined),
-              title: Text(loc.t('nav.admin')),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/admin');
-              },
+            HoverScale(
+              scale: 1.02,
+              child: ListTile(
+                leading: const Icon(Icons.admin_panel_settings_outlined),
+                title: Text(loc.t('nav.admin')),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.go('/admin');
+                },
+              ),
             ),
           ],
         ),
@@ -638,10 +666,10 @@ class _SiteFooter extends StatelessWidget {
                               fontSize: 13)),
                       const SizedBox(height: 10),
                       Row(children: [
-                        _social(Icons.facebook),
-                        _social(Icons.telegram),
-                        _social(Icons.camera_alt_outlined),
-                        _social(Icons.smart_display_outlined),
+                        HoverScale(child: _social(Icons.facebook)),
+                        HoverScale(child: _social(Icons.telegram)),
+                        HoverScale(child: _social(Icons.camera_alt_outlined)),
+                        HoverScale(child: _social(Icons.smart_display_outlined)),
                       ]),
                     ],
                   ),
@@ -714,21 +742,25 @@ class _SiteFooter extends StatelessWidget {
           for (final item in items)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                onTap: () => context.go(item.route),
-                child: Row(
-                  children: [
-                    Icon(item.icon,
-                        size: 14,
-                        color: Colors.white.withValues(alpha: 0.75)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(loc.t(item.labelKey),
-                          style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 13.5)),
-                    ),
-                  ],
+              child: HoverScale(
+                underline: true,
+                child: InkWell(
+                  onTap: () => context.go(item.route),
+                  mouseCursor: SystemMouseCursors.click,
+                  child: Row(
+                    children: [
+                      Icon(item.icon,
+                          size: 14,
+                          color: Colors.white.withValues(alpha: 0.75)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(loc.t(item.labelKey),
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 13.5)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

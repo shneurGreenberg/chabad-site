@@ -7,6 +7,7 @@ import '../../services/geo.dart';
 import '../../services/location_zmanim.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({super.key});
@@ -165,7 +166,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                       )
                     : const Icon(Icons.search, size: 18),
                 label: Text(loc.t('admin.settings.search')),
-              ),
+              ).hoverLift(),
               OutlinedButton.icon(
                 onPressed: _locating ? null : _useGps,
                 icon: _locating
@@ -176,18 +177,21 @@ class _SettingsPanelState extends State<SettingsPanel> {
                       )
                     : const Icon(Icons.my_location, size: 18),
                 label: Text(loc.t('admin.settings.useGps')),
-              ),
+              ).hoverLift(),
             ],
           ),
           if (_results.isNotEmpty) ...[
             const SizedBox(height: 16),
             for (final p in _results)
-              ListTile(
+              HoverScale(
+                scale: 1.02,
+                child: ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.place_outlined, color: AppColors.primary),
                 title: Text(p.name),
                 subtitle: Text(p.region),
                 onTap: _saving ? null : () => _apply(p),
+              ),
               ),
           ],
           const Divider(height: 32),

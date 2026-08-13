@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../models.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
 class FamousPage extends StatefulWidget {
@@ -42,17 +43,17 @@ class _FamousPageState extends State<FamousPage> {
                 label: Text(loc.t('common.all')),
                 selected: _era == null,
                 onSelected: (_) => setState(() => _era = null),
-              ),
+              ).hoverScale(scale: 1.04),
               ChoiceChip(
                 label: Text(loc.t('famous.present')),
                 selected: _era == Era.present,
                 onSelected: (_) => setState(() => _era = Era.present),
-              ),
+              ).hoverScale(scale: 1.04),
               ChoiceChip(
                 label: Text(loc.t('famous.past')),
                 selected: _era == Era.past,
                 onSelected: (_) => setState(() => _era = Era.past),
-              ),
+              ).hoverScale(scale: 1.04),
             ],
           ),
         ),

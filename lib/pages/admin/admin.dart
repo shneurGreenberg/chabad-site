@@ -9,6 +9,7 @@ import '../../state/auth.dart';
 import '../../theme.dart';
 import '../../widgets/admin_fields.dart';
 import '../../widgets/common.dart';
+import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
 import 'banners_panel.dart';
 import 'settings_panel.dart';
@@ -113,13 +114,13 @@ class _AdminLoginState extends State<AdminLogin> {
                           minimumSize: const Size.fromHeight(50)),
                       icon: const Icon(Icons.login, size: 18),
                       label: Text(loc.t('admin.login.button')),
-                    ),
+                    ).hoverLift(),
                     const SizedBox(height: 12),
                     TextButton.icon(
                       onPressed: () => context.go('/'),
                       icon: const Icon(Icons.arrow_back, size: 18),
                       label: Text(loc.t('admin.viewSite')),
-                    ),
+                    ).hoverLift(),
                   ],
                 ),
               ),
@@ -243,7 +244,9 @@ class _AdminShellState extends State<AdminShell> {
     final selected = _index == i;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-      child: Material(
+      child: HoverScale(
+        scale: 1.02,
+        child: Material(
         color: selected ? Colors.white.withValues(alpha: 0.12) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: ListTile(
@@ -260,6 +263,7 @@ class _AdminShellState extends State<AdminShell> {
             if (inDrawer) Navigator.pop(context);
           },
         ),
+      ),
       ),
     );
   }
@@ -294,13 +298,13 @@ class _AdminShellState extends State<AdminShell> {
               onPressed: () => context.go('/'),
               icon: const Icon(Icons.open_in_new, size: 16),
               label: Text(loc.t('admin.viewSite')),
-            )
+            ).hoverLift()
           else
             IconButton(
               tooltip: loc.t('admin.viewSite'),
               onPressed: () => context.go('/'),
               icon: const Icon(Icons.open_in_new),
-            ),
+            ).hoverScale(),
           const SizedBox(width: 8),
           if (!narrow)
             FilledButton.icon(
@@ -312,7 +316,7 @@ class _AdminShellState extends State<AdminShell> {
                   backgroundColor: const Color(0xFFEF4444)),
               icon: const Icon(Icons.logout, size: 16),
               label: Text(loc.t('admin.logout')),
-            )
+            ).hoverLift()
           else
             IconButton(
               tooltip: loc.t('admin.logout'),
@@ -321,7 +325,7 @@ class _AdminShellState extends State<AdminShell> {
                 context.go('/');
               },
               icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
-            ),
+            ).hoverScale(),
         ]),
       ),
     );
@@ -415,7 +419,7 @@ Widget _panelCard({required String title, required Widget child, List<Widget>? a
           ),
           if (actions != null) ...[
             const SizedBox(width: 8),
-            ...actions,
+            for (final a in actions) HoverLift(child: a),
           ],
         ]),
         const Divider(height: 24),
@@ -1358,7 +1362,7 @@ class _BotCard extends StatelessWidget {
             style: FilledButton.styleFrom(backgroundColor: color),
             icon: const Icon(Icons.play_arrow, size: 18),
             label: Text(loc.t('admin.bots.runNow')),
-          ),
+          ).hoverLift(),
         ],
       ),
     );
