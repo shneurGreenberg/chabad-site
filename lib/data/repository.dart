@@ -28,7 +28,11 @@ class AppRepository extends ChangeNotifier {
   static const _snapKey = 'chabad_site_snapshot';
   static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
-      'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. אם Firebase מוגדר, התמונות עולות לשרת.';
+      'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. התוכן נשמר גם ב-Firestore כשהשרת זמין.';
+  static const _cloudDeniedHe =
+      'השמירה לשרת נכשלה — אין הרשאה ב-Firestore. התוכן נשמר מקומית בדפדפן. אם הכללים דורשים התחברות, הפעילו Authentication (אימייל/סיסמה) והתחברו.';
+  static const _cloudFailHe =
+      'השמירה לשרת נכשלה. התוכן נשמר מקומית בדפדפן. בדקו את Firestore בקונסול (לא Storage).';
 
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
@@ -816,7 +820,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   Map<String, dynamic> _encodeSnapshot() => {
-        'v': 2,
+        'v': 3,
         'seq': _seq,
         'updatedAt': DateTime.now().toIso8601String(),
         'mapsKey': googleMapsApiKey,
@@ -1004,50 +1008,25 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
-  void _applyImageUrls(Map<String, dynamic> urls) {
-    for (final e in urls.entries) {
-      final url = '${e.value}';
-      if (url.isEmpty) continue;
-      final key = e.key;
-      final i = key.indexOf(':');
-      if (i <= 0) continue;
-      final kind = key.substring(0, i);
-      final id = key.substring(i + 1);
-      switch (kind) {
-        case 'banner':
-          banners.putIfAbsent(id, PageBanner.new).imageUrl = url;
-        case 'news':
-          for (final a in news) {
-            if (a.id == id) a.imageUrl = url;
-          }
-        case 'program':
-          for (final p in programs) {
-            if (p.id == id) p.imageUrl = url;
-          }
-        case 'product':
-          for (final p in products) {
-            if (p.id == id) p.imageUrl = url;
-          }
-        case 'gallery':
-          for (final p in gallery) {
-            if (p.id == id) p.imageUrl = url;
-          }
-      }
-    }
-  }
-
   Future<void> _pullCloud() async {
     final cloud = await CloudSync.instance.pull();
-    if (cloud == null || cloud.isEmpty) return;
+    if (cloud == null) return;
     final localImages = _collectImages();
-    _applySnapshot(cloud);
-    for (final e in localImages.entries) {
+    _applySnapshot(cloud.snapshot);
+    for (final e in cloud.images.entries) {
       _applyLocalImage(e.key, e.value);
     }
-    final urls = cloud['imageUrls'];
-    if (urls is Map) {
-      _applyImageUrls(Map<String, dynamic>.from(urls));
+    for (final e in localImages.entries) {
+      if (!cloud.images.containsKey(e.key)) {
+        _applyLocalImage(e.key, e.value);
+      }
     }
+    try {
+      await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
+      for (final e in cloud.images.entries) {
+        await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
+      }
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -1064,6 +1043,12 @@ class AppRepository extends ChangeNotifier {
         onPersistWarning?.call(_quotaHe);
       }
     }
-    unawaited(CloudSync.instance.push(snapshot: snap, images: images));
+    final err = await CloudSync.instance.push(snapshot: snap, images: images);
+    if (err == null || err == 'unavailable' || err == 'not-signed-in') return;
+    if (err == 'permission-denied') {
+      onPersistWarning?.call(_cloudDeniedHe);
+    } else {
+      onPersistWarning?.call(_cloudFailHe);
+    }
   }
 }

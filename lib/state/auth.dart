@@ -7,9 +7,9 @@ import '../services/cloud_sync.dart';
 /// Admin authentication.
 ///
 /// When Firebase Auth email/password is enabled, credentials must match a
-/// Firebase user so Firestore/Storage writes are allowed. If Auth is not
-/// ready yet, any non-empty credentials still unlock the local (IndexedDB)
-/// admin — cloud writes stay skipped until a real sign-in succeeds.
+/// Firebase user. If Auth is not ready yet, any non-empty credentials still
+/// unlock the local (IndexedDB) admin. Firestore writes are attempted anyway
+/// while test-mode / open rules allow them.
 class AuthController extends ChangeNotifier {
   bool _loggedIn = false;
   String _email = '';
@@ -34,6 +34,7 @@ class AuthController extends ChangeNotifier {
       final err = await CloudSync.instance.signIn(email, password);
       if (err != null && _rejectCodes.contains(err)) return err;
     }
+    CloudSync.instance.adminSession = true;
     _loggedIn = true;
     _email = email.trim();
     notifyListeners();
@@ -43,6 +44,7 @@ class AuthController extends ChangeNotifier {
   void logout() {
     _loggedIn = false;
     _email = '';
+    CloudSync.instance.adminSession = false;
     notifyListeners();
     unawaited(CloudSync.instance.signOut());
   }

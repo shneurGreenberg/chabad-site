@@ -4,11 +4,12 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, Tar
 /// Public web Firebase config for project `chabad-site-c60ae`.
 ///
 /// The web apiKey is a client identifier, not a service-account secret.
-/// Writes are gated by Firebase Auth (email/password) + security rules.
-/// `--dart-define=FIREBASE_*` still overrides these defaults if set.
+/// Writes go to Cloud Firestore only (no Storage). Auth is optional while
+/// test-mode rules are open. `--dart-define=FIREBASE_*` still overrides.
 ///
-/// Console (one-time): enable Firestore, Storage, and Authentication
-/// (Email/Password) at https://console.firebase.google.com/project/chabad-site-c60ae
+/// Console: Firestore (default) is enough. Ignore Storage.
+/// Optional later: Authentication (Email/Password) at
+/// https://console.firebase.google.com/project/chabad-site-c60ae
 class DefaultFirebaseOptions {
   static const _apiKey = String.fromEnvironment(
     'FIREBASE_API_KEY',

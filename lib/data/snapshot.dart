@@ -14,6 +14,16 @@ Loc locFrom(dynamic v) {
 
 Map<String, String> locTo(Loc loc) => Map<String, String>.from(loc);
 
+String? compactImageUrl(String? url) {
+  if (url == null || url.isEmpty || url.startsWith('data:')) return null;
+  return url;
+}
+
+String? imageIdOf(String kind, String id, {Uint8List? bytes}) {
+  if (bytes == null || bytes.isEmpty) return null;
+  return '$kind:$id';
+}
+
 String? bytesToB64(Uint8List? bytes) {
   if (bytes == null || bytes.isEmpty) return null;
   return base64Encode(bytes);
@@ -48,7 +58,8 @@ Map<String, dynamic> newsToJson(NewsArticle a) => {
       'icon': iconTo(a.icon),
       'source': a.source.name,
       'published': a.published,
-      'imageUrl': a.imageUrl,
+      'imageUrl': compactImageUrl(a.imageUrl),
+      'imageId': imageIdOf('news', a.id, bytes: a.imageBytes),
       'telegramMessageId': a.telegramMessageId,
     };
 
@@ -68,9 +79,9 @@ NewsArticle newsFromJson(dynamic raw) {
     ),
     published: m['published'] != false,
     imageBytes: b64ToBytes(m['image']),
-    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
-        ? '${m['imageUrl']}'
-        : null,
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
     telegramMessageId: (m['telegramMessageId'] as num?)?.toInt(),
   );
 }
@@ -83,7 +94,8 @@ Map<String, dynamic> programToJson(Program p) => {
       'audience': locTo(p.audience),
       'icon': iconTo(p.icon),
       'color': p.color,
-      'imageUrl': p.imageUrl,
+      'imageUrl': compactImageUrl(p.imageUrl),
+      'imageId': imageIdOf('program', p.id, bytes: p.imageBytes),
     };
 
 Program programFromJson(dynamic raw) {
@@ -97,9 +109,9 @@ Program programFromJson(dynamic raw) {
     icon: iconFrom(m['icon'], Icons.groups_outlined),
     color: (m['color'] as num?)?.toInt() ?? 0xFF0EA5E9,
     imageBytes: b64ToBytes(m['image']),
-    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
-        ? '${m['imageUrl']}'
-        : null,
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
   );
 }
 
@@ -111,7 +123,8 @@ Map<String, dynamic> productToJson(Product p) => {
       'category': p.category.name,
       'color': p.color,
       'icon': iconTo(p.icon),
-      'imageUrl': p.imageUrl,
+      'imageUrl': compactImageUrl(p.imageUrl),
+      'imageId': imageIdOf('product', p.id, bytes: p.imageBytes),
     };
 
 Product productFromJson(dynamic raw) {
@@ -128,9 +141,9 @@ Product productFromJson(dynamic raw) {
     color: (m['color'] as num?)?.toInt() ?? 0xFF059669,
     icon: iconFrom(m['icon'], Icons.shopping_bag_outlined),
     imageBytes: b64ToBytes(m['image']),
-    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
-        ? '${m['imageUrl']}'
-        : null,
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
   );
 }
 
@@ -141,7 +154,8 @@ Map<String, dynamic> galleryToJson(GalleryPhoto p) => {
       'tags': p.tags,
       'color': p.color,
       'icon': iconTo(p.icon),
-      'imageUrl': p.imageUrl,
+      'imageUrl': compactImageUrl(p.imageUrl),
+      'imageId': imageIdOf('gallery', p.id, bytes: p.imageBytes),
     };
 
 GalleryPhoto galleryFromJson(dynamic raw) {
@@ -156,14 +170,14 @@ GalleryPhoto galleryFromJson(dynamic raw) {
     color: (m['color'] as num?)?.toInt() ?? 0xFF1D4ED8,
     icon: iconFrom(m['icon'], Icons.photo_camera_back_outlined),
     imageBytes: b64ToBytes(m['image']),
-    imageUrl: m['imageUrl'] is String && '${m['imageUrl']}'.isNotEmpty
-        ? '${m['imageUrl']}'
-        : null,
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
   );
 }
 
 Map<String, dynamic> bannerToJson(PageBanner b) => {
-      'url': b.imageUrl,
+      'url': compactImageUrl(b.imageUrl),
       'x': b.alignX,
       'y': b.alignY,
     };
@@ -173,7 +187,7 @@ PageBanner bannerFromJson(dynamic raw) {
   final m = Map<String, dynamic>.from(raw);
   return PageBanner(
     bytes: b64ToBytes(m['image']),
-    imageUrl: m['url'] is String && '${m['url']}'.isNotEmpty ? '${m['url']}' : null,
+    imageUrl: compactImageUrl(m['url'] is String ? '${m['url']}' : null),
     alignX: (m['x'] as num?)?.toDouble() ?? 0,
     alignY: (m['y'] as num?)?.toDouble() ?? 0,
   );

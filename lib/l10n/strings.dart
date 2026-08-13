@@ -448,9 +448,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Уроки Торы'
   },
   'admin.persist.note': {
-    'he': 'התוכן והתמונות נשמרים בדפדפן (IndexedDB). כדי לשמור גם בשרת: צרו פרויקט Firebase, הפעילו Firestore+Storage+Auth, והעבירו את ה־firebaseConfig ב־dart-define. כתיבה רק למשתמש מחובר.',
-    'en': 'Content and photos are saved in this browser (IndexedDB). For a shared server: create a Firebase project, enable Firestore+Storage+Auth, and pass the web firebaseConfig via dart-define. Writes require a signed-in admin.',
-    'ru': 'Контент и фото хранятся в этом браузере (IndexedDB). Для сервера: создайте проект Firebase, включите Firestore+Storage+Auth и передайте firebaseConfig через dart-define.'
+    'he': 'התוכן והתמונות נשמרים ב-Cloud Firestore (חינמי) ובדפדפן (IndexedDB). אין צורך ב-Firebase Storage. שמירה מהמנהל יוצרת את האוספים בשרת.',
+    'en': 'Content and photos are saved in Cloud Firestore (free) and cached in this browser (IndexedDB). Firebase Storage is not used. Saving in admin creates the server collections.',
+    'ru': 'Контент и фото хранятся в Cloud Firestore (бесплатно) и кэшируются в браузере (IndexedDB). Firebase Storage не используется.'
   },
   'admin.settings.mapsKey': {
     'he': 'מפתח Google Maps (רשות)',
@@ -480,14 +480,14 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Вход администратора'
   },
   'admin.login.hint': {
-    'he': 'הדגמה: כל אימייל וסיסמה יתקבלו (שמירה מקומית בלבד)',
-    'en': 'Demo: any email and password work (local save only)',
-    'ru': 'Демо: подойдут любые почта и пароль (только локально)'
+    'he': 'כל אימייל וסיסמה יפתחו את המנהל. השמירה עולה ל-Firestore (בלי Storage).',
+    'en': 'Any email and password open admin. Saves go to Firestore (no Storage).',
+    'ru': 'Любые почта и пароль откроют админку. Сохранение идёт в Firestore (без Storage).'
   },
   'admin.login.firebaseHint': {
-    'he': 'התחברות עם חשבון Firebase (אימייל וסיסמה)',
-    'en': 'Sign in with the Firebase admin email and password',
-    'ru': 'Вход через Firebase (email и пароль)'
+    'he': 'אם Authentication פעיל — התחברו עם המשתמש. אחרת כל אימייל/סיסמה יעבדו, והשמירה ל-Firestore תנסה בכל מקרה.',
+    'en': 'If Authentication is on, sign in with that user. Otherwise any email/password works, and Firestore writes are still attempted.',
+    'ru': 'Если Authentication включён — войдите этим пользователем. Иначе подойдут любые данные, запись в Firestore всё равно пробуется.'
   },
   'admin.login.button': {'he': 'כניסה', 'en': 'Log in', 'ru': 'Войти'},
   'admin.login.error': {
