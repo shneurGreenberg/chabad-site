@@ -480,11 +480,31 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Вход администратора'
   },
   'admin.login.hint': {
-    'he': 'הדגמה: כל אימייל וסיסמה יתקבלו',
-    'en': 'Demo: any email and password will work',
-    'ru': 'Демо: подойдут любые почта и пароль'
+    'he': 'הדגמה: כל אימייל וסיסמה יתקבלו (שמירה מקומית בלבד)',
+    'en': 'Demo: any email and password work (local save only)',
+    'ru': 'Демо: подойдут любые почта и пароль (только локально)'
+  },
+  'admin.login.firebaseHint': {
+    'he': 'התחברות עם חשבון Firebase (אימייל וסיסמה)',
+    'en': 'Sign in with the Firebase admin email and password',
+    'ru': 'Вход через Firebase (email и пароль)'
   },
   'admin.login.button': {'he': 'כניסה', 'en': 'Log in', 'ru': 'Войти'},
+  'admin.login.error': {
+    'he': 'אימייל או סיסמה שגויים',
+    'en': 'Incorrect email or password',
+    'ru': 'Неверный email или пароль'
+  },
+  'admin.login.empty': {
+    'he': 'נא למלא אימייל וסיסמה',
+    'en': 'Please enter email and password',
+    'ru': 'Введите email и пароль'
+  },
+  'admin.login.unavailable': {
+    'he': 'Firebase לא זמין כרגע — בדקו שהשירותים פעילים בקונסול',
+    'en': 'Firebase is unavailable — enable it in the console',
+    'ru': 'Firebase недоступен — включите сервисы в консоли'
+  },
   'admin.logout': {'he': 'יציאה', 'en': 'Log out', 'ru': 'Выйти'},
   'admin.dashboard': {'he': 'לוח בקרה', 'en': 'Dashboard', 'ru': 'Панель'},
   'admin.viewSite': {

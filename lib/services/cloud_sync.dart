@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../firebase_options.dart';
 
-/// Firestore + Storage sync. No-ops until [DefaultFirebaseOptions.isConfigured].
+/// Firestore + Storage sync. No-ops until Firebase initializes.
 class CloudSync {
   CloudSync._();
   static final CloudSync instance = CloudSync._();
@@ -29,17 +29,20 @@ class CloudSync {
     }
   }
 
-  Future<bool> signIn(String email, String password) async {
+  /// Returns null on success, or a short error code (`invalid-credential`, …).
+  Future<String?> signIn(String email, String password) async {
     await init();
-    if (!enabled) return false;
+    if (!enabled) return 'unavailable';
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
-      return true;
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return e.code;
     } catch (_) {
-      return false;
+      return 'unknown';
     }
   }
 

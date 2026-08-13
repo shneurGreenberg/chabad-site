@@ -1,27 +1,25 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Web Firebase config via `--dart-define=FIREBASE_*`.
+/// Public web Firebase config for project `chabad-site-c60ae`.
 ///
-/// Create a project at https://console.firebase.google.com then enable
-/// Firestore, Storage, and Auth (email/password). Pass the web app config:
+/// The web apiKey is a client identifier, not a service-account secret.
+/// Writes are gated by Firebase Auth (email/password) + security rules.
+/// `--dart-define=FIREBASE_*` still overrides these defaults if set.
 ///
-/// ```
-/// flutter build web --dart-define=FIREBASE_API_KEY=... \
-///   --dart-define=FIREBASE_APP_ID=... \
-///   --dart-define=FIREBASE_MESSAGING_SENDER_ID=... \
-///   --dart-define=FIREBASE_PROJECT_ID=... \
-///   --dart-define=FIREBASE_STORAGE_BUCKET=... \
-///   --dart-define=FIREBASE_AUTH_DOMAIN=...
-/// ```
-///
-/// The web apiKey is a public client key, not a secret service-account JSON.
+/// Console (one-time): enable Firestore, Storage, and Authentication
+/// (Email/Password) at https://console.firebase.google.com/project/chabad-site-c60ae
 class DefaultFirebaseOptions {
-  static bool get isConfigured {
-    const key = String.fromEnvironment('FIREBASE_API_KEY');
-    const project = String.fromEnvironment('FIREBASE_PROJECT_ID');
-    return key.isNotEmpty && project.isNotEmpty;
-  }
+  static const _apiKey = String.fromEnvironment(
+    'FIREBASE_API_KEY',
+    defaultValue: 'AIzaSyCfhL30p5gq9K4S2RfDXsx6PZXzTz_wvUg',
+  );
+  static const _projectId = String.fromEnvironment(
+    'FIREBASE_PROJECT_ID',
+    defaultValue: 'chabad-site-c60ae',
+  );
+
+  static bool get isConfigured => _apiKey.isNotEmpty && _projectId.isNotEmpty;
 
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) return web;
@@ -37,11 +35,27 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
-    appId: String.fromEnvironment('FIREBASE_APP_ID'),
-    messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
-    projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
-    authDomain: String.fromEnvironment('FIREBASE_AUTH_DOMAIN'),
-    storageBucket: String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
+    apiKey: _apiKey,
+    appId: String.fromEnvironment(
+      'FIREBASE_APP_ID',
+      defaultValue: '1:625650476552:web:a8f8172e2a17ba8a8813bd',
+    ),
+    messagingSenderId: String.fromEnvironment(
+      'FIREBASE_MESSAGING_SENDER_ID',
+      defaultValue: '625650476552',
+    ),
+    projectId: _projectId,
+    authDomain: String.fromEnvironment(
+      'FIREBASE_AUTH_DOMAIN',
+      defaultValue: 'chabad-site-c60ae.firebaseapp.com',
+    ),
+    storageBucket: String.fromEnvironment(
+      'FIREBASE_STORAGE_BUCKET',
+      defaultValue: 'chabad-site-c60ae.firebasestorage.app',
+    ),
+    measurementId: String.fromEnvironment(
+      'FIREBASE_MEASUREMENT_ID',
+      defaultValue: 'G-87SS9JELY1',
+    ),
   );
 }

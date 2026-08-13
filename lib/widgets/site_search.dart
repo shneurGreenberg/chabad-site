@@ -78,12 +78,12 @@ class _HeaderSearchState extends State<HeaderSearch> {
       );
     }
     final compact = isTablet(context);
-    final width = compact ? 168.0 : 220.0;
+    final width = compact ? 180.0 : 200.0;
     return OverlayPortal(
       controller: _portal,
       overlayChildBuilder: (context) {
         final rtl = Directionality.of(context) == TextDirection.rtl;
-        // Shrink-wrap so the overlay does not cover/dim the page.
+        // Positioned overlay only — must not expand or dim the header.
         return Align(
           alignment: Alignment.topLeft,
           widthFactor: 1,
@@ -100,7 +100,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
                 if (_portal.isShowing) _portal.hide();
               },
               child: _SearchResults(
-                width: compact ? 320 : 380,
+                width: width,
                 hits: _hits,
                 onOpen: _open,
               ),
@@ -114,46 +114,58 @@ class _HeaderSearchState extends State<HeaderSearch> {
           groupId: _tapGroup,
           child: SizedBox(
             width: width,
-            height: 40,
+            height: 36,
             child: TextField(
-            controller: _controller,
-            focusNode: _focus,
-            onChanged: _onQuery,
-            onTap: () {
-              if (_hits.isNotEmpty && !_portal.isShowing) _portal.show();
-            },
-            textInputAction: TextInputAction.search,
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: loc.t('common.search'),
-              prefixIcon: const Icon(Icons.search, size: 18),
-              suffixIcon: _controller.text.isEmpty
-                  ? null
-                  : IconButton(
-                      tooltip: loc.t('common.close'),
-                      icon: const Icon(Icons.close, size: 16),
-                      onPressed: () {
-                        _controller.clear();
-                        _onQuery('');
-                      },
-                    ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              filled: true,
-              fillColor: AppColors.surface,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                    color: Colors.black.withValues(alpha: 0.1)),
+              controller: _controller,
+              focusNode: _focus,
+              onChanged: _onQuery,
+              onTap: () {
+                if (_hits.isNotEmpty && !_portal.isShowing) _portal.show();
+              },
+              style: const TextStyle(fontSize: 13, height: 1.2),
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: loc.t('common.search'),
+                hintStyle: const TextStyle(fontSize: 13),
+                prefixIcon: const Icon(Icons.search, size: 18),
+                prefixIconConstraints:
+                    const BoxConstraints(minWidth: 36, minHeight: 36),
+                suffixIcon: _controller.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: loc.t('common.close'),
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.close, size: 16),
+                        onPressed: () {
+                          _controller.clear();
+                          _onQuery('');
+                        },
+                      ),
+                suffixIconConstraints:
+                    const BoxConstraints(minWidth: 32, minHeight: 32),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                filled: true,
+                fillColor: AppColors.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                      color: Colors.black.withValues(alpha: 0.1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                      color: Colors.black.withValues(alpha: 0.1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.primary),
+                ),
               ),
             ),
           ),
-        ),
         ),
       ),
     );

@@ -33,7 +33,9 @@ class AdminLogin extends StatefulWidget {
 
 class _AdminLoginState extends State<AdminLogin> {
   final _email = TextEditingController(text: 'admin@chabad-city.org');
-  final _password = TextEditingController(text: 'demo');
+  final _password = TextEditingController();
+  bool _busy = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -42,10 +44,36 @@ class _AdminLoginState extends State<AdminLogin> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    final err =
+        await context.read<AuthController>().login(_email.text, _password.text);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _error = err;
+    });
+  }
+
+  String _errorText(LocaleController loc, String code) {
+    switch (code) {
+      case 'empty':
+        return loc.t('admin.login.empty');
+      case 'unavailable':
+        return loc.t('admin.login.unavailable');
+      default:
+        return loc.t('admin.login.error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final auth = context.read<AuthController>();
+    final firebaseOn = context.watch<AuthController>().cloudEnabled;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(gradient: AppColors.heroGradient),
@@ -82,13 +110,19 @@ class _AdminLoginState extends State<AdminLogin> {
                         style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 22)),
                     const SizedBox(height: 6),
-                    Text(loc.t('admin.login.hint'),
+                    Text(
+                        loc.t(firebaseOn
+                            ? 'admin.login.firebaseHint'
+                            : 'admin.login.hint'),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             color: Colors.black45, fontSize: 13)),
                     const SizedBox(height: 22),
                     TextField(
                       controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (_) => _submit(),
                       decoration: InputDecoration(
                         labelText: loc.t('common.email'),
                         prefixIcon: const Icon(Icons.email_outlined),
@@ -98,21 +132,34 @@ class _AdminLoginState extends State<AdminLogin> {
                     TextField(
                       controller: _password,
                       obscureText: true,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _submit(),
                       decoration: InputDecoration(
                         labelText: loc.t('common.password'),
                         prefixIcon: const Icon(Icons.lock_outline),
                       ),
                     ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        _errorText(loc, _error!),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Color(0xFFB91C1C), fontSize: 13),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     FilledButton.icon(
-                      onPressed: () {
-                        if (auth.login(_email.text, _password.text)) {
-                          // rebuild handled by provider
-                        }
-                      },
+                      onPressed: _busy ? null : _submit,
                       style: FilledButton.styleFrom(
                           minimumSize: const Size.fromHeight(50)),
-                      icon: const Icon(Icons.login, size: 18),
+                      icon: _busy
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.login, size: 18),
                       label: Text(loc.t('admin.login.button')),
                     ).hoverLift(),
                     const SizedBox(height: 12),

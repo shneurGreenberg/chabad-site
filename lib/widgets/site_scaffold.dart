@@ -146,6 +146,8 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const _Logo(),
+                const SizedBox(width: 8),
+                const HeaderSearch(),
                 if (!mobile) ...[
                   Expanded(
                     child: SingleChildScrollView(
@@ -169,8 +171,6 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                   ),
-                  const HeaderSearch(),
-                  const SizedBox(width: 8),
                   const LanguageSwitcher(),
                   const SizedBox(width: 4),
                   const _CartButton(),
@@ -220,7 +220,6 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ] else ...[
                   const Spacer(),
-                  const HeaderSearch(),
                   const _CartButton(),
                   const LanguageSwitcher(),
                   Builder(
