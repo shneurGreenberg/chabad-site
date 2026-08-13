@@ -148,6 +148,8 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                 const _Logo(),
                 const SizedBox(width: 8),
                 const HeaderSearch(),
+                const SizedBox(width: 4),
+                const LanguageSwitcher(),
                 if (!mobile) ...[
                   Expanded(
                     child: SingleChildScrollView(
@@ -171,8 +173,6 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                   ),
-                  const LanguageSwitcher(),
-                  const SizedBox(width: 4),
                   const _CartButton(),
                   const SizedBox(width: 4),
                   if (!compact) ...[
@@ -221,7 +221,6 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                 ] else ...[
                   const Spacer(),
                   const _CartButton(),
-                  const LanguageSwitcher(),
                   Builder(
                     builder: (context) => HoverScale(
                       child: IconButton(
@@ -453,6 +452,7 @@ class LanguageSwitcher extends StatelessWidget {
       tooltip: loc.t('common.language'),
       onSelected: loc.setLang,
       position: PopupMenuPosition.under,
+      padding: EdgeInsets.zero,
       itemBuilder: (context) => [
         for (final code in supportedLangs)
           PopupMenuItem(
@@ -468,17 +468,17 @@ class LanguageSwitcher extends StatelessWidget {
           ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black.withValues(alpha: 0.12)),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.language, size: 18),
-          const SizedBox(width: 6),
+          const Icon(Icons.language, size: 16),
+          const SizedBox(width: 4),
           Text(loc.lang.toUpperCase(),
               style: const TextStyle(
-                  fontWeight: FontWeight.w700, fontSize: 13, height: 1)),
+                  fontWeight: FontWeight.w700, fontSize: 11, height: 1)),
         ]),
       ),
     ),

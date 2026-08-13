@@ -78,7 +78,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
       );
     }
     final compact = isTablet(context);
-    final width = compact ? 180.0 : 200.0;
+    final width = compact ? 112.0 : 132.0;
     return OverlayPortal(
       controller: _portal,
       overlayChildBuilder: (context) {
@@ -114,7 +114,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
           groupId: _tapGroup,
           child: SizedBox(
             width: width,
-            height: 36,
+            height: 30,
             child: TextField(
               controller: _controller,
               focusNode: _focus,
@@ -122,15 +122,15 @@ class _HeaderSearchState extends State<HeaderSearch> {
               onTap: () {
                 if (_hits.isNotEmpty && !_portal.isShowing) _portal.show();
               },
-              style: const TextStyle(fontSize: 13, height: 1.2),
+              style: const TextStyle(fontSize: 12, height: 1.1),
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 isDense: true,
                 hintText: loc.t('common.search'),
-                hintStyle: const TextStyle(fontSize: 13),
-                prefixIcon: const Icon(Icons.search, size: 18),
+                hintStyle: const TextStyle(fontSize: 12),
+                prefixIcon: const Icon(Icons.search, size: 16),
                 prefixIconConstraints:
-                    const BoxConstraints(minWidth: 36, minHeight: 36),
+                    const BoxConstraints(minWidth: 28, minHeight: 28),
                 suffixIcon: _controller.text.isEmpty
                     ? null
                     : IconButton(
@@ -144,23 +144,23 @@ class _HeaderSearchState extends State<HeaderSearch> {
                         },
                       ),
                 suffixIconConstraints:
-                    const BoxConstraints(minWidth: 32, minHeight: 32),
+                    const BoxConstraints(minWidth: 24, minHeight: 24),
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 filled: true,
                 fillColor: AppColors.surface,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(
                       color: Colors.black.withValues(alpha: 0.1)),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(
                       color: Colors.black.withValues(alpha: 0.1)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(color: AppColors.primary),
                 ),
               ),

@@ -448,10 +448,36 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Уроки Торы'
   },
   'admin.persist.note': {
-    'he': 'התוכן והתמונות נשמרים ב-Cloud Firestore (חינמי) ובדפדפן (IndexedDB). אין צורך ב-Firebase Storage. שמירה מהמנהל יוצרת את האוספים בשרת.',
-    'en': 'Content and photos are saved in Cloud Firestore (free) and cached in this browser (IndexedDB). Firebase Storage is not used. Saving in admin creates the server collections.',
-    'ru': 'Контент и фото хранятся в Cloud Firestore (бесплатно) и кэшируются в браузере (IndexedDB). Firebase Storage не используется.'
+    'he': 'התוכן נשמר בדפדפן תמיד. כדי שיעלה לשרת: Firestore → Rules, הדביקו את הכללים מהמנהל, Publish. בלי Storage ובלי תשלום.',
+    'en': 'Content always saves in this browser. To reach the server: Firestore → Rules, paste the admin rules, Publish. No Storage, no paid plan.',
+    'ru': 'Контент всегда в браузере. Чтобы на сервер: Firestore → Rules, вставьте правила, Publish. Без Storage и оплаты.'
   },
+  'admin.cloud.publish': {
+    'he': 'שמור לשרת',
+    'en': 'Save to server',
+    'ru': 'Сохранить на сервер'
+  },
+  'admin.cloud.ok': {
+    'he': 'נשמר ב-Firestore',
+    'en': 'Saved to Firestore',
+    'ru': 'Сохранено в Firestore'
+  },
+  'admin.cloud.blocked': {
+    'he': 'השרת חוסם כתיבה. זה לא Storage ולא תשלום — רק כללי Firestore. בקונסול, טאב Rules, מחקו הכל, הדביקו את הטקסט למטה, Publish, ואז «שמור לשרת».',
+    'en': 'The server is blocking writes. Not Storage and not a paid plan — just Firestore rules. Rules tab: replace with the text below, Publish, then Save to server.',
+    'ru': 'Сервер блокирует запись. Не Storage и не оплата — правила Firestore. Вкладка Rules, вставьте текст ниже, Publish, затем «Сохранить на сервер».'
+  },
+  'admin.cloud.rulesTitle': {
+    'he': 'הדביקו ב-Firestore → Rules ואז Publish:',
+    'en': 'Paste into Firestore → Rules, then Publish:',
+    'ru': 'Вставьте в Firestore → Rules и Publish:'
+  },
+  'admin.cloud.console': {
+    'he': 'פתיחת קונסול Firestore',
+    'en': 'Open Firestore console',
+    'ru': 'Открыть консоль Firestore'
+  },
+
   'admin.settings.mapsKey': {
     'he': 'מפתח Google Maps (רשות)',
     'en': 'Google Maps API key (optional)',

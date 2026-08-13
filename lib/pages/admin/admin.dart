@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,20 @@ import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
 import 'banners_panel.dart';
 import 'settings_panel.dart';
 import 'telegram_panel.dart';
+
+const _kFirestoreRules = '''
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+''';
+
+const _kFirestoreConsole =
+    'https://console.firebase.google.com/project/chabad-site-c60ae/firestore/databases/-default-/rules';
 
 /// Entry point for /admin — shows the login screen or the admin shell.
 class AdminPage extends StatelessWidget {
@@ -229,6 +244,7 @@ class _AdminShellState extends State<AdminShell> {
             child: Column(
               children: [
                 _topBar(context, loc, sections[_index].title, narrow),
+                const _CloudSyncBar(),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -315,6 +331,18 @@ class _AdminShellState extends State<AdminShell> {
     );
   }
 
+  Future<void> _publish(BuildContext context, LocaleController loc) async {
+    final err = await context.read<AppRepository>().publishToCloud();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          err == null ? loc.t('admin.cloud.ok') : loc.t('admin.cloud.blocked'),
+        ),
+      ),
+    );
+  }
+
   Widget _topBar(BuildContext context, LocaleController loc, String title,
       bool narrow) {
     final auth = context.read<AuthController>();
@@ -339,6 +367,21 @@ class _AdminShellState extends State<AdminShell> {
                 style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
           ),
           const LanguageSwitcher(),
+          const SizedBox(width: 8),
+          if (!narrow)
+            HoverLift(
+              child: FilledButton.icon(
+                onPressed: () => _publish(context, loc),
+                icon: const Icon(Icons.cloud_upload_outlined, size: 16),
+                label: Text(loc.t('admin.cloud.publish')),
+              ),
+            )
+          else
+            IconButton(
+              tooltip: loc.t('admin.cloud.publish'),
+              onPressed: () => _publish(context, loc),
+              icon: const Icon(Icons.cloud_upload_outlined),
+            ).hoverScale(),
           const SizedBox(width: 8),
           if (!narrow)
             OutlinedButton.icon(
@@ -374,6 +417,91 @@ class _AdminShellState extends State<AdminShell> {
               icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
             ).hoverScale(),
         ]),
+      ),
+    );
+  }
+}
+
+class _CloudSyncBar extends StatelessWidget {
+  const _CloudSyncBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    final err = repo.cloudError;
+    final ok = err == null && repo.cloudOkAt != null;
+    final blocked = err == 'permission-denied';
+    final bg = ok
+        ? const Color(0xFFECFDF5)
+        : blocked
+            ? const Color(0xFFFEF2F2)
+            : const Color(0xFFFFFBEB);
+    final fg = ok
+        ? const Color(0xFF065F46)
+        : blocked
+            ? const Color(0xFF991B1B)
+            : const Color(0xFF92400E);
+    return Material(
+      color: bg,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              ok
+                  ? loc.t('admin.cloud.ok')
+                  : loc.t('admin.cloud.blocked'),
+              style: TextStyle(color: fg, fontWeight: FontWeight.w700, height: 1.4),
+            ),
+            if (!ok) ...[
+              const SizedBox(height: 8),
+              Text(loc.t('admin.cloud.rulesTitle'),
+                  style: TextStyle(color: fg, fontSize: 13)),
+              const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: fg.withValues(alpha: 0.2)),
+                ),
+                child: SelectableText(
+                  _kFirestoreRules.trim(),
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12, height: 1.35),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      await Clipboard.setData(
+                          ClipboardData(text: _kFirestoreRules.trim()));
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(loc.t('admin.cloud.rulesTitle'))),
+                      );
+                    },
+                    icon: const Icon(Icons.copy, size: 16),
+                    label: Text(loc.lang == 'en' ? 'Copy' : loc.lang == 'ru' ? 'Копировать' : 'העתקה'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Clipboard.setData(
+                          const ClipboardData(text: _kFirestoreConsole));
+                    },
+                    child: Text(loc.t('admin.cloud.console')),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

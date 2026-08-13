@@ -27,6 +27,9 @@ class CloudSync {
   /// Set while the admin UI is open (local fallback or Firebase Auth).
   bool adminSession = false;
 
+  String? lastError;
+  DateTime? lastOkAt;
+
   bool get enabled => DefaultFirebaseOptions.isConfigured && !_initFailed;
   bool get signedIn =>
       enabled && FirebaseAuth.instance.currentUser != null;
@@ -38,8 +41,10 @@ class CloudSync {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       _initialized = true;
-    } catch (_) {
+      lastError = null;
+    } catch (e) {
       _initFailed = true;
+      lastError = 'init:$e';
     }
   }
 
@@ -75,8 +80,14 @@ class CloudSync {
     required Map<String, Uint8List> images,
   }) async {
     await init();
-    if (!enabled) return 'unavailable';
-    if (!signedIn && !adminSession) return 'not-signed-in';
+    if (!enabled) {
+      lastError = 'unavailable';
+      return 'unavailable';
+    }
+    if (!signedIn && !adminSession) {
+      lastError = 'not-signed-in';
+      return 'not-signed-in';
+    }
 
     try {
       final db = FirebaseFirestore.instance;
@@ -130,10 +141,14 @@ class CloudSync {
       await _syncSubscribers(db, _asMaps(snapshot['subscribers']));
       await _syncBanners(db, snapshot['banners'], images);
       await _syncMedia(db, images, now);
+      lastError = null;
+      lastOkAt = DateTime.now();
       return null;
     } on FirebaseException catch (e) {
+      lastError = e.code;
       return e.code;
-    } catch (_) {
+    } catch (e) {
+      lastError = 'unknown';
       return 'unknown';
     }
   }

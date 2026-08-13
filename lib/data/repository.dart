@@ -30,9 +30,14 @@ class AppRepository extends ChangeNotifier {
   static const _quotaHe =
       'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. התוכן נשמר גם ב-Firestore כשהשרת זמין.';
   static const _cloudDeniedHe =
-      'השמירה לשרת נכשלה — אין הרשאה ב-Firestore. התוכן נשמר מקומית בדפדפן. אם הכללים דורשים התחברות, הפעילו Authentication (אימייל/סיסמה) והתחברו.';
+      'השמירה לשרת נחסמה. בקונסול Firebase: Firestore → Rules — הדביקו את הכללים מהמנהל ולחצו Publish. Storage לא צריך.';
   static const _cloudFailHe =
-      'השמירה לשרת נכשלה. התוכן נשמר מקומית בדפדפן. בדקו את Firestore בקונסול (לא Storage).';
+      'השמירה לשרת נכשלה. התוכן נשמר מקומית בדפדפן. בדקו Firestore → Data אחרי שמירה מהמנהל.';
+  static const _cloudUnavailableHe =
+      'אין חיבור ל-Firestore. ודאו שהדאטאבייס (default) נוצר בפרויקט chabad-site-c60ae.';
+
+  String? cloudError;
+  DateTime? cloudOkAt;
 
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
@@ -48,6 +53,8 @@ class AppRepository extends ChangeNotifier {
     super.notifyListeners();
     if (_hydrated) _schedulePersist();
   }
+
+  void _notifyUi() => super.notifyListeners();
 
   @override
   void dispose() {
@@ -1044,11 +1051,22 @@ class AppRepository extends ChangeNotifier {
       }
     }
     final err = await CloudSync.instance.push(snapshot: snap, images: images);
-    if (err == null || err == 'unavailable' || err == 'not-signed-in') return;
+    cloudError = err;
+    cloudOkAt = err == null ? CloudSync.instance.lastOkAt : null;
+    _notifyUi();
+    if (err == null || err == 'not-signed-in') return;
     if (err == 'permission-denied') {
       onPersistWarning?.call(_cloudDeniedHe);
+    } else if (err == 'unavailable') {
+      onPersistWarning?.call(_cloudUnavailableHe);
     } else {
       onPersistWarning?.call(_cloudFailHe);
     }
+  }
+
+  Future<String?> publishToCloud() async {
+    CloudSync.instance.adminSession = true;
+    await _persistNow();
+    return cloudError;
   }
 }
