@@ -1,0 +1,193 @@
+import 'dart:async';
+import 'dart:js_interop';
+
+import 'package:web/web.dart' as web;
+
+import 'persist.dart';
+
+const _dbName = 'chabad_site';
+const _storeName = 'kv';
+const _dbVersion = 1;
+
+web.IDBDatabase? _db;
+
+bool isQuotaExceeded(Object error) {
+  if (error is PersistQuotaException) return true;
+  final s = error.toString().toLowerCase();
+  return s.contains('quota') || s.contains('quotaexceeded');
+}
+
+Future<void> persistPut(String key, String value) async {
+  try {
+    await _idbPut(key, value);
+    return;
+  } catch (e) {
+    if (isQuotaExceeded(e)) rethrow;
+  }
+  // localStorage is ~5MB — never dump photos there.
+  if (value.length > 400000) {
+    throw PersistQuotaException('too large for localStorage');
+  }
+  _localPut(key, value);
+}
+
+Future<void> persistDelete(String key) async {
+  try {
+    await _idbDelete(key);
+  } catch (_) {}
+  try {
+    web.window.localStorage.removeItem(key);
+  } catch (_) {}
+}
+
+Future<List<String>> persistKeys({String prefix = ''}) async {
+  final out = <String>{};
+  try {
+    out.addAll(await _idbKeys(prefix));
+  } catch (_) {}
+  try {
+    final ls = web.window.localStorage;
+    for (var i = 0; i < ls.length; i++) {
+      final k = ls.key(i);
+      if (k != null && (prefix.isEmpty || k.startsWith(prefix))) {
+        out.add(k);
+      }
+    }
+  } catch (_) {}
+  return out.toList();
+}
+
+Future<String?> persistGet(String key) async {
+  try {
+    final fromIdb = await _idbGet(key);
+    if (fromIdb != null) return fromIdb;
+  } catch (_) {}
+  return web.window.localStorage.getItem(key);
+}
+
+void _localPut(String key, String value) {
+  try {
+    web.window.localStorage.setItem(key, value);
+  } catch (e) {
+    if (isQuotaExceeded(e)) {
+      throw PersistQuotaException('$e');
+    }
+    rethrow;
+  }
+}
+
+Future<web.IDBDatabase> _openDb() async {
+  final existing = _db;
+  if (existing != null) return existing;
+  final done = Completer<web.IDBDatabase>();
+  final req = web.window.indexedDB.open(_dbName, _dbVersion);
+  req.onupgradeneeded = (web.Event _) {
+    final db = req.result as web.IDBDatabase;
+    if (!db.objectStoreNames.contains(_storeName)) {
+      db.createObjectStore(_storeName);
+    }
+  }.toJS;
+  req.onsuccess = (web.Event _) {
+    if (!done.isCompleted) {
+      done.complete(req.result as web.IDBDatabase);
+    }
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (!done.isCompleted) {
+      done.completeError(req.error ?? Exception('idb open failed'));
+    }
+  }.toJS;
+  final db = await done.future;
+  _db = db;
+  return db;
+}
+
+Future<void> _idbPut(String key, String value) async {
+  final db = await _openDb();
+  final tx = db.transaction(_storeName.toJS, 'readwrite');
+  final store = tx.objectStore(_storeName);
+  final req = store.put(value.toJS, key.toJS);
+  final done = Completer<void>();
+  req.onsuccess = (web.Event _) {
+    if (!done.isCompleted) done.complete();
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (done.isCompleted) return;
+    final err = req.error;
+    final name = err?.name ?? '';
+    if (name.toLowerCase().contains('quota')) {
+      done.completeError(PersistQuotaException(name));
+    } else {
+      done.completeError(err ?? Exception('idb put failed'));
+    }
+  }.toJS;
+  await done.future;
+}
+
+Future<String?> _idbGet(String key) async {
+  final db = await _openDb();
+  final tx = db.transaction(_storeName.toJS, 'readonly');
+  final store = tx.objectStore(_storeName);
+  final req = store.get(key.toJS);
+  final done = Completer<String?>();
+  req.onsuccess = (web.Event _) {
+    if (done.isCompleted) return;
+    final raw = req.result;
+    if (raw == null) {
+      done.complete(null);
+      return;
+    }
+    final dart = raw.dartify();
+    done.complete(dart is String ? dart : dart?.toString());
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (!done.isCompleted) {
+      done.completeError(req.error ?? Exception('idb get failed'));
+    }
+  }.toJS;
+  return done.future;
+}
+
+Future<void> _idbDelete(String key) async {
+  final db = await _openDb();
+  final tx = db.transaction(_storeName.toJS, 'readwrite');
+  final store = tx.objectStore(_storeName);
+  final req = store.delete(key.toJS);
+  final done = Completer<void>();
+  req.onsuccess = (web.Event _) {
+    if (!done.isCompleted) done.complete();
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (!done.isCompleted) {
+      done.completeError(req.error ?? Exception('idb delete failed'));
+    }
+  }.toJS;
+  await done.future;
+}
+
+Future<List<String>> _idbKeys(String prefix) async {
+  final db = await _openDb();
+  final tx = db.transaction(_storeName.toJS, 'readonly');
+  final store = tx.objectStore(_storeName);
+  final req = store.openCursor();
+  final keys = <String>[];
+  final done = Completer<List<String>>();
+  req.onsuccess = (web.Event _) {
+    if (done.isCompleted) return;
+    final raw = req.result;
+    if (raw == null) {
+      done.complete(keys);
+      return;
+    }
+    final cursor = raw as web.IDBCursor;
+    final key = '${cursor.key.dartify()}';
+    if (prefix.isEmpty || key.startsWith(prefix)) keys.add(key);
+    cursor.continue_();
+  }.toJS;
+  req.onerror = (web.Event _) {
+    if (!done.isCompleted) {
+      done.completeError(req.error ?? Exception('idb keys failed'));
+    }
+  }.toJS;
+  return done.future;
+}

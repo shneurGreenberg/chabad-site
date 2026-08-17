@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Spark/free. Public read. Writes open so admin can save without Auth/Storage.
+    // Tighten later with Authentication if needed.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
