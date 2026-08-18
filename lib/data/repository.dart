@@ -885,6 +885,13 @@ class AppRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  void moveHistory(int from, int to) => _moveIn(history, from, to);
+
+  void reorderHistory(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) newIndex -= 1;
+    moveHistory(oldIndex, newIndex);
+  }
+
   TourStop newBlankTour() => TourStop(
         id: _newId(),
         name: {'he': '', 'en': '', 'ru': ''},
@@ -899,6 +906,21 @@ class AppRepository extends ChangeNotifier {
 
   void deleteTour(String id) {
     tour.removeWhere((e) => e.id == id);
+    notifyListeners();
+  }
+
+  void moveTour(int from, int to) => _moveIn(tour, from, to);
+
+  void reorderTour(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) newIndex -= 1;
+    moveTour(oldIndex, newIndex);
+  }
+
+  void _moveIn<T>(List<T> list, int from, int to) {
+    if (from == to || from < 0 || from >= list.length) return;
+    final dest = to.clamp(0, list.length - 1);
+    final item = list.removeAt(from);
+    list.insert(dest, item);
     notifyListeners();
   }
 
@@ -1197,6 +1219,23 @@ class AppRepository extends ChangeNotifier {
     if (n != null && n >= _seq) _seq = n + 1;
   }
 
+  void _ensureUniqueIds<T>(
+    List<T> items,
+    String Function(T) idOf,
+    void Function(T, String) setId,
+  ) {
+    final seen = <String>{};
+    for (final item in items) {
+      var id = idOf(item);
+      if (id.isEmpty || id == 'null' || !seen.add(id)) {
+        id = _newId();
+        setId(item, id);
+        seen.add(id);
+      }
+      _noteId(id);
+    }
+  }
+
   void _schedulePersist() {
     _saveDebounce?.cancel();
     _saveDebounce = Timer(const Duration(milliseconds: 300), () {
@@ -1359,6 +1398,8 @@ class AppRepository extends ChangeNotifier {
     for (final s in tour) {
       _noteId(s.id);
     }
+    _ensureUniqueIds(history, (e) => e.id, (e, id) => e.id = id);
+    _ensureUniqueIds(tour, (s) => s.id, (s, id) => s.id = id);
     for (final s in shiurim) {
       _noteId(s.id);
     }

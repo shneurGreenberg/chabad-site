@@ -101,7 +101,7 @@ class _TimelineTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.08)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,11 +109,13 @@ class _TimelineTile extends StatelessWidget {
                     Pill(event.year.toUpperCase(), color: AppColors.primary),
                     const SizedBox(height: 8),
                     Text(trLoc(event.title, loc.lang),
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 17)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            color: AppColors.ink)),
                     const SizedBox(height: 4),
                     Text(trLoc(event.description, loc.lang),
-                        style: const TextStyle(color: Colors.black54, height: 1.5)),
+                        style: TextStyle(color: AppColors.muted, height: 1.5)),
                   ],
                 ),
               ),
@@ -157,11 +159,13 @@ class _TourCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(trLoc(stop.name, loc.lang),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w800, fontSize: 16)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: AppColors.ink)),
                 const SizedBox(height: 4),
                 Text(trLoc(stop.description, loc.lang),
-                    style: const TextStyle(color: Colors.black54, height: 1.4)),
+                    style: TextStyle(color: AppColors.muted, height: 1.4)),
                 const SizedBox(height: 12),
                 FilledButton.icon(
                   onPressed: onStart,
@@ -228,11 +232,13 @@ class _TourDialogState extends State<_TourDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(trLoc(stop.name, loc.lang),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w800, fontSize: 20)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          color: AppColors.ink)),
                   const SizedBox(height: 6),
                   Text(trLoc(stop.description, loc.lang),
-                      style: const TextStyle(color: Colors.black54, height: 1.5)),
+                      style: TextStyle(color: AppColors.muted, height: 1.5)),
                   const SizedBox(height: 16),
                   Row(children: [
                     OutlinedButton.icon(

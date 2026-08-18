@@ -260,7 +260,9 @@ ThemeData buildAppTheme([SitePalette? palette]) {
     secondary: p.accent,
     surface: p.card,
     onSurface: p.ink,
+    onSurfaceVariant: p.muted,
     onPrimary: p.onPrimary,
+    outline: p.muted,
   );
 
   final base = ThemeData(
@@ -351,6 +353,7 @@ ThemeData buildAppTheme([SitePalette? palette]) {
         mouseCursor: _clickCursor,
       ),
     ),
+    iconTheme: IconThemeData(color: p.ink),
     listTileTheme: ListTileThemeData(
       mouseCursor: WidgetStateMouseCursor.clickable,
       iconColor: p.primary,
@@ -394,8 +397,14 @@ ThemeData buildAppTheme([SitePalette? palette]) {
         fontWeight: FontWeight.w700,
         color: p.ink,
       ),
+      titleMedium: base.textTheme.titleMedium?.copyWith(color: p.ink),
+      titleSmall: base.textTheme.titleSmall?.copyWith(color: p.ink),
       bodyMedium: base.textTheme.bodyMedium?.copyWith(color: p.ink),
       bodyLarge: base.textTheme.bodyLarge?.copyWith(color: p.ink),
+      bodySmall: base.textTheme.bodySmall?.copyWith(color: p.muted),
+      labelLarge: base.textTheme.labelLarge?.copyWith(color: p.ink),
+      labelMedium: base.textTheme.labelMedium?.copyWith(color: p.muted),
+      labelSmall: base.textTheme.labelSmall?.copyWith(color: p.muted),
     ),
     pageTransitionsTheme: PageTransitionsTheme(
       builders: {

@@ -73,8 +73,8 @@ class AboutPage extends StatelessWidget {
                       Expanded(
                         child: Text(trLoc(h.value, loc.lang),
                             textAlign: TextAlign.end,
-                            style: const TextStyle(
-                                color: Colors.black54, height: 1.35)),
+                            style: TextStyle(
+                                color: AppColors.muted, height: 1.35)),
                       ),
                     ],
                   ),
@@ -143,7 +143,7 @@ class AboutPage extends StatelessWidget {
   Widget _row(IconData icon, String text, {bool phone = false}) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 18, color: Colors.black45),
+          Icon(icon, size: 18, color: AppColors.muted),
           const SizedBox(width: 10),
           Expanded(
             child: phone

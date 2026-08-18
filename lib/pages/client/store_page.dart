@@ -121,7 +121,7 @@ class _CartPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
                 child: Text(loc.t('store.cart.empty'),
-                    style: const TextStyle(color: Colors.black45)),
+                    style: TextStyle(color: AppColors.muted)),
               ),
             )
           else ...[

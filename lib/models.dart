@@ -45,6 +45,10 @@ class NewsArticle {
   Uint8List? imageBytes;
   String? imageUrl;
   int? telegramMessageId;
+
+  bool get hasImage =>
+      (imageBytes != null && imageBytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty);
 }
 
 class SiteLocation {
@@ -107,6 +111,10 @@ class Program {
   int color;
   Uint8List? imageBytes;
   String? imageUrl;
+
+  bool get hasImage =>
+      (imageBytes != null && imageBytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty);
 }
 
 class GalleryShot {
@@ -173,6 +181,9 @@ class GalleryPhoto {
   }
 
   int get photoCount => displayPhotos.length;
+
+  bool get hasImage =>
+      coverBytes != null || (coverUrl != null && coverUrl!.isNotEmpty);
 }
 
 enum Era { present, past }
@@ -314,7 +325,7 @@ class TourStop {
     required this.color,
     this.icon = Icons.location_on_outlined,
   });
-  final String id;
+  String id;
   Loc name;
   Loc description;
   int color;
@@ -344,6 +355,10 @@ class Product {
   IconData icon;
   Uint8List? imageBytes;
   String? imageUrl;
+
+  bool get hasImage =>
+      (imageBytes != null && imageBytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty);
 }
 
 class Shiur {

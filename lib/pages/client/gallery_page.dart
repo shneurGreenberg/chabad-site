@@ -103,7 +103,7 @@ class _GalleryPageState extends State<GalleryPage> {
                           fontWeight: FontWeight.w800, fontSize: 17)),
                   Text(loc.t('gallery.faceSearch.hint'),
                       style:
-                          const TextStyle(color: Colors.black54, fontSize: 13)),
+                          TextStyle(color: AppColors.muted, fontSize: 13)),
                 ],
               ),
             ),

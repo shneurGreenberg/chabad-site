@@ -164,8 +164,8 @@ class _DonatePageState extends State<DonatePage> {
                       Text(d.donor,
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                       Text(trLoc(d.campaign, loc.lang),
-                          style: const TextStyle(
-                              color: Colors.black54, fontSize: 12.5)),
+                          style: TextStyle(
+                              color: AppColors.muted, fontSize: 12.5)),
                     ],
                   ),
                 ),

@@ -117,8 +117,8 @@ class _GraveCard extends StatelessWidget {
                           fontWeight: FontWeight.w800, fontSize: 17)),
                   if (subtitle.isNotEmpty)
                     Text(subtitle,
-                        style: const TextStyle(
-                            color: Colors.black54, fontSize: 13)),
+                        style: TextStyle(
+                            color: AppColors.muted, fontSize: 13)),
                   if (notes.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(notes,

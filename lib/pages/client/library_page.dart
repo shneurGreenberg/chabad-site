@@ -82,16 +82,16 @@ class _ShiurCard extends StatelessWidget {
                       runSpacing: 6,
                       children: [
                         Row(mainAxisSize: MainAxisSize.min, children: [
-                          const Icon(Icons.person_outline, size: 14, color: Colors.black45),
+                          Icon(Icons.person_outline, size: 14, color: AppColors.muted),
                           const SizedBox(width: 4),
                           Text(trLoc(shiur.rabbi, loc.lang),
-                              style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                              style: TextStyle(color: AppColors.muted, fontSize: 13)),
                         ]),
                         Row(mainAxisSize: MainAxisSize.min, children: [
-                          const Icon(Icons.timer_outlined, size: 14, color: Colors.black45),
+                          Icon(Icons.timer_outlined, size: 14, color: AppColors.muted),
                           const SizedBox(width: 4),
                           Text('${shiur.durationMinutes} ${loc.t('library.minutes')}',
-                              style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                              style: TextStyle(color: AppColors.muted, fontSize: 13)),
                         ]),
                       ],
                     ),
@@ -144,7 +144,7 @@ class _ShiurCard extends StatelessWidget {
                             fontWeight: FontWeight.w800, fontSize: 18)),
                     const SizedBox(height: 6),
                     Text(trLoc(shiur.rabbi, loc.lang),
-                        style: const TextStyle(color: Colors.black54)),
+                        style: TextStyle(color: AppColors.muted)),
                     const SizedBox(height: 14),
                     Align(
                       alignment: AlignmentDirectional.centerEnd,

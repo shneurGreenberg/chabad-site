@@ -134,8 +134,7 @@ class _AdminLoginState extends State<AdminLogin> {
                             ? 'admin.login.firebaseHint'
                             : 'admin.login.hint'),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: Colors.black45, fontSize: 13)),
+                        style: TextStyle(color: AppColors.muted, fontSize: 13)),
                     const SizedBox(height: 22),
                     TextField(
                       controller: _email,
@@ -679,17 +678,18 @@ class ManageNewsPanel extends StatelessWidget {
       ],
       child: Column(
         children: [
+          AdminImageCountLine(
+            have: repo.news.where((a) => a.hasImage).length,
+            total: repo.news.length,
+          ),
           for (final a in repo.news)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Color(a.imageColor).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(a.icon, color: Color(a.imageColor), size: 22),
+              leading: AdminMediaThumb(
+                bytes: a.imageBytes,
+                url: a.imageUrl,
+                color: a.imageColor,
+                icon: a.icon,
               ),
               title: Text(trLoc(a.title, loc.lang),
                   maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -866,12 +866,18 @@ class ManageProgramsPanel extends StatelessWidget {
       ],
       child: Column(
         children: [
+          AdminImageCountLine(
+            have: repo.programs.where((p) => p.hasImage).length,
+            total: repo.programs.length,
+          ),
           for (final p in repo.programs)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(
-                backgroundColor: Color(p.color).withValues(alpha: 0.15),
-                child: Icon(p.icon, color: Color(p.color), size: 20),
+              leading: AdminMediaThumb(
+                bytes: p.imageBytes,
+                url: p.imageUrl,
+                color: p.color,
+                icon: p.icon,
               ),
               title: Text(trLoc(p.title, loc.lang)),
               subtitle: Text(trLoc(p.schedule, loc.lang)),
@@ -1037,12 +1043,18 @@ class ManageStorePanel extends StatelessWidget {
       ],
       child: Column(
         children: [
+          AdminImageCountLine(
+            have: repo.products.where((p) => p.hasImage).length,
+            total: repo.products.length,
+          ),
           for (final p in repo.products)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(
-                backgroundColor: Color(p.color).withValues(alpha: 0.15),
-                child: Icon(p.icon, color: Color(p.color), size: 20),
+              leading: AdminMediaThumb(
+                bytes: p.imageBytes,
+                url: p.imageUrl,
+                color: p.color,
+                icon: p.icon,
               ),
               title: Text(trLoc(p.name, loc.lang)),
               subtitle: Text('\$${p.price.toStringAsFixed(0)}'),
@@ -1223,25 +1235,18 @@ class ManageGalleryPanel extends StatelessWidget {
       ],
       child: Column(
         children: [
+          AdminImageCountLine(
+            have: repo.gallery.where((p) => p.hasImage).length,
+            total: repo.gallery.length,
+          ),
           for (final p in repo.gallery)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: p.coverBytes != null
-                      ? Image.memory(p.coverBytes!, fit: BoxFit.cover)
-                      : (p.coverUrl != null && p.coverUrl!.isNotEmpty)
-                          ? (p.coverUrl!.startsWith('assets/')
-                              ? Image.asset(p.coverUrl!, fit: BoxFit.cover)
-                              : Image.network(p.coverUrl!, fit: BoxFit.cover))
-                          : ColoredBox(
-                              color: Color(p.color).withValues(alpha: 0.15),
-                              child: Icon(p.icon, color: Color(p.color), size: 20),
-                            ),
-                ),
+              leading: AdminMediaThumb(
+                bytes: p.coverBytes,
+                url: p.coverUrl,
+                color: p.color,
+                icon: p.icon,
               ),
               title: Text(trLoc(p.event, loc.lang)),
               subtitle: Text(
@@ -1420,7 +1425,7 @@ class CrmPanel extends StatelessWidget {
             Flexible(
               child: Text(loc.t('admin.crm.note'),
                   textAlign: TextAlign.end,
-                  style: const TextStyle(color: Colors.black45, fontSize: 12)),
+                  style: TextStyle(color: AppColors.muted, fontSize: 12)),
             ),
           ],
           child: SingleChildScrollView(
@@ -1574,7 +1579,7 @@ class _BotCard extends StatelessWidget {
                 Text(
                   bot.enabled ? loc.t('admin.bots.enabled') : '—',
                   style: TextStyle(
-                      color: bot.enabled ? const Color(0xFF0D9488) : Colors.black45,
+                      color: bot.enabled ? const Color(0xFF0D9488) : AppColors.muted,
                       fontSize: 12.5),
                 ),
               ],
@@ -1606,7 +1611,7 @@ class _BotCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(a, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-          Text(b, style: const TextStyle(color: Colors.black54, fontSize: 12.5)),
+          Text(b, style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
         ],
       );
 }

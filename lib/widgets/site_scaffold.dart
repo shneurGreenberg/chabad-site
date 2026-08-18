@@ -444,10 +444,13 @@ class _MoreMenu extends StatelessWidget {
 }
 
 class LanguageSwitcher extends StatelessWidget {
-  const LanguageSwitcher({super.key});
+  const LanguageSwitcher({super.key, this.onDark = false});
+  final bool onDark;
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    const cream = Color(0xFFF6F1E8);
+    final fg = onDark ? cream : AppColors.ink;
     return HoverScale(
       child: PopupMenuButton<String>(
         tooltip: loc.t('common.language'),
@@ -471,16 +474,19 @@ class LanguageSwitcher extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black.withValues(alpha: 0.12)),
+            border: Border.all(color: fg.withValues(alpha: 0.35)),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.language, size: 16),
+            Icon(Icons.language, size: 16, color: fg),
             const SizedBox(width: 4),
             Text(loc.lang.toUpperCase(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w700, fontSize: 12, height: 1)),
-            const Icon(Icons.expand_more, size: 16),
+                style: TextStyle(
+                    color: fg,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    height: 1)),
+            Icon(Icons.expand_more, size: 16, color: fg),
           ]),
         ),
       ),
@@ -565,9 +571,13 @@ class _SiteDrawer extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(item.icon,
                       color: navIsActive(currentRoute, item.route)
-                          ? AppColors.primary
-                          : Colors.black54),
-                  title: Text(loc.t(item.labelKey)),
+                          ? AppColors.accentSoft
+                          : const Color(0xFFF6F1E8).withValues(alpha: 0.85)),
+                  title: Text(loc.t(item.labelKey),
+                      style: TextStyle(
+                          color: navIsActive(currentRoute, item.route)
+                              ? AppColors.accentSoft
+                              : const Color(0xFFF6F1E8))),
                   selected: navIsActive(currentRoute, item.route),
                   onTap: () {
                     Navigator.pop(context);
@@ -583,17 +593,21 @@ class _SiteDrawer extends StatelessWidget {
                 children: [
                   Text(loc.t('common.language'),
                       style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 13)),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: Color(0xFFF6F1E8))),
                   const SizedBox(height: 8),
-                  const LanguageSwitcher(),
+                  const LanguageSwitcher(onDark: true),
                 ],
               ),
             ),
             HoverScale(
               scale: 1.02,
               child: ListTile(
-                leading: Icon(Icons.app_registration, color: AppColors.primary),
-                title: Text(loc.t('nav.contact')),
+                leading: const Icon(Icons.app_registration,
+                    color: Color(0xFFF6F1E8)),
+                title: Text(loc.t('nav.contact'),
+                    style: const TextStyle(color: Color(0xFFF6F1E8))),
                 onTap: () {
                   Navigator.pop(context);
                   context.go('/contact');
@@ -604,7 +618,8 @@ class _SiteDrawer extends StatelessWidget {
               scale: 1.02,
               child: ListTile(
                 leading: Icon(Icons.favorite, color: AppColors.accent),
-                title: Text(loc.t('nav.donate')),
+                title: Text(loc.t('nav.donate'),
+                    style: const TextStyle(color: Color(0xFFF6F1E8))),
                 onTap: () {
                   Navigator.pop(context);
                   context.go('/donate');

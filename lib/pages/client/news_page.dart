@@ -143,8 +143,8 @@ class NewsArticlePage extends StatelessWidget {
                   Pill(trLoc(article.category, loc.lang),
                       color: AppColors.accent),
                   Text(fmtDate(context, article.date),
-                      style: const TextStyle(
-                          color: Colors.black45, fontSize: 14)),
+                      style: TextStyle(
+                          color: AppColors.muted, fontSize: 14)),
                 ],
               ),
               const SizedBox(height: 14),
@@ -155,8 +155,8 @@ class NewsArticlePage extends StatelessWidget {
                       ?.copyWith(fontWeight: FontWeight.w800, height: 1.25)),
               const SizedBox(height: 16),
               Text(trLoc(article.body, loc.lang),
-                  style: const TextStyle(
-                      color: Colors.black87, height: 1.6, fontSize: 16.5)),
+                  style: TextStyle(
+                      color: AppColors.ink, height: 1.6, fontSize: 16.5)),
             ],
           ),
         ),

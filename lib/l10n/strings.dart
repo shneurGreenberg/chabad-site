@@ -764,6 +764,21 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Preview (cropped as on the card)',
     'ru': 'Превью (обрезка как на карточке)'
   },
+  'admin.image.has': {
+    'he': 'יש תמונה',
+    'en': 'Has a photo',
+    'ru': 'Есть фото',
+  },
+  'admin.image.none': {
+    'he': 'אין תמונה',
+    'en': 'No photo',
+    'ru': 'Нет фото',
+  },
+  'admin.image.count': {
+    'he': '{have} מתוך {total} עם תמונה',
+    'en': '{have} of {total} have a photo',
+    'ru': '{have} из {total} с фото',
+  },
   'admin.settings': {'he': 'הגדרות', 'en': 'Settings', 'ru': 'Настройки'},
   'admin.settings.subtitle': {
     'he': 'כתבו את שם העיר של בית חב"ד. הזמנים והפרשה באתר יתעדכנו לפי המקום הזה.',
@@ -971,6 +986,18 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Известные евреи',
   },
   'admin.manage.history': {'he': 'היסטוריה', 'en': 'History', 'ru': 'История'},
+  'admin.history.reorder': {
+    'he': 'גררו את הידית או השתמשו בחצים כדי לסדר את ציר הזמן.',
+    'en': 'Drag the handle or use the arrows to arrange the timeline.',
+    'ru': 'Перетащите маркер или стрелки, чтобы выстроить ленту времени.',
+  },
+  'admin.tour.reorder': {
+    'he': 'גררו או השתמשו בחצים כדי לסדר את תחנות הסיור.',
+    'en': 'Drag or use the arrows to arrange the tour stops.',
+    'ru': 'Перетащите или используйте стрелки, чтобы выстроить остановки экскурсии.',
+  },
+  'admin.moveUp': {'he': 'למעלה', 'en': 'Move up', 'ru': 'Выше'},
+  'admin.moveDown': {'he': 'למטה', 'en': 'Move down', 'ru': 'Ниже'},
   'admin.manage.tour': {'he': 'סיור', 'en': 'Tour', 'ru': 'Экскурсия'},
   'admin.manage.library': {
     'he': 'שיעורי תורה',

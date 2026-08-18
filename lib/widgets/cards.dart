@@ -56,7 +56,7 @@ class NewsCard extends StatelessWidget {
                     children: [
                       Pill(trLoc(article.category, loc.lang), color: AppColors.accent),
                       Text(fmtDate(context, article.date),
-                          style: const TextStyle(color: Colors.black45, fontSize: 12)),
+                          style: TextStyle(color: AppColors.muted, fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -71,7 +71,7 @@ class NewsCard extends StatelessWidget {
                   Text(trLoc(article.body, loc.lang),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.black54, height: 1.4)),
+                      style: TextStyle(color: AppColors.muted, height: 1.4)),
                   const SizedBox(height: 10),
                   Row(children: [
                     Text(loc.t('common.readMore'),
@@ -148,7 +148,7 @@ class ProgramCard extends StatelessWidget {
                   Text(trLoc(program.description, loc.lang),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.black54, height: 1.4)),
+                      style: TextStyle(color: AppColors.muted, height: 1.4)),
                   const SizedBox(height: 10),
                   Row(children: [
                     Text(loc.t('common.readMore'),
@@ -200,7 +200,7 @@ class ProductCard extends StatelessWidget {
                 Text(trLoc(product.description, loc.lang),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 12.5)),
+                    style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
                 const SizedBox(height: 10),
                 Row(children: [
                   Text('\$${product.price.toStringAsFixed(0)}',
@@ -277,7 +277,7 @@ class PersonCard extends StatelessWidget {
             ]),
             const SizedBox(height: 12),
             Text(trLoc(person.bio, loc.lang),
-                style: const TextStyle(color: Colors.black54, height: 1.5)),
+                style: TextStyle(color: AppColors.muted, height: 1.5)),
           ],
         ),
       ),

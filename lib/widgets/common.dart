@@ -150,7 +150,7 @@ class SectionHeader extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .titleMedium
-                ?.copyWith(color: Colors.black54, height: 1.4),
+                ?.copyWith(color: AppColors.muted, height: 1.4),
           ),
         ],
       ],

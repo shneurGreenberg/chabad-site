@@ -106,8 +106,8 @@ class _LocFieldGroupState extends State<LocFieldGroup> {
             children: [
               Expanded(
                 child: Text(widget.label,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, color: Colors.black87)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, color: AppColors.ink)),
               ),
               if (_showTranslate)
                 TextButton.icon(
@@ -218,6 +218,117 @@ class CoverImagePicker extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Small admin-list thumbnail: photo if present, otherwise the color icon,
+/// plus a badge so it is obvious which items still need an image.
+class AdminMediaThumb extends StatelessWidget {
+  const AdminMediaThumb({
+    super.key,
+    this.bytes,
+    this.url,
+    required this.color,
+    required this.icon,
+    this.size = 48,
+  });
+
+  final Uint8List? bytes;
+  final String? url;
+  final int color;
+  final IconData icon;
+  final double size;
+
+  bool get hasImage =>
+      (bytes != null && bytes!.isNotEmpty) ||
+      (url != null && url!.isNotEmpty);
+
+  Widget _fallback() => ColoredBox(
+        color: Color(color).withValues(alpha: 0.18),
+        child: Icon(icon, color: Color(color), size: size * 0.42),
+      );
+
+  Widget _photo() {
+    if (bytes != null && bytes!.isNotEmpty) {
+      return Image.memory(
+        bytes!,
+        fit: BoxFit.cover,
+        gaplessPlayback: true,
+        cacheWidth: 96,
+      );
+    }
+    final src = url!;
+    if (src.startsWith('assets/')) {
+      return Image.asset(src, fit: BoxFit.cover, cacheWidth: 96);
+    }
+    return Image.network(
+      src,
+      fit: BoxFit.cover,
+      cacheWidth: 96,
+      errorBuilder: (_, _, _) => _fallback(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final has = hasImage;
+    return Tooltip(
+      message: loc.t(has ? 'admin.image.has' : 'admin.image.none'),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: has ? _photo() : _fallback(),
+              ),
+            ),
+            PositionedDirectional(
+              end: 2,
+              bottom: 2,
+              child: Container(
+                width: 16,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: has ? const Color(0xFF0D9488) : AppColors.muted,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.card, width: 1.5),
+                ),
+                child: Icon(
+                  has ? Icons.check : Icons.hide_image_outlined,
+                  size: 9,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AdminImageCountLine extends StatelessWidget {
+  const AdminImageCountLine({super.key, required this.have, required this.total});
+  final int have;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        loc
+            .t('admin.image.count')
+            .replaceAll('{have}', '$have')
+            .replaceAll('{total}', '$total'),
+        style: TextStyle(color: AppColors.muted, fontSize: 13, height: 1.3),
+      ),
     );
   }
 }

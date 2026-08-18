@@ -64,6 +64,86 @@ Widget _panel({
   );
 }
 
+Widget _reorderableColumn({
+  required LocaleController loc,
+  required int length,
+  required String Function(int i) idOf,
+  required void Function(int oldIndex, int newIndex) onReorder,
+  required void Function(int from, int to) onMove,
+  required Widget Function(int i) leading,
+  required String Function(int i) title,
+  required String Function(int i) subtitle,
+  required void Function(int i) onEdit,
+  required void Function(int i) onDelete,
+}) {
+  return ReorderableListView(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    buildDefaultDragHandles: false,
+    onReorder: onReorder,
+    proxyDecorator: (child, _, _) => Material(
+      color: AppColors.card,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(12),
+      child: child,
+    ),
+    children: [
+      for (int i = 0; i < length; i++)
+        KeyedSubtree(
+          key: ValueKey(idOf(i)),
+          child: Row(
+            children: [
+              ReorderableDragStartListener(
+                index: i,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(end: 4),
+                  child: Icon(Icons.drag_handle, color: AppColors.muted),
+                ),
+              ),
+              Expanded(
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: leading(i),
+                  title: Text(title(i),
+                      style: TextStyle(color: AppColors.ink)),
+                  subtitle: Text(subtitle(i),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: AppColors.muted)),
+                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                    IconButton(
+                      tooltip: loc.t('admin.moveUp'),
+                      onPressed: i == 0 ? null : () => onMove(i, i - 1),
+                      icon: Icon(Icons.keyboard_arrow_up,
+                          color: AppColors.ink),
+                    ),
+                    IconButton(
+                      tooltip: loc.t('admin.moveDown'),
+                      onPressed:
+                          i == length - 1 ? null : () => onMove(i, i + 1),
+                      icon: Icon(Icons.keyboard_arrow_down,
+                          color: AppColors.ink),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit_outlined,
+                          size: 20, color: AppColors.ink),
+                      onPressed: () => onEdit(i),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline,
+                          size: 20, color: Color(0xFFEF4444)),
+                      onPressed: () => onDelete(i),
+                    ),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+        ),
+    ],
+  );
+}
+
 Future<void> _showEditor({
   required BuildContext context,
   required String title,
@@ -508,32 +588,31 @@ class ManageHistoryPanel extends StatelessWidget {
             ),
           ],
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final e in repo.history)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.accent.withValues(alpha: 0.2),
-                    child: Text(e.year,
-                        style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary)),
-                  ),
-                  title: Text(trLoc(e.title, loc.lang)),
-                  subtitle: Text(trLoc(e.description, loc.lang),
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        onPressed: () => _editHist(context, repo, e)),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          size: 20, color: Color(0xFFEF4444)),
-                      onPressed: () => repo.deleteHistory(e.id),
-                    ),
-                  ]),
+              Text(loc.t('admin.history.reorder'),
+                  style: TextStyle(color: AppColors.muted, height: 1.4)),
+              const SizedBox(height: 8),
+              _reorderableColumn(
+                loc: loc,
+                length: repo.history.length,
+                idOf: (i) => repo.history[i].id,
+                onReorder: repo.reorderHistory,
+                onMove: repo.moveHistory,
+                leading: (i) => CircleAvatar(
+                  backgroundColor: AppColors.accent.withValues(alpha: 0.2),
+                  child: Text(repo.history[i].year,
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary)),
                 ),
+                title: (i) => trLoc(repo.history[i].title, loc.lang),
+                subtitle: (i) => trLoc(repo.history[i].description, loc.lang),
+                onEdit: (i) =>
+                    _editHist(context, repo, repo.history[i]),
+                onDelete: (i) => repo.deleteHistory(repo.history[i].id),
+              ),
             ],
           ),
         ),
@@ -549,25 +628,24 @@ class ManageHistoryPanel extends StatelessWidget {
             ),
           ],
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final s in repo.tour)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(s.icon, color: Color(s.color)),
-                  title: Text(trLoc(s.name, loc.lang)),
-                  subtitle: Text(trLoc(s.description, loc.lang),
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        onPressed: () => _editTour(context, repo, s)),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline,
-                          size: 20, color: Color(0xFFEF4444)),
-                      onPressed: () => repo.deleteTour(s.id),
-                    ),
-                  ]),
-                ),
+              Text(loc.t('admin.tour.reorder'),
+                  style: TextStyle(color: AppColors.muted, height: 1.4)),
+              const SizedBox(height: 8),
+              _reorderableColumn(
+                loc: loc,
+                length: repo.tour.length,
+                idOf: (i) => repo.tour[i].id,
+                onReorder: repo.reorderTour,
+                onMove: repo.moveTour,
+                leading: (i) =>
+                    Icon(repo.tour[i].icon, color: Color(repo.tour[i].color)),
+                title: (i) => trLoc(repo.tour[i].name, loc.lang),
+                subtitle: (i) => trLoc(repo.tour[i].description, loc.lang),
+                onEdit: (i) => _editTour(context, repo, repo.tour[i]),
+                onDelete: (i) => repo.deleteTour(repo.tour[i].id),
+              ),
             ],
           ),
         ),

@@ -110,8 +110,8 @@ class ProgramDetailPage extends StatelessWidget {
               ]),
               const SizedBox(height: 18),
               Text(trLoc(program.description, loc.lang),
-                  style: const TextStyle(
-                      color: Colors.black87, height: 1.55, fontSize: 16)),
+                  style: TextStyle(
+                      color: AppColors.ink, height: 1.55, fontSize: 16)),
               const SizedBox(height: 18),
               _meta(Icons.schedule, loc.t('programs.schedule'),
                   trLoc(program.schedule, loc.lang)),
@@ -124,7 +124,7 @@ class ProgramDetailPage extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.onPrimary,
                 ),
                 icon: const Icon(Icons.how_to_reg, size: 20),
                 label: Text(loc.t('programs.register')),
@@ -140,16 +140,16 @@ class ProgramDetailPage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.black45),
+        Icon(icon, size: 18, color: AppColors.muted),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12,
-                      color: Colors.black45,
+                      color: AppColors.muted,
                       fontWeight: FontWeight.w600)),
               Text(value, style: const TextStyle(fontSize: 15, height: 1.4)),
             ],
