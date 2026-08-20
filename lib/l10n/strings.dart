@@ -360,11 +360,26 @@ const Map<String, Map<String, String>> _strings = {
 
   // Library
   'library.subtitle': {
-    'he': 'שיעורי תורה של הרב שניאור זלמן זקלס — בית מנחם נובוסיבירסק',
-    'en': 'Torah classes by Rabbi Shneur Zalman Zaklos — Beit Menachem Novosibirsk',
-    'ru': 'Уроки Торы раввина Шнеура Залмана Заклоса — Бейт Менахем Новосибирск'
+    'he': 'שיעורי תורה מבית מנחם — צפייה ביוטיוב ושיעורים של הרב זקלס',
+    'en': 'Torah classes from Beit Menachem — YouTube playback and Rabbi Zaklos’s shiurim',
+    'ru': 'Уроки Торы Бейт Менахем — просмотр YouTube и занятия раввина Заклоса'
   },
   'library.watch': {'he': 'צפייה', 'en': 'Watch', 'ru': 'Смотреть'},
+  'library.comingSoon': {
+    'he': 'בקרוב ביוטיוב',
+    'en': 'Coming on YouTube',
+    'ru': 'Скоро на YouTube'
+  },
+  'library.noVideo': {
+    'he': 'עדיין אין סרטון לשיעור הזה. במנהל אפשר להדביק קישור יוטיוב והנגן יופיע כאן.',
+    'en': 'This class has no video yet. Paste a YouTube link in Admin and the player will appear here.',
+    'ru': 'У этого урока пока нет видео. Вставьте ссылку YouTube в админке — плеер появится здесь.'
+  },
+  'library.openYoutube': {
+    'he': 'פתחו ביוטיוב',
+    'en': 'Open on YouTube',
+    'ru': 'Открыть на YouTube'
+  },
   'library.rabbi': {'he': 'רב', 'en': 'Rabbi', 'ru': 'Раввин'},
   'library.minutes': {'he': 'דקות', 'en': 'min', 'ru': 'мин'},
 
@@ -879,9 +894,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Откройте канал общины и добавьте бота администратором.'
   },
   'admin.tg.step7': {
-    'he': 'הדביקו את שם הערוץ (למשל @mychannel).',
-    'en': 'Paste the channel username (e.g. @mychannel).',
-    'ru': 'Вставьте имя канала (например @mychannel).'
+    'he': 'הדביקו את שם הערוץ — אצלנו: @jewishsib',
+    'en': 'Paste the channel username — ours is @jewishsib',
+    'ru': 'Вставьте имя канала — у нас @jewishsib'
   },
   'admin.tg.step8': {
     'he': 'לחצו «בדיקת חיבור» — אמור להופיע שם הבוט.',
@@ -899,9 +914,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Токен бота'
   },
   'admin.tg.channel': {
-    'he': 'שם הערוץ',
-    'en': 'Channel username',
-    'ru': 'Имя канала'
+    'he': 'שם הערוץ (@jewishsib)',
+    'en': 'Channel username (@jewishsib)',
+    'ru': 'Имя канала (@jewishsib)'
   },
   'admin.tg.connect': {
     'he': 'בדיקת חיבור',
@@ -1015,6 +1030,17 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Кладбище',
   },
   'admin.shiur.duration': {'he': 'דקות', 'en': 'Minutes', 'ru': 'Минуты'},
+  'admin.shiur.youtube': {
+    'he': 'קישור יוטיוב (watch / youtu.be / מזהה)',
+    'en': 'YouTube link (watch / youtu.be / id)',
+    'ru': 'Ссылка YouTube (watch / youtu.be / id)',
+  },
+  'admin.reminders.title': {
+    'he': 'תזכורות — חומר חסר וחגים מתקרבים',
+    'en': 'Reminders — missing material and upcoming holidays',
+    'ru': 'Напоминания — чего не хватает и ближайшие праздники',
+  },
+  'admin.reminders.open': {'he': 'לפתיחה', 'en': 'Open', 'ru': 'Открыть'},
   'admin.grave.hebrew': {'he': 'שם בעברית', 'en': 'Hebrew name', 'ru': 'Имя на иврите'},
   'admin.grave.section': {'he': 'חלקה', 'en': 'Section', 'ru': 'Участок'},
   'admin.grave.row': {'he': 'שורה', 'en': 'Row', 'ru': 'Ряд'},

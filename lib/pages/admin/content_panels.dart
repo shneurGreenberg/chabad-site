@@ -5,6 +5,7 @@ import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../theme.dart';
+import '../../util/youtube.dart';
 import '../../widgets/admin_fields.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
@@ -738,10 +739,18 @@ class ManageLibraryPanel extends StatelessWidget {
           for (final s in repo.shiurim)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.menu_book_outlined),
+              leading: Icon(
+                youtubeIdFrom(s.youtubeUrl) == null
+                    ? Icons.menu_book_outlined
+                    : Icons.smart_display_outlined,
+                color: youtubeIdFrom(s.youtubeUrl) == null
+                    ? AppColors.muted
+                    : const Color(0xFFDC2626),
+              ),
               title: Text(trLoc(s.title, loc.lang)),
               subtitle: Text(
-                  '${trLoc(s.rabbi, loc.lang)} · ${s.durationMinutes} ${loc.t('admin.shiur.duration')}'),
+                  '${trLoc(s.rabbi, loc.lang)} · ${s.durationMinutes} ${loc.t('admin.shiur.duration')}'
+                  '${youtubeIdFrom(s.youtubeUrl) == null ? '' : ' · YouTube'}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
                     icon: const Icon(Icons.edit_outlined, size: 20),
@@ -764,6 +773,7 @@ class ManageLibraryPanel extends StatelessWidget {
     final rabbi = _locCtrls(shiur.rabbi);
     final topic = _locCtrls(shiur.topic);
     final mins = TextEditingController(text: '${shiur.durationMinutes}');
+    final youtube = TextEditingController(text: shiur.youtubeUrl);
     _showEditor(
       context: context,
       title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
@@ -777,18 +787,28 @@ class ManageLibraryPanel extends StatelessWidget {
           decoration:
               InputDecoration(labelText: context.loc.t('admin.shiur.duration')),
         ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: youtube,
+          decoration: InputDecoration(
+            labelText: context.loc.t('admin.shiur.youtube'),
+            hintText: 'https://www.youtube.com/watch?v=…',
+            prefixIcon: const Icon(Icons.smart_display_outlined),
+          ),
+        ),
       ]),
       onSave: () {
         _applyLoc(shiur.title, title);
         _applyLoc(shiur.rabbi, rabbi);
         _applyLoc(shiur.topic, topic);
         shiur.durationMinutes = int.tryParse(mins.text) ?? shiur.durationMinutes;
+        shiur.youtubeUrl = youtube.text.trim();
         if (isNew) {
           repo.addShiur(shiur);
         } else {
           repo.refresh();
         }
-        _disposeAll([...title.values, ...rabbi.values, ...topic.values, mins]);
+        _disposeAll([...title.values, ...rabbi.values, ...topic.values, mins, youtube]);
       },
     );
   }

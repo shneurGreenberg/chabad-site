@@ -369,6 +369,7 @@ class Shiur {
     required this.topic,
     required this.durationMinutes,
     required this.date,
+    this.youtubeUrl = '',
   });
   final String id;
   Loc title;
@@ -376,6 +377,26 @@ class Shiur {
   Loc topic;
   int durationMinutes;
   DateTime date;
+  String youtubeUrl;
+}
+
+enum AdminJump { news, programs, gallery, library, bots, banners }
+
+class AdminReminder {
+  AdminReminder({
+    required this.id,
+    required this.jump,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.body,
+  });
+  final String id;
+  final AdminJump jump;
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String body;
 }
 
 enum LeadStatus { fresh, contacted, member }

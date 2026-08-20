@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../util/youtube.dart';
 import '../services/cloud_sync.dart';
 import '../services/image_compress.dart';
 import '../services/location_zmanim.dart';
 import '../services/persist.dart';
 import '../services/telegram.dart';
 import '../services/web_prefs.dart';
+import 'holidays.dart';
 import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
@@ -26,7 +28,9 @@ class AppRepository extends ChangeNotifier {
     Future<void>.microtask(_boot);
   }
 
-  static const _contentSeed = 7;
+  static const _contentSeed = 8;
+  static const _imgSynagogue = 'assets/images/beit-menachem-1.jpg';
+  static const _imgHall = 'assets/images/beit-menachem-2.jpg';
   static const _snapKey = 'chabad_site_snapshot';
   static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
@@ -205,6 +209,27 @@ class AppRepository extends ChangeNotifier {
     NewsArticle(
       id: _newId(),
       title: {
+        'he': 'הימים הנוראים תשפ״ז בבית מנחם',
+        'en': 'High Holidays 5787 at Beit Menachem',
+        'ru': 'Высокие праздники 5787 в Бейт Менахем',
+      },
+      body: {
+        'he':
+            'מזמינים את כל הקהילה לתפילות הימים הנוראים בבית הכנסת בית מנחם, שצ׳טינקינה 68. ראש השנה: 11–13 בספטמבר 2026. יום כיפור: 20–21 בספטמבר. סוכות מתחיל ב־25 בספטמבר. לרישום ולמקומות בסעודות: +7 (383) 222-20-23 או chabad.nsk@gmail.com.',
+        'en':
+            'All are invited to High Holiday prayers at Beit Menachem, 68 Shchetinkina St. Rosh Hashanah: 11–13 September 2026. Yom Kippur: 20–21 September. Sukkot begins 25 September. For seats and meals: +7 (383) 222-20-23 or chabad.nsk@gmail.com.',
+        'ru':
+            'Приглашаем общину на молитвы Высоких праздников в синагоге Бейт Менахем, ул. Щетинкина, 68. Рош ха-Шана: 11–13 сентября 2026. Йом Кипур: 20–21 сентября. Суккот с 25 сентября. Запись: +7 (383) 222-20-23 или chabad.nsk@gmail.com.',
+      },
+      date: DateTime(2026, 8, 20),
+      category: {'he': 'חגים', 'en': 'Holidays', 'ru': 'Праздники'},
+      imageColor: 0xFFC2410C,
+      icon: Icons.auto_awesome,
+      imageUrl: _imgSynagogue,
+    ),
+    NewsArticle(
+      id: _newId(),
+      title: {
         'he': 'בית מנחם — בית הכנסת בנובוסיבירסק',
         'en': 'Beit Menachem — the synagogue in Novosibirsk',
         'ru': 'Бейт Менахем — синагога Новосибирска',
@@ -221,6 +246,7 @@ class AppRepository extends ChangeNotifier {
       category: {'he': 'קהילה', 'en': 'Community', 'ru': 'Община'},
       imageColor: 0xFF1D4ED8,
       icon: Icons.synagogue,
+      imageUrl: _imgSynagogue,
     ),
     NewsArticle(
       id: _newId(),
@@ -281,6 +307,7 @@ class AppRepository extends ChangeNotifier {
       category: {'he': 'קהילה', 'en': 'Community', 'ru': 'Община'},
       imageColor: 0xFF9333EA,
       icon: Icons.volunteer_activism,
+      imageUrl: _imgHall,
     ),
   ];
 
@@ -431,27 +458,35 @@ class AppRepository extends ChangeNotifier {
       id: _newId(),
       title: {'he': 'פעילות ילדים ביום ראשון', 'en': 'Sunday children\'s activity', 'ru': 'Детская программа в воскресенье'},
       description: {
-        'he': 'פעילות לילדים בבית הכנסת ביום ראשון.',
-        'en': 'Children\'s activity at the synagogue on Sunday.',
-        'ru': 'Детская программа в синагоге по воскресеньям.',
+        'he':
+            'פעילות לילדים בבית הכנסת ביום ראשון: שירים, סיפורי תורה, מלאכה וכיבוד. מתאים לגילאי הגן ובית הספר. ההורים מוזמנים להישאר.',
+        'en':
+            'Sunday children\'s program at the synagogue: songs, Torah stories, crafts and a snack. For preschool and school ages. Parents are welcome to stay.',
+        'ru':
+            'Детская программа в синагоге по воскресеньям: песни, рассказы Торы, поделки и угощение. Для дошкольников и школьников. Родители могут остаться.',
       },
       schedule: {'he': 'יום ראשון בבית הכנסת', 'en': 'Sunday at the synagogue', 'ru': 'Воскресенье в синагоге'},
       audience: {'he': 'ילדים', 'en': 'Children', 'ru': 'Дети'},
       icon: Icons.child_care,
       color: 0xFFF59E0B,
+      imageUrl: _imgHall,
     ),
     Program(
       id: _newId(),
       title: {'he': 'סעודת שבת', 'en': 'Shabbat meal', 'ru': 'Субботняя трапеза'},
       description: {
-        'he': 'סעודת שבת קהילתית בבית מנחם אחרי התפילה.',
-        'en': 'Community Shabbat meal at Beit Menachem after prayer.',
-        'ru': 'Общинная субботняя трапеза в Бейт Менахем после молитвы.',
+        'he':
+            'סעודת שבת קהילתית בבית מנחם אחרי התפילה — קידוש, ארוחה חמה ושיחה. הרשמה מראש עוזרת למטבח לתכנן.',
+        'en':
+            'Community Shabbat meal at Beit Menachem after prayer — Kiddush, a hot meal and conversation. Please register so the kitchen can plan.',
+        'ru':
+            'Общинная субботняя трапеза в Бейт Менахем после молитвы — кидуш, горячий обед и беседа. Запишитесь заранее.',
       },
       schedule: {'he': 'שבת 13:00', 'en': 'Shabbat 13:00', 'ru': 'Шаббат 13:00'},
       audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
       icon: Icons.restaurant,
       color: 0xFFC2410C,
+      imageUrl: _imgHall,
     ),
     Program(
       id: _newId(),
@@ -491,6 +526,7 @@ class AppRepository extends ChangeNotifier {
       audience: {'he': 'נוער וסטודנטים', 'en': 'Youth & students', 'ru': 'Молодёжь и студенты'},
       icon: Icons.groups_2,
       color: 0xFF8B5CF6,
+      imageUrl: _imgHall,
     ),
     Program(
       id: _newId(),
@@ -508,6 +544,7 @@ class AppRepository extends ChangeNotifier {
       audience: {'he': 'נשים וגברים', 'en': 'Women and men', 'ru': 'Женщины и мужчины'},
       icon: Icons.water_drop,
       color: 0xFF0D9488,
+      imageUrl: _imgSynagogue,
     ),
     Program(
       id: _newId(),
@@ -521,6 +558,40 @@ class AppRepository extends ChangeNotifier {
       audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
       icon: Icons.volunteer_activism,
       color: 0xFFEF4444,
+      imageUrl: _imgHall,
+    ),
+    Program(
+      id: _newId(),
+      title: {'he': 'חוג נשים', 'en': "Women's Circle", 'ru': 'Женский клуб'},
+      description: {
+        'he':
+            'מפגשי נשים בבית מנחם: לימוד, חברותא והכנות לחגים. לפרטים: הרבנית מרים זקלס דרך המזכירות.',
+        'en':
+            'Women\'s gatherings at Beit Menachem: study, friendship and holiday prep. Details: Rebbetzin Miriam Zaklos via the office.',
+        'ru':
+            'Встречи женщин в Бейт Менахем: учёба, общение и подготовка к праздникам. Подробности: раббанит Мириам Заклос через секретариат.',
+      },
+      schedule: {'he': 'לפי הזמנה', 'en': 'By invitation', 'ru': 'По приглашению'},
+      audience: {'he': 'נשים', 'en': 'Women', 'ru': 'Женщины'},
+      icon: Icons.diversity_3,
+      color: 0xFFDB2777,
+    ),
+    Program(
+      id: _newId(),
+      title: {'he': 'שיעורי תורה', 'en': 'Torah classes', 'ru': 'Уроки Торы'},
+      description: {
+        'he':
+            'שיעורי פרשה, תניא והלכה עם הרב שניאור זלמן זקלס. חלק מהשיעורים יועלו ליוטיוב — אפשר להוסיף קישור בדף המנהל.',
+        'en':
+            'Parasha, Tanya and Halacha with Rabbi Shneur Zalman Zaklos. Some classes will be posted on YouTube — add the link in the admin library.',
+        'ru':
+            'Уроки главы, Тании и алахи с раввином Шнеуром Залманом Заклосом. Часть занятий будет на YouTube — ссылку можно добавить в админке.',
+      },
+      schedule: {'he': 'לפי לוח השיעורים', 'en': 'Per class calendar', 'ru': 'По расписанию уроков'},
+      audience: {'he': 'כל הקהילה', 'en': 'Everyone', 'ru': 'Все'},
+      icon: Icons.menu_book,
+      color: 0xFF1D4ED8,
+      imageUrl: _imgSynagogue,
     ),
   ];
 
@@ -657,10 +728,120 @@ class AppRepository extends ChangeNotifier {
   // Torah library
   // ---------------------------------------------------------------------------
   late final List<Shiur> shiurim = [
-    Shiur(id: _newId(), title: {'he': 'פרשת השבוע למעשה', 'en': 'The weekly parasha in practice', 'ru': 'Недельная глава на практике'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'פרשה', 'en': 'Parasha', 'ru': 'Глава'}, durationMinutes: 42, date: DateTime.now().subtract(const Duration(days: 2))),
-    Shiur(id: _newId(), title: {'he': 'יסודות התניא', 'en': 'Foundations of Tanya', 'ru': 'Основы Тании'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'}, durationMinutes: 55, date: DateTime.now().subtract(const Duration(days: 9))),
-    Shiur(id: _newId(), title: {'he': 'הלכות שבת למעשה', 'en': 'Practical laws of Shabbat', 'ru': 'Законы субботы на практике'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'הלכה', 'en': 'Halacha', 'ru': 'Алаха'}, durationMinutes: 38, date: DateTime.now().subtract(const Duration(days: 16))),
-    Shiur(id: _newId(), title: {'he': 'כולל תורה', 'en': 'Kollel Torah', 'ru': 'Колель Тора'}, rabbi: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, topic: {'he': 'גמרא', 'en': 'Gemara', 'ru': 'Гемара'}, durationMinutes: 60, date: DateTime.now().subtract(const Duration(days: 23))),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'הכנה לימים הנוראים',
+        'en': 'Preparing for the High Holidays',
+        'ru': 'Подготовка к Высоким праздникам',
+      },
+      rabbi: {
+        'he': 'הרב שניאור זלמן זקלס',
+        'en': 'Rabbi Shneur Zalman Zaklos',
+        'ru': 'Раввин Шнеур Залман Заклос',
+      },
+      topic: {'he': 'חגים', 'en': 'Holidays', 'ru': 'Праздники'},
+      durationMinutes: 45,
+      date: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'פרשת השבוע למעשה',
+        'en': 'The weekly parasha in practice',
+        'ru': 'Недельная глава на практике',
+      },
+      rabbi: {
+        'he': 'הרב שניאור זלמן זקלס',
+        'en': 'Rabbi Shneur Zalman Zaklos',
+        'ru': 'Раввин Шнеур Залман Заклос',
+      },
+      topic: {'he': 'פרשה', 'en': 'Parasha', 'ru': 'Глава'},
+      durationMinutes: 42,
+      date: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'יסודות התניא',
+        'en': 'Foundations of Tanya',
+        'ru': 'Основы Тании',
+      },
+      rabbi: {
+        'he': 'הרב שניאור זלמן זקלס',
+        'en': 'Rabbi Shneur Zalman Zaklos',
+        'ru': 'Раввин Шнеур Залман Заклос',
+      },
+      topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'},
+      durationMinutes: 55,
+      date: DateTime.now().subtract(const Duration(days: 9)),
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'הלכות שבת למעשה',
+        'en': 'Practical laws of Shabbat',
+        'ru': 'Законы субботы на практике',
+      },
+      rabbi: {
+        'he': 'הרב שניאור זלמן זקלס',
+        'en': 'Rabbi Shneur Zalman Zaklos',
+        'ru': 'Раввин Шнеур Залман Заклос',
+      },
+      topic: {'he': 'הלכה', 'en': 'Halacha', 'ru': 'Алаха'},
+      durationMinutes: 38,
+      date: DateTime.now().subtract(const Duration(days: 16)),
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'כולל תורה',
+        'en': 'Kollel Torah',
+        'ru': 'Колель Тора',
+      },
+      rabbi: {
+        'he': 'הרב שניאור זלמן זקלס',
+        'en': 'Rabbi Shneur Zalman Zaklos',
+        'ru': 'Раввин Шнеур Залман Заклос',
+      },
+      topic: {'he': 'גמרא', 'en': 'Gemara', 'ru': 'Гемара'},
+      durationMinutes: 60,
+      date: DateTime.now().subtract(const Duration(days: 23)),
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'מסע הנשמה — המכתב על המחט והמים',
+        'en': 'The journey of the soul — the needle and the water',
+        'ru': 'Путь души — игла и вода',
+      },
+      rabbi: {
+        'he': 'הרב יוסף יצחק יעקבסון',
+        'en': 'Rabbi YY Jacobson',
+        'ru': 'Раввин Й. Й. Джейкобсон',
+      },
+      topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'},
+      durationMinutes: 75,
+      date: DateTime(2021, 6, 1),
+      youtubeUrl: 'https://www.youtube.com/watch?v=OVKQe9fiNu8',
+    ),
+    Shiur(
+      id: _newId(),
+      title: {
+        'he': 'האם הקב״ה צריך אותנו? שיחה על נח והמרגלים',
+        'en': 'Does G-d need us? On Noah and the spies',
+        'ru': 'Нужен ли нам Бог? Ноах и разведчики',
+      },
+      rabbi: {
+        'he': 'הרב מניס פרידמן',
+        'en': 'Rabbi Manis Friedman',
+        'ru': 'Раввин Манис Фридман',
+      },
+      topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'},
+      durationMinutes: 53,
+      date: DateTime(2021, 12, 1),
+      youtubeUrl: 'https://www.youtube.com/watch?v=nQlfH43G1mg',
+    ),
   ];
 
   // ---------------------------------------------------------------------------
@@ -681,6 +862,7 @@ class AppRepository extends ChangeNotifier {
     {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
     {'he': 'מרכז לב', 'en': 'Lev special-needs center', 'ru': 'Центр Лев'},
     {'he': 'חסד ומצות לפסח', 'en': 'Chesed & Passover matzah', 'ru': 'Хесед и маца к Песаху'},
+    {'he': 'הימים הנוראים תשפ״ז', 'en': 'High Holidays 5787', 'ru': 'Высокие праздники 5787'},
   ];
 
   late final List<Donation> donations = [
@@ -931,6 +1113,7 @@ class AppRepository extends ChangeNotifier {
         topic: {'he': '', 'en': '', 'ru': ''},
         durationMinutes: 40,
         date: DateTime.now(),
+        youtubeUrl: '',
       );
 
   void addShiur(Shiur s) {
@@ -941,6 +1124,146 @@ class AppRepository extends ChangeNotifier {
   void deleteShiur(String id) {
     shiurim.removeWhere((e) => e.id == id);
     notifyListeners();
+  }
+
+  bool _hasPic(Uint8List? bytes, String? url) =>
+      (bytes != null && bytes.isNotEmpty) ||
+      (url != null && url.trim().isNotEmpty);
+
+  List<AdminReminder> adminReminders(String lang) {
+    final out = <AdminReminder>[];
+    final newsMissing = news.where((n) => !_hasPic(n.imageBytes, n.imageUrl)).length;
+    if (newsMissing > 0) {
+      out.add(AdminReminder(
+        id: 'news-photos',
+        jump: AdminJump.news,
+        icon: Icons.image_not_supported_outlined,
+        color: const Color(0xFFEA580C),
+        title: trLoc({
+          'he': 'חסרות תמונות בחדשות ($newsMissing)',
+          'en': 'News missing photos ($newsMissing)',
+          'ru': 'Нет фото в новостях ($newsMissing)',
+        }, lang),
+        body: trLoc({
+          'he': 'הוסיפו תמונה לכל כתבה — כך דף החדשות נראה ייצוגי.',
+          'en': 'Add a photo to each article so the News page looks complete.',
+          'ru': 'Добавьте фото к каждой новости — страница будет представительной.',
+        }, lang),
+      ));
+    }
+    final progMissing =
+        programs.where((p) => !_hasPic(p.imageBytes, p.imageUrl)).length;
+    if (progMissing > 0) {
+      out.add(AdminReminder(
+        id: 'program-photos',
+        jump: AdminJump.programs,
+        icon: Icons.photo_outlined,
+        color: const Color(0xFF2563EB),
+        title: trLoc({
+          'he': 'חסרות תמונות בתוכניות ($progMissing)',
+          'en': 'Programs missing photos ($progMissing)',
+          'ru': 'Нет фото у программ ($progMissing)',
+        }, lang),
+        body: trLoc({
+          'he': 'אור אבנר, מרכז לב וחוג נשים עדיין בלי תמונה מהמקום.',
+          'en': 'Or Avner, Lev and the Women\'s Circle still need on-site photos.',
+          'ru': '«Ор Авнер», «Лев» и женский клуб всё ещё без фото с места.',
+        }, lang),
+      ));
+    }
+    final emptyAlbums = gallery.where((a) {
+      final cover = _hasPic(a.imageBytes, a.imageUrl);
+      final shots = a.photos.any((s) => s.hasImage);
+      return !cover && !shots;
+    }).toList();
+    if (emptyAlbums.isNotEmpty) {
+      final names = emptyAlbums
+          .map((a) => trLoc(a.event, lang))
+          .where((s) => s.isNotEmpty)
+          .take(3)
+          .join(' · ');
+      out.add(AdminReminder(
+        id: 'gallery-empty',
+        jump: AdminJump.gallery,
+        icon: Icons.photo_library_outlined,
+        color: const Color(0xFF7C3AED),
+        title: trLoc({
+          'he': 'אלבומים בלי תמונות (${emptyAlbums.length})',
+          'en': 'Albums without photos (${emptyAlbums.length})',
+          'ru': 'Альбомы без фото (${emptyAlbums.length})',
+        }, lang),
+        body: names.isEmpty
+            ? trLoc({
+                'he': 'העלו תמונות אמיתיות מחגים — לא תמונות של הבניין במקומן.',
+                'en': 'Upload real holiday photos — do not substitute building shots.',
+                'ru': 'Загрузите настоящие праздничные фото, не заменяйте снимками здания.',
+              }, lang)
+            : names,
+      ));
+    }
+    final noVideo =
+        shiurim.where((s) => youtubeIdFrom(s.youtubeUrl) == null).length;
+    if (noVideo > 0) {
+      out.add(AdminReminder(
+        id: 'shiur-youtube',
+        jump: AdminJump.library,
+        icon: Icons.smart_display_outlined,
+        color: const Color(0xFFDC2626),
+        title: trLoc({
+          'he': 'שיעורים בלי קישור יוטיוב ($noVideo)',
+          'en': 'Classes without a YouTube link ($noVideo)',
+          'ru': 'Уроки без ссылки YouTube ($noVideo)',
+        }, lang),
+        body: trLoc({
+          'he': 'הדביקו קישור watch/youtu.be בדף השיעורים במנהל — הצפייה באתר תעבוד מיד.',
+          'en': 'Paste a watch/youtu.be link in the admin library — playback on the site starts immediately.',
+          'ru': 'Вставьте ссылку watch/youtu.be в библиотеке админки — просмотр на сайте заработает сразу.',
+        }, lang),
+      ));
+    }
+    if (!TelegramService.instance.hasToken) {
+      out.add(AdminReminder(
+        id: 'telegram',
+        jump: AdminJump.bots,
+        icon: Icons.send,
+        color: const Color(0xFF0284C7),
+        title: trLoc({
+          'he': 'בוט הטלגרם עדיין לא מחובר',
+          'en': 'Telegram bot is not connected yet',
+          'ru': 'Telegram-бот ещё не подключён',
+        }, lang),
+        body: trLoc({
+          'he': 'צרו בוט ב-@BotFather, הדביקו טוקן, הוסיפו אותו כמנהל ב-@jewishsib, ואז בדיקת חיבור ומשיכת חדשות.',
+          'en': 'Create a bot with @BotFather, paste the token, add it as admin of @jewishsib, then Check connection and Pull news.',
+          'ru': 'Создайте бота у @BotFather, вставьте токен, сделайте его админом @jewishsib, затем проверка связи и загрузка новостей.',
+        }, lang),
+      ));
+    }
+    for (final h in upcomingHolidays(withinDays: 45)) {
+      final days = daysUntilHoliday(h);
+      final when = days == 0
+          ? trLoc({'he': 'היום', 'en': 'today', 'ru': 'сегодня'}, lang)
+          : days == 1
+              ? trLoc({'he': 'מחר', 'en': 'tomorrow', 'ru': 'завтра'}, lang)
+              : trLoc({
+                  'he': 'בעוד $days ימים',
+                  'en': 'in $days days',
+                  'ru': 'через $days дн.',
+                }, lang);
+      out.add(AdminReminder(
+        id: 'holiday-${h.start.toIso8601String()}',
+        jump: AdminJump.news,
+        icon: Icons.event_outlined,
+        color: const Color(0xFFC9A227),
+        title: '${trLoc(h.name, lang)} · $when',
+        body: trLoc({
+          'he': 'פרסמו שעות תפילה, סעודות ותמונות מהחג. אלבום הגלריה עדיין ריק אם אין העלאה.',
+          'en': 'Publish prayer times, meals and holiday photos. Gallery albums stay empty until you upload.',
+          'ru': 'Опубликуйте часы молитв, трапезы и фото праздника. Альбомы пусты, пока нет загрузки.',
+        }, lang),
+      ));
+    }
+    return out;
   }
 
   void addCampaign(Loc campaign) {

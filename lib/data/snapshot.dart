@@ -483,6 +483,7 @@ Map<String, dynamic> shiurToJson(Shiur s) => {
       'topic': locTo(s.topic),
       'durationMinutes': s.durationMinutes,
       'date': s.date.toIso8601String(),
+      'youtubeUrl': s.youtubeUrl,
     };
 
 Shiur shiurFromJson(dynamic raw) {
@@ -494,6 +495,7 @@ Shiur shiurFromJson(dynamic raw) {
     topic: locFrom(m['topic']),
     durationMinutes: (m['durationMinutes'] as num?)?.toInt() ?? 40,
     date: DateTime.tryParse('${m['date']}') ?? DateTime.now(),
+    youtubeUrl: '${m['youtubeUrl'] ?? ''}',
   );
 }
 

@@ -26,7 +26,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
   void initState() {
     super.initState();
     _tg.loadSaved();
-    _channel.text = _tg.channel.isEmpty ? '' : '@${_tg.channel}';
+    _channel.text = _tg.channel.isEmpty ? '@jewishsib' : '@${_tg.channel}';
     if (_tg.hasToken) {
       _token.text = _tg.maskedToken;
       _botLabel = _tg.maskedToken;
@@ -218,7 +218,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
             controller: _channel,
             decoration: InputDecoration(
               labelText: loc.t('admin.tg.channel'),
-              hintText: '@mychannel',
+              hintText: '@jewishsib',
               prefixIcon: const Icon(Icons.campaign_outlined),
             ),
           ),

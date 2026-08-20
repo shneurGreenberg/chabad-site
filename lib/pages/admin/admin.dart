@@ -17,6 +17,7 @@ import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
 import 'appearance_panel.dart';
 import 'banners_panel.dart';
 import 'content_panels.dart';
+import 'reminders_banner.dart';
 import 'settings_panel.dart';
 import 'telegram_panel.dart';
 
@@ -273,6 +274,9 @@ class _AdminShellState extends State<AdminShell> {
               children: [
                 _topBar(context, loc, sections[_index].title, narrow),
                 const _CloudSyncBar(),
+                AdminRemindersBanner(
+                  onJump: (jump) => setState(() => _index = _jumpIndex(jump)),
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -367,6 +371,15 @@ class _AdminShellState extends State<AdminShell> {
       ),
     );
   }
+
+  int _jumpIndex(AdminJump jump) => switch (jump) {
+        AdminJump.news => 5,
+        AdminJump.programs => 6,
+        AdminJump.gallery => 8,
+        AdminJump.library => 11,
+        AdminJump.bots => 15,
+        AdminJump.banners => 4,
+      };
 
   Future<void> _publish(BuildContext context, LocaleController loc) async {
     final err = await context.read<AppRepository>().publishToCloud();
