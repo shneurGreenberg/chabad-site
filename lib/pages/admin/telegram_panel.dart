@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/repository.dart';
-import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../services/telegram.dart';
 import '../../theme.dart';
