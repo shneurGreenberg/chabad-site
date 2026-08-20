@@ -71,6 +71,7 @@ flutter:
     - assets/data/kaddish_novosibirsk.json
     - assets/images/beit-menachem-1.jpg
     - assets/images/beit-menachem-2.jpg
+    - assets/images/chabad-emblem.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

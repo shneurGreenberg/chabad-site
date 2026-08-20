@@ -144,3 +144,32 @@ extension HoverWidgetX on Widget {
   Widget hoverScale({double scale = 1.05, bool underline = false}) =>
       HoverScale(scale: scale, underline: underline, child: this);
 }
+
+/// Exposes whether the pointer is over [builder]'s child.
+class HoverAware extends StatefulWidget {
+  const HoverAware({super.key, required this.builder});
+  final Widget Function(bool hovering) builder;
+
+  @override
+  State<HoverAware> createState() => _HoverAwareState();
+}
+
+class _HoverAwareState extends State<HoverAware> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        if (!_hovering) setState(() => _hovering = true);
+      },
+      onExit: (_) {
+        if (_hovering) setState(() => _hovering = false);
+      },
+      onHover: (_) {
+        if (!_hovering) setState(() => _hovering = true);
+      },
+      child: widget.builder(_hovering),
+    );
+  }
+}

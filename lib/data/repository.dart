@@ -70,6 +70,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> _boot() async {
+    await TelegramService.instance.loadSavedAsync();
     await CloudSync.instance.init();
     await _hydrate();
     await _loadKaddishGraves();
@@ -251,13 +252,13 @@ class AppRepository extends ChangeNotifier {
     NewsArticle(
       id: _newId(),
       title: {
-        'he': 'ליד אור אבנר — חינוך יהודי בנובוסיבירסק',
+        'he': 'בית ספר אור אבנר — חינוך יהודי בנובוסיבירסק',
         'en': 'Or Avner — Jewish education in Novosibirsk',
         'ru': 'Лицей «Ор Авнер» — еврейское образование',
       },
       body: {
         'he':
-            'מאז ספטמבר 2000 פועל ליד אור אבנר עם גן לגילאי 3–6, ביוזמת הרב זקלס. הילדים משתתפים בכל חגי הקהילה, ובוגרים ממשיכים ללימודים ברוסיה ובישראל. כתובת: רחוב שקספיר 9ב.',
+            'מאז ספטמבר 2000 פועל בית ספר אור אבנר עם גן לגילאי 3–6, ביוזמת הרב זקלס. הילדים משתתפים בכל חגי הקהילה, ובוגרים ממשיכים ללימודים ברוסיה ובישראל. כתובת: רחוב שקספיר 9ב.',
         'en':
             'Since September 2000 Or Avner school and a preschool for ages 3–6 have operated at Rabbi Zaklos\'s initiative. Children take part in every communal holiday; graduates continue studies in Russia and Israel. Address: 9b Shakspira St.',
         'ru':
@@ -440,24 +441,14 @@ class AppRepository extends ChangeNotifier {
   // Zmanim
   // ---------------------------------------------------------------------------
   final List<Zman> zmanim = [
-    Zman(name: {'he': 'עלות השחר', 'en': 'Dawn', 'ru': 'Рассвет'}, time: '04:52'),
-    Zman(
-        name: {'he': 'הנץ החמה', 'en': 'Sunrise', 'ru': 'Восход'},
-        time: '05:58'),
-    Zman(
-        name: {'he': 'סוף זמן ק"ש', 'en': 'Latest Shema', 'ru': 'Крайний Шма'},
-        time: '09:14'),
-    Zman(
-        name: {'he': 'חצות היום', 'en': 'Midday', 'ru': 'Полдень'},
-        time: '12:41'),
-    Zman(
-        name: {'he': 'מנחה גדולה', 'en': 'Mincha Gedola', 'ru': 'Минха гдола'},
-        time: '13:15'),
-    Zman(
-        name: {'he': 'שקיעה', 'en': 'Sunset', 'ru': 'Закат'}, time: '19:24'),
-    Zman(
-        name: {'he': 'צאת הכוכבים', 'en': 'Nightfall', 'ru': 'Появление звёзд'},
-        time: '19:52'),
+    Zman(name: {'he': 'עלות השחר', 'en': 'Dawn', 'ru': 'Рассвет'}, time: '04:52', kind: ZmanKind.dawn),
+    Zman(name: {'he': 'הנץ החמה', 'en': 'Sunrise', 'ru': 'Восход'}, time: '05:58', kind: ZmanKind.sunrise),
+    Zman(name: {'he': 'סוף זמן ק"ש', 'en': 'Latest Shema', 'ru': 'Крайний Шма'}, time: '09:14', kind: ZmanKind.shema),
+    Zman(name: {'he': 'סוף זמן תפילה', 'en': 'Latest Shacharit', 'ru': 'Крайняя Шахарит'}, time: '09:50', kind: ZmanKind.shacharit),
+    Zman(name: {'he': 'חצות היום', 'en': 'Midday', 'ru': 'Полдень'}, time: '12:41', kind: ZmanKind.midday),
+    Zman(name: {'he': 'מנחה גדולה', 'en': 'Mincha Gedola', 'ru': 'Минха гдола'}, time: '13:15', kind: ZmanKind.mincha),
+    Zman(name: {'he': 'שקיעה', 'en': 'Sunset', 'ru': 'Закат'}, time: '19:24', kind: ZmanKind.sunset),
+    Zman(name: {'he': 'צאת הכוכבים', 'en': 'Nightfall', 'ru': 'Появление звёзд'}, time: '19:52', kind: ZmanKind.stars),
   ];
 
   final Map<String, String> shabbat = {
@@ -526,7 +517,7 @@ class AppRepository extends ChangeNotifier {
     ),
     Program(
       id: _newId(),
-      title: {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
+      title: {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
       description: {
         'he': 'בית ספר יהודי עם גן לגילאי 3–6. פועל מאז 2000 ברחוב שקספיר 9ב.',
         'en': 'Jewish school with preschool for ages 3–6. Operating since 2000 at 9b Shakspira St.',
@@ -632,14 +623,8 @@ class AppRepository extends ChangeNotifier {
   ];
 
   // ---------------------------------------------------------------------------
-  // Gallery + face tags
+  // Gallery
   // ---------------------------------------------------------------------------
-  final List<String> faces = [
-    'Rabbi Zaklos',
-    'Rebbetzin Miriam',
-    'Sender Kruglov',
-  ];
-
   late final List<GalleryPhoto> gallery = [
     GalleryPhoto(
       id: _newId(),
@@ -663,7 +648,7 @@ class AppRepository extends ChangeNotifier {
   // Famous Jews
   // ---------------------------------------------------------------------------
   late final List<FamousPerson> famous = [
-    FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם ליד אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
+    FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם בית ספר אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
     FamousPerson(id: _newId(), name: {'he': 'הרבנית מרים זקלס', 'en': 'Rebbetzin Miriam Zaklos', 'ru': 'Раббанит Мириам Заклос'}, profession: {'he': 'שליחת חב״ד', 'en': 'Chabad emissary', 'ru': 'Посланница Хабада'}, bio: {'he': 'שותפה לשליחות בנובוסיבירסק מאז 1999. מובילה חינוך, חגים וחיי הקהילה לצד הרב.', 'en': 'Partner in the Novosibirsk shlichut since 1999. Leads education, holidays and community life alongside the Rabbi.', 'ru': 'Вместе с раввином на миссии с 1999 года. Образование, праздники и жизнь общины.'}, era: Era.present, color: 0xFFDB2777, initials: 'MZ'),
     FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'נשיא הקהילה', 'en': 'President of the community', 'ru': 'Президент общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 נשיא קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since June 2019 president of the Beit Menachem community.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с июня 2019 президент общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
   ];
@@ -678,17 +663,32 @@ class AppRepository extends ChangeNotifier {
       'https://synagogue-kadish-shneur.amvera.io/photos/';
 
   Future<void> _loadKaddishGraves() async {
-    if (_gravesEdited && graves.isNotEmpty) return;
     try {
       final raw = await rootBundle.loadString(_kaddishAsset);
       final list = jsonDecode(raw);
       if (list is! List) return;
-      graves
-        ..clear()
-        ..addAll([
-          for (final item in list)
-            if (item is Map) _graveFromKaddish(Map<String, dynamic>.from(item)),
-        ]);
+      final fromFile = [
+        for (final item in list)
+          if (item is Map) _graveFromKaddish(Map<String, dynamic>.from(item)),
+      ];
+      if (graves.isEmpty || !_gravesEdited) {
+        graves
+          ..clear()
+          ..addAll(fromFile);
+        return;
+      }
+      final byId = {for (final g in fromFile) g.id: g};
+      for (final g in graves) {
+        final src = byId[g.id];
+        if (src == null) continue;
+        if (g.photoUrl == null || g.photoUrl!.trim().isEmpty) {
+          g.photoUrl = src.photoUrl;
+        }
+      }
+      final have = {for (final g in graves) g.id};
+      for (final g in fromFile) {
+        if (have.add(g.id)) graves.add(g);
+      }
     } catch (_) {}
   }
 
@@ -734,7 +734,7 @@ class AppRepository extends ChangeNotifier {
     HistoryEvent(year: '1926', title: {'he': 'נובוסיבירסק', 'en': 'The city is renamed', 'ru': 'Город переименован'}, description: {'he': 'שם העיר משתנה לנובוסיבירסק. החיים היהודיים ממשיכים תחת לחץ סובייטי גובר.', 'en': 'The city is renamed Novosibirsk. Jewish life continues under growing Soviet pressure.', 'ru': 'Город получает имя Новосибирск. Еврейская жизнь — под нарастающим советским давлением.'}),
     HistoryEvent(year: '1990s', title: {'he': 'התחדשות', 'en': 'Revival', 'ru': 'Возрождение'}, description: {'he': 'עם הפשרה הפוליטית הקהילה מתחדשת ומצטרפת לפדרציית הקהילות היהודיות ברוסיה (FEOR). פועלים גם הסוכנות היהודית וחסד «אתיקווה».', 'en': 'With political thaw the community revives and joins FEOR. The Jewish Agency and Hesed Atikva also operate in the city.', 'ru': 'С оттепелью община возрождается и входит в ФЕОР. Работают Сохнут и хесед «Атиква».'}),
     HistoryEvent(year: '1999', title: {'he': 'שליחות חב״ד', 'en': 'Chabad arrives', 'ru': 'Приезд Хабада'}, description: {'he': 'הרב שניאור זלמן זקלס מגיע לעיר כרב מוסמך ראשון בהיסטוריה של נובוסיבירסק, שליח הרבי מליובאוויטש. העירייה מקצה קרקע במרכז העיר לבית כנסת.', 'en': 'Rabbi Shneur Zalman Zaklos arrives as the first ordained rabbi in the city\'s history, a Chabad emissary. The municipality grants land downtown for a synagogue.', 'ru': 'Раввин Шнеур Залман Заклос — первый дипломированный раввин в истории города, посланник Ребе. Мэрия выделяет участок в центре под синагогу.'}),
-    HistoryEvent(year: '2000', title: {'he': 'אור אבנר', 'en': 'Or Avner', 'ru': 'Ор Авнер'}, description: {'he': 'נפתח הליד היהודי אור אבנר עם גן לגיל הרך.', 'en': 'Or Avner Jewish school and preschool open.', 'ru': 'Открывается еврейский лицей «Ор Авнер» с дошкольной группой.'}),
+    HistoryEvent(year: '2000', title: {'he': 'אור אבנר', 'en': 'Or Avner', 'ru': 'Ор Авнер'}, description: {'he': 'נפתח בית הספר היהודי אור אבנר עם גן לגיל הרך.', 'en': 'Or Avner Jewish school and preschool open.', 'ru': 'Открывается еврейский лицей «Ор Авнер» с дошкольной группой.'}),
     HistoryEvent(year: '2013', title: {'he': 'חנוכת בית מנחם', 'en': 'Beit Menachem opens', 'ru': 'Открытие Бейт Менахем'}, description: {'he': 'ב־28 באוגוסט נחנך המרכז (~3,400 מ״ר) ברחוב שצ׳טינקינה 68, על שם הרבי. בטקס: הרב ברל לזר, ראש העיר גורודצקי, ויותר מאלף אורחים. הבנייה נמשכה כ־13 שנה מתרומות.', 'en': 'On 28 August the ~3,400 m² center at 68 Shchetinkina St. opens, named for the Rebbe. Chief Rabbi Berel Lazar, Mayor Gorodetsky and 1,000+ guests attend. Construction took about 13 years, funded by donations.', 'ru': '28 августа открыт центр (~3400 м²) на ул. Щетинкина, 68, в честь Ребе. Берл Лазар, мэр Городецкий и более тысячи гостей. Строительство около 13 лет на пожертвования.'}),
     HistoryEvent(year: 'today', title: {'he': 'קהילה חיה בסיביר', 'en': 'A living community in Siberia', 'ru': 'Живая община Сибири'}, description: {'he': 'תפילות יומיות, מקווה, חנות כשרה, נוער, אור אבנר ומרכז לב. באזור כ־12,000 יהודים. בית מנחם הוא הבית הרוחני של יהדות נובוסיבירסק.', 'en': 'Daily prayers, mikveh, kosher shop, youth, Or Avner and Lev. About 12,000 Jews in the region. Beit Menachem is the spiritual home of Novosibirsk Jewry.', 'ru': 'Ежедневные молитвы, миква, кошерный магазин, молодёжь, «Ор Авнер» и «Лев». Около 12 000 евреев в регионе. Бейт Менахем — духовный дом евреев Новосибирска.'}),
   ];
@@ -742,7 +742,7 @@ class AppRepository extends ChangeNotifier {
   late final List<TourStop> tour = [
     TourStop(id: _newId(), name: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, description: {'he': 'בית הכנסת והמרכז הקהילתי, רחוב שצ׳טינקינה 68. כיפה ומגן דוד — לב יהדות נובוסיבירסק.', 'en': 'Synagogue and community center, 68 Shchetinkina St. Dome and Star of David — the heart of Novosibirsk Jewry.', 'ru': 'Синагога и общинный центр, ул. Щетинкина, 68. Купол и звезда Давида — сердце еврейского Новосибирска.'}, color: 0xFF1D4ED8, icon: Icons.synagogue),
     TourStop(id: _newId(), name: {'he': 'מקווה וחנות כשרה', 'en': 'Mikveh & kosher shop', 'ru': 'Миква и кошерный магазин'}, description: {'he': 'בתוך אותו בניין: מקווה לגברים ולנשים, חנות כשרה ואולם אירועים.', 'en': 'In the same building: men\'s and women\'s mikveh, kosher shop and banquet hall.', 'ru': 'В том же здании: миквы, кошерный магазин и праздничный зал.'}, color: 0xFF0D9488, icon: Icons.water_drop),
-    TourStop(id: _newId(), name: {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'}, description: {'he': 'בית הספר היהודי וגן הילדים, רחוב שקספיר 9ב.', 'en': 'The Jewish school and preschool, 9b Shakspira St.', 'ru': 'Еврейский лицей и детская группа, ул. Шекспира, 9Б.'}, color: 0xFF3B82F6, icon: Icons.school),
+    TourStop(id: _newId(), name: {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'}, description: {'he': 'בית הספר היהודי וגן הילדים, רחוב שקספיר 9ב.', 'en': 'The Jewish school and preschool, 9b Shakspira St.', 'ru': 'Еврейский лицей и детская группа, ул. Шекспира, 9Б.'}, color: 0xFF3B82F6, icon: Icons.school),
     TourStop(id: _newId(), name: {'he': 'מרכז לב', 'en': 'Lev center', 'ru': 'Центр Лев'}, description: {'he': 'מרכז לילדים עם צרכים מיוחדים ובריכה, רחוב שקספיר 9א.', 'en': 'Center for children with special needs and a pool, 9a Shakspira St.', 'ru': 'Центр для детей с ОВЗ и бассейн, ул. Шекспира, 9А.'}, color: 0xFFEC4899, icon: Icons.favorite),
   ];
 
@@ -895,7 +895,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   final List<Loc> campaigns = [
     {'he': 'החזקת בית מנחם', 'en': 'Beit Menachem upkeep', 'ru': 'Содержание Бейт Менахем'},
-    {'he': 'ליד אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
+    {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
     {'he': 'מרכז לב', 'en': 'Lev special-needs center', 'ru': 'Центр Лев'},
     {'he': 'חסד ומצות לפסח', 'en': 'Chesed & Passover matzah', 'ru': 'Хесед и маца к Песаху'},
     {'he': 'הימים הנוראים תשפ״ז', 'en': 'High Holidays 5787', 'ru': 'Высокие праздники 5787'},
@@ -1451,22 +1451,87 @@ class AppRepository extends ChangeNotifier {
     return banners['/'] ?? PageBanner();
   }
 
-  void setBannerImage(String route, Uint8List bytes) {
+  void setBannerImage(String route, Uint8List bytes) =>
+      addBannerSlide(route, bytes);
+
+  void addBannerSlide(String route, Uint8List bytes) {
     final current = banners.putIfAbsent(route, PageBanner.new);
-    current.bytes = compressSiteImage(bytes);
-    current.imageUrl = null;
+    final compressed = compressSiteImage(bytes);
+    if (!current.hasImage) {
+      current.bytes = compressed;
+      current.imageUrl = null;
+      current.alignY = -0.2;
+    } else {
+      current.extra.add(BannerSlide(bytes: compressed, alignY: -0.2));
+    }
     notifyListeners();
   }
 
-  void setBannerAlign(String route, {double? x, double? y}) {
+  void removeBannerSlide(String route, int index) {
+    final current = banners[route];
+    if (current == null) return;
+    if (index <= 0) {
+      if (current.extra.isNotEmpty) {
+        final next = current.extra.removeAt(0);
+        current.bytes = next.bytes;
+        current.imageUrl = next.imageUrl;
+        current.alignX = next.alignX;
+        current.alignY = next.alignY;
+      } else {
+        current.bytes = null;
+        current.imageUrl = null;
+      }
+    } else {
+      final i = index - 1;
+      if (i >= 0 && i < current.extra.length) current.extra.removeAt(i);
+    }
+    notifyListeners();
+  }
+
+  void setBannerAlign(String route, {double? x, double? y}) =>
+      setSlideAlign(route, 0, x: x, y: y);
+
+  void setSlideAlign(String route, int index, {double? x, double? y}) {
     final current = banners.putIfAbsent(route, PageBanner.new);
-    if (x != null) current.alignX = x;
-    if (y != null) current.alignY = y;
+    if (index <= 0) {
+      if (x != null) current.alignX = x;
+      if (y != null) current.alignY = y;
+    } else {
+      final i = index - 1;
+      if (i < 0) return;
+      while (current.extra.length <= i) {
+        current.extra.add(BannerSlide());
+      }
+      if (x != null) current.extra[i].alignX = x;
+      if (y != null) current.extra[i].alignY = y;
+    }
     notifyListeners();
   }
 
   void clearBanner(String route) {
     banners[route] = PageBanner();
+    notifyListeners();
+  }
+
+  Uint8List? emblemBytes;
+  String? emblemUrl = 'assets/images/chabad-emblem.png';
+
+  bool get hasCustomEmblem =>
+      (emblemBytes != null && emblemBytes!.isNotEmpty) ||
+      (emblemUrl != null &&
+          emblemUrl!.isNotEmpty &&
+          emblemUrl != 'assets/images/chabad-emblem.png');
+
+  void setEmblemImage(Uint8List bytes) {
+    emblemBytes = compressSiteImage(bytes);
+    emblemUrl = null;
+    notifyListeners();
+  }
+
+  void clearEmblem() {
+    emblemBytes = null;
+    emblemUrl = 'assets/images/chabad-emblem.png';
+    unawaited(persistDelete('${_imgPrefix}emblem:logo'));
     notifyListeners();
   }
 
@@ -1625,6 +1690,7 @@ class AppRepository extends ChangeNotifier {
         'banners': {
           for (final e in banners.entries) e.key: bannerToJson(e.value),
         },
+        if (emblemUrl != null && emblemUrl!.isNotEmpty) 'emblemUrl': emblemUrl,
         'cart': _cart,
         'leads': [for (final l in leads) leadToJson(l)],
         'donations': [for (final d in donations) donationToJson(d)],
@@ -1669,6 +1735,8 @@ class AppRepository extends ChangeNotifier {
         banners[e.key] = bannerFromJson(e.value);
       }
     }
+    final emblem = '${m['emblemUrl'] ?? ''}'.trim();
+    if (emblem.isNotEmpty) emblemUrl = emblem;
     if (m['cart'] is Map) {
       _cart
         ..clear()
@@ -1870,8 +1938,28 @@ class AppRepository extends ChangeNotifier {
             !incoming.imageUrl!.startsWith('assets/')) {
           current.imageUrl = incoming.imageUrl;
         }
+        if (incoming.alignX != 0) current.alignX = incoming.alignX;
+        if (incoming.alignY != 0) current.alignY = incoming.alignY;
+        for (var i = 0; i < incoming.extra.length; i++) {
+          while (current.extra.length <= i) {
+            current.extra.add(BannerSlide());
+          }
+          final src = incoming.extra[i];
+          if (src.bytes != null && src.bytes!.isNotEmpty) {
+            current.extra[i].bytes = src.bytes;
+          }
+          if (src.imageUrl != null &&
+              src.imageUrl!.isNotEmpty &&
+              !src.imageUrl!.startsWith('assets/')) {
+            current.extra[i].imageUrl = src.imageUrl;
+          }
+          current.extra[i].alignX = src.alignX;
+          current.extra[i].alignY = src.alignY;
+        }
       }
     }
+    final emblem = '${m['emblemUrl'] ?? ''}'.trim();
+    if (emblem.isNotEmpty && emblemBytes == null) emblemUrl = emblem;
   }
 
   _UploadKeep _captureUploads() => _UploadKeep(
@@ -1886,8 +1974,16 @@ class AppRepository extends ChangeNotifier {
         ],
         banners: {
           for (final e in banners.entries)
-            if (_hasBytes(e.value.bytes)) e.key: e.value.bytes!,
+            if (e.value.hasImage)
+              e.key: PageBanner(
+                bytes: e.value.bytes,
+                imageUrl: e.value.imageUrl,
+                alignX: e.value.alignX,
+                alignY: e.value.alignY,
+                extra: [for (final s in e.value.extra) s.copy()],
+              ),
         },
+        emblemBytes: emblemBytes,
       );
 
   void _restoreUploads(_UploadKeep saved) {
@@ -1939,7 +2035,22 @@ class AppRepository extends ChangeNotifier {
       }
     }
     for (final e in saved.banners.entries) {
-      banners.putIfAbsent(e.key, PageBanner.new).bytes = e.value;
+      final current = banners.putIfAbsent(e.key, PageBanner.new);
+      if (!_hasBytes(current.bytes) && _hasBytes(e.value.bytes)) {
+        current.bytes = e.value.bytes;
+      }
+      for (var i = 0; i < e.value.extra.length; i++) {
+        while (current.extra.length <= i) {
+          current.extra.add(BannerSlide());
+        }
+        if (!_hasBytes(current.extra[i].bytes) &&
+            _hasBytes(e.value.extra[i].bytes)) {
+          current.extra[i].bytes = e.value.extra[i].bytes;
+        }
+      }
+    }
+    if (!_hasBytes(emblemBytes) && _hasBytes(saved.emblemBytes)) {
+      emblemBytes = saved.emblemBytes;
     }
   }
 
@@ -1981,6 +2092,15 @@ class AppRepository extends ChangeNotifier {
     for (final e in banners.entries) {
       final b = e.value.bytes;
       if (b != null && b.isNotEmpty) out['banner:${e.key}'] = b;
+      for (var i = 0; i < e.value.extra.length; i++) {
+        final sb = e.value.extra[i].bytes;
+        if (sb != null && sb.isNotEmpty) {
+          out['banner:${e.key}|$i'] = sb;
+        }
+      }
+    }
+    if (emblemBytes != null && emblemBytes!.isNotEmpty) {
+      out['emblem:logo'] = emblemBytes!;
     }
     for (final a in news) {
       final b = a.imageBytes;
@@ -2014,7 +2134,20 @@ class AppRepository extends ChangeNotifier {
     final id = key.substring(i + 1);
     switch (kind) {
       case 'banner':
-        banners.putIfAbsent(id, PageBanner.new).bytes = bytes;
+        final pipe = id.lastIndexOf('|');
+        if (pipe > 0 && int.tryParse(id.substring(pipe + 1)) != null) {
+          final route = id.substring(0, pipe);
+          final idx = int.parse(id.substring(pipe + 1));
+          final b = banners.putIfAbsent(route, PageBanner.new);
+          while (b.extra.length <= idx) {
+            b.extra.add(BannerSlide());
+          }
+          b.extra[idx].bytes = bytes;
+        } else {
+          banners.putIfAbsent(id, PageBanner.new).bytes = bytes;
+        }
+      case 'emblem':
+        emblemBytes = bytes;
       case 'news':
         final existing = news.where((a) => a.id == id);
         if (existing.isNotEmpty) {
@@ -2175,10 +2308,12 @@ class _UploadKeep {
     required this.products,
     required this.gallery,
     required this.banners,
+    this.emblemBytes,
   });
   final List<NewsArticle> news;
   final List<Program> programs;
   final List<Product> products;
   final List<GalleryPhoto> gallery;
-  final Map<String, Uint8List> banners;
+  final Map<String, PageBanner> banners;
+  final Uint8List? emblemBytes;
 }

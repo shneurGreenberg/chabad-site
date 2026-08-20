@@ -132,7 +132,7 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Лет миссии Хабада'
   },
   'home.stats.meals': {
-    'he': 'ליד אור אבנר',
+    'he': 'בית ספר אור אבנר',
     'en': 'Or Avner school since',
     'ru': 'Лицей Ор Авнер с'
   },
@@ -432,7 +432,7 @@ const Map<String, Map<String, String>> _strings = {
   },
   'about.story.body': {
     'he':
-        'בית מנחם הוא המרכז הקהילתי היהודי ובית הכנסת בנובוסיבירסק. הוא נקרא על שם הרבי מליובאוויטש, רבי מנחם מנדל שניאורסון. בראש הקהילה עומדים שליחי חב״ד הרב שניאור זלמן זקלס ורעייתו הרבנית מרים. המבנה נחנך ב־28 באוגוסט 2013: בית כנסת, מקווה לגברים ולנשים, ספרייה, אולם אירועים, חנות כשרה ומרכז ילדים. ליד הקהילה פועלים ליד אור אבנר (משנת 2000) ומרכז «לב» לילדים עם צרכים מיוחדים.',
+        'בית מנחם הוא המרכז הקהילתי היהודי ובית הכנסת בנובוסיבירסק. הוא נקרא על שם הרבי מליובאוויטש, רבי מנחם מנדל שניאורסון. בראש הקהילה עומדים שליחי חב״ד הרב שניאור זלמן זקלס ורעייתו הרבנית מרים. המבנה נחנך ב־28 באוגוסט 2013: בית כנסת, מקווה לגברים ולנשים, ספרייה, אולם אירועים, חנות כשרה ומרכז ילדים. ליד הקהילה פועל בית ספר אור אבנר (משנת 2000) ומרכז «לב» לילדים עם צרכים מיוחדים.',
     'en':
         'Beit Menachem is the Jewish community center and synagogue in Novosibirsk, named for the Lubavitcher Rebbe, Rabbi Menachem Mendel Schneerson. It is led by Chabad emissaries Rabbi Shneur Zalman Zaklos and Rebbetzin Miriam. The building opened on 28 August 2013: sanctuary, men\'s and women\'s mikveh, library, banquet hall, kosher shop and children\'s center. The community also runs Or Avner school (since 2000) and the Lev center for children with special needs.',
     'ru':
@@ -743,9 +743,39 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Синий баннер по умолчанию'
   },
   'admin.banners.hint': {
-    'he': 'גררו את המחוונים כדי לבחור איזה חלק מהתמונה יוצג. מה שמחוץ למסגרת ייחתך.',
-    'en': 'Drag the sliders to choose which part of the photo is shown. Anything outside the frame is cropped.',
-    'ru': 'Ползунки выбирают видимую часть фото. Всё за рамкой обрезается.'
+    'he': 'גררו את המחוונים כדי לבחור איזה חלק מהתמונה יוצג. מה שמחוץ למסגרת ייחתך. אפשר כמה תמונות — הן יתחלפו לבד.',
+    'en': 'Drag the sliders to choose which part of the photo is shown. You can add several photos — they rotate by themselves.',
+    'ru': 'Ползунки выбирают видимую часть фото. Можно несколько снимков — они будут сменяться.'
+  },
+  'admin.banners.addSlide': {
+    'he': 'הוספת תמונה',
+    'en': 'Add photo',
+    'ru': 'Добавить фото'
+  },
+  'admin.banners.slide': {
+    'he': 'תמונה',
+    'en': 'Slide',
+    'ru': 'Слайд'
+  },
+  'admin.emblem': {
+    'he': 'סמל חב״ד',
+    'en': 'Chabad emblem',
+    'ru': 'Эмблема Хабада'
+  },
+  'admin.emblem.hint': {
+    'he': 'מופיע בכותרת ובתחתית האתר. אפשר להחליף בתמונה משלכם.',
+    'en': 'Shown in the header and footer. You can replace it with your own image.',
+    'ru': 'В шапке и подвале сайта. Можно заменить своим изображением.'
+  },
+  'admin.emblem.upload': {
+    'he': 'החלפת סמל',
+    'en': 'Replace emblem',
+    'ru': 'Заменить эмблему'
+  },
+  'admin.emblem.reset': {
+    'he': 'סמל ברירת מחדל',
+    'en': 'Default emblem',
+    'ru': 'Эмблема по умолчанию'
   },
   'admin.recent': {
     'he': 'פעילות אחרונה',
@@ -760,8 +790,8 @@ const Map<String, Map<String, String>> _strings = {
   },
   'admin.translate.ok': {
     'he': 'התרגום מולא בשדות הריקים',
-    'en': 'Empty fields were filled from Hebrew',
-    'ru': 'Пустые поля заполнены с иврита'
+    'en': 'Empty fields were filled from the language you wrote',
+    'ru': 'Пустые поля заполнены с введённого языка'
   },
   'admin.translate.skip': {
     'he': 'אין שדות ריקים למילוי',

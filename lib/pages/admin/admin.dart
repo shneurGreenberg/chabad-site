@@ -1294,12 +1294,10 @@ class _GalleryEditorState extends State<_GalleryEditor> {
   };
   late final _year =
       TextEditingController(text: '${widget.photo.year}');
-  late final _tags =
-      TextEditingController(text: widget.photo.tags.join(', '));
 
   @override
   void dispose() {
-    for (final c in [..._event.values, _year, _tags]) {
+    for (final c in [..._event.values, _year]) {
       c.dispose();
     }
     super.dispose();
@@ -1342,11 +1340,6 @@ class _GalleryEditorState extends State<_GalleryEditor> {
                     controller: _year,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(labelText: loc.t('gallery.year')),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _tags,
-                    decoration: InputDecoration(labelText: loc.t('gallery.tagged')),
                   ),
                 ]),
               ),
@@ -1393,11 +1386,6 @@ class _GalleryEditorState extends State<_GalleryEditor> {
       widget.photo.event[l] = _event[l]!.text;
     }
     widget.photo.year = int.tryParse(_year.text) ?? widget.photo.year;
-    widget.photo.tags = _tags.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
     if (widget.isNew) {
       widget.repo.addGalleryPhoto(widget.photo);
     } else {

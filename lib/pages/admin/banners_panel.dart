@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
+import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 
@@ -16,6 +17,8 @@ class BannersPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const _EmblemEditor(),
+        const SizedBox(height: 22),
         Text(loc.t('admin.banners.subtitle'),
             style: TextStyle(color: AppColors.muted, height: 1.45, fontSize: 15)),
         const SizedBox(height: 8),
@@ -27,6 +30,70 @@ class BannersPanel extends StatelessWidget {
           const SizedBox(height: 18),
         ],
       ],
+    );
+  }
+}
+
+class _EmblemEditor extends StatelessWidget {
+  const _EmblemEditor();
+
+  Future<void> _pick(BuildContext context) async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      imageQuality: 92,
+    );
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (!context.mounted) return;
+    context.read<AppRepository>().setEmblemImage(bytes);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const ChabadEmblem(size: 64),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(loc.t('admin.emblem'),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w800, fontSize: 17)),
+                const SizedBox(height: 4),
+                Text(loc.t('admin.emblem.hint'),
+                    style: TextStyle(color: AppColors.muted, height: 1.4)),
+              ],
+            ),
+          ),
+          FilledButton.icon(
+            onPressed: () => _pick(context),
+            icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+            label: Text(loc.t('admin.emblem.upload')),
+          ).hoverLift(),
+          if (repo.hasCustomEmblem)
+            OutlinedButton.icon(
+              onPressed: repo.clearEmblem,
+              icon: const Icon(Icons.restart_alt, size: 18),
+              label: Text(loc.t('admin.emblem.reset')),
+            ).hoverLift(),
+        ],
+      ),
     );
   }
 }
@@ -45,7 +112,7 @@ class _BannerEditor extends StatelessWidget {
     if (picked == null) return;
     final bytes = await picked.readAsBytes();
     if (!context.mounted) return;
-    repo.setBannerImage(slot.route, bytes);
+    repo.addBannerSlide(slot.route, bytes);
   }
 
   @override
@@ -53,6 +120,7 @@ class _BannerEditor extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final banner = repo.bannerFor(slot.route);
+    final slides = banner.allSlides;
     final previewH = slot.tall ? 220.0 : 148.0;
 
     return Container(
@@ -79,7 +147,9 @@ class _BannerEditor extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () => _pick(context),
                 icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
-                label: Text(loc.t('admin.banners.upload')),
+                label: Text(slides.isEmpty
+                    ? loc.t('admin.banners.upload')
+                    : loc.t('admin.banners.addSlide')),
               ).hoverLift(),
               if (banner.hasImage)
                 OutlinedButton.icon(
@@ -101,21 +171,8 @@ class _BannerEditor extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  if (banner.bytes != null && banner.bytes!.isNotEmpty)
-                    Image.memory(
-                      banner.bytes!,
-                      fit: BoxFit.cover,
-                      alignment: banner.alignment,
-                      gaplessPlayback: true,
-                    )
-                  else if (banner.imageUrl != null &&
-                      banner.imageUrl!.isNotEmpty)
-                    Image.network(
-                      banner.imageUrl!,
-                      fit: BoxFit.cover,
-                      alignment: banner.alignment,
-                    )
-                  else
+                  BannerFill(banner: banner, positioned: false),
+                  if (!banner.hasImage)
                     Container(
                       decoration:
                           BoxDecoration(gradient: AppColors.heroGradient),
@@ -124,16 +181,6 @@ class _BannerEditor extends StatelessWidget {
                             style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.85),
                                 fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  if (banner.hasImage)
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0x440B1C3A), Color(0x880B1C3A)],
-                        ),
                       ),
                     ),
                   PositionedDirectional(
@@ -152,25 +199,39 @@ class _BannerEditor extends StatelessWidget {
               ),
             ),
           ),
-          if (banner.hasImage) ...[
+          for (var i = 0; i < slides.length; i++) ...[
             const SizedBox(height: 14),
+            Row(
+              children: [
+                Text(
+                  '${loc.t('admin.banners.slide')} ${i + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: loc.t('admin.banners.remove'),
+                  onPressed: () => repo.removeBannerSlide(slot.route, i),
+                  icon: const Icon(Icons.close, size: 18),
+                ),
+              ],
+            ),
             Text(loc.t('admin.banners.alignX'),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
             Slider(
-              value: banner.alignX,
+              value: slides[i].alignX,
               min: -1,
               max: 1,
-              label: banner.alignX.toStringAsFixed(2),
-              onChanged: (v) => repo.setBannerAlign(slot.route, x: v),
+              label: slides[i].alignX.toStringAsFixed(2),
+              onChanged: (v) => repo.setSlideAlign(slot.route, i, x: v),
             ),
             Text(loc.t('admin.banners.alignY'),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
             Slider(
-              value: banner.alignY,
+              value: slides[i].alignY,
               min: -1,
               max: 1,
-              label: banner.alignY.toStringAsFixed(2),
-              onChanged: (v) => repo.setBannerAlign(slot.route, y: v),
+              label: slides[i].alignY.toStringAsFixed(2),
+              onChanged: (v) => repo.setSlideAlign(slot.route, i, y: v),
             ),
           ],
         ],

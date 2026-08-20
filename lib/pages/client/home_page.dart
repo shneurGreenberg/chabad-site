@@ -9,6 +9,7 @@ import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/newsletter.dart';
+import '../../widgets/playful_icons.dart';
 import '../../widgets/site_scaffold.dart';
 
 class HomePage extends StatelessWidget {
@@ -185,7 +186,7 @@ class _Hero extends StatelessWidget {
                   side: const BorderSide(color: Colors.white70, width: 1.4),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 22, vertical: 17)),
-              icon: const Icon(Icons.favorite_border),
+              icon: const PlayfulIcon(Icons.favorite_border, color: Colors.white),
               label: Text(loc.t('home.hero.donate')),
             ).hoverLift(),
           ],
@@ -397,7 +398,7 @@ class _QuickLinks extends StatelessWidget {
                       color: item.$4.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(item.$1, color: item.$4),
+                    child: PlayfulIcon(item.$1, color: item.$4),
                   ),
                   const SizedBox(height: 10),
                   Text(item.$2,
@@ -443,7 +444,7 @@ class _ZmanimStrip extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.schedule, color: AppColors.primary),
+                child: PlayfulIcon(Icons.schedule, color: AppColors.primary),
               ),
               Text(loc.t('home.zmanim.title'),
                   style: Theme.of(context)
@@ -467,10 +468,11 @@ class _ZmanimStrip extends StatelessWidget {
             runSpacing: 12,
             children: [
               for (final z in repo.zmanim.take(5))
-                _zmanChip(trLoc(z.name, loc.lang), z.time, AppColors.primary),
+                _zmanChip(trLoc(z.name, loc.lang), z.time, AppColors.primary,
+                    icon: zmanIconOf(z.kind), kind: playfulKindForZman(z.kind)),
               _zmanChip(loc.t('zmanim.candle'), repo.shabbat['candle']!,
                   AppColors.accent,
-                  icon: Icons.local_fire_department),
+                  icon: Icons.local_fire_department, kind: PlayfulKind.flame),
             ],
           ),
         ],
@@ -478,7 +480,8 @@ class _ZmanimStrip extends StatelessWidget {
     );
   }
 
-  Widget _zmanChip(String name, String time, Color color, {IconData? icon}) {
+  Widget _zmanChip(String name, String time, Color color,
+      {IconData? icon, PlayfulKind? kind}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -488,7 +491,7 @@ class _ZmanimStrip extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         if (icon != null) ...[
-          Icon(icon, size: 16, color: color),
+          PlayfulIcon(icon, size: 16, color: color, kind: kind),
           const SizedBox(width: 6),
         ],
         Text(name, style: TextStyle(color: AppColors.muted, fontSize: 13)),

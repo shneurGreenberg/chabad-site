@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'cors_proxy.dart';
+import 'persist.dart';
 import 'web_prefs.dart';
 
 const _tokenKey = 'chabad_tg_bot_token';
@@ -60,11 +61,35 @@ class TelegramService {
   }
 
   void loadSaved() {
-    _token = readPref(_tokenKey) ?? '';
-    _channel = readPref(_channelKey) ?? '';
-    _offset = int.tryParse(readPref(_offsetKey) ?? '') ?? 0;
-    _botName = readPref(_nameKey) ?? '';
-    _botUser = readPref(_userKey) ?? '';
+    final token = (readPref(_tokenKey) ?? '').trim();
+    if (token.isNotEmpty) _token = token;
+    final channel = (readPref(_channelKey) ?? '').trim();
+    if (channel.isNotEmpty) _channel = channel;
+    final offset = int.tryParse(readPref(_offsetKey) ?? '');
+    if (offset != null) _offset = offset;
+    final name = (readPref(_nameKey) ?? '').trim();
+    if (name.isNotEmpty) _botName = name;
+    final user = (readPref(_userKey) ?? '').trim();
+    if (user.isNotEmpty) _botUser = user;
+  }
+
+  Future<void> loadSavedAsync() async {
+    loadSaved();
+    try {
+      final token = (await persistGet(_tokenKey))?.trim() ?? '';
+      if (token.isNotEmpty) _token = token;
+      final channel = (await persistGet(_channelKey))?.trim() ?? '';
+      if (channel.isNotEmpty) _channel = channel;
+      final offset = int.tryParse((await persistGet(_offsetKey)) ?? '');
+      if (offset != null) _offset = offset;
+      final name = (await persistGet(_nameKey))?.trim() ?? '';
+      if (name.isNotEmpty) _botName = name;
+      final user = (await persistGet(_userKey))?.trim() ?? '';
+      if (user.isNotEmpty) _botUser = user;
+    } catch (_) {}
+    if (_token.isNotEmpty || _channel.isNotEmpty) {
+      await _persistCreds();
+    }
   }
 
   void save({required String token, required String channel}) {
@@ -72,6 +97,17 @@ class TelegramService {
     _channel = normalizeChannel(channel);
     writePref(_tokenKey, _token);
     writePref(_channelKey, _channel);
+    Future<void>.microtask(_persistCreds);
+  }
+
+  Future<void> _persistCreds() async {
+    try {
+      await persistPut(_tokenKey, _token);
+      await persistPut(_channelKey, _channel);
+      await persistPut(_offsetKey, '$_offset');
+      await persistPut(_nameKey, _botName);
+      await persistPut(_userKey, _botUser);
+    } catch (_) {}
   }
 
   static String normalizeChannel(String raw) {
@@ -111,6 +147,7 @@ class TelegramService {
     _botUser = username ?? '';
     writePref(_nameKey, _botName);
     writePref(_userKey, _botUser);
+    await _persistCreds();
 
     String? chatTitle;
     try {

@@ -5,6 +5,7 @@ import '../../models.dart';
 import '../../services/web_prefs.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/cross_origin_image.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 
@@ -181,15 +182,12 @@ class _GravePhoto extends StatelessWidget {
     if (src.isEmpty) return _fallback();
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.network(
-        src,
+      child: CrossOriginImage(
+        url: src,
         width: 72,
         height: 96,
         fit: BoxFit.cover,
-        cacheWidth: imageDecodePx(context, 72),
-        cacheHeight: imageDecodePx(context, 96),
-        filterQuality: FilterQuality.low,
-        errorBuilder: (_, error, stackTrace) => _fallback(),
+        error: _fallback(),
       ),
     );
   }

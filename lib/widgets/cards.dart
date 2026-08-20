@@ -287,9 +287,8 @@ class PersonCard extends StatelessWidget {
 }
 
 class PhotoCard extends StatelessWidget {
-  const PhotoCard(this.photo, {super.key, this.highlightFace});
+  const PhotoCard(this.photo, {super.key});
   final GalleryPhoto photo;
-  final String? highlightFace;
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
@@ -338,23 +337,6 @@ class PhotoCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (photo.tags.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          for (final tag in photo.tags)
-                            Pill(
-                              tag,
-                              icon: Icons.face,
-                              color: tag == highlightFace
-                                  ? AppColors.accent
-                                  : AppColors.primary,
-                            ),
-                        ],
-                      ),
-                    ],
                   ],
                 ),
               ),

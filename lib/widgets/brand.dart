@@ -1,39 +1,62 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../data/repository.dart';
 import '../theme.dart';
 
-/// Classic Chabad-Lubavitch circular emblem: navy disc, gold rings, חב״ד.
+/// Chabad flame emblem (from Chabad.org) on a navy disc, or an admin upload.
 class ChabadEmblem extends StatelessWidget {
   const ChabadEmblem({super.key, this.size = 44});
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    Uint8List? bytes;
+    String? url;
+    try {
+      final repo = context.watch<AppRepository>();
+      bytes = repo.emblemBytes;
+      url = repo.emblemUrl;
+    } catch (_) {
+      url = 'assets/images/chabad-emblem.png';
+    }
+
+    Widget mark;
+    if (bytes != null && bytes.isNotEmpty) {
+      mark = Image.memory(bytes, fit: BoxFit.contain, gaplessPlayback: true);
+    } else if (url != null && url.isNotEmpty) {
+      mark = url.startsWith('assets/')
+          ? Image.asset(url, fit: BoxFit.contain)
+          : Image.network(url, fit: BoxFit.contain);
+    } else {
+      mark = CustomPaint(painter: const _ChabadEmblemPainter());
+    }
+
     return Semantics(
       label: 'חב״ד',
       image: true,
       child: SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(
-          painter: const _ChabadEmblemPainter(),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: size * 0.02),
-              child: Text(
-                'חב״ד',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.accentSoft,
-                  fontSize: size * 0.30,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
-                  letterSpacing: -0.4,
-                ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.primaryDark,
+            border: Border.all(color: AppColors.accent, width: math.max(1.4, size * 0.045)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryDark.withValues(alpha: 0.25),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-            ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(size * 0.18),
+            child: mark,
           ),
         ),
       ),
@@ -56,14 +79,6 @@ class _ChabadEmblemPainter extends CustomPainter {
         ..color = AppColors.accent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2,
-    );
-    canvas.drawCircle(
-      c,
-      r - 4.4,
-      Paint()
-        ..color = AppColors.accentSoft.withValues(alpha: 0.85)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.1,
     );
   }
 

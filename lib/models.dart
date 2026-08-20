@@ -92,11 +92,30 @@ class SiteLocation {
       );
 }
 
+enum ZmanKind {
+  dawn,
+  sunrise,
+  shema,
+  shacharit,
+  midday,
+  mincha,
+  sunset,
+  stars,
+  candle,
+  havdala,
+}
+
 class Zman {
-  Zman({required this.name, required this.time, this.highlight = false});
+  Zman({
+    required this.name,
+    required this.time,
+    this.highlight = false,
+    this.kind = ZmanKind.sunrise,
+  });
   Loc name;
   String time;
   bool highlight;
+  ZmanKind kind;
 }
 
 class Program {
@@ -317,7 +336,7 @@ class SiteCopy {
         },
         aboutBody: {
           'he':
-              'בית מנחם הוא המרכז הקהילתי היהודי ובית הכנסת בנובוסיבירסק. הוא נקרא על שם הרבי מליובאוויטש, רבי מנחם מנדל שניאורסון. בראש הקהילה עומדים שליחי חב״ד הרב שניאור זלמן זקלס ורעייתו הרבנית מרים. המבנה נחנך ב־28 באוגוסט 2013: בית כנסת, מקווה לגברים ולנשים, ספרייה, אולם אירועים, חנות כשרה ומרכז ילדים. ליד הקהילה פועלים ליד אור אבנר (משנת 2000) ומרכז «לב» לילדים עם צרכים מיוחדים.',
+              'בית מנחם הוא המרכז הקהילתי היהודי ובית הכנסת בנובוסיבירסק. הוא נקרא על שם הרבי מליובאוויטש, רבי מנחם מנדל שניאורסון. בראש הקהילה עומדים שליחי חב״ד הרב שניאור זלמן זקלס ורעייתו הרבנית מרים. המבנה נחנך ב־28 באוגוסט 2013: בית כנסת, מקווה לגברים ולנשים, ספרייה, אולם אירועים, חנות כשרה ומרכז ילדים. ליד הקהילה פועל בית ספר אור אבנר (משנת 2000) ומרכז «לב» לילדים עם צרכים מיוחדים.',
           'en':
               'Beit Menachem is the Jewish community center and synagogue in Novosibirsk, named for the Lubavitcher Rebbe, Rabbi Menachem Mendel Schneerson. It is led by Chabad emissaries Rabbi Shneur Zalman Zaklos and Rebbetzin Miriam. The building opened on 28 August 2013: sanctuary, men\'s and women\'s mikveh, library, banquet hall, kosher shop and children\'s center. The community also runs Or Avner school (since 2000) and the Lev center for children with special needs.',
           'ru':
@@ -504,9 +523,14 @@ class ContactInfo {
   List<StaffContact> staff;
 }
 
-/// A photo that replaces the default blue banner on a page.
-class PageBanner {
-  PageBanner({this.bytes, this.imageUrl, this.alignX = 0, this.alignY = 0});
+/// One photo in a page banner (home can rotate through several).
+class BannerSlide {
+  BannerSlide({
+    this.bytes,
+    this.imageUrl,
+    this.alignX = 0,
+    this.alignY = 0,
+  });
   Uint8List? bytes;
   String? imageUrl;
   double alignX;
@@ -516,6 +540,48 @@ class PageBanner {
       (bytes != null && bytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
   Alignment get alignment => Alignment(alignX, alignY);
+
+  BannerSlide copy() => BannerSlide(
+        bytes: bytes,
+        imageUrl: imageUrl,
+        alignX: alignX,
+        alignY: alignY,
+      );
+}
+
+/// A photo that replaces the default blue banner on a page.
+class PageBanner {
+  PageBanner({
+    this.bytes,
+    this.imageUrl,
+    this.alignX = 0,
+    this.alignY = 0,
+    List<BannerSlide>? extra,
+  }) : extra = extra ?? [];
+  Uint8List? bytes;
+  String? imageUrl;
+  double alignX;
+  double alignY;
+  List<BannerSlide> extra;
+
+  bool get hasImage =>
+      (bytes != null && bytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty) ||
+      extra.any((s) => s.hasImage);
+  Alignment get alignment => Alignment(alignX, alignY);
+
+  List<BannerSlide> get allSlides {
+    final out = <BannerSlide>[];
+    final first = BannerSlide(
+      bytes: bytes,
+      imageUrl: imageUrl,
+      alignX: alignX,
+      alignY: alignY,
+    );
+    if (first.hasImage) out.add(first);
+    out.addAll(extra.where((s) => s.hasImage));
+    return out;
+  }
 }
 
 class BannerSlot {

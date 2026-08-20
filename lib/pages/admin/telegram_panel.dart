@@ -28,11 +28,18 @@ class _TelegramWizardState extends State<TelegramWizard> {
   @override
   void initState() {
     super.initState();
-    _tg.loadSaved();
-    _channel.text = _tg.channel.isEmpty ? '@jewishsib' : '@${_tg.channel}';
-    if (_tg.hasToken) {
-      _token.text = _tg.maskedToken;
-    }
+    _restore();
+  }
+
+  Future<void> _restore() async {
+    await _tg.loadSavedAsync();
+    if (!mounted) return;
+    setState(() {
+      _channel.text = _tg.channel.isEmpty ? '@jewishsib' : '@${_tg.channel}';
+      if (_tg.hasToken) {
+        _token.text = _tg.maskedToken;
+      }
+    });
   }
 
   @override

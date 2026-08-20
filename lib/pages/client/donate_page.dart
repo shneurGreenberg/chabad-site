@@ -6,6 +6,7 @@ import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
+import '../../widgets/playful_icons.dart';
 import '../../widgets/site_scaffold.dart';
 
 class DonatePage extends StatefulWidget {
@@ -124,7 +125,7 @@ class _DonatePageState extends State<DonatePage> {
                 backgroundColor: AppColors.accent,
                 foregroundColor: AppColors.primaryDark,
                 minimumSize: const Size.fromHeight(50)),
-            icon: const Icon(Icons.favorite),
+            icon: const PlayfulIcon(Icons.favorite),
             label: Text('${loc.t('donate.give')}  \$${_amount.text}'),
           ).hoverLift(),
         ],

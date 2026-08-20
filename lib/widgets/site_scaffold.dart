@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +10,7 @@ import '../theme.dart';
 import 'brand.dart';
 import 'common.dart';
 import 'hover.dart';
+import 'playful_icons.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
 
@@ -192,13 +195,19 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                         ),
                         const SizedBox(width: 8),
                         HoverLift(
-                          child: FilledButton.icon(
-                            onPressed: () => context.go('/donate'),
-                            style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.accent,
-                                foregroundColor: AppColors.primaryDark),
-                            icon: const Icon(Icons.favorite_outline, size: 18),
-                            label: Text(loc.t('nav.donate')),
+                          child: HoverAware(
+                            builder: (hovering) => FilledButton.icon(
+                              onPressed: () => context.go('/donate'),
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.accent,
+                                  foregroundColor: AppColors.primaryDark),
+                              icon: PlayfulIcon(
+                                Icons.favorite_outline,
+                                size: 18,
+                                hovering: hovering,
+                              ),
+                              label: Text(loc.t('nav.donate')),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -211,10 +220,15 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                           ),
                         ),
                         HoverScale(
-                          child: IconButton(
-                            tooltip: loc.t('nav.donate'),
-                            onPressed: () => context.go('/donate'),
-                            icon: const Icon(Icons.favorite_outline),
+                          child: HoverAware(
+                            builder: (hovering) => IconButton(
+                              tooltip: loc.t('nav.donate'),
+                              onPressed: () => context.go('/donate'),
+                              icon: PlayfulIcon(
+                                Icons.favorite_outline,
+                                hovering: hovering,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -231,14 +245,20 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                       const Spacer(),
                       const _CartButton(),
                       Builder(
-                        builder: (context) => HoverScale(
-                          child: IconButton(
-                            tooltip: loc.t('nav.menu'),
-                            icon: const Icon(Icons.menu),
-                            visualDensity: VisualDensity.compact,
-                            onPressed: () => openMenuDrawer(
-                              context,
-                              leadingButton: false,
+                        builder: (context) => MouseRegion(
+                          onEnter: (_) => openMenuDrawer(
+                            context,
+                            leadingButton: false,
+                          ),
+                          child: HoverScale(
+                            child: IconButton(
+                              tooltip: loc.t('nav.menu'),
+                              icon: const Icon(Icons.menu),
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => openMenuDrawer(
+                                context,
+                                leadingButton: false,
+                              ),
                             ),
                           ),
                         ),
@@ -356,7 +376,7 @@ class _NavChrome extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 16, color: color),
+                PlayfulIcon(icon, size: 16, color: color),
                 const SizedBox(width: 6),
                 Text(
                   label,
@@ -403,40 +423,134 @@ class _NavChrome extends StatelessWidget {
   }
 }
 
-class _MoreMenu extends StatelessWidget {
+class _MoreMenu extends StatefulWidget {
   const _MoreMenu({required this.currentRoute});
   final String currentRoute;
   @override
+  State<_MoreMenu> createState() => _MoreMenuState();
+}
+
+class _MoreMenuState extends State<_MoreMenu> {
+  final LayerLink _link = LayerLink();
+  OverlayEntry? _entry;
+  bool _overButton = false;
+  bool _overMenu = false;
+  Timer? _hide;
+
+  @override
+  void dispose() {
+    _hide?.cancel();
+    _entry?.remove();
+    super.dispose();
+  }
+
+  void _sync() {
+    _hide?.cancel();
+    if (_overButton || _overMenu) {
+      _show();
+    } else {
+      _hide = Timer(const Duration(milliseconds: 180), _remove);
+    }
+  }
+
+  void _remove() {
+    _entry?.remove();
+    _entry = null;
+  }
+
+  void _show() {
+    if (_entry != null) return;
+    final overlay = Overlay.of(context);
+    _entry = OverlayEntry(
+      builder: (context) {
+        final loc = this.context.locWatch;
+        return Positioned(
+          width: 260,
+          child: CompositedTransformFollower(
+            link: _link,
+            showWhenUnlinked: false,
+            offset: const Offset(0, 56),
+            child: MouseRegion(
+              onEnter: (_) {
+                _overMenu = true;
+                _sync();
+              },
+              onExit: (_) {
+                _overMenu = false;
+                _sync();
+              },
+              child: Material(
+                elevation: 8,
+                borderRadius: BorderRadius.circular(14),
+                color: AppColors.card,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (final item in moreNav)
+                        InkWell(
+                          onTap: () {
+                            _overButton = false;
+                            _overMenu = false;
+                            _remove();
+                            this.context.go(item.route);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            child: Row(children: [
+                              PlayfulIcon(item.icon,
+                                  size: 18, color: AppColors.primary),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(loc.t(item.labelKey))),
+                            ]),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    overlay.insert(_entry!);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final moreItems = [...moreNav];
-    final moreActive = moreItems.any((i) => navIsActive(currentRoute, i.route));
-    return HoverScale(
-      scale: 1.03,
-      underline: true,
-      child: PopupMenuButton<String>(
-        tooltip: loc.t('nav.menu'),
-        padding: EdgeInsets.zero,
-        onSelected: (route) => context.go(route),
-        position: PopupMenuPosition.under,
-        itemBuilder: (context) => [
-          for (final item in moreItems)
-            PopupMenuItem(
-              value: item.route,
-              child: Row(children: [
-                Icon(item.icon, size: 18, color: AppColors.primary),
-                const SizedBox(width: 10),
-                Text(loc.t(item.labelKey)),
-              ]),
+    final moreActive =
+        moreNav.any((i) => navIsActive(widget.currentRoute, i.route));
+    return CompositedTransformTarget(
+      link: _link,
+      child: MouseRegion(
+        onEnter: (_) {
+          _overButton = true;
+          _sync();
+        },
+        onExit: (_) {
+          _overButton = false;
+          _sync();
+        },
+        child: HoverScale(
+          scale: 1.03,
+          underline: true,
+          child: InkWell(
+            onTap: _show,
+            borderRadius: BorderRadius.circular(10),
+            mouseCursor: SystemMouseCursors.click,
+            child: _NavChrome(
+              icon: Icons.menu,
+              label: loc.t('nav.menu'),
+              active: moreActive,
+              trailing: Icon(Icons.expand_more,
+                  size: 16,
+                  color: moreActive ? AppColors.primary : AppColors.ink),
             ),
-        ],
-        child: _NavChrome(
-          icon: Icons.menu,
-          label: loc.t('nav.menu'),
-          active: moreActive,
-          trailing: Icon(Icons.expand_more,
-              size: 16,
-              color: moreActive ? AppColors.primary : AppColors.ink),
+          ),
         ),
       ),
     );
@@ -499,6 +613,7 @@ class _CartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = context.watch<AppRepository>().cartCount;
+    if (count <= 0) return const SizedBox.shrink();
     final loc = context.locWatch;
     return HoverScale(
       child: Stack(

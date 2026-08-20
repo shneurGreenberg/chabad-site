@@ -10,15 +10,23 @@ class YoutubeIFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = youtubeEmbedUrl(videoId);
-    return HtmlElementView.fromTagName(
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: HtmlElementView.fromTagName(
       key: ValueKey(url),
       tagName: 'iframe',
       onElementCreated: (element) {
         final iframe = element as web.HTMLIFrameElement;
         iframe.src = url;
         iframe.style.border = 'none';
+        iframe.style.position = 'absolute';
+        iframe.style.left = '0';
+        iframe.style.top = '0';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
         iframe.style.width = '100%';
         iframe.style.height = '100%';
+        iframe.style.setProperty('direction', 'ltr');
         iframe.setAttribute('loading', 'lazy');
         iframe.setAttribute('allowfullscreen', 'true');
         iframe.setAttribute(
@@ -29,6 +37,7 @@ class YoutubeIFrame extends StatelessWidget {
         iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         iframe.title = 'YouTube';
       },
+    ),
     );
   }
 }

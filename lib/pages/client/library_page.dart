@@ -216,7 +216,10 @@ class _ShiurCard extends StatelessWidget {
                               color: Colors.white, size: 64),
                         ),
                       )
-                    : YoutubeEmbed(videoId: id),
+                    : Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: YoutubeEmbed(videoId: id),
+                      ),
               ),
               Padding(
                 padding: const EdgeInsets.all(18),

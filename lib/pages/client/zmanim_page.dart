@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/playful_icons.dart';
 import '../../widgets/site_scaffold.dart';
 
 class ZmanimPage extends StatelessWidget {
@@ -93,8 +94,11 @@ class ZmanimPage extends StatelessWidget {
                           : AppColors.surface.withValues(alpha: 0.5),
                     ),
                     child: ListTile(
-                      leading: Icon(Icons.brightness_5_outlined,
-                          color: AppColors.primary),
+                      leading: PlayfulIcon(
+                        zmanIconOf(repo.zmanim[i].kind),
+                        kind: playfulKindForZman(repo.zmanim[i].kind),
+                        color: AppColors.primary,
+                      ),
                       title: Text(trLoc(repo.zmanim[i].name, loc.lang),
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                       trailing: Text(repo.zmanim[i].time,

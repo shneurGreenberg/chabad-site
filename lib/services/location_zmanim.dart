@@ -123,14 +123,14 @@ class LocationZmanimApi {
     }
 
     final zmanim = <Zman>[
-      Zman(name: {'he': 'עלות השחר', 'en': 'Dawn', 'ru': 'Рассвет'}, time: t('alotHaShachar')),
-      Zman(name: {'he': 'הנץ החמה', 'en': 'Sunrise', 'ru': 'Восход'}, time: t('sunrise')),
-      Zman(name: {'he': 'סוף זמן ק"ש', 'en': 'Latest Shema', 'ru': 'Крайний Шма'}, time: t('sofZmanShma')),
-      Zman(name: {'he': 'סוף זמן תפילה', 'en': 'Latest Shacharit', 'ru': 'Крайняя Шахарит'}, time: t('sofZmanTfilla')),
-      Zman(name: {'he': 'חצות היום', 'en': 'Midday', 'ru': 'Полдень'}, time: t('chatzot')),
-      Zman(name: {'he': 'מנחה גדולה', 'en': 'Mincha Gedola', 'ru': 'Минха гдола'}, time: t('minchaGedola')),
-      Zman(name: {'he': 'שקיעה', 'en': 'Sunset', 'ru': 'Закат'}, time: t('sunset')),
-      Zman(name: {'he': 'צאת הכוכבים', 'en': 'Nightfall', 'ru': 'Появление звёзд'}, time: t('tzeit')),
+      Zman(name: {'he': 'עלות השחר', 'en': 'Dawn', 'ru': 'Рассвет'}, time: t('alotHaShachar'), kind: ZmanKind.dawn),
+      Zman(name: {'he': 'הנץ החמה', 'en': 'Sunrise', 'ru': 'Восход'}, time: t('sunrise'), kind: ZmanKind.sunrise),
+      Zman(name: {'he': 'סוף זמן ק"ש', 'en': 'Latest Shema', 'ru': 'Крайний Шма'}, time: t('sofZmanShma'), kind: ZmanKind.shema),
+      Zman(name: {'he': 'סוף זמן תפילה', 'en': 'Latest Shacharit', 'ru': 'Крайняя Шахарит'}, time: t('sofZmanTfilla'), kind: ZmanKind.shacharit),
+      Zman(name: {'he': 'חצות היום', 'en': 'Midday', 'ru': 'Полдень'}, time: t('chatzot'), kind: ZmanKind.midday),
+      Zman(name: {'he': 'מנחה גדולה', 'en': 'Mincha Gedola', 'ru': 'Минха гдола'}, time: t('minchaGedola'), kind: ZmanKind.mincha),
+      Zman(name: {'he': 'שקיעה', 'en': 'Sunset', 'ru': 'Закат'}, time: t('sunset'), kind: ZmanKind.sunset),
+      Zman(name: {'he': 'צאת הכוכבים', 'en': 'Nightfall', 'ru': 'Появление звёзд'}, time: t('tzeit'), kind: ZmanKind.stars),
     ];
 
     final shabbatEn = await _json(

@@ -229,16 +229,39 @@ Map<String, dynamic> bannerToJson(PageBanner b) => {
       'url': compactImageUrl(b.imageUrl),
       'x': b.alignX,
       'y': b.alignY,
+      if (b.extra.isNotEmpty)
+        'slides': [
+          for (final s in b.extra)
+            {
+              'url': compactImageUrl(s.imageUrl),
+              'x': s.alignX,
+              'y': s.alignY,
+            },
+        ],
     };
 
 PageBanner bannerFromJson(dynamic raw) {
   if (raw is! Map) return PageBanner();
   final m = Map<String, dynamic>.from(raw);
+  final extra = <BannerSlide>[];
+  if (m['slides'] is List) {
+    for (final item in m['slides'] as List) {
+      if (item is! Map) continue;
+      final s = Map<String, dynamic>.from(item);
+      extra.add(BannerSlide(
+        bytes: b64ToBytes(s['image']),
+        imageUrl: compactImageUrl(s['url'] is String ? '${s['url']}' : null),
+        alignX: (s['x'] as num?)?.toDouble() ?? 0,
+        alignY: (s['y'] as num?)?.toDouble() ?? 0,
+      ));
+    }
+  }
   return PageBanner(
     bytes: b64ToBytes(m['image']),
     imageUrl: compactImageUrl(m['url'] is String ? '${m['url']}' : null),
     alignX: (m['x'] as num?)?.toDouble() ?? 0,
     alignY: (m['y'] as num?)?.toDouble() ?? 0,
+    extra: extra,
   );
 }
 

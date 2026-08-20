@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../data/repository.dart';
+import 'playful_icons.dart';
 
 String copyOf(BuildContext context, Loc map, String fallbackKey) {
   final loc = context.locWatch;
@@ -54,14 +56,17 @@ class PhoneText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Text(
-        number,
-        textAlign: TextAlign.start,
-        style: style,
-        maxLines: maxLines,
-        overflow: overflow,
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Text(
+          number,
+          textAlign: TextAlign.left,
+          style: style,
+          maxLines: maxLines,
+          overflow: overflow,
+        ),
       ),
     );
   }
@@ -498,7 +503,7 @@ class PageHero extends StatelessWidget {
                       border: Border.all(
                           color: AppColors.accent.withValues(alpha: 0.5)),
                     ),
-                    child: Icon(icon, color: AppColors.accentSoft, size: 28),
+                    child: PlayfulIcon(icon, color: AppColors.accentSoft, size: 28),
                   ),
                   const SizedBox(height: 18),
                   Text(title,
@@ -535,59 +540,131 @@ class PageHero extends StatelessWidget {
 }
 
 /// Photo (cover-cropped) or empty — sits behind hero content.
-class BannerFill extends StatelessWidget {
-  const BannerFill({super.key, required this.banner});
+class BannerFill extends StatefulWidget {
+  const BannerFill({super.key, required this.banner, this.positioned = true});
   final PageBanner banner;
+  final bool positioned;
+
+  @override
+  State<BannerFill> createState() => _BannerFillState();
+}
+
+class _BannerFillState extends State<BannerFill> {
+  int _index = 0;
+  Timer? _timer;
+
+  List<BannerSlide> get _slides => widget.banner.allSlides;
+
+  @override
+  void initState() {
+    super.initState();
+    _arm();
+  }
+
+  @override
+  void didUpdateWidget(covariant BannerFill oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_index >= _slides.length) _index = 0;
+    _arm();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _arm() {
+    _timer?.cancel();
+    if (_slides.length < 2) return;
+    _timer = Timer.periodic(const Duration(milliseconds: 3500), (_) {
+      if (!mounted) return;
+      setState(() => _index = (_index + 1) % _slides.length);
+    });
+  }
+
+  Widget _image(BannerSlide slide) {
+    final bytes = slide.bytes;
+    final url = slide.imageUrl;
+    final w = imageDecodePx(context, MediaQuery.sizeOf(context).width);
+    if (bytes != null && bytes.isNotEmpty) {
+      return Image.memory(
+        bytes,
+        fit: BoxFit.cover,
+        alignment: slide.alignment,
+        gaplessPlayback: true,
+        width: double.infinity,
+        height: double.infinity,
+        cacheWidth: w,
+      );
+    }
+    if (url != null && url.isNotEmpty) {
+      if (url.startsWith('assets/')) {
+        return Image.asset(
+          url,
+          fit: BoxFit.cover,
+          alignment: slide.alignment,
+          width: double.infinity,
+          height: double.infinity,
+          cacheWidth: w,
+        );
+      }
+      return Image.network(
+        url,
+        fit: BoxFit.cover,
+        alignment: slide.alignment,
+        width: double.infinity,
+        height: double.infinity,
+        cacheWidth: w,
+        filterQuality: FilterQuality.medium,
+      );
+    }
+    return const SizedBox.expand();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (!banner.hasImage) return const SizedBox.shrink();
-    final bytes = banner.bytes;
-    final url = banner.imageUrl;
-    return Positioned.fill(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (bytes != null && bytes.isNotEmpty)
-            Image.memory(
-              bytes,
-              fit: BoxFit.cover,
-              alignment: banner.alignment,
-              gaplessPlayback: true,
-              cacheWidth: imageDecodePx(context, MediaQuery.sizeOf(context).width),
-            )
-          else if (url != null && url.isNotEmpty)
-            url.startsWith('assets/')
-                ? Image.asset(
-                    url,
-                    fit: BoxFit.cover,
-                    alignment: banner.alignment,
-                    cacheWidth: imageDecodePx(
-                        context, MediaQuery.sizeOf(context).width),
-                  )
-                : Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    alignment: banner.alignment,
-                    cacheWidth: imageDecodePx(
-                        context, MediaQuery.sizeOf(context).width),
-                    filterQuality: FilterQuality.medium,
-                  ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x8A0B1C3A),
-                  Color(0xC20B1C3A),
-                ],
+    if (!widget.banner.hasImage) return const SizedBox.shrink();
+    final slides = _slides;
+    if (slides.isEmpty) return const SizedBox.shrink();
+    final i = _index.clamp(0, slides.length - 1);
+    final body = Stack(
+      fit: StackFit.expand,
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 900),
+          switchInCurve: Curves.easeInOutCubic,
+          switchOutCurve: Curves.easeInOutCubic,
+          transitionBuilder: (child, anim) {
+            return FadeTransition(
+              opacity: anim,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 1.06, end: 1).animate(anim),
+                child: child,
               ),
+            );
+          },
+          child: KeyedSubtree(
+            key: ValueKey('${i}_${slides[i].imageUrl}_${slides[i].bytes?.length}'),
+            child: _image(slides[i]),
+          ),
+        ),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0x8A0B1C3A),
+                Color(0xC20B1C3A),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
+    if (!widget.positioned) return body;
+    return Positioned.fill(child: body);
   }
 }
 

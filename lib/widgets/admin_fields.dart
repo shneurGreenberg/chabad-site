@@ -52,22 +52,23 @@ class _LocFieldGroupState extends State<LocFieldGroup> {
   }
 
   bool get _showTranslate {
-    final he = widget.controllers['he']?.text.trim() ?? '';
-    if (he.isEmpty) return false;
-    final en = widget.controllers['en']?.text.trim() ?? '';
-    final ru = widget.controllers['ru']?.text.trim() ?? '';
-    return en.isEmpty || ru.isEmpty;
+    final filled = widget.controllers.values
+        .where((c) => c.text.trim().isNotEmpty)
+        .length;
+    return filled > 0 && filled < widget.controllers.length;
   }
 
   Future<void> _translate() async {
     final loc = context.loc;
-    final he = widget.controllers['he']?.text.trim() ?? '';
-    if (he.isEmpty) return;
+    final fields = {
+      for (final e in widget.controllers.entries) e.key: e.value.text,
+    };
+    if (fields.values.every((v) => v.trim().isEmpty)) return;
     setState(() => _loading = true);
     try {
-      final out = await AutoTranslate.fromHebrew(he);
+      final out = await AutoTranslate.fillEmpty(fields);
       var filled = 0;
-      for (final lang in ['en', 'ru']) {
+      for (final lang in out.keys) {
         final c = widget.controllers[lang];
         if (c == null) continue;
         if (c.text.trim().isNotEmpty) continue;
