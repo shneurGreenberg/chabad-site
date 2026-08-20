@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/repository.dart';
+import '../../l10n/strings.dart';
+import '../../models.dart';
 import '../../services/telegram.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
@@ -20,7 +23,8 @@ class _TelegramWizardState extends State<TelegramWizard> {
   final _tg = TelegramService.instance;
   bool _connecting = false;
   bool _pulling = false;
-  String? _botLabel;
+  bool _publishing = false;
+  String? _publishingId;
 
   @override
   void initState() {
@@ -29,7 +33,6 @@ class _TelegramWizardState extends State<TelegramWizard> {
     _channel.text = _tg.channel.isEmpty ? '@jewishsib' : '@${_tg.channel}';
     if (_tg.hasToken) {
       _token.text = _tg.maskedToken;
-      _botLabel = _tg.maskedToken;
     }
   }
 
@@ -42,8 +45,17 @@ class _TelegramWizardState extends State<TelegramWizard> {
 
   String _tokenValue() {
     final typed = _token.text.trim();
-    if (typed.contains('…') && _tg.hasToken) return ''; // keep saved token
+    if (typed.contains('…') && _tg.hasToken) return '';
     return typed;
+  }
+
+  String? _connectedLabel() {
+    if (!_tg.isConnected) return null;
+    if (_tg.botName.isEmpty && _tg.botUsername.isEmpty) {
+      return _tg.maskedToken;
+    }
+    final user = _tg.botUsername.isEmpty ? '' : ' (@${_tg.botUsername})';
+    return '${_tg.botName}$user';
   }
 
   Future<void> _connect() async {
@@ -55,12 +67,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
         channel: _channel.text,
       );
       if (!mounted) return;
-      setState(() {
-        _botLabel = info.username == null
-            ? info.name
-            : '${info.name} (@${info.username})';
-        _token.text = _tg.maskedToken;
-      });
+      setState(() => _token.text = _tg.maskedToken);
       final repo = context.read<AppRepository>();
       repo.telegramBot
         ..enabled = true
@@ -125,6 +132,63 @@ class _TelegramWizardState extends State<TelegramWizard> {
     }
   }
 
+  Future<void> _publishOne(NewsArticle a) async {
+    final loc = context.loc;
+    final repo = context.read<AppRepository>();
+    setState(() => _publishingId = a.id);
+    try {
+      await repo.publishNewsToTelegram(a, loc.lang);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.t('admin.tg.publishedOne'))),
+      );
+    } on TelegramException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_err(loc.t(e.messageKey), e.detail))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.t('admin.tg.err.publish'))),
+      );
+    } finally {
+      if (mounted) setState(() => _publishingId = null);
+    }
+  }
+
+  Future<void> _publishPending() async {
+    final loc = context.loc;
+    final repo = context.read<AppRepository>();
+    setState(() => _publishing = true);
+    try {
+      if (!_tg.hasToken) await _connect();
+      final n = await repo.publishPendingNewsToTelegram(loc.lang);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            n == 0
+                ? loc.t('admin.tg.nonePending')
+                : loc.t('admin.tg.publishedN').replaceAll('{n}', '$n'),
+          ),
+        ),
+      );
+    } on TelegramException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_err(loc.t(e.messageKey), e.detail))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.t('admin.tg.err.publish'))),
+      );
+    } finally {
+      if (mounted) setState(() => _publishing = false);
+    }
+  }
+
   String _err(String msg, String? detail) {
     if (detail == null || detail.trim().isEmpty) return msg;
     return '$msg\n$detail';
@@ -133,6 +197,10 @@ class _TelegramWizardState extends State<TelegramWizard> {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    final connected = _connectedLabel();
+    final pending = repo.newsPendingTelegram;
+    final posted = repo.news.where((a) => a.onTelegram).toList();
     final steps = <(IconData, String)>[
       (Icons.phone_iphone, loc.t('admin.tg.step1')),
       (Icons.search, loc.t('admin.tg.step2')),
@@ -170,41 +238,74 @@ class _TelegramWizardState extends State<TelegramWizard> {
                       style: const TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 18)),
                   Text(loc.t('admin.tg.subtitle'),
-                      style: TextStyle(
-                          color: AppColors.muted, height: 1.4)),
+                      style: TextStyle(color: AppColors.muted, height: 1.4)),
                 ],
               ),
             ),
           ]),
-          const SizedBox(height: 22),
-          Text(loc.t('admin.tg.guideTitle'),
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-          const SizedBox(height: 12),
-          for (var i = 0; i < steps.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text('${i + 1}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary)),
-                  ),
-                  const SizedBox(width: 10),
-                  Icon(steps[i].$1, size: 20, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(steps[i].$2,
-                        style: const TextStyle(height: 1.4, fontSize: 15)),
-                  ),
-                ],
+          if (connected != null) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF6EE7B7)),
               ),
+              child: Row(children: [
+                const Icon(Icons.check_circle, color: Color(0xFF059669), size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${loc.t('admin.tg.connected')}: $connected'
+                    '${_tg.channel.isEmpty ? '' : ' · @${_tg.channel}'}',
+                    style: const TextStyle(
+                      color: Color(0xFF065F46),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ]),
             ),
-          const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 12),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: const EdgeInsets.only(bottom: 8),
+              title: Text(loc.t('admin.tg.guideTitle'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 15)),
+              children: [
+                for (var i = 0; i < steps.length; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor:
+                              AppColors.primary.withValues(alpha: 0.1),
+                          child: Text('${i + 1}',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primary)),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(steps[i].$2,
+                              style: const TextStyle(height: 1.35, fontSize: 14)),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
           TextField(
             controller: _token,
             obscureText: true,
@@ -222,12 +323,6 @@ class _TelegramWizardState extends State<TelegramWizard> {
               prefixIcon: const Icon(Icons.campaign_outlined),
             ),
           ),
-          if (_botLabel != null) ...[
-            const SizedBox(height: 12),
-            Text('${loc.t('admin.tg.connected')}: $_botLabel',
-                style: const TextStyle(
-                    color: Color(0xFF0D9488), fontWeight: FontWeight.w700)),
-          ],
           const SizedBox(height: 16),
           Wrap(
             spacing: 10,
@@ -258,10 +353,95 @@ class _TelegramWizardState extends State<TelegramWizard> {
                     : const Icon(Icons.download, size: 18),
                 label: Text(loc.t('admin.tg.pull')),
               ).hoverLift(),
+              FilledButton.icon(
+                onPressed: _publishing || pending.isEmpty ? null : _publishPending,
+                style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF059669)),
+                icon: _publishing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.upload, size: 18),
+                label: Text(loc.t('admin.tg.publishAll')),
+              ).hoverLift(),
             ],
           ),
+          const SizedBox(height: 22),
+          Text(loc.t('admin.tg.queueTitle'),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+          const SizedBox(height: 6),
+          Text(
+            loc
+                .t('admin.tg.queueHint')
+                .replaceAll('{pending}', '${pending.length}')
+                .replaceAll('{posted}', '${posted.length}'),
+            style: TextStyle(color: AppColors.muted, height: 1.4),
+          ),
+          const SizedBox(height: 10),
+          for (final a in repo.news.take(16))
+            _NewsTelegramRow(
+              article: a,
+              busy: _publishingId == a.id,
+              onPublish: () => _publishOne(a),
+            ),
         ],
       ),
+    );
+  }
+}
+
+class _NewsTelegramRow extends StatelessWidget {
+  const _NewsTelegramRow({
+    required this.article,
+    required this.busy,
+    required this.onPublish,
+  });
+  final NewsArticle article;
+  final bool busy;
+  final VoidCallback onPublish;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final done = article.onTelegram;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        done ? Icons.check_circle : Icons.schedule,
+        color: done ? const Color(0xFF059669) : const Color(0xFFD97706),
+      ),
+      title: Text(
+        trLoc(article.title, loc.lang),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        done
+            ? loc.t('admin.tg.statusPosted') +
+                (article.telegramPublishedAt == null
+                    ? ''
+                    : ' · ${DateFormat.MMMd(loc.lang).add_Hm().format(article.telegramPublishedAt!)}')
+            : loc.t('admin.tg.statusPending'),
+        style: TextStyle(
+          color: done ? const Color(0xFF059669) : const Color(0xFFD97706),
+          fontSize: 12.5,
+        ),
+      ),
+      trailing: done
+          ? null
+          : TextButton(
+              onPressed: busy ? null : onPublish,
+              child: busy
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(loc.t('admin.tg.publishOne')),
+            ),
     );
   }
 }

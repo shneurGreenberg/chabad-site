@@ -71,6 +71,8 @@ Map<String, dynamic> newsToJson(NewsArticle a) => {
       'imageUrl': compactImageUrl(a.imageUrl),
       'imageId': imageIdOf('news', a.id, bytes: a.imageBytes),
       'telegramMessageId': a.telegramMessageId,
+      'telegramPublishedId': a.telegramPublishedId,
+      'telegramPublishedAt': a.telegramPublishedAt?.toIso8601String(),
     };
 
 NewsArticle newsFromJson(dynamic raw) {
@@ -93,6 +95,8 @@ NewsArticle newsFromJson(dynamic raw) {
       m['imageUrl'] is String ? '${m['imageUrl']}' : null,
     ),
     telegramMessageId: (m['telegramMessageId'] as num?)?.toInt(),
+    telegramPublishedId: (m['telegramPublishedId'] as num?)?.toInt(),
+    telegramPublishedAt: DateTime.tryParse('${m['telegramPublishedAt'] ?? ''}'),
   );
 }
 

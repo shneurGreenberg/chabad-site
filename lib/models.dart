@@ -31,6 +31,8 @@ class NewsArticle {
     this.imageBytes,
     this.imageUrl,
     this.telegramMessageId,
+    this.telegramPublishedId,
+    this.telegramPublishedAt,
   });
 
   final String id;
@@ -45,10 +47,17 @@ class NewsArticle {
   Uint8List? imageBytes;
   String? imageUrl;
   int? telegramMessageId;
+  int? telegramPublishedId;
+  DateTime? telegramPublishedAt;
 
   bool get hasImage =>
       (imageBytes != null && imageBytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
+
+  bool get onTelegram =>
+      source == NewsSource.telegram ||
+      telegramMessageId != null ||
+      telegramPublishedId != null;
 }
 
 class SiteLocation {

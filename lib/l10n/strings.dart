@@ -538,6 +538,16 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Paste into Firestore → Rules, then Publish:',
     'ru': 'Вставьте в Firestore → Rules и Publish:'
   },
+  'admin.cloud.blockedShort': {
+    'he': 'השמירה לשרת נחסמה — לחצו לפרטים',
+    'en': 'Server save blocked — tap for details',
+    'ru': 'Сохранение на сервер заблокировано — подробности'
+  },
+  'admin.cloud.details': {
+    'he': 'פרטים',
+    'en': 'Details',
+    'ru': 'Подробнее'
+  },
   'admin.cloud.console': {
     'he': 'פתיחת קונסול Firestore',
     'en': 'Open Firestore console',
@@ -623,9 +633,9 @@ const Map<String, Map<String, String>> _strings = {
   },
   'admin.bots': {'he': 'בוטים', 'en': 'Bots', 'ru': 'Боты'},
   'admin.bots.telegram': {
-    'he': 'בוט טלגרם — משיכת חדשות',
-    'en': 'Telegram bot — news import',
-    'ru': 'Telegram-бот — импорт новостей'
+    'he': 'בוט טלגרם — משיכה ופרסום',
+    'en': 'Telegram bot — pull and publish',
+    'ru': 'Telegram-бот — загрузка и публикация'
   },
   'admin.bots.social': {
     'he': 'בוט רשתות — פרסום אוטומטי',
@@ -854,9 +864,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Времена для'
   },
   'admin.tg.subtitle': {
-    'he': 'חברו את ערוץ הטלגרם של הקהילה — הפוסטים יופיעו בחדשות.',
-    'en': 'Connect the community Telegram channel — posts will appear in News.',
-    'ru': 'Подключите Telegram-канал общины — посты появятся в новостях.'
+    'he': 'מחובר לערוץ הקהילה: מושך פוסטים לחדשות, ומפרסם כתבות מהאתר לטלגרם.',
+    'en': 'Connected to the community channel: pull posts into News, and publish site articles to Telegram.',
+    'ru': 'Подключён к каналу общины: загружает посты в новости и публикует статьи сайта в Telegram.'
   },
   'admin.tg.guideTitle': {
     'he': 'איך מחברים, שלב אחרי שלב',
@@ -954,14 +964,69 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Токен неверный. Скопируйте снова у BotFather (без пробелов).'
   },
   'admin.tg.err.channel': {
-    'he': 'חסר שם ערוץ. כתבו למשל @mychannel.',
-    'en': 'Channel username is missing. Enter e.g. @mychannel.',
-    'ru': 'Нет имени канала. Введите, например, @mychannel.'
+    'he': 'חסר שם ערוץ. כתבו @jewishsib.',
+    'en': 'Channel username is missing. Enter @jewishsib.',
+    'ru': 'Нет имени канала. Введите @jewishsib.'
   },
   'admin.tg.err.generic': {
     'he': 'משהו לא עבד. בדקו את הקוד ואת שם הערוץ ונסו שוב.',
     'en': 'Something went wrong. Check the token and channel name, then try again.',
     'ru': 'Что-то пошло не так. Проверьте токен и имя канала.'
+  },
+  'admin.tg.err.pull': {
+    'he': 'החיבור תקין, אבל המשיכה נכשלה. ודאו שהבוט מנהל ב-@jewishsib, כבו חוסם פרסומות, ונסו שוב.',
+    'en': 'Connected, but pull failed. Make sure the bot is admin of @jewishsib, pause ad blockers, and try again.',
+    'ru': 'Связь есть, но загрузка не удалась. Бот должен быть админом @jewishsib; отключите блокировщик и повторите.'
+  },
+  'admin.tg.err.publish': {
+    'he': 'הפרסום לטלגרם נכשל. ודאו שלבוט יש הרשאה «פרסום הודעות» בערוץ.',
+    'en': 'Publishing to Telegram failed. Give the bot Post Messages permission in the channel.',
+    'ru': 'Публикация в Telegram не удалась. Дайте боту право публиковать сообщения в канале.'
+  },
+  'admin.tg.publishAll': {
+    'he': 'פרסמו ממתינים לטלגרם',
+    'en': 'Publish pending to Telegram',
+    'ru': 'Опубликовать ожидающие в Telegram'
+  },
+  'admin.tg.publishOne': {
+    'he': 'פרסום',
+    'en': 'Publish',
+    'ru': 'Опубликовать'
+  },
+  'admin.tg.publishedOne': {
+    'he': 'פורסם בטלגרם',
+    'en': 'Published to Telegram',
+    'ru': 'Опубликовано в Telegram'
+  },
+  'admin.tg.publishedN': {
+    'he': 'פורסמו {n} כתבות בטלגרם',
+    'en': 'Published {n} articles to Telegram',
+    'ru': 'Опубликовано {n} статей в Telegram'
+  },
+  'admin.tg.nonePending': {
+    'he': 'אין כתבות ממתינות לפרסום',
+    'en': 'No articles waiting to be published',
+    'ru': 'Нет статей в очереди'
+  },
+  'admin.tg.queueTitle': {
+    'he': 'מעקב פרסום',
+    'en': 'Publish tracker',
+    'ru': 'Учёт публикаций'
+  },
+  'admin.tg.queueHint': {
+    'he': '{pending} ממתינות · {posted} כבר בטלגרם',
+    'en': '{pending} pending · {posted} already on Telegram',
+    'ru': '{pending} ждут · {posted} уже в Telegram'
+  },
+  'admin.tg.statusPosted': {
+    'he': 'פורסם',
+    'en': 'Posted',
+    'ru': 'Опубликовано'
+  },
+  'admin.tg.statusPending': {
+    'he': 'ממתין לפרסום',
+    'en': 'Waiting to publish',
+    'ru': 'Ожидает публикации'
   },
   'admin.appearance': {'he': 'מראה וצבעים', 'en': 'Look & colors', 'ru': 'Оформление'},
   'admin.appearance.subtitle': {

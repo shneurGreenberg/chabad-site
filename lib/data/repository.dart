@@ -400,6 +400,78 @@ class AppRepository extends ChangeNotifier {
     return added;
   }
 
+  static const publicSiteBase = 'https://shneurgreenberg.github.io/chabad-site';
+
+  List<NewsArticle> get newsPendingTelegram =>
+      news.where((a) => a.published && !a.onTelegram).toList();
+
+  Future<void> publishNewsToTelegram(NewsArticle a, String lang) async {
+    if (a.onTelegram) return;
+    final tg = TelegramService.instance;
+    final title = trLoc(a.title, lang);
+    final body = trLoc(a.body, lang);
+    final link = '$publicSiteBase/news/${a.id}';
+    final text = '<b>${TelegramService.escapeHtml(title)}</b>\n\n'
+        '${TelegramService.escapeHtml(body)}\n\n'
+        '🔗 $link';
+    final url = a.imageUrl;
+    final photo = (url != null &&
+            (url.startsWith('http://') || url.startsWith('https://')))
+        ? url
+        : null;
+    final id = await tg.publishToChannel(text: text, photoUrl: photo);
+    a.telegramPublishedId = id;
+    a.telegramPublishedAt = DateTime.now();
+    telegramBot.lastSync = DateTime.now();
+    telegramBot.itemsSynced += 1;
+    notifyListeners();
+  }
+
+  Future<int> publishPendingNewsToTelegram(String lang) async {
+    var n = 0;
+    for (final a in List<NewsArticle>.from(newsPendingTelegram)) {
+      await publishNewsToTelegram(a, lang);
+      n++;
+    }
+    return n;
+  }
+
+  static const publicSiteBase = 'https://shneurgreenberg.github.io/chabad-site';
+
+  List<NewsArticle> get newsPendingTelegram =>
+      news.where((a) => a.published && !a.onTelegram).toList();
+
+  Future<void> publishNewsToTelegram(NewsArticle a, String lang) async {
+    if (a.onTelegram) return;
+    final tg = TelegramService.instance;
+    final title = trLoc(a.title, lang);
+    final body = trLoc(a.body, lang);
+    final link = '$publicSiteBase/news/${a.id}';
+    final text = '<b>${TelegramService.escapeHtml(title)}</b>\n\n'
+        '${TelegramService.escapeHtml(body)}\n\n'
+        '🔗 $link';
+    final url = a.imageUrl;
+    final photo = (url != null &&
+            (url.startsWith('http://') || url.startsWith('https://')))
+        ? url
+        : null;
+    final id = await tg.publishToChannel(text: text, photoUrl: photo);
+    a.telegramPublishedId = id;
+    a.telegramPublishedAt = DateTime.now();
+    telegramBot.lastSync = DateTime.now();
+    telegramBot.itemsSynced += 1;
+    notifyListeners();
+  }
+
+  Future<int> publishPendingNewsToTelegram(String lang) async {
+    var n = 0;
+    for (final a in List<NewsArticle>.from(newsPendingTelegram)) {
+      await publishNewsToTelegram(a, lang);
+      n++;
+    }
+    return n;
+  }
+
   // ---------------------------------------------------------------------------
   // Zmanim
   // ---------------------------------------------------------------------------

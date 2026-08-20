@@ -14,6 +14,7 @@ import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
+import '../../services/web_prefs.dart';
 import 'appearance_panel.dart';
 import 'banners_panel.dart';
 import 'content_panels.dart';
@@ -482,77 +483,75 @@ class _CloudSyncBar extends StatelessWidget {
     final repo = context.watch<AppRepository>();
     final err = repo.cloudError;
     final ok = err == null && repo.cloudOkAt != null;
+    if (ok || err == null) return const SizedBox.shrink();
     final blocked = err == 'permission-denied';
-    final bg = ok
-        ? const Color(0xFFECFDF5)
-        : blocked
-            ? const Color(0xFFFEF2F2)
-            : const Color(0xFFFFFBEB);
-    final fg = ok
-        ? const Color(0xFF065F46)
-        : blocked
-            ? const Color(0xFF991B1B)
-            : const Color(0xFF92400E);
+    final fg = blocked ? const Color(0xFF991B1B) : const Color(0xFF92400E);
     return Material(
-      color: bg,
+      color: blocked ? const Color(0xFFFEF2F2) : const Color(0xFFFFFBEB),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              ok
-                  ? loc.t('admin.cloud.ok')
-                  : loc.t('admin.cloud.blocked'),
-              style: TextStyle(color: fg, fontWeight: FontWeight.w700, height: 1.4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Row(children: [
+          Icon(Icons.cloud_off_outlined, size: 18, color: fg),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              loc.t('admin.cloud.blockedShort'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 13),
             ),
-            if (!ok) ...[
-              const SizedBox(height: 8),
-              Text(loc.t('admin.cloud.rulesTitle'),
-                  style: TextStyle(color: fg, fontSize: 13)),
-              const SizedBox(height: 6),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: fg.withValues(alpha: 0.2)),
-                ),
-                child: SelectableText(
-                  _kFirestoreRules.trim(),
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12, height: 1.35),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      await Clipboard.setData(
-                          ClipboardData(text: _kFirestoreRules.trim()));
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(loc.t('admin.cloud.rulesTitle'))),
-                      );
-                    },
-                    icon: const Icon(Icons.copy, size: 16),
-                    label: Text(loc.lang == 'en' ? 'Copy' : loc.lang == 'ru' ? 'Копировать' : 'העתקה'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Clipboard.setData(
-                          const ClipboardData(text: _kFirestoreConsole));
-                    },
-                    child: Text(loc.t('admin.cloud.console')),
-                  ),
-                ],
+          ),
+          TextButton(
+            onPressed: () => _showRules(context, loc),
+            child: Text(loc.t('admin.cloud.details')),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  void _showRules(BuildContext context, LocaleController loc) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(loc.t('admin.cloud.rulesTitle')),
+        content: SizedBox(
+          width: 480,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.t('admin.cloud.blocked'),
+                  style: const TextStyle(height: 1.4, fontSize: 13)),
+              const SizedBox(height: 10),
+              SelectableText(
+                _kFirestoreRules.trim(),
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 12, height: 1.35),
               ),
             ],
-          ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => openUrl(_kFirestoreConsole),
+            child: Text(loc.t('admin.cloud.console')),
+          ),
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: _kFirestoreRules.trim()));
+              Navigator.pop(ctx);
+            },
+            child: Text(loc.lang == 'en'
+                ? 'Copy'
+                : loc.lang == 'ru'
+                    ? 'Копировать'
+                    : 'העתקה'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(loc.t('common.close')),
+          ),
+        ],
       ),
     );
   }
@@ -578,18 +577,6 @@ class DashboardPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          margin: const EdgeInsets.only(bottom: 18),
-          decoration: BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
-          ),
-          child: Text(loc.t('admin.persist.note'),
-              style: TextStyle(color: AppColors.muted, height: 1.45)),
-        ),
         ResponsiveGrid(
           columns: gridColumns(context, max: 4) < 2 ? 2 : gridColumns(context, max: 4),
           children: [

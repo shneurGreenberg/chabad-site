@@ -7,6 +7,8 @@ import 'web_prefs.dart';
 const _tokenKey = 'chabad_tg_bot_token';
 const _channelKey = 'chabad_tg_channel';
 const _offsetKey = 'chabad_tg_update_offset';
+const _nameKey = 'chabad_tg_bot_name';
+const _userKey = 'chabad_tg_bot_user';
 
 class TelegramException implements Exception {
   TelegramException(this.messageKey, {this.detail});
@@ -41,9 +43,14 @@ class TelegramService {
   String _token = '';
   String _channel = '';
   int _offset = 0;
+  String _botName = '';
+  String _botUser = '';
 
   String get channel => _channel;
   bool get hasToken => _token.trim().isNotEmpty;
+  bool get isConnected => hasToken && _channel.isNotEmpty;
+  String get botName => _botName;
+  String get botUsername => _botUser;
 
   /// Token is never exposed in logs; UI may show a masked hint only.
   String get maskedToken {
@@ -56,6 +63,8 @@ class TelegramService {
     _token = readPref(_tokenKey) ?? '';
     _channel = readPref(_channelKey) ?? '';
     _offset = int.tryParse(readPref(_offsetKey) ?? '') ?? 0;
+    _botName = readPref(_nameKey) ?? '';
+    _botUser = readPref(_userKey) ?? '';
   }
 
   void save({required String token, required String channel}) {
@@ -74,6 +83,11 @@ class TelegramService {
     return s;
   }
 
+  static String escapeHtml(String s) => s
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+
   Future<TelegramBotInfo> connect({
     String token = '',
     required String channel,
@@ -87,14 +101,16 @@ class TelegramService {
       throw TelegramException('admin.tg.err.channel');
     }
 
+    await _clearWebhook();
     final me = await _api('getMe');
-    if (me['ok'] != true) {
-      throw TelegramException('admin.tg.err.token',
-          detail: '${me['description'] ?? ''}');
-    }
+    _throwIfNotOk(me, 'admin.tg.err.token');
     final result = me['result'] as Map<String, dynamic>? ?? {};
     final name = (result['first_name'] as String?)?.trim() ?? 'Bot';
     final username = result['username'] as String?;
+    _botName = name;
+    _botUser = username ?? '';
+    writePref(_nameKey, _botName);
+    writePref(_userKey, _botUser);
 
     String? chatTitle;
     try {
@@ -103,9 +119,7 @@ class TelegramService {
         final cr = chat['result'] as Map<String, dynamic>? ?? {};
         chatTitle = (cr['title'] as String?) ?? _channel;
       }
-    } catch (_) {
-      // Channel check is best-effort; getMe success is enough to continue.
-    }
+    } catch (_) {}
 
     return TelegramBotInfo(name: name, username: username, chatTitle: chatTitle);
   }
@@ -114,31 +128,84 @@ class TelegramService {
     if (_token.isEmpty || _channel.isEmpty) {
       throw TelegramException('admin.tg.err.token');
     }
-
-    final fromUpdates = await _fromGetUpdates();
-    if (fromUpdates.isNotEmpty) return fromUpdates;
+    await _clearWebhook();
 
     try {
-      final url = 'https://t.me/s/$_channel';
-      final res = await CorsProxy.get(url);
-      return await _parsePreviewWithImages(res.body);
-    } catch (_) {
-      return const [];
+      final fromUpdates = await _fromGetUpdates();
+      if (fromUpdates.isNotEmpty) return fromUpdates;
+    } on TelegramException {
+      rethrow;
     }
+
+    Object? previewErr;
+    for (final url in [
+      'https://t.me/s/$_channel',
+      'https://r.jina.ai/https://t.me/s/$_channel',
+    ]) {
+      try {
+        final res = await CorsProxy.getDirectOrProxy(url);
+        final posts = await _parsePreviewWithImages(res.body);
+        if (posts.isNotEmpty) return posts;
+      } catch (e) {
+        previewErr = e;
+      }
+    }
+    if (previewErr != null) {
+      throw TelegramException(
+        'admin.tg.err.pull',
+        detail: CorsProxy.redact('$previewErr'),
+      );
+    }
+    return const [];
+  }
+
+  Future<int> publishToChannel({
+    required String text,
+    String? photoUrl,
+  }) async {
+    if (_token.isEmpty || _channel.isEmpty) {
+      throw TelegramException('admin.tg.err.token');
+    }
+    await _clearWebhook();
+    final photo = photoUrl?.trim() ?? '';
+    final usePhoto = photo.startsWith('http://') || photo.startsWith('https://');
+    final json = usePhoto
+        ? await _api('sendPhoto', {
+            'chat_id': '@$_channel',
+            'photo': photo,
+            'caption': _clip(text, 1024),
+            'parse_mode': 'HTML',
+          })
+        : await _api('sendMessage', {
+            'chat_id': '@$_channel',
+            'text': _clip(text, 4000),
+            'parse_mode': 'HTML',
+            'disable_web_page_preview': 'false',
+          });
+    _throwIfNotOk(json, 'admin.tg.err.publish');
+    final result = json['result'];
+    if (result is Map) {
+      return (result['message_id'] as num?)?.toInt() ?? 0;
+    }
+    return 0;
+  }
+
+  Future<void> _clearWebhook() async {
+    try {
+      await _api('deleteWebhook');
+    } catch (_) {}
   }
 
   Future<List<TelegramPost>> _fromGetUpdates() async {
     final params = <String, String>{
       'timeout': '0',
+      'limit': '100',
       'allowed_updates': jsonEncode(['channel_post', 'message']),
     };
     if (_offset > 0) params['offset'] = '${_offset + 1}';
 
     final json = await _api('getUpdates', params);
-    if (json['ok'] != true) {
-      throw TelegramException('admin.tg.err.generic',
-          detail: '${json['description'] ?? ''}');
-    }
+    _throwIfNotOk(json, 'admin.tg.err.pull');
     final list = json['result'] as List? ?? const [];
     final posts = <TelegramPost>[];
     var maxId = _offset;
@@ -203,11 +270,10 @@ class TelegramService {
     try {
       final json = await _api('getFile', {'file_id': fileId});
       if (json['ok'] != true) return null;
-      final path =
-          (json['result'] as Map?)?['file_path'] as String?;
+      final path = (json['result'] as Map?)?['file_path'] as String?;
       if (path == null || path.isEmpty) return null;
       final fileUrl = 'https://api.telegram.org/file/bot$_token/$path';
-      final res = await CorsProxy.get(fileUrl);
+      final res = await CorsProxy.getDirectOrProxy(fileUrl);
       final bytes = res.bodyBytes;
       if (bytes.length < 40) return null;
       return bytes;
@@ -218,46 +284,63 @@ class TelegramService {
 
   Future<List<TelegramPost>> _parsePreviewWithImages(String html) async {
     final idRe = RegExp(
-        r'https://t\.me/' + RegExp.escape(_channel) + r'/(\d+)',
+        r'(?:https://t\.me/|t\.me/)' +
+            RegExp.escape(_channel) +
+            r'/(\d+)',
         caseSensitive: false);
-    final blocks = html.split('class="tgme_widget_message ');
+    final blocks = html.contains('tgme_widget_message')
+        ? html.split('class="tgme_widget_message ')
+        : html.split('\n');
     final posts = <TelegramPost>[];
-    for (final block in blocks.skip(1)) {
-      final idMatch = idRe.firstMatch(block);
-      if (idMatch == null) continue;
-      final id = int.tryParse(idMatch.group(1) ?? '');
-      if (id == null) continue;
-      if (posts.any((p) => p.messageId == id)) continue;
+    if (html.contains('tgme_widget_message')) {
+      for (final block in blocks.skip(1)) {
+        final idMatch = idRe.firstMatch(block);
+        if (idMatch == null) continue;
+        final id = int.tryParse(idMatch.group(1) ?? '');
+        if (id == null) continue;
+        if (posts.any((p) => p.messageId == id)) continue;
 
-      String text = '';
-      final textMatch = RegExp(
-        r'tgme_widget_message_text[^>]*>([\s\S]*?)</div>',
-        caseSensitive: false,
-      ).firstMatch(block);
-      if (textMatch != null) {
-        text = _stripHtml(textMatch.group(1) ?? '');
-      }
+        String text = '';
+        final textMatch = RegExp(
+          r'tgme_widget_message_text[^>]*>([\s\S]*?)</div>',
+          caseSensitive: false,
+        ).firstMatch(block);
+        if (textMatch != null) {
+          text = _stripHtml(textMatch.group(1) ?? '');
+        }
 
-      Uint8List? image;
-      final bg = RegExp(
-        r'''background-image:url\(['"]([^'"]+)['"]\)''',
-        caseSensitive: false,
-      ).firstMatch(block);
-      final photoUrl = bg?.group(1);
-      if (photoUrl != null && photoUrl.startsWith('http')) {
-        try {
-          final img = await CorsProxy.get(photoUrl);
-          if (img.bodyBytes.length > 80) image = img.bodyBytes;
-        } catch (_) {}
+        Uint8List? image;
+        final bg = RegExp(
+          r'''background-image:url\(['"]([^'"]+)['"]\)''',
+          caseSensitive: false,
+        ).firstMatch(block);
+        final photoUrl = bg?.group(1);
+        if (photoUrl != null && photoUrl.startsWith('http')) {
+          try {
+            final img = await CorsProxy.getDirectOrProxy(photoUrl);
+            if (img.bodyBytes.length > 80) image = img.bodyBytes;
+          } catch (_) {}
+        }
+        if (text.isEmpty && image == null) continue;
+        posts.add(TelegramPost(
+          messageId: id,
+          text: text,
+          date: DateTime.now(),
+          imageBytes: image,
+        ));
+        if (posts.length >= 12) break;
       }
-      if (text.isEmpty && image == null) continue;
-      posts.add(TelegramPost(
-        messageId: id,
-        text: text,
-        date: DateTime.now(),
-        imageBytes: image,
-      ));
-      if (posts.length >= 12) break;
+    } else {
+      for (final m in idRe.allMatches(html)) {
+        final id = int.tryParse(m.group(1) ?? '');
+        if (id == null || posts.any((p) => p.messageId == id)) continue;
+        posts.add(TelegramPost(
+          messageId: id,
+          text: '',
+          date: DateTime.now(),
+        ));
+        if (posts.length >= 12) break;
+      }
     }
     return posts.reversed.toList();
   }
@@ -266,12 +349,11 @@ class TelegramService {
     String method, [
     Map<String, String>? query,
   ]) async {
-    final q = query == null || query.isEmpty
-        ? ''
-        : '?${query.entries.map((e) => '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}').join('&')}';
-    final url = 'https://api.telegram.org/bot$_token/$method$q';
+    final url = 'https://api.telegram.org/bot$_token/$method';
     try {
-      final res = await CorsProxy.get(url);
+      final res = (query == null || query.isEmpty)
+          ? await CorsProxy.getDirectOrProxy(url)
+          : await CorsProxy.postForm(url, query);
       final body = res.body.trim();
       if (body.startsWith('<')) {
         throw TelegramException('admin.tg.err.proxy');
@@ -292,6 +374,18 @@ class TelegramService {
       }
       throw TelegramException('admin.tg.err.generic', detail: msg);
     }
+  }
+
+  void _throwIfNotOk(Map<String, dynamic> json, String fallbackKey) {
+    if (json['ok'] == true) return;
+    final desc = '${json['description'] ?? ''}'.trim();
+    throw TelegramException(fallbackKey, detail: desc.isEmpty ? null : desc);
+  }
+
+  static String _clip(String s, int max) {
+    final t = s.trim();
+    if (t.length <= max) return t;
+    return '${t.substring(0, max - 1)}…';
   }
 
   static String _stripHtml(String raw) {
