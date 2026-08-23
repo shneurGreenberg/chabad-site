@@ -9,6 +9,7 @@ import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/youtube_embed.dart';
+import '../../widgets/playful_icons.dart';
 
 class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key, this.highlightId});
@@ -25,6 +26,8 @@ class LibraryPage extends StatelessWidget {
           subtitle: loc.t('library.subtitle'),
           icon: Icons.menu_book_outlined,
         ),
+        if (repo.shiurim.any((s) => s.isWeekly))
+          Section(child: _WeeklyBoard(repo.shiurim, loc)),
         Section(
           child: ResponsiveGrid(
             columns: gridColumns(context, max: 2),
@@ -40,6 +43,55 @@ class LibraryPage extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _WeeklyBoard extends StatelessWidget {
+  const _WeeklyBoard(this.shiurim, this.loc);
+  final List<Shiur> shiurim;
+  final LocaleController loc;
+
+  @override
+  Widget build(BuildContext context) {
+    final days = [1, 2, 3, 4, 5, 6, 7];
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(loc.t('library.weekly'),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+          const SizedBox(height: 12),
+          for (final d in days)
+            ..._dayRows(d),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _dayRows(int weekday) {
+    final items = shiurim.where((s) => s.weekday == weekday).toList();
+    if (items.isEmpty) return const [];
+    return [
+      Text(loc.t('weekday.$weekday'),
+          style: const TextStyle(fontWeight: FontWeight.w700)),
+      const SizedBox(height: 6),
+      for (final s in items)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            '${s.weeklyTime.isEmpty ? '—' : s.weeklyTime} · ${trLoc(s.title, loc.lang)} · ${trLoc(s.rabbi, loc.lang)}',
+            style: TextStyle(color: AppColors.muted, height: 1.35),
+          ),
+        ),
+      const SizedBox(height: 8),
+    ];
   }
 }
 
@@ -98,7 +150,7 @@ class _ShiurCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
+                        child: PlayfulIcon(
                           id == null
                               ? Icons.hourglass_empty
                               : Icons.play_arrow_rounded,
@@ -148,7 +200,7 @@ class _ShiurCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Row(children: [
-                      const Icon(Icons.person_outline,
+                      const PlayfulIcon(Icons.person_outline,
                           size: 14, color: Colors.black45),
                       const SizedBox(width: 4),
                       Expanded(
@@ -164,7 +216,7 @@ class _ShiurCard extends StatelessWidget {
                     const SizedBox(height: 10),
                     TextButton.icon(
                       onPressed: () => _play(context),
-                      icon: Icon(
+                      icon: PlayfulIcon(
                         id == null
                             ? Icons.schedule
                             : Icons.play_circle_outline,
@@ -212,7 +264,7 @@ class _ShiurCard extends StatelessWidget {
                         decoration:
                             BoxDecoration(gradient: AppColors.heroGradient),
                         child: const Center(
-                          child: Icon(Icons.menu_book_outlined,
+                          child: PlayfulIcon(Icons.menu_book_outlined,
                               color: Colors.white, size: 64),
                         ),
                       )
@@ -247,12 +299,12 @@ class _ShiurCard extends StatelessWidget {
                         if (id != null)
                           OutlinedButton.icon(
                             onPressed: () => openYoutubeWatch(id),
-                            icon: const Icon(Icons.open_in_new, size: 18),
+                            icon: const PlayfulIcon(Icons.open_in_new, size: 18),
                             label: Text(loc.t('library.openYoutube')),
                           ).hoverLift(),
                         FilledButton.icon(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.check, size: 18),
+                          icon: const PlayfulIcon(Icons.check, size: 18),
                           label: Text(loc.t('common.close')),
                         ).hoverLift(),
                       ],

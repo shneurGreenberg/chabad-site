@@ -15,3 +15,14 @@ void removePref(String key) {
 void openUrl(String url) {
   web.window.open(url, '_blank');
 }
+
+void downloadText(String filename, String text) {
+  final href =
+      'data:application/json;charset=utf-8,${Uri.encodeComponent(text)}';
+  final a = web.document.createElement('a') as web.HTMLAnchorElement;
+  a.href = href;
+  a.setAttribute('download', filename);
+  web.document.body?.appendChild(a);
+  a.click();
+  a.remove();
+}

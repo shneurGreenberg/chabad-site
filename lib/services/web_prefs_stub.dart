@@ -7,3 +7,5 @@ String? readPref(String key) => _mem[key];
 void removePref(String key) => _mem.remove(key);
 
 void openUrl(String url) {}
+
+void downloadText(String filename, String text) {}

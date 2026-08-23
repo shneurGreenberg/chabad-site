@@ -7,6 +7,7 @@ import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/map_embed.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -79,6 +80,17 @@ class AboutPage extends StatelessWidget {
                     ],
                   ),
                 ),
+              if (trLoc(repo.contact.holidayHours, loc.lang).trim().isNotEmpty) ...[
+                const Divider(height: 22),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(loc.t('about.holidayHours'),
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                ),
+                const SizedBox(height: 6),
+                Text(trLoc(repo.contact.holidayHours, loc.lang),
+                    style: TextStyle(color: AppColors.muted, height: 1.4)),
+              ],
             ],
           ),
         ),
@@ -122,7 +134,7 @@ class AboutPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              Icon(icon, color: AppColors.primary),
+              PlayfulIcon(icon, color: AppColors.primary),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(title,
@@ -143,7 +155,7 @@ class AboutPage extends StatelessWidget {
   Widget _row(IconData icon, String text, {bool phone = false}) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 18, color: AppColors.muted),
+          PlayfulIcon(icon, size: 18, color: AppColors.muted),
           const SizedBox(width: 10),
           Expanded(
             child: phone
@@ -190,7 +202,7 @@ class AboutPage extends StatelessWidget {
                   ],
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.place, color: AppColors.accent, size: 18),
+                  PlayfulIcon(Icons.place, color: AppColors.accent, size: 18),
                   const SizedBox(width: 8),
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 220),

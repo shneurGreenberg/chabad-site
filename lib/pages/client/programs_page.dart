@@ -7,6 +7,7 @@ import '../../theme.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class ProgramsPage extends StatelessWidget {
   const ProgramsPage({super.key, this.highlightId});
@@ -62,7 +63,7 @@ class ProgramDetailPage extends StatelessWidget {
           Section(
             child: TextButton.icon(
               onPressed: () => context.go('/programs'),
-              icon: const Icon(Icons.arrow_back),
+              icon: const PlayfulIcon(Icons.arrow_back),
               label: Text(loc.t('nav.programs')),
             ),
           ),
@@ -86,7 +87,7 @@ class ProgramDetailPage extends StatelessWidget {
             children: [
               TextButton.icon(
                 onPressed: () => context.go('/programs'),
-                icon: const Icon(Icons.arrow_back),
+                icon: const PlayfulIcon(Icons.arrow_back),
                 label: Text(loc.t('nav.programs')),
               ),
               const SizedBox(height: 8),
@@ -97,7 +98,7 @@ class ProgramDetailPage extends StatelessWidget {
                     color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(program.icon, color: color, size: 32),
+                  child: PlayfulIcon(program.icon, color: color, size: 32),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -126,7 +127,7 @@ class ProgramDetailPage extends StatelessWidget {
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
                 ),
-                icon: const Icon(Icons.how_to_reg, size: 20),
+                icon: const PlayfulIcon(Icons.how_to_reg, size: 20),
                 label: Text(loc.t('programs.register')),
               ),
             ],
@@ -140,7 +141,7 @@ class ProgramDetailPage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: AppColors.muted),
+        PlayfulIcon(icon, size: 18, color: AppColors.muted),
         const SizedBox(width: 8),
         Expanded(
           child: Column(

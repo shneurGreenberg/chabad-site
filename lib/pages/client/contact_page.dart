@@ -7,6 +7,7 @@ import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class _RegTopic {
   const _RegTopic(this.id, this.label, this.icon);
@@ -161,7 +162,7 @@ class _ContactPageState extends State<ContactPage> {
                         if (trLoc(t.label, loc.lang).trim().isNotEmpty)
                           FilterChip(
                           showCheckmark: false,
-                          avatar: Icon(t.icon, size: 18),
+                          avatar: PlayfulIcon(t.icon, size: 18),
                           label: Text(trLoc(t.label, loc.lang)),
                           selected: _selected.contains(t.id),
                           onSelected: (on) => setState(() {
@@ -225,7 +226,7 @@ class _ContactPageState extends State<ContactPage> {
                     onPressed: () => _submit(context, repo, loc, topics),
                     style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(50)),
-                    icon: const Icon(Icons.send),
+                    icon: const PlayfulIcon(Icons.send),
                     label: Text(loc.t('common.send')),
                   ).hoverLift(),
                 ],
@@ -248,7 +249,7 @@ class _ContactPageState extends State<ContactPage> {
       keyboardType: phone ? TextInputType.phone : null,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: icon == null ? null : Icon(icon),
+        prefixIcon: icon == null ? null : PlayfulIcon(icon),
       ),
       validator: (v) {
         if (required && (v == null || v.trim().isEmpty)) {
@@ -302,12 +303,12 @@ class _ContactPageState extends State<ContactPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Color(0xFF0D9488), size: 46),
+        icon: const PlayfulIcon(Icons.check_circle, color: Color(0xFF0D9488), size: 46),
         title: Text(loc.t('contact.thanks')),
         actions: [
           FilledButton.icon(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.check, size: 18),
+            icon: const PlayfulIcon(Icons.check, size: 18),
             label: Text(loc.t('common.close')),
           ),
         ],

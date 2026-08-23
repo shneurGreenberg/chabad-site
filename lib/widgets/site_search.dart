@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'playful_icons.dart';
 
 import '../data/repository.dart';
 import '../l10n/strings.dart';
@@ -73,7 +74,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
         child: IconButton(
           tooltip: loc.t('common.search'),
           onPressed: _openMobile,
-          icon: const Icon(Icons.search),
+          icon: const PlayfulIcon(Icons.search),
         ),
       );
     }
@@ -128,7 +129,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
                 isDense: true,
                 hintText: loc.t('common.search'),
                 hintStyle: const TextStyle(fontSize: 12),
-                prefixIcon: const Icon(Icons.search, size: 16),
+                prefixIcon: const PlayfulIcon(Icons.search, size: 16),
                 prefixIconConstraints:
                     const BoxConstraints(minWidth: 28, minHeight: 28),
                 suffixIcon: _controller.text.isEmpty
@@ -137,7 +138,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
                         tooltip: loc.t('common.close'),
                         visualDensity: VisualDensity.compact,
                         padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.close, size: 16),
+                        icon: const PlayfulIcon(Icons.close, size: 16),
                         onPressed: () {
                           _controller.clear();
                           _onQuery('');
@@ -213,7 +214,7 @@ class _SearchDialogState extends State<_SearchDialog> {
                 onChanged: _onQuery,
                 decoration: InputDecoration(
                   hintText: loc.t('common.search'),
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const PlayfulIcon(Icons.search),
                 ),
               ),
               const SizedBox(height: 8),
@@ -303,7 +304,7 @@ class _SearchResults extends StatelessWidget {
                         child: ListTile(
                           dense: true,
                           mouseCursor: SystemMouseCursors.click,
-                          leading: Icon(hit.icon,
+                          leading: PlayfulIcon(hit.icon,
                               color: AppColors.primary, size: 20),
                           title: Text(
                             hit.title,

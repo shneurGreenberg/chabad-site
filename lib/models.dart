@@ -225,6 +225,8 @@ class FamousPerson {
     required this.era,
     this.color = 0xFF7C3AED,
     this.initials = '',
+    this.photoUrl,
+    this.photoBytes,
   });
   final String id;
   Loc name;
@@ -233,6 +235,12 @@ class FamousPerson {
   Era era;
   int color;
   String initials;
+  String? photoUrl;
+  Uint8List? photoBytes;
+
+  bool get hasPhoto =>
+      (photoBytes != null && photoBytes!.isNotEmpty) ||
+      (photoUrl != null && photoUrl!.isNotEmpty);
 }
 
 class Grave {
@@ -398,6 +406,8 @@ class Shiur {
     required this.durationMinutes,
     required this.date,
     this.youtubeUrl = '',
+    this.weekday,
+    this.weeklyTime = '',
   });
   final String id;
   Loc title;
@@ -406,9 +416,24 @@ class Shiur {
   int durationMinutes;
   DateTime date;
   String youtubeUrl;
+  /// 1 = Monday … 7 = Sunday. Null = not on the weekly timetable.
+  int? weekday;
+  String weeklyTime;
+
+  bool get isWeekly => weekday != null && weekday! >= 1 && weekday! <= 7;
 }
 
-enum AdminJump { news, programs, gallery, library, bots, banners }
+enum AdminJump {
+  news,
+  programs,
+  gallery,
+  library,
+  bots,
+  banners,
+  cemetery,
+  events,
+  crm,
+}
 
 class AdminReminder {
   AdminReminder({
@@ -513,14 +538,152 @@ class ContactInfo {
     required this.email,
     required List<MapEntry<Loc, Loc>> hours,
     List<StaffContact>? staff,
+    Loc? holidayHours,
   })  : hours = List<MapEntry<Loc, Loc>>.of(hours),
-        staff = List<StaffContact>.of(staff ?? const []);
+        staff = List<StaffContact>.of(staff ?? const []),
+        holidayHours = holidayHours ?? {'he': '', 'en': '', 'ru': ''};
   Loc name;
   Loc address;
   String phone;
   String email;
   List<MapEntry<Loc, Loc>> hours; // day -> hours
   List<StaffContact> staff;
+  Loc holidayHours;
+}
+
+enum AdminRole { admin, editor }
+
+class SiteLinks {
+  SiteLinks({
+    this.telegram = 'https://t.me/jewishsib',
+    this.vk = 'https://vk.com/jewishsib',
+    this.youtube = '',
+    this.facebook = '',
+    this.instagram = '',
+    this.website = 'http://jewishsib.com',
+    this.donateUrl = '',
+    this.bankDetails = '',
+    this.whatsapp = '',
+    this.notifyChatId = '',
+    this.adminEmails = 'admin@chabad-city.org',
+  });
+
+  String telegram;
+  String vk;
+  String youtube;
+  String facebook;
+  String instagram;
+  String website;
+  String donateUrl;
+  String bankDetails;
+  String whatsapp;
+  String notifyChatId;
+  String adminEmails;
+
+  List<({IconData icon, String url, String labelKey})> publicItems() {
+    return [
+      if (telegram.trim().isNotEmpty)
+        (icon: Icons.telegram, url: telegram.trim(), labelKey: 'social.telegram'),
+      if (vk.trim().isNotEmpty)
+        (icon: Icons.group_outlined, url: vk.trim(), labelKey: 'social.vk'),
+      if (youtube.trim().isNotEmpty)
+        (
+          icon: Icons.smart_display_outlined,
+          url: youtube.trim(),
+          labelKey: 'social.youtube'
+        ),
+      if (facebook.trim().isNotEmpty)
+        (icon: Icons.facebook, url: facebook.trim(), labelKey: 'social.facebook'),
+      if (instagram.trim().isNotEmpty)
+        (
+          icon: Icons.camera_alt_outlined,
+          url: instagram.trim(),
+          labelKey: 'social.instagram'
+        ),
+      if (website.trim().isNotEmpty)
+        (icon: Icons.language, url: website.trim(), labelKey: 'social.website'),
+    ];
+  }
+}
+
+class CommunityEvent {
+  CommunityEvent({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.place,
+    required this.startsAt,
+    this.capacity = 0,
+    this.reserved = 0,
+    List<EventRsvp>? rsvps,
+  }) : rsvps = rsvps ?? [];
+
+  String id;
+  Loc title;
+  Loc description;
+  Loc place;
+  DateTime startsAt;
+  int capacity;
+  int reserved;
+  List<EventRsvp> rsvps;
+
+  bool get isFull => capacity > 0 && reserved >= capacity;
+  int get seatsLeft => capacity <= 0 ? 999 : (capacity - reserved).clamp(0, capacity);
+}
+
+class EventRsvp {
+  EventRsvp({
+    required this.name,
+    required this.phone,
+    this.email = '',
+    this.guests = 1,
+    DateTime? at,
+  }) : at = at ?? DateTime.now();
+
+  String name;
+  String phone;
+  String email;
+  int guests;
+  DateTime at;
+}
+
+class StoreOrder {
+  StoreOrder({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.fulfillment,
+    required this.lines,
+    required this.total,
+    required this.date,
+    this.email = '',
+    this.address = '',
+    this.note = '',
+  });
+
+  final String id;
+  String name;
+  String phone;
+  String email;
+  String fulfillment; // pickup | delivery
+  String address;
+  String note;
+  List<OrderLine> lines;
+  double total;
+  DateTime date;
+}
+
+class OrderLine {
+  OrderLine({
+    required this.productId,
+    required this.name,
+    required this.qty,
+    required this.price,
+  });
+  String productId;
+  String name;
+  int qty;
+  double price;
 }
 
 /// One photo in a page banner (home can rotate through several).
@@ -607,6 +770,7 @@ const bannerSlots = [
   BannerSlot(route: '/history', labelKey: 'nav.history'),
   BannerSlot(route: '/library', labelKey: 'nav.library'),
   BannerSlot(route: '/donate', labelKey: 'nav.donate'),
+  BannerSlot(route: '/events', labelKey: 'nav.events'),
   BannerSlot(route: '/contact', labelKey: 'nav.contact'),
   BannerSlot(route: '/about', labelKey: 'nav.about'),
 ];

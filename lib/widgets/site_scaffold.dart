@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../data/repository.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
+import '../services/links.dart';
+import '../services/web_prefs.dart';
 import '../theme.dart';
 import 'brand.dart';
 import 'common.dart';
@@ -31,6 +33,7 @@ const primaryNav = [
 ];
 
 const moreNav = [
+  NavItem('/events', 'nav.events', Icons.event_outlined),
   NavItem('/cemetery', 'nav.cemetery', Icons.grid_view_outlined),
   NavItem('/famous', 'nav.famous', Icons.star_outline),
   NavItem('/history', 'nav.history', Icons.account_balance_outlined),
@@ -106,6 +109,8 @@ class _SiteShellState extends State<SiteShell> {
       appBar: _SiteHeader(currentRoute: widget.currentRoute),
       drawer: fromEnd ? null : menu,
       endDrawer: fromEnd ? menu : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButton: const _FloatContact(),
       body: PrimaryScrollController.none(
         child: SingleChildScrollView(
           controller: _scroll,
@@ -189,7 +194,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                         HoverLift(
                           child: OutlinedButton.icon(
                             onPressed: () => context.go('/contact'),
-                            icon: const Icon(Icons.app_registration, size: 18),
+                            icon: const PlayfulIcon(Icons.app_registration, size: 18),
                             label: Text(loc.t('nav.contact')),
                           ),
                         ),
@@ -216,7 +221,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                           child: IconButton(
                             tooltip: loc.t('nav.contact'),
                             onPressed: () => context.go('/contact'),
-                            icon: const Icon(Icons.app_registration),
+                            icon: const PlayfulIcon(Icons.app_registration),
                           ),
                         ),
                         HoverScale(
@@ -236,7 +241,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                         child: IconButton(
                           tooltip: loc.t('nav.admin'),
                           onPressed: () => context.go('/admin'),
-                          icon: const Icon(Icons.admin_panel_settings_outlined),
+                          icon: const PlayfulIcon(Icons.admin_panel_settings_outlined),
                         ),
                       ),
                     ] else ...[
@@ -253,7 +258,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                           child: HoverScale(
                             child: IconButton(
                               tooltip: loc.t('nav.menu'),
-                              icon: const Icon(Icons.menu),
+                              icon: const PlayfulIcon(Icons.menu),
                               visualDensity: VisualDensity.compact,
                               onPressed: () => openMenuDrawer(
                                 context,
@@ -546,7 +551,7 @@ class _MoreMenuState extends State<_MoreMenu> {
               icon: Icons.menu,
               label: loc.t('nav.menu'),
               active: moreActive,
-              trailing: Icon(Icons.expand_more,
+              trailing: PlayfulIcon(Icons.expand_more,
                   size: 16,
                   color: moreActive ? AppColors.primary : AppColors.ink),
             ),
@@ -577,7 +582,7 @@ class LanguageSwitcher extends StatelessWidget {
               value: code,
               child: Row(children: [
                 if (loc.lang == code)
-                  Icon(Icons.check, size: 16, color: AppColors.primary)
+                  PlayfulIcon(Icons.check, size: 16, color: AppColors.primary)
                 else
                   const SizedBox(width: 16),
                 const SizedBox(width: 8),
@@ -592,7 +597,7 @@ class LanguageSwitcher extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.language, size: 16, color: fg),
+            PlayfulIcon(Icons.language, size: 16, color: fg),
             const SizedBox(width: 4),
             Text(loc.lang.toUpperCase(),
                 style: TextStyle(
@@ -600,7 +605,7 @@ class LanguageSwitcher extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                     height: 1)),
-            Icon(Icons.expand_more, size: 16, color: fg),
+            PlayfulIcon(Icons.expand_more, size: 16, color: fg),
           ]),
         ),
       ),
@@ -622,7 +627,7 @@ class _CartButton extends StatelessWidget {
         IconButton(
           tooltip: loc.t('store.cart'),
           onPressed: () => context.go('/store'),
-          icon: const Icon(Icons.shopping_cart_outlined),
+          icon: const PlayfulIcon(Icons.shopping_cart_outlined),
         ),
         if (count > 0)
           PositionedDirectional(
@@ -684,7 +689,7 @@ class _SiteDrawer extends StatelessWidget {
               HoverScale(
                 scale: 1.02,
                 child: ListTile(
-                  leading: Icon(item.icon,
+                  leading: PlayfulIcon(item.icon,
                       color: navIsActive(currentRoute, item.route)
                           ? AppColors.accentSoft
                           : const Color(0xFFF6F1E8).withValues(alpha: 0.85)),
@@ -719,7 +724,7 @@ class _SiteDrawer extends StatelessWidget {
             HoverScale(
               scale: 1.02,
               child: ListTile(
-                leading: const Icon(Icons.app_registration,
+                leading: const PlayfulIcon(Icons.app_registration,
                     color: Color(0xFFF6F1E8)),
                 title: Text(loc.t('nav.contact'),
                     style: const TextStyle(color: Color(0xFFF6F1E8))),
@@ -732,7 +737,7 @@ class _SiteDrawer extends StatelessWidget {
             HoverScale(
               scale: 1.02,
               child: ListTile(
-                leading: Icon(Icons.favorite, color: AppColors.accent),
+                leading: PlayfulIcon(Icons.favorite, color: AppColors.accent),
                 title: Text(loc.t('nav.donate'),
                     style: const TextStyle(color: Color(0xFFF6F1E8))),
                 onTap: () {
@@ -744,7 +749,7 @@ class _SiteDrawer extends StatelessWidget {
             HoverScale(
               scale: 1.02,
               child: ListTile(
-                leading: const Icon(Icons.admin_panel_settings_outlined),
+                leading: const PlayfulIcon(Icons.admin_panel_settings_outlined),
                 title: Text(loc.t('nav.admin')),
                 onTap: () {
                   Navigator.pop(context);
@@ -810,10 +815,8 @@ class _SiteFooter extends StatelessWidget {
                               fontSize: 13)),
                       const SizedBox(height: 10),
                       Row(children: [
-                        HoverScale(child: _social(Icons.facebook)),
-                        HoverScale(child: _social(Icons.telegram)),
-                        HoverScale(child: _social(Icons.camera_alt_outlined)),
-                        HoverScale(child: _social(Icons.smart_display_outlined)),
+                        for (final s in repo.links.publicItems())
+                          HoverScale(child: _social(s.icon, s.url)),
                       ]),
                     ],
                   ),
@@ -866,15 +869,20 @@ class _SiteFooter extends StatelessWidget {
     );
   }
 
-  Widget _social(IconData icon) => Padding(
+  Widget _social(IconData icon, String url) => Padding(
         padding: const EdgeInsetsDirectional.only(end: 8),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          onTap: () => openUrl(url),
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: PlayfulIcon(icon, color: Colors.white, size: 18),
           ),
-          child: Icon(icon, color: Colors.white, size: 18),
         ),
       );
 
@@ -901,7 +909,7 @@ class _SiteFooter extends StatelessWidget {
                   mouseCursor: SystemMouseCursors.click,
                   child: Row(
                     children: [
-                      Icon(item.icon,
+                      PlayfulIcon(item.icon,
                           size: 14,
                           color: Colors.white.withValues(alpha: 0.75)),
                       const SizedBox(width: 8),
@@ -927,7 +935,7 @@ class _SiteFooter extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.accentSoft, size: 16),
+            PlayfulIcon(icon, color: AppColors.accentSoft, size: 16),
             const SizedBox(width: 8),
             Expanded(
               child: phone
@@ -947,4 +955,44 @@ class _SiteFooter extends StatelessWidget {
           ],
         ),
       );
+}
+
+class _FloatContact extends StatelessWidget {
+  const _FloatContact();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    final phone = repo.links.whatsapp.trim().isEmpty
+        ? repo.contact.phone
+        : repo.links.whatsapp;
+    final wa = waMeUrl(phone);
+    final tel = telUrl(repo.contact.phone);
+    if (wa == null && tel == null) return const SizedBox.shrink();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (wa != null)
+          FloatingActionButton(
+            heroTag: 'wa',
+            backgroundColor: const Color(0xFF25D366),
+            foregroundColor: Colors.white,
+            tooltip: loc.t('social.whatsapp'),
+            onPressed: () => openUrl(wa),
+            child: const PlayfulIcon(Icons.chat, color: Colors.white),
+          ),
+        if (wa != null && tel != null) const SizedBox(height: 10),
+        if (tel != null)
+          FloatingActionButton.small(
+            heroTag: 'tel',
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            tooltip: loc.t('common.phone'),
+            onPressed: () => openUrl(tel),
+            child: const PlayfulIcon(Icons.phone, color: Colors.white, size: 20),
+          ),
+      ],
+    );
+  }
 }

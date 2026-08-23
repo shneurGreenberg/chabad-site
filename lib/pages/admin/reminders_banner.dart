@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../widgets/playful_icons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,7 @@ class _AdminRemindersBannerState extends State<AdminRemindersBanner> {
             children: [
               CircleAvatar(
                 backgroundColor: r.color.withValues(alpha: 0.14),
-                child: Icon(r.icon, color: r.color),
+                child: PlayfulIcon(r.icon, color: r.color),
               ),
               const SizedBox(width: 12),
               Expanded(

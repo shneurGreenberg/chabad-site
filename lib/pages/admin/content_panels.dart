@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../widgets/playful_icons.dart';
 
 import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
+import '../../services/notify.dart';
+import '../../services/yahrzeit.dart';
 import '../../theme.dart';
 import '../../util/youtube.dart';
 import '../../widgets/admin_fields.dart';
@@ -98,7 +101,7 @@ Widget _reorderableColumn({
                 index: i,
                 child: Padding(
                   padding: const EdgeInsetsDirectional.only(end: 4),
-                  child: Icon(Icons.drag_handle, color: AppColors.muted),
+                  child: PlayfulIcon(Icons.drag_handle, color: AppColors.muted),
                 ),
               ),
               Expanded(
@@ -115,23 +118,23 @@ Widget _reorderableColumn({
                     IconButton(
                       tooltip: loc.t('admin.moveUp'),
                       onPressed: i == 0 ? null : () => onMove(i, i - 1),
-                      icon: Icon(Icons.keyboard_arrow_up,
+                      icon: PlayfulIcon(Icons.keyboard_arrow_up,
                           color: AppColors.ink),
                     ),
                     IconButton(
                       tooltip: loc.t('admin.moveDown'),
                       onPressed:
                           i == length - 1 ? null : () => onMove(i, i + 1),
-                      icon: Icon(Icons.keyboard_arrow_down,
+                      icon: PlayfulIcon(Icons.keyboard_arrow_down,
                           color: AppColors.ink),
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit_outlined,
+                      icon: PlayfulIcon(Icons.edit_outlined,
                           size: 20, color: AppColors.ink),
                       onPressed: () => onEdit(i),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline,
+                      icon: const PlayfulIcon(Icons.delete_outline,
                           size: 20, color: Color(0xFFEF4444)),
                       onPressed: () => onDelete(i),
                     ),
@@ -168,7 +171,7 @@ Future<void> _showEditor({
                           fontWeight: FontWeight.w800, fontSize: 18)),
                 ),
                 IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const PlayfulIcon(Icons.close),
                     onPressed: () => Navigator.pop(ctx)),
               ]),
             ),
@@ -185,7 +188,7 @@ Future<void> _showEditor({
                 children: [
                   TextButton.icon(
                     onPressed: () => Navigator.pop(ctx),
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const PlayfulIcon(Icons.close, size: 18),
                     label: Text(ctx.loc.t('common.cancel')),
                   ),
                   const SizedBox(width: 8),
@@ -194,7 +197,7 @@ Future<void> _showEditor({
                       onSave();
                       Navigator.pop(ctx);
                     },
-                    icon: const Icon(Icons.save_outlined, size: 18),
+                    icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                     label: Text(ctx.loc.t('common.save')),
                   ),
                 ],
@@ -223,6 +226,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
   late final Map<String, TextEditingController> _address;
   late final TextEditingController _phone;
   late final TextEditingController _email;
+  late final Map<String, TextEditingController> _holidayHours;
   late List<_HourRow> _hours;
   late List<_StaffRow> _staff;
 
@@ -239,6 +243,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
     _address = _locCtrls(repo.contact.address);
     _phone = TextEditingController(text: repo.contact.phone);
     _email = TextEditingController(text: repo.contact.email);
+    _holidayHours = _locCtrls(repo.contact.holidayHours);
     _hours = [
       for (final h in repo.contact.hours) _HourRow(h.key, h.value),
     ];
@@ -259,6 +264,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
       ..._address.values,
       _phone,
       _email,
+      ..._holidayHours.values,
       for (final h in _hours) ...[...h.day.values, ...h.hours.values],
       for (final s in _staff) ...[...s.name.values, ...s.role.values, s.phone],
     ]);
@@ -276,6 +282,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
     _applyLoc(repo.contact.address, _address);
     repo.contact.phone = _phone.text.trim();
     repo.contact.email = _email.text.trim();
+    _applyLoc(repo.contact.holidayHours, _holidayHours);
     repo.contact.hours
       ..clear()
       ..addAll([
@@ -311,7 +318,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
           actions: [
             FilledButton.icon(
               onPressed: _save,
-              icon: const Icon(Icons.save_outlined, size: 18),
+              icon: const PlayfulIcon(Icons.save_outlined, size: 18),
               label: Text(loc.t('common.save')),
             ),
           ],
@@ -359,7 +366,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
           actions: [
             OutlinedButton.icon(
               onPressed: () => setState(() => _hours.add(_HourRow({}, {}))),
-              icon: const Icon(Icons.add, size: 18),
+              icon: const PlayfulIcon(Icons.add, size: 18),
               label: Text(loc.t('common.add')),
             ),
           ],
@@ -388,12 +395,17 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
                           _hours[i].dispose();
                           _hours.removeAt(i);
                         }),
-                        icon: const Icon(Icons.delete_outline,
+                        icon: const PlayfulIcon(Icons.delete_outline,
                             color: Color(0xFFEF4444)),
                       ),
                     ],
                   ),
                 ),
+              LocFieldGroup(
+                label: loc.t('about.holidayHours'),
+                controllers: _holidayHours,
+                maxLines: 3,
+              ),
             ],
           ),
         ),
@@ -407,7 +419,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
                     role: {'he': '', 'en': '', 'ru': ''},
                     phone: '',
                   )))),
-              icon: const Icon(Icons.add, size: 18),
+              icon: const PlayfulIcon(Icons.add, size: 18),
               label: Text(loc.t('common.add')),
             ),
           ],
@@ -440,7 +452,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
                           _staff[i].dispose();
                           _staff.removeAt(i);
                         }),
-                        icon: const Icon(Icons.delete_outline,
+                        icon: const PlayfulIcon(Icons.delete_outline,
                             color: Color(0xFFEF4444)),
                       ),
                     ],
@@ -485,7 +497,7 @@ class ManageFamousPanel extends StatelessWidget {
       actions: [
         FilledButton.icon(
           onPressed: () => _edit(context, repo, repo.newBlankFamous(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -496,18 +508,27 @@ class ManageFamousPanel extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: Color(p.color).withValues(alpha: 0.15),
-                child: Text(p.initials.isEmpty ? '•' : p.initials,
-                    style: TextStyle(
-                        color: Color(p.color), fontWeight: FontWeight.w800)),
+                backgroundImage: p.hasPhoto
+                    ? ((p.photoBytes != null && p.photoBytes!.isNotEmpty)
+                        ? MemoryImage(p.photoBytes!)
+                        : (p.photoUrl!.startsWith('assets/')
+                            ? AssetImage(p.photoUrl!)
+                            : NetworkImage(p.photoUrl!)) as ImageProvider)
+                    : null,
+                child: p.hasPhoto
+                    ? null
+                    : Text(p.initials.isEmpty ? '•' : p.initials,
+                        style: TextStyle(
+                            color: Color(p.color), fontWeight: FontWeight.w800)),
               ),
               title: Text(trLoc(p.name, loc.lang)),
               subtitle: Text(trLoc(p.profession, loc.lang)),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                     onPressed: () => _edit(context, repo, p)),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteFamous(p.id),
                 ),
@@ -525,12 +546,22 @@ class ManageFamousPanel extends StatelessWidget {
     final bio = _locCtrls(person.bio);
     final initials = TextEditingController(text: person.initials);
     var era = person.era;
+    var photoBytes = person.photoBytes;
     _showEditor(
       context: context,
       title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
       child: StatefulBuilder(builder: (context, setSt) {
         final loc = context.locWatch;
         return Column(children: [
+          CoverImagePicker(
+            bytes: photoBytes,
+            url: person.photoUrl,
+            color: person.color,
+            icon: Icons.person_outline,
+            height: 180,
+            onChanged: (b) => setSt(() => photoBytes = b),
+          ),
+          const SizedBox(height: 12),
           LocFieldGroup(label: loc.t('common.name'), controllers: name),
           LocFieldGroup(label: loc.t('admin.staff.role'), controllers: profession),
           LocFieldGroup(
@@ -559,6 +590,7 @@ class ManageFamousPanel extends StatelessWidget {
         _applyLoc(person.bio, bio);
         person.initials = initials.text.trim();
         person.era = era;
+        person.photoBytes = photoBytes;
         if (isNew) {
           repo.addFamous(person);
         } else {
@@ -584,7 +616,7 @@ class ManageHistoryPanel extends StatelessWidget {
             FilledButton.icon(
               onPressed: () =>
                   _editHist(context, repo, repo.newBlankHistory(), isNew: true),
-              icon: const Icon(Icons.add, size: 18),
+              icon: const PlayfulIcon(Icons.add, size: 18),
               label: Text(loc.t('common.add')),
             ),
           ],
@@ -624,7 +656,7 @@ class ManageHistoryPanel extends StatelessWidget {
             FilledButton.icon(
               onPressed: () =>
                   _editTour(context, repo, repo.newBlankTour(), isNew: true),
-              icon: const Icon(Icons.add, size: 18),
+              icon: const PlayfulIcon(Icons.add, size: 18),
               label: Text(loc.t('common.add')),
             ),
           ],
@@ -641,7 +673,7 @@ class ManageHistoryPanel extends StatelessWidget {
                 onReorder: repo.reorderTour,
                 onMove: repo.moveTour,
                 leading: (i) =>
-                    Icon(repo.tour[i].icon, color: Color(repo.tour[i].color)),
+                    PlayfulIcon(repo.tour[i].icon, color: Color(repo.tour[i].color)),
                 title: (i) => trLoc(repo.tour[i].name, loc.lang),
                 subtitle: (i) => trLoc(repo.tour[i].description, loc.lang),
                 onEdit: (i) => _editTour(context, repo, repo.tour[i]),
@@ -730,7 +762,7 @@ class ManageLibraryPanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: () =>
               _edit(context, repo, repo.newBlankShiur(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -739,7 +771,7 @@ class ManageLibraryPanel extends StatelessWidget {
           for (final s in repo.shiurim)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: Icon(
+              leading: PlayfulIcon(
                 youtubeIdFrom(s.youtubeUrl) == null
                     ? Icons.menu_book_outlined
                     : Icons.smart_display_outlined,
@@ -753,10 +785,10 @@ class ManageLibraryPanel extends StatelessWidget {
                   '${youtubeIdFrom(s.youtubeUrl) == null ? '' : ' · YouTube'}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                     onPressed: () => _edit(context, repo, s)),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteShiur(s.id),
                 ),
@@ -774,6 +806,8 @@ class ManageLibraryPanel extends StatelessWidget {
     final topic = _locCtrls(shiur.topic);
     final mins = TextEditingController(text: '${shiur.durationMinutes}');
     final youtube = TextEditingController(text: shiur.youtubeUrl);
+    final weekday = TextEditingController(text: shiur.weekday?.toString() ?? '');
+    final weeklyTime = TextEditingController(text: shiur.weeklyTime);
     _showEditor(
       context: context,
       title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
@@ -789,11 +823,28 @@ class ManageLibraryPanel extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         TextField(
+          controller: weekday,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: context.loc.t('admin.shiur.weekday'),
+            hintText: '1–7',
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: weeklyTime,
+          decoration: InputDecoration(
+            labelText: context.loc.t('admin.shiur.time'),
+            hintText: '19:00',
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
           controller: youtube,
           decoration: InputDecoration(
             labelText: context.loc.t('admin.shiur.youtube'),
             hintText: 'https://www.youtube.com/watch?v=…',
-            prefixIcon: const Icon(Icons.smart_display_outlined),
+            prefixIcon: const PlayfulIcon(Icons.smart_display_outlined),
           ),
         ),
       ]),
@@ -803,12 +854,23 @@ class ManageLibraryPanel extends StatelessWidget {
         _applyLoc(shiur.topic, topic);
         shiur.durationMinutes = int.tryParse(mins.text) ?? shiur.durationMinutes;
         shiur.youtubeUrl = youtube.text.trim();
+        final w = int.tryParse(weekday.text.trim());
+        shiur.weekday = (w != null && w >= 1 && w <= 7) ? w : null;
+        shiur.weeklyTime = weeklyTime.text.trim();
         if (isNew) {
           repo.addShiur(shiur);
         } else {
           repo.refresh();
         }
-        _disposeAll([...title.values, ...rabbi.values, ...topic.values, mins, youtube]);
+        _disposeAll([
+          ...title.values,
+          ...rabbi.values,
+          ...topic.values,
+          mins,
+          youtube,
+          weekday,
+          weeklyTime,
+        ]);
       },
     );
   }
@@ -826,7 +888,7 @@ class ManageDonatePanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: () => _edit(context, repo, {'he': '', 'en': '', 'ru': ''},
               isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -835,15 +897,15 @@ class ManageDonatePanel extends StatelessWidget {
           for (int i = 0; i < repo.campaigns.length; i++)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.volunteer_activism_outlined),
+              leading: const PlayfulIcon(Icons.volunteer_activism_outlined),
               title: Text(trLoc(repo.campaigns[i], loc.lang)),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                     onPressed: () => _edit(context, repo, repo.campaigns[i],
                         index: i)),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteCampaignAt(i),
                 ),
@@ -857,20 +919,28 @@ class ManageDonatePanel extends StatelessWidget {
   void _edit(BuildContext context, AppRepository repo, Loc campaign,
       {int? index, bool isNew = false}) {
     final ctrls = _locCtrls(campaign);
+    final notes = _locCtrls(index == null ? {} : repo.campaignNoteAt(index));
     _showEditor(
       context: context,
       title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
-      child: LocFieldGroup(
-          label: context.loc.t('common.name'), controllers: ctrls),
+      child: Column(children: [
+        LocFieldGroup(label: context.loc.t('common.name'), controllers: ctrls),
+        LocFieldGroup(
+          label: context.loc.t('donate.campaign.note'),
+          controllers: notes,
+          maxLines: 3,
+        ),
+      ]),
       onSave: () {
         final next = {for (final l in supportedLangs) l: ctrls[l]!.text};
+        final note = {for (final l in supportedLangs) l: notes[l]!.text};
         if (isNew) {
-          repo.addCampaign(next);
+          repo.addCampaign(next, note);
         } else if (index != null) {
           repo.campaigns[index] = next;
-          repo.refresh();
+          repo.setCampaignNoteAt(index, note);
         }
-        _disposeAll(ctrls.values);
+        _disposeAll([...ctrls.values, ...notes.values]);
       },
     );
   }
@@ -902,7 +972,7 @@ class _ManageCemeteryPanelState extends State<ManageCemeteryPanel> {
         FilledButton.icon(
           onPressed: () =>
               _edit(context, repo, repo.newBlankGrave(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -911,11 +981,47 @@ class _ManageCemeteryPanelState extends State<ManageCemeteryPanel> {
           TextField(
             onChanged: (v) => setState(() => _q = v),
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: const PlayfulIcon(Icons.search),
               hintText: loc.t('search.hint'),
             ),
           ),
           const SizedBox(height: 12),
+          if (upcomingYahrzeits(repo.graves, withinDays: 21).isNotEmpty) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(loc.t('cemetery.upcoming'),
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+            ),
+            for (final y in upcomingYahrzeits(repo.graves, withinDays: 21))
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const PlayfulIcon(Icons.local_florist_outlined),
+                title: Text(y.grave.hebrewName.isEmpty
+                    ? y.grave.name
+                    : y.grave.hebrewName),
+                subtitle: Text('${y.grave.deathLabel} · ${y.days}'),
+                trailing: IconButton(
+                  tooltip: loc.t('admin.yahrzeit.send'),
+                  icon: const PlayfulIcon(Icons.send, size: 18),
+                  onPressed: () async {
+                    final who = y.grave.hebrewName.isEmpty
+                        ? y.grave.name
+                        : y.grave.hebrewName;
+                    await SiteNotify.send(
+                      notifyChatId: repo.links.notifyChatId,
+                      email: repo.contact.email,
+                      title: 'יארצייט · $who',
+                      body: '${y.grave.deathLabel} · ${y.days}',
+                    );
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.t('admin.yahrzeit.sent'))),
+                    );
+                  },
+                ),
+              ),
+            const Divider(),
+          ],
           for (final g in items.take(80))
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -924,10 +1030,10 @@ class _ManageCemeteryPanelState extends State<ManageCemeteryPanel> {
                   [g.name, g.section, g.deathLabel].where((s) => s.isNotEmpty).join(' · ')),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                     onPressed: () => _edit(context, repo, g)),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteGrave(g.id),
                 ),
@@ -1008,6 +1114,108 @@ class _ManageCemeteryPanelState extends State<ManageCemeteryPanel> {
           repo.markGravesEdited();
         }
         _disposeAll([name, hebrew, section, row, birth, death, ...notes.values]);
+      },
+    );
+  }
+}
+
+class ManageEventsPanel extends StatelessWidget {
+  const ManageEventsPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    return _panel(
+      title: loc.t('admin.manage.events'),
+      actions: [
+        FilledButton.icon(
+          onPressed: () =>
+              _edit(context, repo, repo.newBlankEvent(), isNew: true),
+          icon: const PlayfulIcon(Icons.add, size: 18),
+          label: Text(loc.t('common.add')),
+        ),
+      ],
+      child: Column(
+        children: [
+          for (final e in repo.events)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const PlayfulIcon(Icons.event_outlined),
+              title: Text(trLoc(e.title, loc.lang)),
+              subtitle: Text(
+                '${e.startsAt} · ${e.rsvps.length} ${loc.t('events.rsvp')} · ${e.reserved}/${e.capacity <= 0 ? '∞' : e.capacity}',
+              ),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                IconButton(
+                  icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
+                  onPressed: () => _edit(context, repo, e),
+                ),
+                IconButton(
+                  icon: const PlayfulIcon(Icons.delete_outline,
+                      size: 20, color: Color(0xFFEF4444)),
+                  onPressed: () => repo.deleteEvent(e.id),
+                ),
+              ]),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _edit(BuildContext context, AppRepository repo, CommunityEvent event,
+      {bool isNew = false}) {
+    final title = _locCtrls(event.title);
+    final desc = _locCtrls(event.description);
+    final place = _locCtrls(event.place);
+    final when = TextEditingController(text: event.startsAt.toIso8601String());
+    final cap = TextEditingController(text: '${event.capacity}');
+    _showEditor(
+      context: context,
+      title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
+      child: Column(children: [
+        LocFieldGroup(label: context.loc.t('common.name'), controllers: title),
+        LocFieldGroup(
+          label: context.loc.t('common.message'),
+          controllers: desc,
+          maxLines: 3,
+        ),
+        LocFieldGroup(label: context.loc.t('events.place'), controllers: place),
+        TextField(
+          controller: when,
+          decoration: InputDecoration(labelText: context.loc.t('events.when')),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: cap,
+          keyboardType: TextInputType.number,
+          decoration:
+              InputDecoration(labelText: context.loc.t('events.capacity')),
+        ),
+        if (event.rsvps.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          for (final r in event.rsvps)
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text('${r.name} · ${r.guests}'),
+              subtitle: Text('${r.phone} ${r.email}'),
+            ),
+        ],
+      ]),
+      onSave: () {
+        _applyLoc(event.title, title);
+        _applyLoc(event.description, desc);
+        _applyLoc(event.place, place);
+        event.startsAt =
+            DateTime.tryParse(when.text.trim()) ?? event.startsAt;
+        event.capacity = int.tryParse(cap.text) ?? event.capacity;
+        if (isNew) {
+          repo.addEvent(event);
+        } else {
+          repo.refresh();
+        }
+        _disposeAll([...title.values, ...desc.values, ...place.values, when, cap]);
       },
     );
   }

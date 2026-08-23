@@ -6,6 +6,7 @@ import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -81,7 +82,7 @@ class _TimelineTile extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.flag, size: 20, color: AppColors.primaryDark),
+                child: PlayfulIcon(Icons.flag, size: 20, color: AppColors.primaryDark),
               ),
               if (!isLast)
                 Expanded(
@@ -148,7 +149,7 @@ class _TourCard extends StatelessWidget {
                     color: Colors.black.withValues(alpha: 0.35),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.threesixty, color: Colors.white, size: 30),
+                  child: const PlayfulIcon(Icons.threesixty, color: Colors.white, size: 30),
                 ),
               ),
             ),
@@ -169,7 +170,7 @@ class _TourCard extends StatelessWidget {
                 const SizedBox(height: 12),
                 FilledButton.icon(
                   onPressed: onStart,
-                  icon: const Icon(Icons.play_circle_outline, size: 18),
+                  icon: const PlayfulIcon(Icons.play_circle_outline, size: 18),
                   label: Text(loc.t('history.tour.cta')),
                 ).hoverLift(),
               ],
@@ -207,7 +208,7 @@ class _TourDialogState extends State<_TourDialog> {
               GradientImage(color: stop.color, icon: stop.icon, height: 240),
               Positioned.fill(
                 child: Center(
-                  child: Icon(Icons.threesixty,
+                  child: PlayfulIcon(Icons.threesixty,
                       color: Colors.white.withValues(alpha: 0.85), size: 54),
                 ),
               ),
@@ -215,7 +216,7 @@ class _TourDialogState extends State<_TourDialog> {
                 top: 8,
                 end: 8,
                 child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: const PlayfulIcon(Icons.close, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
                 ).hoverScale(),
               ),
@@ -243,7 +244,7 @@ class _TourDialogState extends State<_TourDialog> {
                   Row(children: [
                     OutlinedButton.icon(
                       onPressed: _i > 0 ? () => setState(() => _i--) : null,
-                      icon: const Icon(Icons.chevron_left),
+                      icon: const PlayfulIcon(Icons.chevron_left),
                       label: Text(loc.t('common.previous')),
                     ).hoverLift(),
                     const Spacer(),
@@ -251,7 +252,7 @@ class _TourDialogState extends State<_TourDialog> {
                       onPressed: _i < widget.stops.length - 1
                           ? () => setState(() => _i++)
                           : () => Navigator.pop(context),
-                      icon: Icon(
+                      icon: PlayfulIcon(
                         _i < widget.stops.length - 1
                             ? Icons.chevron_right
                             : Icons.check,

@@ -10,8 +10,10 @@ import '../services/cloud_sync.dart';
 import '../services/image_compress.dart';
 import '../services/location_zmanim.dart';
 import '../services/persist.dart';
+import '../services/notify.dart';
 import '../services/telegram.dart';
 import '../services/web_prefs.dart';
+import '../services/yahrzeit.dart';
 import 'holidays.dart';
 import 'snapshot.dart';
 
@@ -185,6 +187,78 @@ class AppRepository extends ChangeNotifier {
       ),
     ],
   );
+
+  final SiteLinks links = SiteLinks();
+  final List<Loc> campaignNotes = [
+    {
+      'he': 'החזקת הבניין, תפילות וקהילה יומיומית',
+      'en': 'Building upkeep, daily prayer and community life',
+      'ru': 'Содержание здания, молитвы и повседневная жизнь общины',
+    },
+    {
+      'he': 'חינוך יהודי לילדים בנובוסיבירסק',
+      'en': 'Jewish education for children in Novosibirsk',
+      'ru': 'Еврейское образование детей в Новосибирске',
+    },
+    {
+      'he': 'תמיכה בילדים עם צרכים מיוחדים',
+      'en': 'Support for children with special needs',
+      'ru': 'Поддержка детей с особыми потребностями',
+    },
+    {
+      'he': 'מצות וסיוע לחג הפסח',
+      'en': 'Matzah and Passover assistance',
+      'ru': 'Маца и помощь к Песаху',
+    },
+    {
+      'he': 'מושב, שופר וסעודות הימים הנוראים',
+      'en': 'High Holiday seats, shofar and meals',
+      'ru': 'Места, шофар и трапезы Высоких праздников',
+    },
+  ];
+  late final List<CommunityEvent> events = [
+    CommunityEvent(
+      id: _newId(),
+      title: {
+        'he': 'סעודת שבת קהילתית',
+        'en': 'Community Shabbat meal',
+        'ru': 'Общинная субботняя трапеза',
+      },
+      description: {
+        'he': 'סעודה חמה אחרי התפילה. הרשמה מראש — מספר המקומות מוגבל.',
+        'en': 'A warm meal after services. Please RSVP — seats are limited.',
+        'ru': 'Тёплая трапеза после молитвы. Регистрация заранее — мест мало.',
+      },
+      place: {
+        'he': 'אולם בית מנחם',
+        'en': 'Beit Menachem hall',
+        'ru': 'Зал Бейт Менахем',
+      },
+      startsAt: DateTime.now().add(const Duration(days: 5, hours: 3)),
+      capacity: 80,
+    ),
+    CommunityEvent(
+      id: _newId(),
+      title: {
+        'he': 'ערב ראש השנה',
+        'en': 'Erev Rosh Hashanah',
+        'ru': 'Канун Рош ха-Шана',
+      },
+      description: {
+        'he': 'תפילת ערבית, שופר וברכה לקהילה. מוזמנים משפחות וילדים.',
+        'en': 'Maariv, shofar and a blessing for the community. Families welcome.',
+        'ru': 'Маарив, шофар и благословение общины. Семьи приглашаются.',
+      },
+      place: {
+        'he': 'בית הכנסת בית מנחם',
+        'en': 'Beit Menachem synagogue',
+        'ru': 'Синагога Бейт Менахем',
+      },
+      startsAt: DateTime(DateTime.now().year, 9, 11, 18, 30),
+      capacity: 200,
+    ),
+  ];
+  final List<StoreOrder> orders = [];
 
   String googleMapsApiKey = '';
   final SiteCopy siteCopy = SiteCopy.defaults();
@@ -651,7 +725,180 @@ class AppRepository extends ChangeNotifier {
     FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם בית ספר אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
     FamousPerson(id: _newId(), name: {'he': 'הרבנית מרים זקלס', 'en': 'Rebbetzin Miriam Zaklos', 'ru': 'Раббанит Мириам Заклос'}, profession: {'he': 'שליחת חב״ד', 'en': 'Chabad emissary', 'ru': 'Посланница Хабада'}, bio: {'he': 'שותפה לשליחות בנובוסיבירסק מאז 1999. מובילה חינוך, חגים וחיי הקהילה לצד הרב.', 'en': 'Partner in the Novosibirsk shlichut since 1999. Leads education, holidays and community life alongside the Rabbi.', 'ru': 'Вместе с раввином на миссии с 1999 года. Образование, праздники и жизнь общины.'}, era: Era.present, color: 0xFFDB2777, initials: 'MZ'),
     FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'נשיא הקהילה', 'en': 'President of the community', 'ru': 'Президент общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 נשיא קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since June 2019 president of the Beit Menachem community.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с июня 2019 президент общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
+    ...historicalFamous(),
   ];
+
+  static List<FamousPerson> historicalFamous() => [
+        FamousPerson(
+          id: 'famous-kantorovich',
+          name: {
+            'he': 'לאוניד קנטורוביץ׳',
+            'en': 'Leonid Kantorovich',
+            'ru': 'Леонид Канторович'
+          },
+          profession: {
+            'he': 'מתמטיקאי וכלכלן, חתן פרס נובל',
+            'en': 'Mathematician and economist, Nobel laureate',
+            'ru': 'Математик и экономист, лауреат Нобелевской премии'
+          },
+          bio: {
+            'he': 'מתמטיקאי וכלכלן יהודי־רוסי, אבי התכנון הליניארי וחתן פרס נובל לכלכלה (1975). בין 1960–1971 חי בנובוסיבירסק, הקים וניהל את המחלקה למתמטיקה חישובית באוניברסיטת נובוסיבירסק (NSU).',
+            'en': 'Jewish-Russian mathematician and economist, father of linear programming and 1975 Nobel laureate in economics. Lived in Novosibirsk in 1960–1971 and founded the computational mathematics department at NSU.',
+            'ru': 'Еврейский математик и экономист, основоположник линейного программирования, Нобелевский лауреат 1975 года. В 1960–1971 жил в Новосибирске и создал кафедру вычислительной математики в НГУ.'
+          },
+          era: Era.past,
+          color: 0xFF1D4ED8,
+          initials: 'LK',
+          photoUrl: 'assets/images/famous/kantorovich.jpg',
+        ),
+        FamousPerson(
+          id: 'famous-budker',
+          name: {
+            'he': 'גרש בודקר',
+            'en': 'Gersh Budker',
+            'ru': 'Герш Будкер'
+          },
+          profession: {
+            'he': 'פיזיקאי גרעין, מייסד BINP',
+            'en': 'Nuclear physicist, founder of BINP',
+            'ru': 'Физик-ядерщик, основатель ИЯФ'
+          },
+          bio: {
+            'he': 'פיזיקאי גרעין יהודי פורץ דרך. ייסד ב־1959 את המכון לפיזיקה גרעינית בנובוסיבירסק (BINP) ועמד בראשו — המכון נקרא כיום על שמו. המציא בעיר את שיטת הקירור האלקטרוני של חלקיקים.',
+            'en': 'Pioneering Jewish nuclear physicist. Founded the Budker Institute of Nuclear Physics (BINP) in Novosibirsk in 1959 and invented electron cooling of particles there. The institute now bears his name.',
+            'ru': 'Выдающийся физик-ядерщик. В 1959 основал Институт ядерной физики в Новосибирске и изобрёл электронное охлаждение частиц. Институт носит его имя.'
+          },
+          era: Era.past,
+          color: 0xFF7C3AED,
+          initials: 'GB',
+          photoUrl: 'assets/images/famous/budker.jpg',
+        ),
+        FamousPerson(
+          id: 'famous-sokolov',
+          name: {
+            'he': 'ארסני סוקולוב',
+            'en': 'Arseny Sokolov',
+            'ru': 'Арсений Соколов'
+          },
+          profession: {
+            'he': 'פיזיקאי תאורטי',
+            'en': 'Theoretical physicist',
+            'ru': 'Физик-теоретик'
+          },
+          bio: {
+            'he': 'פיזיקאי תאורטי יהודי נודע, שותף לפיתוח תיאוריית קרינת הסינכרוטרון. נולד בנובוסיבירסק ב־1910.',
+            'en': 'Noted Jewish theoretical physicist who helped develop synchrotron radiation theory. Born in Novosibirsk in 1910.',
+            'ru': 'Известный физик-теоретик, один из авторов теории синхротронного излучения. Родился в Новосибирске в 1910 году.'
+          },
+          era: Era.past,
+          color: 0xFF0F766E,
+          initials: 'AS',
+          photoUrl: 'assets/images/famous/sokolov.jpg',
+        ),
+        FamousPerson(
+          id: 'famous-vengerov',
+          name: {
+            'he': 'מקסים ונגרוב',
+            'en': 'Maxim Vengerov',
+            'ru': 'Максим Венгеров'
+          },
+          profession: {
+            'he': 'כנר, ויולן ומנצח',
+            'en': 'Violinist, violist and conductor',
+            'ru': 'Скрипач, альтист и дирижёр'
+          },
+          bio: {
+            'he': 'כנר וירטואוז מהשורה הראשונה בעולם. נולד בנובוסיבירסק ב־1974 להורים מוזיקאים יהודים, עלה לישראל וקיבל אזרחות ישראלית.',
+            'en': 'World-renowned violinist. Born in Novosibirsk in 1974 to local Jewish musicians, later made aliyah and became an Israeli citizen.',
+            'ru': 'Скрипач мирового уровня. Родился в Новосибирске в 1974 году в еврейской музыкальной семье, репатриировался в Израиль.'
+          },
+          era: Era.present,
+          color: 0xFFB45309,
+          initials: 'MV',
+          photoUrl: 'assets/images/famous/vengerov.jpg',
+        ),
+        FamousPerson(
+          id: 'famous-zak',
+          name: {
+            'he': 'איזידור זאק',
+            'en': 'Isidor Zak',
+            'ru': 'Исидор Зак'
+          },
+          profession: {
+            'he': 'מנצח, מייסד תיאטרון האופרה',
+            'en': 'Conductor, opera theatre founder',
+            'ru': 'Дирижёр, основатель театра оперы'
+          },
+          bio: {
+            'he': 'מנצח ואיש מוזיקה יהודי בולט. ממייסדיו ומנהלו המוזיקלי הראשון של תיאטרון האופרה והבלט של נובוסיבירסק — המבנה הגדול בעיר וסמלה התרבותי.',
+            'en': 'Prominent Jewish conductor. Co-founder and first music director of the Novosibirsk Opera and Ballet Theatre, the city’s largest cultural landmark.',
+            'ru': 'Выдающийся дирижёр. Один из основателей и первый музыкальный руководитель Новосибирского театра оперы и балета — главного культурного символа города.'
+          },
+          era: Era.past,
+          color: 0xFF9F1239,
+          initials: 'IZ',
+          photoUrl: 'assets/images/famous/zak.jpg',
+        ),
+        FamousPerson(
+          id: 'famous-rabinovich',
+          name: {
+            'he': 'אלכסנדר רבינוביץ׳',
+            'en': 'Aleksandr Rabinovich',
+            'ru': 'Александр Рабинович'
+          },
+          profession: {
+            'he': 'מוזיקולוג ומלחין',
+            'en': 'Musicologist and composer',
+            'ru': 'Музыковед и композитор'
+          },
+          bio: {
+            'he': 'מוזיקולוג ומלחין יהודי חשוב שנולד בסנקט פטרבורג. פעל, יצר ונפטר בנובוסיבירסק ב־1943, בתקופת פינוי אנשי הרוח במלחמת העולם השנייה.',
+            'en': 'Important Jewish musicologist and composer, born in Saint Petersburg. Worked and died in Novosibirsk in 1943 during the wartime evacuation of intellectuals.',
+            'ru': 'Крупный музыковед и композитор, уроженец Санкт-Петербурга. Работал и умер в Новосибирске в 1943 году во время эвакуации деятелей культуры.'
+          },
+          era: Era.past,
+          color: 0xFF334155,
+          initials: 'AR',
+        ),
+        FamousPerson(
+          id: 'famous-vaksberg',
+          name: {
+            'he': 'ארקדי ואקסברג',
+            'en': 'Arkady Vaksberg',
+            'ru': 'Аркадий Ваксберг'
+          },
+          profession: {
+            'he': 'משפטן, היסטוריון ועיתונאי',
+            'en': 'Lawyer, historian and journalist',
+            'ru': 'Юрист, историк и журналист'
+          },
+          bio: {
+            'he': 'משפטן, היסטוריון, עיתונאי חוקר וסופר יהודי־רוסי. נולד בנובוסיבירסק ב־1927 וכתב עשרות ספרים על מאחורי הקלעים של המשטר הסובייטי, ובהם «סטלין נגד היהודים».',
+            'en': 'Jewish-Russian lawyer, historian and investigative journalist. Born in Novosibirsk in 1927; wrote many books on the Soviet regime, including Stalin Against the Jews.',
+            'ru': 'Юрист, историк и журналист-расследователь. Родился в Новосибирске в 1927 году; автор книг о советской власти, в том числе «Сталин против евреев».'
+          },
+          era: Era.past,
+          color: 0xFF155E75,
+          initials: 'AV',
+          photoUrl: 'assets/images/famous/vaksberg.jpg',
+        ),
+      ];
+
+  void _ensureHistoricalFamous() {
+    final have = {for (final p in famous) p.id: p};
+    for (final p in historicalFamous()) {
+      final existing = have[p.id];
+      if (existing == null) {
+        famous.add(p);
+        _noteId(p.id);
+        continue;
+      }
+      if ((existing.photoUrl == null || existing.photoUrl!.trim().isEmpty) &&
+          p.photoUrl != null) {
+        existing.photoUrl = p.photoUrl;
+      }
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Cemetery (loaded from JSON asset — not stored in snapshot)
@@ -779,6 +1026,8 @@ class AppRepository extends ChangeNotifier {
       topic: {'he': 'חגים', 'en': 'Holidays', 'ru': 'Праздники'},
       durationMinutes: 45,
       date: DateTime.now().subtract(const Duration(days: 1)),
+      weekday: DateTime.sunday,
+      weeklyTime: '11:00',
     ),
     Shiur(
       id: _newId(),
@@ -795,6 +1044,8 @@ class AppRepository extends ChangeNotifier {
       topic: {'he': 'פרשה', 'en': 'Parasha', 'ru': 'Глава'},
       durationMinutes: 42,
       date: DateTime.now().subtract(const Duration(days: 2)),
+      weekday: DateTime.saturday,
+      weeklyTime: '12:30',
     ),
     Shiur(
       id: _newId(),
@@ -811,6 +1062,8 @@ class AppRepository extends ChangeNotifier {
       topic: {'he': 'חסידות', 'en': 'Chassidut', 'ru': 'Хасидизм'},
       durationMinutes: 55,
       date: DateTime.now().subtract(const Duration(days: 9)),
+      weekday: DateTime.thursday,
+      weeklyTime: '19:00',
     ),
     Shiur(
       id: _newId(),
@@ -827,6 +1080,8 @@ class AppRepository extends ChangeNotifier {
       topic: {'he': 'הלכה', 'en': 'Halacha', 'ru': 'Алаха'},
       durationMinutes: 38,
       date: DateTime.now().subtract(const Duration(days: 16)),
+      weekday: DateTime.friday,
+      weeklyTime: '10:30',
     ),
     Shiur(
       id: _newId(),
@@ -843,6 +1098,8 @@ class AppRepository extends ChangeNotifier {
       topic: {'he': 'גמרא', 'en': 'Gemara', 'ru': 'Гемара'},
       durationMinutes: 60,
       date: DateTime.now().subtract(const Duration(days: 23)),
+      weekday: DateTime.monday,
+      weeklyTime: '09:30',
     ),
     Shiur(
       id: _newId(),
@@ -924,6 +1181,16 @@ class AppRepository extends ChangeNotifier {
       NewsletterSubscriber(email: email, date: DateTime.now()),
     );
     notifyListeners();
+    unawaited(_publicDoc(
+      'subscribers',
+      email.replaceAll('/', '_'),
+      subscriberToJson(subscribers.first),
+    ));
+    unawaited(SiteNotify.subscriber(
+      subscriberEmail: email,
+      email: contact.email,
+      notifyChatId: links.notifyChatId,
+    ));
     return SubscribeResult.ok;
   }
 
@@ -1040,19 +1307,23 @@ class AppRepository extends ChangeNotifier {
     required Loc topic,
     String source = 'website',
   }) {
-    leads.insert(
-      0,
-      Lead(
-        id: _newId(),
-        name: name,
-        email: email,
-        phone: phone,
-        topic: topic,
-        date: DateTime.now(),
-        source: source,
-      ),
+    final lead = Lead(
+      id: _newId(),
+      name: name,
+      email: email,
+      phone: phone,
+      topic: topic,
+      date: DateTime.now(),
+      source: source,
     );
+    leads.insert(0, lead);
     notifyListeners();
+    unawaited(_publicDoc('leads', lead.id, leadToJson(lead)));
+    unawaited(SiteNotify.lead(
+      lead: lead,
+      email: contact.email,
+      notifyChatId: links.notifyChatId,
+    ));
   }
 
   void setLeadStatus(Lead lead, LeadStatus status) {
@@ -1061,11 +1332,30 @@ class AppRepository extends ChangeNotifier {
   }
 
   void addDonation({required String donor, required double amount, required Loc campaign}) {
-    donations.insert(
-      0,
-      Donation(id: _newId(), donor: donor.isEmpty ? 'Anonymous' : donor, amount: amount, campaign: campaign, date: DateTime.now()),
+    final d = Donation(
+      id: _newId(),
+      donor: donor.isEmpty ? 'Anonymous' : donor,
+      amount: amount,
+      campaign: campaign,
+      date: DateTime.now(),
     );
+    donations.insert(0, d);
     notifyListeners();
+    unawaited(_publicDoc('donations', d.id, donationToJson(d)));
+  }
+
+  Future<void> _publicDoc(
+    String collection,
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      await CloudSync.instance.submitPublic(
+        collection: collection,
+        id: id,
+        data: data,
+      );
+    } catch (_) {}
   }
 
   FamousPerson newBlankFamous() => FamousPerson(
@@ -1275,6 +1565,46 @@ class AppRepository extends ChangeNotifier {
         }, lang),
       ));
     }
+    for (final y in upcomingYahrzeits(graves, withinDays: 14)) {
+      final who = y.grave.hebrewName.isNotEmpty
+          ? y.grave.hebrewName
+          : y.grave.name;
+      out.add(AdminReminder(
+        id: 'yahrzeit-${y.grave.id}',
+        jump: AdminJump.cemetery,
+        icon: Icons.local_florist_outlined,
+        color: const Color(0xFF0F766E),
+        title: trLoc({
+          'he': 'יארצייט · $who · בעוד ${y.days} ימים',
+          'en': 'Yahrzeit · $who · in ${y.days} days',
+          'ru': 'Йорцайт · $who · через ${y.days} дн.',
+        }, lang),
+        body: trLoc({
+          'he': 'תאריך פטירה ${y.grave.deathLabel}. אפשר לשלוח תזכורת בטלגרם מהמנהל.',
+          'en': 'Passed ${y.grave.deathLabel}. Send a Telegram reminder from admin.',
+          'ru': 'Дата ${y.grave.deathLabel}. Напоминание в Telegram — из админки.',
+        }, lang),
+      ));
+    }
+    final freshLeads = leads.where((l) => l.status == LeadStatus.fresh).length;
+    if (freshLeads > 0) {
+      out.add(AdminReminder(
+        id: 'leads-fresh',
+        jump: AdminJump.crm,
+        icon: Icons.mark_email_unread_outlined,
+        color: const Color(0xFFB45309),
+        title: trLoc({
+          'he': 'פניות חדשות ($freshLeads)',
+          'en': 'New inquiries ($freshLeads)',
+          'ru': 'Новые обращения ($freshLeads)',
+        }, lang),
+        body: trLoc({
+          'he': 'חזרו לפונים או סמנו «נוצר קשר» ב-CRM.',
+          'en': 'Reply or mark them Contacted in CRM.',
+          'ru': 'Ответьте или отметьте «связались» в CRM.',
+        }, lang),
+      ));
+    }
     for (final h in upcomingHolidays(withinDays: 45)) {
       final days = daysUntilHoliday(h);
       final when = days == 0
@@ -1302,15 +1632,138 @@ class AppRepository extends ChangeNotifier {
     return out;
   }
 
-  void addCampaign(Loc campaign) {
+  void addCampaign(Loc campaign, [Loc? note]) {
     campaigns.add(campaign);
+    campaignNotes.add(note ?? {'he': '', 'en': '', 'ru': ''});
     notifyListeners();
   }
 
   void deleteCampaignAt(int index) {
     if (index < 0 || index >= campaigns.length) return;
     campaigns.removeAt(index);
+    if (index < campaignNotes.length) campaignNotes.removeAt(index);
     notifyListeners();
+  }
+
+  Loc campaignNoteAt(int index) =>
+      index >= 0 && index < campaignNotes.length ? campaignNotes[index] : {};
+
+  void setCampaignNoteAt(int index, Loc note) {
+    while (campaignNotes.length <= index) {
+      campaignNotes.add({});
+    }
+    campaignNotes[index] = note;
+    notifyListeners();
+  }
+
+  CommunityEvent newBlankEvent() => CommunityEvent(
+        id: _newId(),
+        title: {'he': '', 'en': '', 'ru': ''},
+        description: {'he': '', 'en': '', 'ru': ''},
+        place: {'he': '', 'en': '', 'ru': ''},
+        startsAt: DateTime.now().add(const Duration(days: 7)),
+        capacity: 40,
+      );
+
+  void addEvent(CommunityEvent e) {
+    events.add(e);
+    notifyListeners();
+  }
+
+  void deleteEvent(String id) {
+    events.removeWhere((e) => e.id == id);
+    notifyListeners();
+  }
+
+  String? rsvpEvent({
+    required CommunityEvent event,
+    required String name,
+    required String phone,
+    String email = '',
+    int guests = 1,
+  }) {
+    if (name.trim().isEmpty || phone.trim().isEmpty) return 'required';
+    if (event.isFull) return 'full';
+    final rsvp = EventRsvp(
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      guests: guests < 1 ? 1 : guests,
+    );
+    event.rsvps.add(rsvp);
+    event.reserved += rsvp.guests;
+    notifyListeners();
+    unawaited(_publicDoc('rsvps', '${event.id}-${rsvp.at.millisecondsSinceEpoch}', {
+      'eventId': event.id,
+      ...rsvpToJson(rsvp),
+    }));
+    unawaited(SiteNotify.rsvp(
+      event: event,
+      rsvp: rsvp,
+      email: contact.email,
+      notifyChatId: links.notifyChatId,
+    ));
+    return null;
+  }
+
+  StoreOrder placeOrder({
+    required String name,
+    required String phone,
+    required String fulfillment,
+    String email = '',
+    String address = '',
+    String note = '',
+    required String lang,
+  }) {
+    final lines = <OrderLine>[
+      for (final e in _cart.entries)
+        if (products.any((p) => p.id == e.key))
+          OrderLine(
+            productId: e.key,
+            name: trLoc(products.firstWhere((p) => p.id == e.key).name, lang),
+            qty: e.value,
+            price: products.firstWhere((p) => p.id == e.key).price,
+          ),
+    ];
+    final order = StoreOrder(
+      id: _newId(),
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      fulfillment: fulfillment,
+      address: address.trim(),
+      note: note.trim(),
+      lines: lines,
+      total: cartTotal,
+      date: DateTime.now(),
+    );
+    orders.insert(0, order);
+    clearCart();
+    unawaited(_publicDoc('orders', order.id, orderToJson(order)));
+    unawaited(SiteNotify.order(
+      order: order,
+      email: contact.email,
+      notifyChatId: links.notifyChatId,
+    ));
+    return order;
+  }
+
+  String exportBackupJson() {
+    final snap = _encodeSnapshot();
+    snap['exportedAt'] = DateTime.now().toIso8601String();
+    return const JsonEncoder.withIndent('  ').convert(snap);
+  }
+
+  String? importBackupJson(String raw) {
+    try {
+      final m = jsonDecode(raw);
+      if (m is! Map) return 'invalid';
+      _applySnapshot(Map<String, dynamic>.from(m));
+      notifyListeners();
+      return null;
+    } catch (_) {
+      return 'invalid';
+    }
   }
 
   Grave newBlankGrave() => Grave(
@@ -1620,6 +2073,19 @@ class AppRepository extends ChangeNotifier {
         ));
       }
     }
+    for (final e in events) {
+      if (_locHas(e.title, q) ||
+          _locHas(e.description, q) ||
+          _locHas(e.place, q)) {
+        hits.add(SearchHit(
+          groupKey: 'search.group.events',
+          title: trLoc(e.title, lang),
+          subtitle: trLoc(e.place, lang),
+          route: '/events',
+          icon: Icons.event_outlined,
+        ));
+      }
+    }
     for (final s in shiurim) {
       if (_locHas(s.title, q) || _locHas(s.rabbi, q) || _locHas(s.topic, q)) {
         hits.add(SearchHit(
@@ -1682,6 +2148,10 @@ class AppRepository extends ChangeNotifier {
         'tour': [for (final s in tour) tourToJson(s)],
         'shiurim': [for (final s in shiurim) shiurToJson(s)],
         'campaigns': [for (final c in campaigns) locTo(c)],
+        'campaignNotes': [for (final n in campaignNotes) locTo(n)],
+        'links': linksToJson(links),
+        'events': [for (final e in events) eventToJson(e)],
+        'orders': [for (final o in orders) orderToJson(o)],
         if (_gravesEdited) 'graves': [for (final g in graves) graveToJson(g)],
         'news': [for (final a in news) newsToJson(a)],
         'programs': [for (final p in programs) programToJson(p)],
@@ -1789,6 +2259,26 @@ class AppRepository extends ChangeNotifier {
         ..clear()
         ..addAll(loadedCampaigns);
     }
+    if (m['campaignNotes'] != null) {
+      campaignNotes
+        ..clear()
+        ..addAll(campaignNotesFromJson(m['campaignNotes'], campaigns.length));
+    } else {
+      while (campaignNotes.length < campaigns.length) {
+        campaignNotes.add({});
+      }
+    }
+    linksFromJson(links, m['links']);
+    if (m['events'] is List) {
+      events
+        ..clear()
+        ..addAll((m['events'] as List).map(eventFromJson));
+    }
+    if (m['orders'] is List) {
+      orders
+        ..clear()
+        ..addAll((m['orders'] as List).map(orderFromJson));
+    }
     if (m['graves'] is List) {
       _gravesEdited = true;
       graves
@@ -1830,9 +2320,16 @@ class AppRepository extends ChangeNotifier {
     for (final s in shiurim) {
       _noteId(s.id);
     }
+    for (final e in events) {
+      _noteId(e.id);
+    }
+    for (final o in orders) {
+      _noteId(o.id);
+    }
     for (final g in graves) {
       _noteId(g.id);
     }
+    _ensureHistoricalFamous();
   }
 
   Future<void> _hydrate() async {
@@ -1852,6 +2349,7 @@ class AppRepository extends ChangeNotifier {
       }
     }
     await _hydrateLocalImages(m);
+    _ensureHistoricalFamous();
   }
 
   bool _jsonHasUpload(Map item) {
@@ -1984,6 +2482,7 @@ class AppRepository extends ChangeNotifier {
               ),
         },
         emblemBytes: emblemBytes,
+        famous: [for (final p in famous) if (_hasBytes(p.photoBytes)) p],
       );
 
   void _restoreUploads(_UploadKeep saved) {
@@ -2052,6 +2551,15 @@ class AppRepository extends ChangeNotifier {
     if (!_hasBytes(emblemBytes) && _hasBytes(saved.emblemBytes)) {
       emblemBytes = saved.emblemBytes;
     }
+    for (final p in saved.famous) {
+      final i = famous.indexWhere((e) => e.id == p.id);
+      if (i < 0) {
+        famous.add(p);
+        _noteId(p.id);
+      } else if (!_hasBytes(famous[i].photoBytes)) {
+        famous[i].photoBytes = p.photoBytes;
+      }
+    }
   }
 
   bool _hasBytes(Uint8List? bytes) => bytes != null && bytes.isNotEmpty;
@@ -2077,6 +2585,7 @@ class AppRepository extends ChangeNotifier {
           'gallery:${p.id}',
           for (final s in p.photos) 'gallery:${p.id}:${s.id}',
         ],
+        for (final p in famous) 'famous:${p.id}',
       ]);
     }
     for (final key in keys.toSet()) {
@@ -2101,6 +2610,10 @@ class AppRepository extends ChangeNotifier {
     }
     if (emblemBytes != null && emblemBytes!.isNotEmpty) {
       out['emblem:logo'] = emblemBytes!;
+    }
+    for (final p in famous) {
+      final b = p.photoBytes;
+      if (b != null && b.isNotEmpty) out['famous:${p.id}'] = b;
     }
     for (final a in news) {
       final b = a.imageBytes;
@@ -2148,6 +2661,21 @@ class AppRepository extends ChangeNotifier {
         }
       case 'emblem':
         emblemBytes = bytes;
+      case 'famous':
+        final existing = famous.where((p) => p.id == id);
+        if (existing.isNotEmpty) {
+          existing.first.photoBytes = bytes;
+        } else {
+          famous.add(FamousPerson(
+            id: id,
+            name: const {'he': '', 'en': '', 'ru': ''},
+            profession: const {'he': '', 'en': '', 'ru': ''},
+            bio: const {'he': '', 'en': '', 'ru': ''},
+            era: Era.past,
+            photoBytes: bytes,
+          ));
+          _noteId(id);
+        }
       case 'news':
         final existing = news.where((a) => a.id == id);
         if (existing.isNotEmpty) {
@@ -2251,6 +2779,7 @@ class AppRepository extends ChangeNotifier {
       _applyLocalImage(e.key, e.value);
     }
     _restoreUploads(saved);
+    _ensureHistoricalFamous();
     try {
       await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
       for (final e in cloud.images.entries) {
@@ -2309,6 +2838,7 @@ class _UploadKeep {
     required this.gallery,
     required this.banners,
     this.emblemBytes,
+    this.famous = const [],
   });
   final List<NewsArticle> news;
   final List<Program> programs;
@@ -2316,4 +2846,5 @@ class _UploadKeep {
   final List<GalleryPhoto> gallery;
   final Map<String, PageBanner> banners;
   final Uint8List? emblemBytes;
+  final List<FamousPerson> famous;
 }

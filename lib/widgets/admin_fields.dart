@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'playful_icons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -119,7 +120,7 @@ class _LocFieldGroupState extends State<LocFieldGroup> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.translate, size: 18),
+                      : const PlayfulIcon(Icons.translate, size: 18),
                   label: Text(loc.t('admin.translate')),
                 ).hoverLift(),
             ],
@@ -157,11 +158,13 @@ class CoverImagePicker extends StatelessWidget {
     super.key,
     required this.bytes,
     required this.onChanged,
+    this.url,
     this.color = 0xFF1E3A8A,
     this.icon = Icons.image_outlined,
     this.height = 160,
   });
   final Uint8List? bytes;
+  final String? url;
   final ValueChanged<Uint8List?> onChanged;
   final int color;
   final IconData icon;
@@ -180,7 +183,9 @@ class CoverImagePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final has = bytes != null && bytes!.isNotEmpty;
+    final hasBytes = bytes != null && bytes!.isNotEmpty;
+    final fallback = url?.trim() ?? '';
+    final hasUrl = fallback.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -195,9 +200,13 @@ class CoverImagePicker extends StatelessWidget {
           child: SizedBox(
             height: height,
             width: double.infinity,
-            child: has
+            child: hasBytes
                 ? Image.memory(bytes!, fit: BoxFit.cover, gaplessPlayback: true)
-                : GradientImage(color: color, icon: icon, height: height),
+                : hasUrl
+                    ? (fallback.startsWith('assets/')
+                        ? Image.asset(fallback, fit: BoxFit.cover)
+                        : Image.network(fallback, fit: BoxFit.cover))
+                    : GradientImage(color: color, icon: icon, height: height),
           ),
         ),
         const SizedBox(height: 10),
@@ -207,13 +216,13 @@ class CoverImagePicker extends StatelessWidget {
           children: [
             FilledButton.icon(
               onPressed: _pick,
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+              icon: const PlayfulIcon(Icons.add_photo_alternate_outlined, size: 18),
               label: Text(loc.t('admin.image.choose')),
             ).hoverLift(),
-            if (has)
+            if (hasBytes)
               OutlinedButton.icon(
                 onPressed: () => onChanged(null),
-                icon: const Icon(Icons.delete_outline, size: 18),
+                icon: const PlayfulIcon(Icons.delete_outline, size: 18),
                 label: Text(loc.t('admin.image.remove')),
               ).hoverLift(),
           ],
@@ -247,7 +256,7 @@ class AdminMediaThumb extends StatelessWidget {
 
   Widget _fallback() => ColoredBox(
         color: Color(color).withValues(alpha: 0.18),
-        child: Icon(icon, color: Color(color), size: size * 0.42),
+        child: PlayfulIcon(icon, color: Color(color), size: size * 0.42),
       );
 
   Widget _photo() {
@@ -299,7 +308,7 @@ class AdminMediaThumb extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.card, width: 1.5),
                 ),
-                child: Icon(
+                child: PlayfulIcon(
                   has ? Icons.check : Icons.hide_image_outlined,
                   size: 9,
                   color: Colors.white,
@@ -385,7 +394,7 @@ class AlbumPhotosPicker extends StatelessWidget {
                           onTap: () => onRemove(shot.id),
                           child: const Padding(
                             padding: EdgeInsets.all(4),
-                            child: Icon(Icons.close,
+                            child: PlayfulIcon(Icons.close,
                                 size: 16, color: Colors.white),
                           ),
                         ),
@@ -402,7 +411,7 @@ class AlbumPhotosPicker extends StatelessWidget {
         const SizedBox(height: 10),
         FilledButton.icon(
           onPressed: onAdd,
-          icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+          icon: const PlayfulIcon(Icons.add_photo_alternate_outlined, size: 18),
           label: Text(loc.t('admin.gallery.addPhotos')),
         ).hoverLift(),
       ],

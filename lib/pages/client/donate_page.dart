@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../theme.dart';
+import '../../services/web_prefs.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/playful_icons.dart';
@@ -80,6 +81,27 @@ class _DonatePageState extends State<DonatePage> {
         children: [
           Text(loc.t('donate.give'),
               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 22)),
+          const SizedBox(height: 8),
+          Text(loc.t('donate.honest'),
+              style: TextStyle(color: AppColors.muted, height: 1.45)),
+          const SizedBox(height: 18),
+          for (int i = 0; i < repo.campaigns.length; i++)
+            if (trLoc(repo.campaignNoteAt(i), loc.lang).trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  '• ${trLoc(repo.campaigns[i], loc.lang)} — ${trLoc(repo.campaignNoteAt(i), loc.lang)}',
+                  style: const TextStyle(height: 1.4, fontSize: 13.5),
+                ),
+              ),
+          if (repo.links.bankDetails.trim().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(loc.t('donate.bank'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            SelectableText(repo.links.bankDetails,
+                style: TextStyle(color: AppColors.muted, height: 1.4)),
+          ],
           const SizedBox(height: 18),
           Wrap(
             spacing: 10,
@@ -154,7 +176,7 @@ class _DonatePageState extends State<DonatePage> {
                 CircleAvatar(
                   radius: 18,
                   backgroundColor: Color(0x1416336B),
-                  child: Icon(Icons.volunteer_activism,
+                  child: PlayfulIcon(Icons.volunteer_activism,
                       size: 18, color: AppColors.primary),
                 ),
                 const SizedBox(width: 12),
@@ -186,17 +208,23 @@ class _DonatePageState extends State<DonatePage> {
     repo.addDonation(
         donor: _name.text.trim(), amount: amount, campaign: _campaign!);
     _name.clear();
+    final pay = repo.links.donateUrl.trim();
+    if (pay.isNotEmpty) {
+      openUrl(pay);
+    }
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        icon: Icon(Icons.favorite, color: AppColors.accent, size: 46),
-        title: Text(loc.t('donate.thanks')),
+        icon: PlayfulIcon(Icons.favorite, color: AppColors.accent, size: 46),
+        title: Text(pay.isEmpty
+            ? loc.t('donate.pledge')
+            : loc.t('donate.redirect')),
         content: Text('\$${amount.toStringAsFixed(0)} · ${trLoc(_campaign!, loc.lang)}',
             textAlign: TextAlign.center),
         actions: [
           FilledButton.icon(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.check, size: 18),
+            icon: const PlayfulIcon(Icons.check, size: 18),
             label: Text(loc.t('common.close')),
           ),
         ],

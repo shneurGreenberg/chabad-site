@@ -8,6 +8,7 @@ import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class StorePage extends StatefulWidget {
   const StorePage({super.key, this.highlightId});
@@ -108,7 +109,7 @@ class _CartPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Icon(Icons.shopping_cart_outlined, color: AppColors.primary),
+            PlayfulIcon(Icons.shopping_cart_outlined, color: AppColors.primary),
             const SizedBox(width: 8),
             Text(loc.t('store.cart'),
                 style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
@@ -139,11 +140,14 @@ class _CartPanel extends StatelessWidget {
                       color: AppColors.primary)),
             ]),
             const SizedBox(height: 12),
+            Text(loc.t('store.fulfill.hint'),
+                style: TextStyle(color: AppColors.muted, fontSize: 13, height: 1.4)),
+            const SizedBox(height: 10),
             FilledButton.icon(
               onPressed: () => _checkout(context, repo),
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-              icon: const Icon(Icons.lock_outline, size: 18),
-              label: Text(loc.t('store.checkout')),
+              icon: const PlayfulIcon(Icons.storefront_outlined, size: 18),
+              label: Text(loc.t('store.order')),
             ).hoverLift(),
           ],
         ],
@@ -164,13 +168,13 @@ class _CartPanel extends StatelessWidget {
         IconButton(
           visualDensity: VisualDensity.compact,
           onPressed: () => repo.removeFromCart(id),
-          icon: const Icon(Icons.remove_circle_outline, size: 20),
+          icon: const PlayfulIcon(Icons.remove_circle_outline, size: 20),
         ).hoverScale(),
         Text('$qty', style: const TextStyle(fontWeight: FontWeight.w700)),
         IconButton(
           visualDensity: VisualDensity.compact,
           onPressed: () => repo.addToCart(id),
-          icon: const Icon(Icons.add_circle_outline, size: 20),
+          icon: const PlayfulIcon(Icons.add_circle_outline, size: 20),
         ).hoverScale(),
       ]),
     );
@@ -178,27 +182,110 @@ class _CartPanel extends StatelessWidget {
 
   void _checkout(BuildContext context, AppRepository repo) {
     final loc = context.read<LocaleController>();
+    final name = TextEditingController();
+    final phone = TextEditingController();
+    final email = TextEditingController();
+    final address = TextEditingController();
+    final note = TextEditingController();
+    var fulfillment = 'pickup';
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Color(0xFF0D9488), size: 46),
-        title: Text(loc.t('store.checkout')),
-        content: Text(
-          '${loc.t('store.total')}: \$${repo.cartTotal.toStringAsFixed(0)}\n\n'
-          '${loc.t('donate.thanks')}',
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          FilledButton.icon(
-            onPressed: () {
-              repo.clearCart();
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.check, size: 18),
-            label: Text(loc.t('common.close')),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: Text(loc.t('store.order')),
+          content: SizedBox(
+            width: 380,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${loc.t('store.total')}: \$${repo.cartTotal.toStringAsFixed(0)}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(loc.t('store.fulfill.hint'),
+                      style: TextStyle(color: AppColors.muted, fontSize: 13)),
+                  const SizedBox(height: 12),
+                  SegmentedButton<String>(
+                    segments: [
+                      ButtonSegment(
+                          value: 'pickup', label: Text(loc.t('store.pickup'))),
+                      ButtonSegment(
+                          value: 'delivery',
+                          label: Text(loc.t('store.delivery'))),
+                    ],
+                    selected: {fulfillment},
+                    onSelectionChanged: (s) =>
+                        setLocal(() => fulfillment = s.first),
+                  ),
+                  TextField(
+                    controller: name,
+                    decoration:
+                        InputDecoration(labelText: loc.t('common.name')),
+                  ),
+                  TextField(
+                    controller: phone,
+                    decoration:
+                        InputDecoration(labelText: loc.t('common.phone')),
+                  ),
+                  TextField(
+                    controller: email,
+                    decoration:
+                        InputDecoration(labelText: loc.t('common.email')),
+                  ),
+                  if (fulfillment == 'delivery')
+                    TextField(
+                      controller: address,
+                      decoration:
+                          InputDecoration(labelText: loc.t('store.address')),
+                    ),
+                  TextField(
+                    controller: note,
+                    decoration:
+                        InputDecoration(labelText: loc.t('store.note')),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(loc.t('common.close')),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (name.text.trim().isEmpty || phone.text.trim().isEmpty) {
+                  return;
+                }
+                repo.placeOrder(
+                  name: name.text,
+                  phone: phone.text,
+                  email: email.text,
+                  fulfillment: fulfillment,
+                  address: address.text,
+                  note: note.text,
+                  lang: loc.lang,
+                );
+                Navigator.pop(ctx, true);
+              },
+              child: Text(loc.t('store.order')),
+            ),
+          ],
+        ),
       ),
-    );
+    ).then((ok) {
+      name.dispose();
+      phone.dispose();
+      email.dispose();
+      address.dispose();
+      note.dispose();
+      if (ok == true && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.t('store.order.thanks'))),
+        );
+      }
+    });
   }
 }

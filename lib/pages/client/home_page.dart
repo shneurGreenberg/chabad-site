@@ -112,7 +112,7 @@ class HomePage extends StatelessWidget {
         Expanded(child: SectionHeader(title: title)),
         TextButton.icon(
           onPressed: () => context.go(route),
-          icon: const Icon(Icons.arrow_forward, size: 18),
+          icon: const PlayfulIcon(Icons.arrow_forward, size: 18),
           label: Text(loc.t('common.viewAll')),
         ).hoverLift(),
       ],
@@ -176,7 +176,7 @@ class _Hero extends StatelessWidget {
                   foregroundColor: AppColors.primaryDark,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
-              icon: const Icon(Icons.group_add),
+              icon: const PlayfulIcon(Icons.group_add),
               label: Text(loc.t('home.hero.cta')),
             ).hoverLift(),
             OutlinedButton.icon(
@@ -294,7 +294,7 @@ class _ShabbatCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
-                Icon(Icons.local_fire_department, color: AppColors.accentSoft),
+                PlayfulIcon(Icons.local_fire_department, color: AppColors.accentSoft),
                 const SizedBox(width: 8),
                 Text(loc.t('zmanim.shabbat'),
                     style: const TextStyle(
@@ -321,7 +321,7 @@ class _ShabbatCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                     side: BorderSide(color: Colors.white.withValues(alpha: 0.45)),
                   ),
-                  icon: const Icon(Icons.schedule, size: 18),
+                  icon: const PlayfulIcon(Icons.schedule, size: 18),
                   label: Text(loc.t('home.zmanim.title')),
                 ).hoverLift(),
               ),
@@ -457,7 +457,7 @@ class _ZmanimStrip extends StatelessWidget {
               ),
               TextButton.icon(
                 onPressed: () => context.go('/zmanim'),
-                icon: const Icon(Icons.arrow_forward, size: 16),
+                icon: const PlayfulIcon(Icons.arrow_forward, size: 16),
                 label: Text(loc.t('common.viewAll')),
               ).hoverLift(),
             ],
@@ -545,7 +545,7 @@ class _ReconnectBand extends StatelessWidget {
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 18)),
-            icon: const Icon(Icons.connect_without_contact),
+            icon: const PlayfulIcon(Icons.connect_without_contact),
             label: Text(loc.t('home.hero.cta')),
           ).hoverLift(),
         ],

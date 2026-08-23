@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../widgets/playful_icons.dart';
 
 import '../../data/repository.dart';
 import '../../models.dart';
@@ -233,7 +234,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
           Row(children: [
             const CircleAvatar(
               backgroundColor: Color(0x1A0EA5E9),
-              child: Icon(Icons.send, color: Color(0xFF0EA5E9)),
+              child: PlayfulIcon(Icons.send, color: Color(0xFF0EA5E9)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -260,7 +261,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                 border: Border.all(color: const Color(0xFF6EE7B7)),
               ),
               child: Row(children: [
-                const Icon(Icons.check_circle, color: Color(0xFF059669), size: 20),
+                const PlayfulIcon(Icons.check_circle, color: Color(0xFF059669), size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -317,7 +318,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
             obscureText: true,
             decoration: InputDecoration(
               labelText: loc.t('admin.tg.token'),
-              prefixIcon: const Icon(Icons.key_outlined),
+              prefixIcon: const PlayfulIcon(Icons.key_outlined),
             ),
           ),
           const SizedBox(height: 12),
@@ -326,7 +327,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
             decoration: InputDecoration(
               labelText: loc.t('admin.tg.channel'),
               hintText: '@jewishsib',
-              prefixIcon: const Icon(Icons.campaign_outlined),
+              prefixIcon: const PlayfulIcon(Icons.campaign_outlined),
             ),
           ),
           const SizedBox(height: 16),
@@ -342,7 +343,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.link, size: 18),
+                    : const PlayfulIcon(Icons.link, size: 18),
                 label: Text(loc.t('admin.tg.connect')),
               ).hoverLift(),
               FilledButton.icon(
@@ -356,7 +357,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Icon(Icons.download, size: 18),
+                    : const PlayfulIcon(Icons.download, size: 18),
                 label: Text(loc.t('admin.tg.pull')),
               ).hoverLift(),
               FilledButton.icon(
@@ -370,7 +371,7 @@ class _TelegramWizardState extends State<TelegramWizard> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white),
                       )
-                    : const Icon(Icons.upload, size: 18),
+                    : const PlayfulIcon(Icons.upload, size: 18),
                 label: Text(loc.t('admin.tg.publishAll')),
               ).hoverLift(),
             ],
@@ -415,7 +416,7 @@ class _NewsTelegramRow extends StatelessWidget {
     final done = article.onTelegram;
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(
+      leading: PlayfulIcon(
         done ? Icons.check_circle : Icons.schedule,
         color: done ? const Color(0xFF059669) : const Color(0xFFD97706),
       ),

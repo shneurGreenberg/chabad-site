@@ -82,6 +82,7 @@ const Map<String, Map<String, String>> _strings = {
   'nav.donate': {'he': 'תרומה', 'en': 'Donate', 'ru': 'Пожертвовать'},
   'nav.contact': {'he': 'הרשמה', 'en': 'Register', 'ru': 'Регистрация'},
   'nav.about': {'he': 'אודות', 'en': 'About', 'ru': 'О нас'},
+  'nav.events': {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
   'nav.admin': {'he': 'ניהול', 'en': 'Admin', 'ru': 'Админ'},
   'nav.menu': {'he': 'תפריט', 'en': 'Menu', 'ru': 'Меню'},
 
@@ -743,9 +744,14 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Синий баннер по умолчанию'
   },
   'admin.banners.hint': {
-    'he': 'גררו את המחוונים כדי לבחור איזה חלק מהתמונה יוצג. מה שמחוץ למסגרת ייחתך. אפשר כמה תמונות — הן יתחלפו לבד.',
-    'en': 'Drag the sliders to choose which part of the photo is shown. You can add several photos — they rotate by themselves.',
-    'ru': 'Ползунки выбирают видимую часть фото. Можно несколько снимков — они будут сменяться.'
+    'he': 'גררו את התמונה בתצוגה כדי לבחור איזה חלק יוצג — בכל עמוד באתר. אפשר גם כמה תמונות שמתחלפות לבד.',
+    'en': 'Drag the photo in the preview to choose the crop — on every page. You can also add several photos that rotate.',
+    'ru': 'Перетащите фото в превью, чтобы выбрать кадр — на каждой странице. Можно несколько снимков.'
+  },
+  'admin.banners.drag': {
+    'he': 'גררו את התמונה כדי לכוון את החיתוך',
+    'en': 'Drag the photo to set the crop',
+    'ru': 'Перетащите фото, чтобы выбрать кадр'
   },
   'admin.banners.addSlide': {
     'he': 'הוספת תמונה',
@@ -1143,4 +1149,170 @@ const Map<String, Map<String, String>> _strings = {
   'admin.grave.death': {'he': 'שנת פטירה', 'en': 'Death year', 'ru': 'Год смерти'},
   'admin.initials': {'he': 'ראשי תיבות', 'en': 'Initials', 'ru': 'Инициалы'},
   'admin.year': {'he': 'שנה', 'en': 'Year', 'ru': 'Год'},
+  'admin.manage.events': {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
+  'admin.links': {
+    'he': 'קישורים, תשלום והתראות',
+    'en': 'Links, payments and alerts',
+    'ru': 'Ссылки, оплата и уведомления',
+  },
+  'admin.notifyChat': {
+    'he': 'מזהה צ׳אט טלגרם להתראות (לא הערוץ הציבורי)',
+    'en': 'Telegram chat ID for private alerts (not the public channel)',
+    'ru': 'ID чата Telegram для оповещений (не публичный канал)',
+  },
+  'admin.notifyChat.hint': {
+    'he': 'שלחו הודעה לבוט ואז בדקו getUpdates. בלי זה הפניות נשמרות רק ב-CRM.',
+    'en': 'Message the bot, then check getUpdates. Without this, leads stay in CRM only.',
+    'ru': 'Напишите боту и проверьте getUpdates. Иначе заявки останутся только в CRM.',
+  },
+  'admin.emails': {
+    'he': 'אימיילי מנהל (מופרדים בפסיק)',
+    'en': 'Admin emails (comma-separated)',
+    'ru': 'Почта администраторов через запятую',
+  },
+  'admin.editorPin': {
+    'he': 'סיסמת עורך',
+    'en': 'Editor PIN',
+    'ru': 'Пароль редактора',
+  },
+  'admin.editorPin.hint': {
+    'he': 'התחברות עם editor@chabad-city.org והסיסמה הזו — בלי טלגרם והגדרות.',
+    'en': 'Sign in as editor@chabad-city.org with this PIN — no Telegram or settings.',
+    'ru': 'Вход editor@chabad-city.org с этим паролем — без Telegram и настроек.',
+  },
+  'admin.backup': {'he': 'גיבוי', 'en': 'Backup', 'ru': 'Резервная копия'},
+  'admin.backup.export': {
+    'he': 'הורדת JSON',
+    'en': 'Download JSON',
+    'ru': 'Скачать JSON',
+  },
+  'admin.backup.import': {
+    'he': 'הדבקת גיבוי JSON',
+    'en': 'Paste backup JSON',
+    'ru': 'Вставьте JSON-копию',
+  },
+  'admin.backup.apply': {'he': 'שחזור', 'en': 'Restore', 'ru': 'Восстановить'},
+  'admin.backup.bad': {
+    'he': 'הקובץ לא תקין',
+    'en': 'That file is not valid',
+    'ru': 'Файл повреждён',
+  },
+  'admin.shiur.weekday': {
+    'he': 'יום בלוח השבועי (1=שני … 7=ראשון, ריק=לא בלוח)',
+    'en': 'Weekly weekday (1=Mon … 7=Sun, empty=off)',
+    'ru': 'День расписания (1=пн … 7=вс, пусто=нет)',
+  },
+  'admin.shiur.time': {'he': 'שעה קבועה', 'en': 'Weekly time', 'ru': 'Время'},
+  'admin.yahrzeit.send': {
+    'he': 'שלחו תזכורת',
+    'en': 'Send reminder',
+    'ru': 'Отправить напоминание',
+  },
+  'admin.yahrzeit.sent': {
+    'he': 'נשלחה תזכורת (או נשמרה אם אין צ׳אט)',
+    'en': 'Reminder sent (or saved if no chat is set)',
+    'ru': 'Напоминание отправлено (или сохранено, если нет чата)',
+  },
+  'social.telegram': {'he': 'טלגרם', 'en': 'Telegram', 'ru': 'Telegram'},
+  'social.vk': {'he': 'VK', 'en': 'VK', 'ru': 'VK'},
+  'social.youtube': {'he': 'יוטיוב', 'en': 'YouTube', 'ru': 'YouTube'},
+  'social.facebook': {'he': 'פייסבוק', 'en': 'Facebook', 'ru': 'Facebook'},
+  'social.instagram': {'he': 'אינסטגרם', 'en': 'Instagram', 'ru': 'Instagram'},
+  'social.website': {'he': 'אתר', 'en': 'Website', 'ru': 'Сайт'},
+  'social.whatsapp': {'he': 'וואטסאפ', 'en': 'WhatsApp', 'ru': 'WhatsApp'},
+  'donate.honest': {
+    'he': 'אין סליקת כרטיס באתר. אם יש קישור תשלום הוא ייפתח אחרי הרישום; אחרת ניצור קשר. פרטי העברה מופיעים למטה כשממלאים אותם במנהל.',
+    'en': 'This site does not charge cards. If a payment link is set it opens after you register; otherwise we will contact you. Bank details appear when the office fills them in.',
+    'ru': 'Сайт не принимает карты. Если есть ссылка на оплату — она откроется после записи; иначе мы свяжемся. Реквизиты появятся, когда их внесут в админке.',
+  },
+  'donate.bank': {
+    'he': 'העברה בנקאית / SBP',
+    'en': 'Bank transfer / SBP',
+    'ru': 'Банковский перевод / СБП',
+  },
+  'donate.url': {
+    'he': 'קישור לתשלום (YooMoney / Tinkoff / PayPal)',
+    'en': 'Payment link (YooMoney / Tinkoff / PayPal)',
+    'ru': 'Ссылка на оплату (ЮMoney / Tinkoff / PayPal)',
+  },
+  'donate.pledge': {
+    'he': 'ההתחייבות נרשמה. ניצור קשר לתיאום התשלום.',
+    'en': 'Your pledge is recorded. We will contact you to arrange payment.',
+    'ru': 'Обещание записано. Мы свяжемся, чтобы оформить платёж.',
+  },
+  'donate.redirect': {
+    'he': 'נפתח דף התשלום. אם הוא לא נפתח — בדקו חוסם חלונות.',
+    'en': 'The payment page opened. If it did not, allow pop-ups.',
+    'ru': 'Страница оплаты открыта. Если нет — разрешите всплывающие окна.',
+  },
+  'donate.campaign.note': {
+    'he': 'תיאור הייעוד',
+    'en': 'Campaign description',
+    'ru': 'Описание назначения',
+  },
+  'store.order': {'he': 'הזמנה לאיסוף', 'en': 'Place order', 'ru': 'Заказать'},
+  'store.order.thanks': {
+    'he': 'ההזמנה נקלטה. נאסוף בחנות הכשרה או ניצור קשר למשלוח — אין תשלום מקוון.',
+    'en': 'Order received. Pick up at the kosher shop or we will arrange delivery — no online payment.',
+    'ru': 'Заказ принят. Самовывоз из кошерного магазина или доставка — онлайн-оплаты нет.',
+  },
+  'store.fulfill.hint': {
+    'he': 'איסוף משצ׳טינקינה 68 או משלוח מקומי בתיאום טלפוני.',
+    'en': 'Pickup at 68 Shchetinkina or local delivery by phone.',
+    'ru': 'Самовывоз со Щетинкина 68 или доставка по телефону.',
+  },
+  'store.pickup': {'he': 'איסוף', 'en': 'Pickup', 'ru': 'Самовывоз'},
+  'store.delivery': {'he': 'משלוח', 'en': 'Delivery', 'ru': 'Доставка'},
+  'store.address': {'he': 'כתובת למשלוח', 'en': 'Delivery address', 'ru': 'Адрес доставки'},
+  'store.note': {'he': 'הערה', 'en': 'Note', 'ru': 'Заметка'},
+  'newsletter.consent': {
+    'he': 'אני מסכים/ה לקבל עדכונים מבית מנחם במייל או בטלגרם.',
+    'en': 'I agree to receive Beit Menachem updates by email or Telegram.',
+    'ru': 'Согласен(на) получать новости Бейт Менахем по почте или в Telegram.',
+  },
+  'newsletter.consent.need': {
+    'he': 'סמנו את הסכמתכם כדי להירשם.',
+    'en': 'Please confirm consent to subscribe.',
+    'ru': 'Отметьте согласие, чтобы подписаться.',
+  },
+  'cemetery.upcoming': {
+    'he': 'יארצייט קרוב',
+    'en': 'Upcoming yahrzeit',
+    'ru': 'Ближайший йорцайт',
+  },
+  'library.weekly': {
+    'he': 'לוח שיעורים שבועי',
+    'en': 'Weekly class timetable',
+    'ru': 'Недельное расписание уроков',
+  },
+  'weekday.1': {'he': 'שני', 'en': 'Monday', 'ru': 'Понедельник'},
+  'weekday.2': {'he': 'שלישי', 'en': 'Tuesday', 'ru': 'Вторник'},
+  'weekday.3': {'he': 'רביעי', 'en': 'Wednesday', 'ru': 'Среда'},
+  'weekday.4': {'he': 'חמישי', 'en': 'Thursday', 'ru': 'Четверг'},
+  'weekday.5': {'he': 'שישי', 'en': 'Friday', 'ru': 'Пятница'},
+  'weekday.6': {'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
+  'weekday.7': {'he': 'ראשון', 'en': 'Sunday', 'ru': 'Воскресенье'},
+  'about.holidayHours': {
+    'he': 'שינוי שעות בחגים',
+    'en': 'Holiday hours',
+    'ru': 'Часы в праздники',
+  },
+  'events.subtitle': {
+    'he': 'סעודות, חגים ושיעורים עם הרשמה ומכסת מקומות',
+    'en': 'Meals, holidays and classes with RSVP and capacity',
+    'ru': 'Трапезы, праздники и уроки с регистрацией и лимитом мест',
+  },
+  'events.rsvp': {'he': 'הרשמה', 'en': 'RSVP', 'ru': 'Запись'},
+  'events.rsvp.thanks': {
+    'he': 'נרשמתם. נאשר טלפונית אם צריך.',
+    'en': 'You are registered. We will confirm by phone if needed.',
+    'ru': 'Вы записаны. При необходимости подтвердим по телефону.',
+  },
+  'events.full': {'he': 'האירוע מלא', 'en': 'Event is full', 'ru': 'Мест нет'},
+  'events.left': {'he': 'מקומות פנויים', 'en': 'Seats left', 'ru': 'Свободно'},
+  'events.guests': {'he': 'אורחים', 'en': 'Guests', 'ru': 'Гостей'},
+  'events.place': {'he': 'מקום', 'en': 'Place', 'ru': 'Место'},
+  'events.when': {'he': 'תאריך ושעה (ISO)', 'en': 'Date and time (ISO)', 'ru': 'Дата и время (ISO)'},
+  'events.capacity': {'he': 'מכסה (0=בלי הגבלה)', 'en': 'Capacity (0=unlimited)', 'ru': 'Лимит (0=без лимита)'},
+  'search.group.events': {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
 };

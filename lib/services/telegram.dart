@@ -227,6 +227,30 @@ class TelegramService {
     return 0;
   }
 
+  /// Private admin alert. [chatId] is a numeric user/group id or @username.
+  /// Never used for the public news channel.
+  Future<int> sendToChat({required String chatId, required String text}) async {
+    if (_token.isEmpty) {
+      throw TelegramException('admin.tg.err.token');
+    }
+    final id = chatId.trim();
+    if (id.isEmpty) {
+      throw TelegramException('admin.tg.err.channel');
+    }
+    final json = await _api('sendMessage', {
+      'chat_id': id,
+      'text': _clip(text, 4000),
+      'parse_mode': 'HTML',
+      'disable_web_page_preview': 'true',
+    });
+    _throwIfNotOk(json, 'admin.tg.err.publish');
+    final result = json['result'];
+    if (result is Map) {
+      return (result['message_id'] as num?)?.toInt() ?? 0;
+    }
+    return 0;
+  }
+
   Future<void> _clearWebhook() async {
     try {
       await _api('deleteWebhook');

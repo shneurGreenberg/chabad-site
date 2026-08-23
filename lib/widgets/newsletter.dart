@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'playful_icons.dart';
 
 import '../data/repository.dart';
 import '../l10n/strings.dart';
@@ -27,6 +28,7 @@ class _NewsletterSignupState extends State<NewsletterSignup> {
   final _email = TextEditingController();
   String? _message;
   bool _ok = false;
+  bool _consent = false;
 
   @override
   void dispose() {
@@ -36,6 +38,13 @@ class _NewsletterSignupState extends State<NewsletterSignup> {
 
   void _submit() {
     final loc = context.read<LocaleController>();
+    if (!_consent) {
+      setState(() {
+        _ok = false;
+        _message = loc.t('newsletter.consent.need');
+      });
+      return;
+    }
     final result =
         context.read<AppRepository>().subscribeNewsletter(_email.text);
     setState(() {
@@ -99,7 +108,7 @@ class _NewsletterSignupState extends State<NewsletterSignup> {
                       ? Colors.white.withValues(alpha: 0.12)
                       : Colors.white,
                   isDense: true,
-                  prefixIcon: Icon(Icons.mail_outline,
+                  prefixIcon: PlayfulIcon(Icons.mail_outline,
                       size: 18, color: light ? Colors.white70 : AppColors.muted),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -130,6 +139,35 @@ class _NewsletterSignupState extends State<NewsletterSignup> {
               child: Text(loc.t('newsletter.join')),
             ).hoverLift(),
           ],
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => setState(() => _consent = !_consent),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 22,
+                height: 22,
+                child: Checkbox(
+                  value: _consent,
+                  onChanged: (v) => setState(() => _consent = v ?? false),
+                  side: BorderSide(
+                    color: light
+                        ? Colors.white.withValues(alpha: 0.55)
+                        : AppColors.muted,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  loc.t('newsletter.consent'),
+                  style: TextStyle(color: hint, fontSize: 12, height: 1.35),
+                ),
+              ),
+            ],
+          ),
         ),
         if (_message != null) ...[
           const SizedBox(height: 8),

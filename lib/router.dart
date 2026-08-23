@@ -5,6 +5,7 @@ import 'pages/client/about_page.dart';
 import 'pages/client/cemetery_page.dart';
 import 'pages/client/contact_page.dart';
 import 'pages/client/donate_page.dart';
+import 'pages/client/events_page.dart';
 import 'pages/client/famous_page.dart';
 import 'pages/client/gallery_page.dart';
 import 'pages/client/history_page.dart';
@@ -66,6 +67,7 @@ final appRouter = GoRouter(
             child: GalleryAlbumPage(id: state.pathParameters['id'] ?? ''),
           ),
         ),
+        _route('/events', (_) => const EventsPage()),
         _route('/cemetery', (s) => CemeteryPage(highlightId: _h(s))),
         _route('/famous', (s) => FamousPage(highlightId: _h(s))),
         _route('/history', (_) => const HistoryPage()),

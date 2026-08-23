@@ -8,6 +8,7 @@ import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key, this.highlightId});
@@ -104,7 +105,7 @@ class NewsArticlePage extends StatelessWidget {
           Section(
             child: TextButton.icon(
               onPressed: () => context.go('/news'),
-              icon: const Icon(Icons.arrow_back),
+              icon: const PlayfulIcon(Icons.arrow_back),
               label: Text(loc.t('nav.news')),
             ),
           ),
@@ -131,7 +132,7 @@ class NewsArticlePage extends StatelessWidget {
             children: [
               TextButton.icon(
                 onPressed: () => context.go('/news'),
-                icon: const Icon(Icons.arrow_back),
+                icon: const PlayfulIcon(Icons.arrow_back),
                 label: Text(loc.t('nav.news')),
               ),
               const SizedBox(height: 8),

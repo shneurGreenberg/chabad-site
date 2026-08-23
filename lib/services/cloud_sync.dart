@@ -107,6 +107,8 @@ class CloudSync {
         'telegramBot': snapshot['telegramBot'],
         'socialBot': snapshot['socialBot'],
         'lang': snapshot['lang'],
+        'links': snapshot['links'],
+        'campaignNotes': snapshot['campaignNotes'],
         'imageKeys': mediaIds,
       });
 
@@ -153,6 +155,10 @@ class CloudSync {
         prune: prune,
       );
       await _syncSubscribers(db, _asMaps(snapshot['subscribers']), prune: prune);
+      await _syncList(db, 'events', _asMaps(snapshot['events']), images, null,
+          prune: prune);
+      await _syncList(db, 'orders', _asMaps(snapshot['orders']), images, null,
+          prune: prune);
       await _syncBanners(db, snapshot['banners'], images, prune: prune);
       await _syncMedia(db, images, now, prune: prune);
       lastError = null;
@@ -186,6 +192,8 @@ class CloudSync {
         snapshot['leads'] = await _loadList(db, 'leads');
         snapshot['donations'] = await _loadList(db, 'donations');
         snapshot['subscribers'] = await _loadList(db, 'subscribers');
+        snapshot['events'] = await _loadList(db, 'events');
+        snapshot['orders'] = await _loadList(db, 'orders');
         snapshot['banners'] = await _loadBanners(db);
       }
 
@@ -250,12 +258,36 @@ class CloudSync {
     ];
   }
 
+  /// Visitor form: a single create, no admin session required.
+  Future<String?> submitPublic({
+    required String collection,
+    required String id,
+    required Map<String, dynamic> data,
+  }) async {
+    await init();
+    if (!enabled) return 'unavailable';
+    const allowed = {'leads', 'subscribers', 'donations', 'orders', 'rsvps'};
+    if (!allowed.contains(collection) || id.trim().isEmpty) return 'denied';
+    try {
+      await FirebaseFirestore.instance.collection(collection).doc(id).set(data);
+      return null;
+    } on FirebaseException catch (e) {
+      return e.code;
+    } catch (_) {
+      return 'unknown';
+    }
+  }
+
   Future<List<Map<String, dynamic>>> _loadList(
     FirebaseFirestore db,
     String name,
   ) async {
-    final snap = await db.collection(name).get();
-    return [for (final d in snap.docs) {'id': d.id, ...d.data()}];
+    try {
+      final snap = await db.collection(name).get();
+      return [for (final d in snap.docs) {'id': d.id, ...d.data()}];
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<Map<String, dynamic>> _loadBanners(FirebaseFirestore db) async {

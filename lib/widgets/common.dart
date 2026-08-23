@@ -8,6 +8,8 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../data/repository.dart';
+import '../services/links.dart';
+import '../services/web_prefs.dart';
 import 'playful_icons.dart';
 
 String copyOf(BuildContext context, Loc map, String fallbackKey) {
@@ -48,25 +50,36 @@ class PhoneText extends StatelessWidget {
     this.style,
     this.maxLines,
     this.overflow,
+    this.link = true,
   });
   final String number;
   final TextStyle? style;
   final int? maxLines;
   final TextOverflow? overflow;
+  final bool link;
 
   @override
   Widget build(BuildContext context) {
+    final href = telUrl(number);
+    Widget child = Text(
+      number,
+      textAlign: TextAlign.left,
+      style: style,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+    if (link && href != null) {
+      child = InkWell(
+        onTap: () => openUrl(href),
+        mouseCursor: SystemMouseCursors.click,
+        child: child,
+      );
+    }
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Directionality(
         textDirection: TextDirection.ltr,
-        child: Text(
-          number,
-          textAlign: TextAlign.left,
-          style: style,
-          maxLines: maxLines,
-          overflow: overflow,
-        ),
+        child: child,
       ),
     );
   }
@@ -285,7 +298,7 @@ class GradientImage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (icon != null)
-                    Icon(icon, size: 46, color: Colors.white.withValues(alpha: 0.95)),
+                    PlayfulIcon(icon!, size: 46, color: Colors.white.withValues(alpha: 0.95)),
                   if (label != null) ...[
                     const SizedBox(height: 8),
                     Padding(
@@ -331,7 +344,7 @@ class Pill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: c),
+            PlayfulIcon(icon!, size: 14, color: c),
             const SizedBox(width: 6),
           ],
           Text(text,
@@ -378,7 +391,7 @@ class StatCard extends StatelessWidget {
               color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: color),
+            child: PlayfulIcon(icon, color: color),
           ),
           const SizedBox(height: 16),
           Text(value,
@@ -645,7 +658,8 @@ class _BannerFillState extends State<BannerFill> {
             );
           },
           child: KeyedSubtree(
-            key: ValueKey('${i}_${slides[i].imageUrl}_${slides[i].bytes?.length}'),
+            key: ValueKey(
+                '${i}_${slides[i].imageUrl}_${slides[i].bytes?.length}_${slides[i].alignX}_${slides[i].alignY}'),
             child: _image(slides[i]),
           ),
         ),
@@ -682,7 +696,7 @@ class EmptyHint extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            Icon(icon, size: 40, color: AppColors.muted.withValues(alpha: 0.7)),
+            PlayfulIcon(icon, size: 40, color: AppColors.muted.withValues(alpha: 0.7)),
             const SizedBox(height: 10),
             Text(label ?? loc.t('common.empty'),
                 style: TextStyle(color: AppColors.muted, fontSize: 15)),

@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../services/web_prefs.dart';
+import '../../services/yahrzeit.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/cross_origin_image.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class CemeteryPage extends StatefulWidget {
   const CemeteryPage({super.key, this.highlightId});
@@ -18,6 +20,7 @@ class CemeteryPage extends StatefulWidget {
 
 class _CemeteryPageState extends State<CemeteryPage> {
   String _query = '';
+  bool _upcomingOnly = false;
 
   static const _kaddishUrl =
       'https://synagogue-kadish-shneur.amvera.io/s/novosibirsk';
@@ -39,7 +42,13 @@ class _CemeteryPageState extends State<CemeteryPage> {
     final repo = context.watch<AppRepository>();
     final raw = _query.trim();
     final q = raw.toLowerCase();
-    final graves = repo.graves.where((g) => _matches(g, q, raw, loc.lang)).toList();
+    var graves = repo.graves.where((g) => _matches(g, q, raw, loc.lang)).toList();
+    if (_upcomingOnly) {
+      final soon = upcomingYahrzeits(graves, withinDays: 45)
+          .map((y) => y.grave.id)
+          .toSet();
+      graves = graves.where((g) => soon.contains(g.id)).toList();
+    }
 
     return SiteScaffold(
       currentRoute: '/cemetery',
@@ -55,16 +64,22 @@ class _CemeteryPageState extends State<CemeteryPage> {
             children: [
               TextButton.icon(
                 onPressed: () => openUrl(_kaddishUrl),
-                icon: const Icon(Icons.open_in_new, size: 18),
+                icon: const PlayfulIcon(Icons.open_in_new, size: 18),
                 label: Text(loc.t('cemetery.source')),
               ).hoverLift(),
               const SizedBox(height: 8),
               TextField(
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const PlayfulIcon(Icons.search),
                   hintText: loc.t('cemetery.search'),
                 ),
                 onChanged: (v) => setState(() => _query = v),
+              ),
+              const SizedBox(height: 8),
+              FilterChip(
+                selected: _upcomingOnly,
+                label: Text(loc.t('cemetery.upcoming')),
+                onSelected: (v) => setState(() => _upcomingOnly = v),
               ),
             ],
           ),
@@ -173,7 +188,7 @@ class _GravePhoto extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: const Icon(Icons.star, color: Colors.white54, size: 20),
+        child: const PlayfulIcon(Icons.star, color: Colors.white54, size: 20),
       );
 
   @override

@@ -47,7 +47,7 @@ class ZmanimPage extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.local_fire_department, color: AppColors.accent),
+                      PlayfulIcon(Icons.local_fire_department, color: AppColors.accent),
                       const SizedBox(width: 8),
                       Text(loc.t('zmanim.shabbat'),
                           style: const TextStyle(

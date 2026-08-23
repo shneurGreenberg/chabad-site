@@ -7,6 +7,7 @@ import '../../theme.dart';
 import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
+import '../../widgets/playful_icons.dart';
 
 class BannersPanel extends StatelessWidget {
   const BannersPanel({super.key});
@@ -83,13 +84,13 @@ class _EmblemEditor extends StatelessWidget {
           ),
           FilledButton.icon(
             onPressed: () => _pick(context),
-            icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+            icon: const PlayfulIcon(Icons.add_photo_alternate_outlined, size: 18),
             label: Text(loc.t('admin.emblem.upload')),
           ).hoverLift(),
           if (repo.hasCustomEmblem)
             OutlinedButton.icon(
               onPressed: repo.clearEmblem,
-              icon: const Icon(Icons.restart_alt, size: 18),
+              icon: const PlayfulIcon(Icons.restart_alt, size: 18),
               label: Text(loc.t('admin.emblem.reset')),
             ).hoverLift(),
         ],
@@ -139,14 +140,14 @@ class _BannerEditor extends StatelessWidget {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Icon(slot.tall ? Icons.home_outlined : Icons.web_asset,
+              PlayfulIcon(slot.tall ? Icons.home_outlined : Icons.web_asset,
                   color: AppColors.primary),
               Text(loc.t(slot.labelKey),
                   style: const TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 17)),
               FilledButton.icon(
                 onPressed: () => _pick(context),
-                icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+                icon: const PlayfulIcon(Icons.add_photo_alternate_outlined, size: 18),
                 label: Text(slides.isEmpty
                     ? loc.t('admin.banners.upload')
                     : loc.t('admin.banners.addSlide')),
@@ -154,7 +155,7 @@ class _BannerEditor extends StatelessWidget {
               if (banner.hasImage)
                 OutlinedButton.icon(
                   onPressed: () => repo.clearBanner(slot.route),
-                  icon: const Icon(Icons.delete_outline, size: 18),
+                  icon: const PlayfulIcon(Icons.delete_outline, size: 18),
                   label: Text(loc.t('admin.banners.remove')),
                 ).hoverLift(),
             ],
@@ -162,45 +163,14 @@ class _BannerEditor extends StatelessWidget {
           const SizedBox(height: 6),
           Text(loc.t('admin.banners.preview'),
               style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
+          if (slides.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(loc.t('admin.banners.drag'),
+                style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
+          ],
           const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              height: previewH,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  BannerFill(banner: banner, positioned: false),
-                  if (!banner.hasImage)
-                    Container(
-                      decoration:
-                          BoxDecoration(gradient: AppColors.heroGradient),
-                      child: Center(
-                        child: Text(loc.t('admin.banners.empty'),
-                            style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.85),
-                                fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  PositionedDirectional(
-                    start: 18,
-                    bottom: 16,
-                    child: Text(
-                      loc.t(slot.labelKey),
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 20,
-                          shadows: [Shadow(color: Colors.black54, blurRadius: 8)]),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           for (var i = 0; i < slides.length; i++) ...[
-            const SizedBox(height: 14),
+            if (i > 0) const SizedBox(height: 14),
             Row(
               children: [
                 Text(
@@ -211,9 +181,16 @@ class _BannerEditor extends StatelessWidget {
                 IconButton(
                   tooltip: loc.t('admin.banners.remove'),
                   onPressed: () => repo.removeBannerSlide(slot.route, i),
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const PlayfulIcon(Icons.close, size: 18),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            _BannerCropPreview(
+              slide: slides[i],
+              height: previewH,
+              label: loc.t(slot.labelKey),
+              onPan: (x, y) => repo.setSlideAlign(slot.route, i, x: x, y: y),
             ),
             Text(loc.t('admin.banners.alignX'),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
@@ -234,7 +211,109 @@ class _BannerEditor extends StatelessWidget {
               onChanged: (v) => repo.setSlideAlign(slot.route, i, y: v),
             ),
           ],
+          if (slides.isEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                height: previewH,
+                width: double.infinity,
+                decoration: BoxDecoration(gradient: AppColors.heroGradient),
+                alignment: Alignment.center,
+                child: Text(loc.t('admin.banners.empty'),
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontWeight: FontWeight.w600)),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _BannerCropPreview extends StatelessWidget {
+  const _BannerCropPreview({
+    required this.slide,
+    required this.height,
+    required this.label,
+    required this.onPan,
+  });
+  final BannerSlide slide;
+  final double height;
+  final String label;
+  final void Function(double x, double y) onPan;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            return GestureDetector(
+              onPanUpdate: (d) {
+                final nx = (slide.alignX - d.delta.dx / (box.maxWidth / 2))
+                    .clamp(-1.0, 1.0);
+                final ny = (slide.alignY - d.delta.dy / (box.maxHeight / 2))
+                    .clamp(-1.0, 1.0);
+                onPan(nx, ny);
+              },
+              child: MouseRegion(
+                cursor: SystemMouseCursors.grab,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (slide.bytes != null && slide.bytes!.isNotEmpty)
+                      Image.memory(
+                        slide.bytes!,
+                        fit: BoxFit.cover,
+                        alignment: slide.alignment,
+                        gaplessPlayback: true,
+                      )
+                    else if (slide.imageUrl != null && slide.imageUrl!.isNotEmpty)
+                      slide.imageUrl!.startsWith('assets/')
+                          ? Image.asset(
+                              slide.imageUrl!,
+                              fit: BoxFit.cover,
+                              alignment: slide.alignment,
+                            )
+                          : Image.network(
+                              slide.imageUrl!,
+                              fit: BoxFit.cover,
+                              alignment: slide.alignment,
+                            )
+                    else
+                      const ColoredBox(color: Color(0xFF0B1C3A)),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0x660B1C3A), Color(0xB30B1C3A)],
+                        ),
+                      ),
+                    ),
+                    PositionedDirectional(
+                      start: 18,
+                      bottom: 16,
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          shadows: [Shadow(color: Colors.black54, blurRadius: 8)],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

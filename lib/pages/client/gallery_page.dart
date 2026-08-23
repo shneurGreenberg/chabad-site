@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository.dart';
@@ -8,6 +8,7 @@ import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../widgets/playful_icons.dart';
 
 class GalleryPage extends StatefulWidget {
   const GalleryPage({super.key});
@@ -102,7 +103,7 @@ class GalleryAlbumPage extends StatelessWidget {
           Section(
             child: TextButton.icon(
               onPressed: () => context.go('/gallery'),
-              icon: const Icon(Icons.arrow_back),
+              icon: const PlayfulIcon(Icons.arrow_back),
               label: Text(loc.t('gallery.back')),
             ),
           ),
@@ -127,7 +128,7 @@ class GalleryAlbumPage extends StatelessWidget {
             children: [
               TextButton.icon(
                 onPressed: () => context.go('/gallery'),
-                icon: const Icon(Icons.arrow_back),
+                icon: const PlayfulIcon(Icons.arrow_back),
                 label: Text(loc.t('gallery.back')),
               ),
             ],
@@ -242,7 +243,7 @@ class _AlbumLightboxState extends State<_AlbumLightbox> {
             child: IconButton(
               style: IconButton.styleFrom(backgroundColor: Colors.black54),
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.close, color: Colors.white),
+              icon: const PlayfulIcon(Icons.close, color: Colors.white),
             ),
           ),
           if (widget.shots.length > 1)

@@ -8,3 +8,6 @@ String? readPref(String key) => impl.readPref(key);
 void removePref(String key) => impl.removePref(key);
 
 void openUrl(String url) => impl.openUrl(url);
+
+void downloadText(String filename, String text) =>
+    impl.downloadText(filename, text);

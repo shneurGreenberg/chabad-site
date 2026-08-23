@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'playful_icons.dart';
 
 import '../theme.dart';
 
@@ -11,7 +12,7 @@ class YoutubeIFrame extends StatelessWidget {
     return ColoredBox(
       color: const Color(0xFF111827),
       child: Center(
-        child: Icon(Icons.play_circle_fill,
+        child: PlayfulIcon(Icons.play_circle_fill,
             color: AppColors.accent.withValues(alpha: 0.9), size: 64),
       ),
     );

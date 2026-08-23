@@ -13,6 +13,7 @@ import '../../widgets/admin_fields.dart';
 import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
+import '../../widgets/playful_icons.dart';
 import '../../widgets/site_scaffold.dart' show LanguageSwitcher;
 import '../../services/web_prefs.dart';
 import 'appearance_panel.dart';
@@ -26,8 +27,64 @@ const _kFirestoreRules = '''
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null;
+    }
+    match /site/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /news/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /programs/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /banners/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /media/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /leads/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /subscribers/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /donations/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /orders/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /rsvps/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
     match /{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
@@ -71,8 +128,12 @@ class _AdminLoginState extends State<AdminLogin> {
       _busy = true;
       _error = null;
     });
-    final err =
-        await context.read<AuthController>().login(_email.text, _password.text);
+    final emails = context.read<AppRepository>().links.adminEmails;
+    final err = await context.read<AuthController>().login(
+          _email.text,
+          _password.text,
+          adminEmails: emails,
+        );
     if (!mounted) return;
     setState(() {
       _busy = false;
@@ -121,7 +182,7 @@ class _AdminLoginState extends State<AdminLogin> {
                           gradient: AppColors.heroGradient,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Icon(Icons.admin_panel_settings,
+                        child: PlayfulIcon(Icons.admin_panel_settings,
                             color: AppColors.accent, size: 32),
                       ),
                     ),
@@ -145,7 +206,7 @@ class _AdminLoginState extends State<AdminLogin> {
                       onSubmitted: (_) => _submit(),
                       decoration: InputDecoration(
                         labelText: loc.t('common.email'),
-                        prefixIcon: const Icon(Icons.email_outlined),
+                        prefixIcon: const PlayfulIcon(Icons.email_outlined),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -156,7 +217,7 @@ class _AdminLoginState extends State<AdminLogin> {
                       onSubmitted: (_) => _submit(),
                       decoration: InputDecoration(
                         labelText: loc.t('common.password'),
-                        prefixIcon: const Icon(Icons.lock_outline),
+                        prefixIcon: const PlayfulIcon(Icons.lock_outline),
                       ),
                     ),
                     if (_error != null) ...[
@@ -179,13 +240,13 @@ class _AdminLoginState extends State<AdminLogin> {
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Icon(Icons.login, size: 18),
+                          : const PlayfulIcon(Icons.login, size: 18),
                       label: Text(loc.t('admin.login.button')),
                     ).hoverLift(),
                     const SizedBox(height: 12),
                     TextButton.icon(
                       onPressed: () => context.go('/'),
-                      icon: const Icon(Icons.arrow_back, size: 18),
+                      icon: const PlayfulIcon(Icons.arrow_back, size: 18),
                       label: Text(loc.t('admin.viewSite')),
                     ).hoverLift(),
                   ],
@@ -213,7 +274,8 @@ class _AdminShellState extends State<AdminShell> {
     final loc = context.locWatch;
     final narrow = MediaQuery.sizeOf(context).width < 900;
 
-    final sections = <_AdminSection>[
+    final auth = context.watch<AuthController>();
+    final all = <_AdminSection>[
       _AdminSection(loc.t('admin.dashboard'), Icons.dashboard_outlined,
           const DashboardPanel()),
       _AdminSection(loc.t('admin.appearance'), Icons.palette_outlined,
@@ -221,30 +283,47 @@ class _AdminShellState extends State<AdminShell> {
       _AdminSection(loc.t('admin.siteContent'), Icons.edit_note_outlined,
           const SiteContentPanel()),
       _AdminSection(loc.t('admin.settings'), Icons.settings_outlined,
-          const SettingsPanel()),
+          const SettingsPanel(),
+          adminOnly: true),
       _AdminSection(loc.t('admin.banners'), Icons.image_outlined,
-          const BannersPanel()),
+          const BannersPanel(),
+          jump: AdminJump.banners),
       _AdminSection(loc.t('admin.manage.news'), Icons.article_outlined,
-          const ManageNewsPanel()),
+          const ManageNewsPanel(),
+          jump: AdminJump.news),
       _AdminSection(loc.t('admin.manage.programs'), Icons.groups_outlined,
-          const ManageProgramsPanel()),
+          const ManageProgramsPanel(),
+          jump: AdminJump.programs),
+      _AdminSection(loc.t('admin.manage.events'), Icons.event_outlined,
+          const ManageEventsPanel(),
+          jump: AdminJump.events),
       _AdminSection(loc.t('admin.manage.store'), Icons.storefront_outlined,
           const ManageStorePanel()),
       _AdminSection(loc.t('admin.manage.gallery'), Icons.photo_library_outlined,
-          const ManageGalleryPanel()),
+          const ManageGalleryPanel(),
+          jump: AdminJump.gallery),
       _AdminSection(loc.t('admin.manage.famous'), Icons.star_outline,
           const ManageFamousPanel()),
       _AdminSection(loc.t('admin.manage.history'), Icons.account_balance_outlined,
           const ManageHistoryPanel()),
       _AdminSection(loc.t('admin.manage.library'), Icons.menu_book_outlined,
-          const ManageLibraryPanel()),
+          const ManageLibraryPanel(),
+          jump: AdminJump.library),
       _AdminSection(loc.t('admin.manage.donate'), Icons.volunteer_activism_outlined,
           const ManageDonatePanel()),
       _AdminSection(loc.t('admin.manage.cemetery'), Icons.grid_view_outlined,
-          const ManageCemeteryPanel()),
-      _AdminSection(loc.t('admin.crm'), Icons.contacts_outlined, const CrmPanel()),
-      _AdminSection(loc.t('admin.bots'), Icons.smart_toy_outlined, const BotsPanel()),
+          const ManageCemeteryPanel(),
+          jump: AdminJump.cemetery),
+      _AdminSection(loc.t('admin.crm'), Icons.contacts_outlined, const CrmPanel(),
+          jump: AdminJump.crm),
+      _AdminSection(loc.t('admin.bots'), Icons.smart_toy_outlined, const BotsPanel(),
+          jump: AdminJump.bots, adminOnly: true),
     ];
+    final sections = [
+      for (final s in all)
+        if (!s.adminOnly || auth.isAdmin) s,
+    ];
+    if (_index >= sections.length) _index = 0;
 
     final fromEnd = menuDrawerFromEnd(context, leadingButton: true);
     final menu = narrow
@@ -276,7 +355,10 @@ class _AdminShellState extends State<AdminShell> {
                 _topBar(context, loc, sections[_index].title, narrow),
                 const _CloudSyncBar(),
                 AdminRemindersBanner(
-                  onJump: (jump) => setState(() => _index = _jumpIndex(jump)),
+                  onJump: (jump) => setState(() {
+                    final i = sections.indexWhere((s) => s.jump == jump);
+                    if (i >= 0) _index = i;
+                  }),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -356,7 +438,7 @@ class _AdminShellState extends State<AdminShell> {
                   ? BorderSide(color: AppColors.accent, width: 1.2)
                   : BorderSide.none,
             ),
-            leading: Icon(s.icon,
+            leading: PlayfulIcon(s.icon,
                 color: selected ? AppColors.accentSoft : cream, size: 22),
             title: Text(s.title,
                 style: TextStyle(
@@ -372,15 +454,6 @@ class _AdminShellState extends State<AdminShell> {
       ),
     );
   }
-
-  int _jumpIndex(AdminJump jump) => switch (jump) {
-        AdminJump.news => 5,
-        AdminJump.programs => 6,
-        AdminJump.gallery => 8,
-        AdminJump.library => 11,
-        AdminJump.bots => 15,
-        AdminJump.banners => 4,
-      };
 
   Future<void> _publish(BuildContext context, LocaleController loc) async {
     final err = await context.read<AppRepository>().publishToCloud();
@@ -407,7 +480,7 @@ class _AdminShellState extends State<AdminShell> {
             Builder(
               builder: (context) => IconButton(
                 tooltip: loc.t('nav.menu'),
-                icon: const Icon(Icons.menu),
+                icon: const PlayfulIcon(Icons.menu),
                 onPressed: () =>
                     openMenuDrawer(context, leadingButton: true),
               ),
@@ -424,7 +497,7 @@ class _AdminShellState extends State<AdminShell> {
             HoverLift(
               child: FilledButton.icon(
                 onPressed: () => _publish(context, loc),
-                icon: const Icon(Icons.cloud_upload_outlined, size: 16),
+                icon: const PlayfulIcon(Icons.cloud_upload_outlined, size: 16),
                 label: Text(loc.t('admin.cloud.publish')),
               ),
             )
@@ -432,20 +505,20 @@ class _AdminShellState extends State<AdminShell> {
             IconButton(
               tooltip: loc.t('admin.cloud.publish'),
               onPressed: () => _publish(context, loc),
-              icon: const Icon(Icons.cloud_upload_outlined),
+              icon: const PlayfulIcon(Icons.cloud_upload_outlined),
             ).hoverScale(),
           const SizedBox(width: 8),
           if (!narrow)
             OutlinedButton.icon(
               onPressed: () => context.go('/'),
-              icon: const Icon(Icons.open_in_new, size: 16),
+              icon: const PlayfulIcon(Icons.open_in_new, size: 16),
               label: Text(loc.t('admin.viewSite')),
             ).hoverLift()
           else
             IconButton(
               tooltip: loc.t('admin.viewSite'),
               onPressed: () => context.go('/'),
-              icon: const Icon(Icons.open_in_new),
+              icon: const PlayfulIcon(Icons.open_in_new),
             ).hoverScale(),
           const SizedBox(width: 8),
           if (!narrow)
@@ -456,7 +529,7 @@ class _AdminShellState extends State<AdminShell> {
               },
               style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFEF4444)),
-              icon: const Icon(Icons.logout, size: 16),
+              icon: const PlayfulIcon(Icons.logout, size: 16),
               label: Text(loc.t('admin.logout')),
             ).hoverLift()
           else
@@ -466,7 +539,7 @@ class _AdminShellState extends State<AdminShell> {
                 auth.logout();
                 context.go('/');
               },
-              icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
+              icon: const PlayfulIcon(Icons.logout, color: Color(0xFFEF4444)),
             ).hoverScale(),
         ]),
       ),
@@ -491,7 +564,7 @@ class _CloudSyncBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(children: [
-          Icon(Icons.cloud_off_outlined, size: 18, color: fg),
+          PlayfulIcon(Icons.cloud_off_outlined, size: 18, color: fg),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -558,10 +631,18 @@ class _CloudSyncBar extends StatelessWidget {
 }
 
 class _AdminSection {
-  _AdminSection(this.title, this.icon, this.panel);
+  _AdminSection(
+    this.title,
+    this.icon,
+    this.panel, {
+    this.jump,
+    this.adminOnly = false,
+  });
   final String title;
   final IconData icon;
   final Widget panel;
+  final AdminJump? jump;
+  final bool adminOnly;
 }
 
 // ---------------------------------------------------------------------------
@@ -596,7 +677,7 @@ class DashboardPanel extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-                    child: Icon(Icons.person, color: AppColors.primary, size: 20),
+                    child: PlayfulIcon(Icons.person, color: AppColors.primary, size: 20),
                   ),
                   title: Text(lead.name,
                       style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -672,7 +753,7 @@ class ManageNewsPanel extends StatelessWidget {
       actions: [
         FilledButton.icon(
           onPressed: () => _edit(context, repo, repo.newBlankNews(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -699,14 +780,14 @@ class ManageNewsPanel extends StatelessWidget {
                 if (a.source == NewsSource.telegram)
                   const Padding(
                     padding: EdgeInsetsDirectional.only(end: 6),
-                    child: Icon(Icons.send, size: 16, color: Color(0xFF0EA5E9)),
+                    child: PlayfulIcon(Icons.send, size: 16, color: Color(0xFF0EA5E9)),
                   ),
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                   onPressed: () => _edit(context, repo, a),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteNews(a.id),
                 ),
@@ -776,7 +857,7 @@ class _NewsEditorState extends State<_NewsEditor> {
                         fontWeight: FontWeight.w800, fontSize: 18)),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: const PlayfulIcon(Icons.close),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
@@ -813,13 +894,13 @@ class _NewsEditorState extends State<_NewsEditor> {
                 children: [
                   TextButton.icon(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: const PlayfulIcon(Icons.close, size: 18),
                     label: Text(loc.t('common.cancel')),
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
                     onPressed: _save,
-                    icon: const Icon(Icons.save_outlined, size: 18),
+                    icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                     label: Text(loc.t('common.save')),
                   ),
                 ],
@@ -860,7 +941,7 @@ class ManageProgramsPanel extends StatelessWidget {
       actions: [
         FilledButton.icon(
           onPressed: () => _edit(context, repo, repo.newBlankProgram(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -883,11 +964,11 @@ class ManageProgramsPanel extends StatelessWidget {
               subtitle: Text(trLoc(p.schedule, loc.lang)),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                   onPressed: () => _edit(context, repo, p),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteProgram(p.id),
                 ),
@@ -959,7 +1040,7 @@ class _ProgramEditorState extends State<_ProgramEditor> {
                     style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
                 const Spacer(),
                 IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const PlayfulIcon(Icons.close),
                     onPressed: () => Navigator.pop(context)),
               ]),
             ),
@@ -989,13 +1070,13 @@ class _ProgramEditorState extends State<_ProgramEditor> {
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const PlayfulIcon(Icons.close, size: 18),
                   label: Text(loc.t('common.cancel')),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.save_outlined, size: 18),
+                  icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                   label: Text(loc.t('common.save')),
                 ),
               ]),
@@ -1037,7 +1118,7 @@ class ManageStorePanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: () =>
               _edit(context, repo, repo.newBlankProduct(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -1060,11 +1141,11 @@ class ManageStorePanel extends StatelessWidget {
               subtitle: Text('\$${p.price.toStringAsFixed(0)}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                   onPressed: () => _edit(context, repo, p),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteProduct(p.id),
                 ),
@@ -1133,7 +1214,7 @@ class _ProductEditorState extends State<_ProductEditor> {
                         fontWeight: FontWeight.w800, fontSize: 18)),
                 const Spacer(),
                 IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const PlayfulIcon(Icons.close),
                     onPressed: () => Navigator.pop(context)),
               ]),
             ),
@@ -1184,13 +1265,13 @@ class _ProductEditorState extends State<_ProductEditor> {
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const PlayfulIcon(Icons.close, size: 18),
                   label: Text(loc.t('common.cancel')),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.save_outlined, size: 18),
+                  icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                   label: Text(loc.t('common.save')),
                 ),
               ]),
@@ -1229,7 +1310,7 @@ class ManageGalleryPanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: () =>
               _edit(context, repo, repo.newBlankGallery(), isNew: true),
-          icon: const Icon(Icons.add, size: 18),
+          icon: const PlayfulIcon(Icons.add, size: 18),
           label: Text(loc.t('common.add')),
         ),
       ],
@@ -1253,11 +1334,11 @@ class ManageGalleryPanel extends StatelessWidget {
                   '${p.year} · ${p.photoCount} ${loc.t('gallery.photos')}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
                   onPressed: () => _edit(context, repo, p),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const PlayfulIcon(Icons.delete_outline,
                       size: 20, color: Color(0xFFEF4444)),
                   onPressed: () => repo.deleteGalleryPhoto(p.id),
                 ),
@@ -1320,7 +1401,7 @@ class _GalleryEditorState extends State<_GalleryEditor> {
                         fontWeight: FontWeight.w800, fontSize: 18)),
                 const Spacer(),
                 IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const PlayfulIcon(Icons.close),
                     onPressed: () => Navigator.pop(context)),
               ]),
             ),
@@ -1349,13 +1430,13 @@ class _GalleryEditorState extends State<_GalleryEditor> {
               child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 TextButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, size: 18),
+                  icon: const PlayfulIcon(Icons.close, size: 18),
                   label: Text(loc.t('common.cancel')),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.save_outlined, size: 18),
+                  icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                   label: Text(loc.t('common.save')),
                 ),
               ]),
@@ -1471,14 +1552,14 @@ class CrmPanel extends StatelessWidget {
                     for (final s in repo.subscribers)
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: Icon(Icons.mail_outline,
+                        leading: PlayfulIcon(Icons.mail_outline,
                             color: AppColors.primary),
                         title: Text(s.email),
                         subtitle: Text(
                             DateFormat.yMMMd(loc.lang).add_Hm().format(s.date)),
                         trailing: IconButton(
                           tooltip: loc.t('common.delete'),
-                          icon: const Icon(Icons.delete_outline),
+                          icon: const PlayfulIcon(Icons.delete_outline),
                           onPressed: () => repo.removeSubscriber(s.email),
                         ),
                       ),
@@ -1556,7 +1637,7 @@ class _BotCard extends StatelessWidget {
             CircleAvatar(
               radius: 24,
               backgroundColor: color.withValues(alpha: 0.15),
-              child: Icon(icon, color: color),
+              child: PlayfulIcon(icon, color: color),
             ),
             const SizedBox(width: 14),
             Column(
@@ -1587,7 +1668,7 @@ class _BotCard extends StatelessWidget {
           FilledButton.icon(
             onPressed: bot.enabled ? onRun : null,
             style: FilledButton.styleFrom(backgroundColor: color),
-            icon: const Icon(Icons.play_arrow, size: 18),
+            icon: const PlayfulIcon(Icons.play_arrow, size: 18),
             label: Text(loc.t('admin.bots.runNow')),
           ).hoverLift(),
         ],

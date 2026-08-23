@@ -26,11 +26,17 @@ class ChabadEmblem extends StatelessWidget {
 
     Widget mark;
     if (bytes != null && bytes.isNotEmpty) {
-      mark = Image.memory(bytes, fit: BoxFit.contain, gaplessPlayback: true);
+      mark = Image.memory(
+        bytes,
+        fit: BoxFit.cover,
+        width: size,
+        height: size,
+        gaplessPlayback: true,
+      );
     } else if (url != null && url.isNotEmpty) {
       mark = url.startsWith('assets/')
-          ? Image.asset(url, fit: BoxFit.contain)
-          : Image.network(url, fit: BoxFit.contain);
+          ? Image.asset(url, fit: BoxFit.cover, width: size, height: size)
+          : Image.network(url, fit: BoxFit.cover, width: size, height: size);
     } else {
       mark = CustomPaint(painter: const _ChabadEmblemPainter());
     }
@@ -54,10 +60,7 @@ class ChabadEmblem extends StatelessWidget {
               ),
             ],
           ),
-          child: Padding(
-            padding: EdgeInsets.all(size * 0.18),
-            child: mark,
-          ),
+          child: ClipOval(child: mark),
         ),
       ),
     );

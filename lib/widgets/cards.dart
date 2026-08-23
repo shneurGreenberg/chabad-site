@@ -8,6 +8,7 @@ import '../models.dart';
 import '../theme.dart';
 import 'common.dart';
 import 'hover.dart';
+import 'playful_icons.dart';
 
 String fmtDate(BuildContext context, DateTime d) {
   final lang = context.read<LocaleController>().lang;
@@ -77,7 +78,7 @@ class NewsCard extends StatelessWidget {
                     Text(loc.t('common.readMore'),
                         style: TextStyle(
                             color: AppColors.primary, fontWeight: FontWeight.w700)),
-                    Icon(Icons.arrow_forward, size: 16, color: AppColors.primary),
+                    PlayfulIcon(Icons.arrow_forward, size: 16, color: AppColors.primary),
                   ]),
                 ],
               ),
@@ -131,7 +132,7 @@ class ProgramCard extends StatelessWidget {
                         color: color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Icon(program.icon, color: color, size: 26),
+                      child: PlayfulIcon(program.icon, color: color, size: 26),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -154,7 +155,7 @@ class ProgramCard extends StatelessWidget {
                     Text(loc.t('common.readMore'),
                         style: TextStyle(
                             color: color, fontWeight: FontWeight.w700)),
-                    Icon(Icons.arrow_forward, size: 16, color: color),
+                    PlayfulIcon(Icons.arrow_forward, size: 16, color: color),
                   ]),
                 ],
               ),
@@ -224,7 +225,7 @@ class ProductCard extends StatelessWidget {
                       style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10)),
-                      child: const Icon(Icons.add_shopping_cart, size: 18),
+                      child: const PlayfulIcon(Icons.add_shopping_cart, size: 18),
                     ).hoverLift(scale: 1.05),
                   ),
                 ]),
@@ -236,6 +237,16 @@ class ProductCard extends StatelessWidget {
     ),
     );
   }
+}
+
+ImageProvider? _personPhoto(FamousPerson p) {
+  if (p.photoBytes != null && p.photoBytes!.isNotEmpty) {
+    return MemoryImage(p.photoBytes!);
+  }
+  final url = p.photoUrl?.trim() ?? '';
+  if (url.isEmpty) return null;
+  if (url.startsWith('assets/')) return AssetImage(url);
+  return NetworkImage(url);
 }
 
 class PersonCard extends StatelessWidget {
@@ -256,9 +267,14 @@ class PersonCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: color.withValues(alpha: 0.15),
-                child: Text(person.initials,
-                    style: TextStyle(
-                        color: color, fontWeight: FontWeight.w800, fontSize: 18)),
+                backgroundImage: _personPhoto(person),
+                child: person.hasPhoto
+                    ? null
+                    : Text(person.initials,
+                        style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18)),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -324,7 +340,7 @@ class PhotoCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.photo_library_outlined,
+                        PlayfulIcon(Icons.photo_library_outlined,
                             size: 16, color: Color(photo.color)),
                         const SizedBox(width: 6),
                         Text(
@@ -369,7 +385,7 @@ class ShotImage extends StatelessWidget {
     if (url == null || url.isEmpty) {
       return const ColoredBox(
         color: Color(0xFF1E3A8A),
-        child: Center(child: Icon(Icons.photo, color: Colors.white54)),
+        child: Center(child: PlayfulIcon(Icons.photo, color: Colors.white54)),
       );
     }
     final cacheW = imageDecodePx(context, fit == BoxFit.contain ? 1200 : 480);

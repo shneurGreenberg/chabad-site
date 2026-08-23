@@ -360,6 +360,7 @@ Map<String, dynamic> contactToJson(ContactInfo c) => {
       'hours': [
         for (final h in c.hours) {'day': locTo(h.key), 'hours': locTo(h.value)},
       ],
+      'holidayHours': locTo(c.holidayHours),
       'staff': [
         for (final s in c.staff)
           {
@@ -379,6 +380,10 @@ void contactFromJson(ContactInfo target, dynamic raw) {
   if (address.isNotEmpty) target.address = address;
   if (m['phone'] != null) target.phone = '${m['phone']}';
   if (m['email'] != null) target.email = '${m['email']}';
+  final holiday = locFrom(m['holidayHours']);
+  if (holiday.values.any((v) => v.trim().isNotEmpty)) {
+    target.holidayHours = holiday;
+  }
   final hours = m['hours'];
   if (hours is List && hours.isNotEmpty) {
     target.hours
@@ -449,6 +454,7 @@ Map<String, dynamic> famousToJson(FamousPerson p) => {
       'era': p.era.name,
       'color': p.color,
       'initials': p.initials,
+      if (p.photoUrl != null && p.photoUrl!.isNotEmpty) 'photoUrl': p.photoUrl,
     };
 
 FamousPerson famousFromJson(dynamic raw) {
@@ -464,6 +470,9 @@ FamousPerson famousFromJson(dynamic raw) {
     ),
     color: (m['color'] as num?)?.toInt() ?? 0xFF7C3AED,
     initials: '${m['initials'] ?? ''}',
+    photoUrl: compactImageUrl(
+      m['photoUrl'] is String ? '${m['photoUrl']}' : null,
+    ),
   );
 }
 
@@ -511,6 +520,8 @@ Map<String, dynamic> shiurToJson(Shiur s) => {
       'durationMinutes': s.durationMinutes,
       'date': s.date.toIso8601String(),
       'youtubeUrl': s.youtubeUrl,
+      'weekday': s.weekday,
+      'weeklyTime': s.weeklyTime,
     };
 
 Shiur shiurFromJson(dynamic raw) {
@@ -523,6 +534,8 @@ Shiur shiurFromJson(dynamic raw) {
     durationMinutes: (m['durationMinutes'] as num?)?.toInt() ?? 40,
     date: DateTime.tryParse('${m['date']}') ?? DateTime.now(),
     youtubeUrl: '${m['youtubeUrl'] ?? ''}',
+    weekday: (m['weekday'] as num?)?.toInt(),
+    weeklyTime: '${m['weeklyTime'] ?? ''}',
   );
 }
 
@@ -561,6 +574,149 @@ List<Loc> campaignsFromJson(dynamic raw) {
   if (raw is! List) return [];
   return [
     for (final item in raw)
-      if (item is Map) locFrom(item),
+      if (item is Map)
+        item.containsKey('name') ? locFrom(item['name']) : locFrom(item),
   ];
+}
+
+List<Loc> campaignNotesFromJson(dynamic raw, int length) {
+  if (raw is! List) return [for (var i = 0; i < length; i++) {}];
+  final notes = <Loc>[
+    for (final item in raw)
+      if (item is Map)
+        item.containsKey('description')
+            ? locFrom(item['description'])
+            : locFrom(item),
+  ];
+  while (notes.length < length) {
+    notes.add({});
+  }
+  return notes;
+}
+
+Map<String, dynamic> linksToJson(SiteLinks l) => {
+      'telegram': l.telegram,
+      'vk': l.vk,
+      'youtube': l.youtube,
+      'facebook': l.facebook,
+      'instagram': l.instagram,
+      'website': l.website,
+      'donateUrl': l.donateUrl,
+      'bankDetails': l.bankDetails,
+      'whatsapp': l.whatsapp,
+      'notifyChatId': l.notifyChatId,
+      'adminEmails': l.adminEmails,
+    };
+
+void linksFromJson(SiteLinks target, dynamic raw) {
+  if (raw is! Map) return;
+  final m = Map<String, dynamic>.from(raw);
+  if (m['telegram'] != null) target.telegram = '${m['telegram']}';
+  if (m['vk'] != null) target.vk = '${m['vk']}';
+  if (m['youtube'] != null) target.youtube = '${m['youtube']}';
+  if (m['facebook'] != null) target.facebook = '${m['facebook']}';
+  if (m['instagram'] != null) target.instagram = '${m['instagram']}';
+  if (m['website'] != null) target.website = '${m['website']}';
+  if (m['donateUrl'] != null) target.donateUrl = '${m['donateUrl']}';
+  if (m['bankDetails'] != null) target.bankDetails = '${m['bankDetails']}';
+  if (m['whatsapp'] != null) target.whatsapp = '${m['whatsapp']}';
+  if (m['notifyChatId'] != null) target.notifyChatId = '${m['notifyChatId']}';
+  if (m['adminEmails'] != null) target.adminEmails = '${m['adminEmails']}';
+}
+
+Map<String, dynamic> eventToJson(CommunityEvent e) => {
+      'id': e.id,
+      'title': locTo(e.title),
+      'description': locTo(e.description),
+      'place': locTo(e.place),
+      'startsAt': e.startsAt.toIso8601String(),
+      'capacity': e.capacity,
+      'reserved': e.reserved,
+      'rsvps': [for (final r in e.rsvps) rsvpToJson(r)],
+    };
+
+Map<String, dynamic> rsvpToJson(EventRsvp r) => {
+      'name': r.name,
+      'phone': r.phone,
+      'email': r.email,
+      'guests': r.guests,
+      'at': r.at.toIso8601String(),
+    };
+
+EventRsvp rsvpFromJson(dynamic raw) {
+  final m = Map<String, dynamic>.from(raw as Map);
+  return EventRsvp(
+    name: '${m['name'] ?? ''}',
+    phone: '${m['phone'] ?? ''}',
+    email: '${m['email'] ?? ''}',
+    guests: (m['guests'] as num?)?.toInt() ?? 1,
+    at: DateTime.tryParse('${m['at'] ?? ''}'),
+  );
+}
+
+CommunityEvent eventFromJson(dynamic raw) {
+  final m = Map<String, dynamic>.from(raw as Map);
+  final rsvps = m['rsvps'];
+  return CommunityEvent(
+    id: '${m['id']}',
+    title: locFrom(m['title']),
+    description: locFrom(m['description']),
+    place: locFrom(m['place']),
+    startsAt: DateTime.tryParse('${m['startsAt']}') ?? DateTime.now(),
+    capacity: (m['capacity'] as num?)?.toInt() ?? 0,
+    reserved: (m['reserved'] as num?)?.toInt() ?? 0,
+    rsvps: [
+      if (rsvps is List)
+        for (final r in rsvps)
+          if (r is Map) rsvpFromJson(r),
+    ],
+  );
+}
+
+Map<String, dynamic> orderToJson(StoreOrder o) => {
+      'id': o.id,
+      'name': o.name,
+      'phone': o.phone,
+      'email': o.email,
+      'fulfillment': o.fulfillment,
+      'address': o.address,
+      'note': o.note,
+      'total': o.total,
+      'date': o.date.toIso8601String(),
+      'lines': [
+        for (final l in o.lines)
+          {
+            'productId': l.productId,
+            'name': l.name,
+            'qty': l.qty,
+            'price': l.price,
+          },
+      ],
+    };
+
+StoreOrder orderFromJson(dynamic raw) {
+  final m = Map<String, dynamic>.from(raw as Map);
+  final lines = m['lines'];
+  return StoreOrder(
+    id: '${m['id']}',
+    name: '${m['name'] ?? ''}',
+    phone: '${m['phone'] ?? ''}',
+    email: '${m['email'] ?? ''}',
+    fulfillment: '${m['fulfillment'] ?? 'pickup'}',
+    address: '${m['address'] ?? ''}',
+    note: '${m['note'] ?? ''}',
+    total: (m['total'] as num?)?.toDouble() ?? 0,
+    date: DateTime.tryParse('${m['date']}') ?? DateTime.now(),
+    lines: [
+      if (lines is List)
+        for (final l in lines)
+          if (l is Map)
+            OrderLine(
+              productId: '${l['productId'] ?? ''}',
+              name: '${l['name'] ?? ''}',
+              qty: (l['qty'] as num?)?.toInt() ?? 1,
+              price: (l['price'] as num?)?.toDouble() ?? 0,
+            ),
+    ],
+  );
 }
