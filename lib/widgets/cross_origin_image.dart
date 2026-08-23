@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'cross_origin_image_stub.dart'
-    if (dart.library.js_interop) 'cross_origin_image_web.dart' as impl;
-
-/// Displays a remote photo even when the host does not send CORS headers.
+/// Remote photo that still shows when the host does not send CORS headers.
 class CrossOriginImage extends StatelessWidget {
   const CrossOriginImage({
     super.key,
@@ -11,6 +8,7 @@ class CrossOriginImage extends StatelessWidget {
     this.width,
     this.height,
     this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
     this.error,
   });
 
@@ -18,14 +16,21 @@ class CrossOriginImage extends StatelessWidget {
   final double? width;
   final double? height;
   final BoxFit fit;
+  final Alignment alignment;
   final Widget? error;
 
   @override
-  Widget build(BuildContext context) => impl.CrossOriginImageView(
-        url: url,
-        width: width,
-        height: height,
-        fit: fit,
-        error: error,
-      );
+  Widget build(BuildContext context) {
+    return Image.network(
+      url,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      filterQuality: FilterQuality.medium,
+      webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+      errorBuilder: (_, error, stackTrace) =>
+          this.error ?? const SizedBox.shrink(),
+    );
+  }
 }

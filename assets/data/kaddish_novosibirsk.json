@@ -1,225 +1,5 @@
 [
   {
-    "id": 188,
-    "name": "Адонина Елена дочь Владимира и Эсфирь",
-    "title": "",
-    "deathYear": 2023,
-    "deathMonth": 4,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "188.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/188.jpg"
-  },
-  {
-    "id": 57,
-    "name": "Айзман (Вайнштейн) Хася дочь Цудика",
-    "title": "",
-    "deathYear": 1994,
-    "deathMonth": 11,
-    "deathDay": 6,
-    "hebrew": {},
-    "photo": "57.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/57.jpg"
-  },
-  {
-    "id": 56,
-    "name": "Айзман Идель сын Шульмана",
-    "title": "",
-    "deathYear": 2017,
-    "deathMonth": 1,
-    "deathDay": 6,
-    "hebrew": {},
-    "photo": "56.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/56.jpg"
-  },
-  {
-    "id": 20,
-    "name": "Аникштейн Григорий Моисеевич",
-    "title": "",
-    "deathYear": 1992,
-    "deathMonth": 8,
-    "deathDay": 17,
-    "hebrew": {},
-    "photo": "20.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/20.jpg"
-  },
-  {
-    "id": 19,
-    "name": "Аникштейн Хая дочь Иделя",
-    "title": "",
-    "deathYear": 2014,
-    "deathMonth": 1,
-    "deathDay": 27,
-    "hebrew": {},
-    "photo": "19.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/19.jpg"
-  },
-  {
-    "id": 185,
-    "name": "Анна Мирмильштейн дочь Хайма и Розы",
-    "title": "",
-    "deathYear": 2023,
-    "deathMonth": 12,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "185.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/185.jpg"
-  },
-  {
-    "id": 87,
-    "name": "Берольская (Верник) Маня дочь Аврама",
-    "title": "",
-    "deathYear": 2021,
-    "deathMonth": 3,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "87.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/87.jpg"
-  },
-  {
-    "id": 88,
-    "name": "Берольский Соломон сын Марка",
-    "title": "",
-    "deathYear": 2010,
-    "deathMonth": 3,
-    "deathDay": 24,
-    "hebrew": {},
-    "photo": "88.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/88.jpg"
-  },
-  {
-    "id": 97,
-    "name": "Бикман Герш сын Дувида",
-    "title": "",
-    "deathYear": 1979,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "97.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/97.jpg"
-  },
-  {
-    "id": 34,
-    "name": "Бикман Дувид сын Шмуля",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 96,
-    "name": "Бикман Ошер сын Дувида",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 33,
-    "name": "Бикман Цина дочь Мойше",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "33.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/33.jpg"
-  },
-  {
-    "id": 94,
-    "name": "Бикман Шифра дочь Дувида",
-    "title": "",
-    "deathYear": 1942,
-    "deathMonth": 12,
-    "deathDay": 18,
-    "hebrew": {},
-    "photo": "94.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/94.jpg"
-  },
-  {
-    "id": 40,
-    "name": "Бикман Шмуль сын Араама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 52,
-    "name": "Бочевер Абрам сын Моисея",
-    "title": "",
-    "deathYear": 2018,
-    "deathMonth": 8,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "52.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/52.jpg"
-  },
-  {
-    "id": 141,
-    "name": "Бочевер Анна Борисовна",
-    "title": "",
-    "deathYear": 2016,
-    "deathMonth": 6,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "141.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/141.jpg"
-  },
-  {
-    "id": 53,
-    "name": "Бочевер Зиновий сын Моисея (Залман)",
-    "title": "",
-    "deathYear": 2006,
-    "deathMonth": 1,
-    "deathDay": 3,
-    "hebrew": {},
-    "photo": "53.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/53.jpg"
-  },
-  {
-    "id": 51,
-    "name": "Бочевер Израиль сын Моисея",
-    "title": "",
-    "deathYear": 1995,
-    "deathMonth": 12,
-    "deathDay": 26,
-    "hebrew": {},
-    "photo": "51.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/51.jpg"
-  },
-  {
-    "id": 50,
-    "name": "Бочевер Иосиф сын Моисея",
-    "title": "",
-    "deathYear": 1987,
-    "deathMonth": 1,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "50.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/50.jpg"
-  },
-  {
-    "id": 163,
-    "name": "Брегман Софья дочь Рувима",
-    "title": "",
-    "deathYear": 2021,
-    "deathMonth": 12,
-    "deathDay": 31,
-    "hebrew": {},
-    "photo": "163.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/163.jpg"
-  },
-  {
     "id": 1,
     "name": "Брусиловский Виктор сын Александра",
     "title": "",
@@ -228,150 +8,12 @@
     "deathDay": 15,
     "hebrew": {},
     "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 86,
-    "name": "Буртман Михаил сын Абрама",
-    "title": "",
-    "deathYear": 2007,
-    "deathMonth": 2,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "86.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/86.jpg"
-  },
-  {
-    "id": 143,
-    "name": "Буторин Борис Викторович",
-    "title": "",
-    "deathYear": 1990,
-    "deathMonth": 2,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "143.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/143.jpg"
-  },
-  {
-    "id": 172,
-    "name": "Буторина (Богач) Софья дочь Павла",
-    "title": "",
-    "deathYear": 2022,
-    "deathMonth": 11,
-    "deathDay": 21,
-    "hebrew": {},
-    "photo": "172.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/172.jpg"
-  },
-  {
-    "id": 142,
-    "name": "Буторина Берта Григорьевна (Шапкайц)",
-    "title": "",
-    "deathYear": 1996,
-    "deathMonth": 6,
-    "deathDay": 14,
-    "hebrew": {},
-    "photo": "142.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/142.jpg"
-  },
-  {
-    "id": 116,
-    "name": "Вайнер (Шнайдер) Роза дочь Иосифа",
-    "title": "",
-    "deathYear": 1989,
-    "deathMonth": 5,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "116.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/116.jpg"
-  },
-  {
-    "id": 115,
-    "name": "Вайнер Семен сын Хаима (Шулем Хаймович)",
-    "title": "",
-    "deathYear": 1942,
-    "deathMonth": 9,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "115.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/115.jpg"
-  },
-  {
-    "id": 117,
-    "name": "Вайнер Хаим сын Иосифа",
-    "title": "",
-    "deathYear": 1954,
-    "deathMonth": 1,
-    "deathDay": 30,
-    "hebrew": {},
-    "photo": "117.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/117.jpg"
-  },
-  {
-    "id": 22,
-    "name": "Вайсбург Борис сын Лазаря",
-    "title": "",
-    "deathYear": 2009,
-    "deathMonth": 9,
-    "deathDay": 8,
-    "hebrew": {},
-    "photo": "22.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/22.jpg"
-  },
-  {
-    "id": 21,
-    "name": "Вайсбург Сарра Моисеевна",
-    "title": "",
-    "deathYear": 2006,
-    "deathMonth": 11,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "21.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/21.jpg"
-  },
-  {
-    "id": 162,
-    "name": "Верба Вера дочь Израиля",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 6,
-    "deathDay": 19,
-    "hebrew": {},
-    "photo": "162.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/162.jpg"
-  },
-  {
-    "id": 167,
-    "name": "Верба Иосиф сын Бориса",
-    "title": "",
-    "deathYear": 1999,
-    "deathMonth": 5,
-    "deathDay": 28,
-    "hebrew": {},
-    "photo": "167.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/167.jpg"
-  },
-  {
-    "id": 84,
-    "name": "Верник (Полищук) Роза дочь Иосифа",
-    "title": "",
-    "deathYear": 1966,
-    "deathMonth": 7,
-    "deathDay": 4,
-    "hebrew": {},
-    "photo": "84.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/84.jpg"
-  },
-  {
-    "id": 85,
-    "name": "Верник Авраам сын Исаака",
-    "title": "",
-    "deathYear": 1976,
-    "deathMonth": 9,
-    "deathDay": 29,
-    "hebrew": {},
-    "photo": "85.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/85.jpg"
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
   },
   {
     "id": 2,
@@ -385,26 +27,506 @@
     "photoUrl": ""
   },
   {
-    "id": 42,
-    "name": "Вильдер Леонид сын Озяса",
+    "id": 3,
+    "name": "Дыхне Семен сын Мендела",
     "title": "",
-    "deathYear": 1994,
+    "deathYear": 2016,
     "deathMonth": 5,
-    "deathDay": 15,
+    "deathDay": 11,
     "hebrew": {},
-    "photo": "42.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/42.jpg"
+    "photo": "",
+    "photoUrl": ""
   },
   {
-    "id": 46,
-    "name": "Вильдер Озяс сын Авраама",
+    "id": 4,
+    "name": "Кац Арнольд сын Михаила",
+    "title": "",
+    "deathYear": 2007,
+    "deathMonth": 1,
+    "deathDay": 22,
+    "hebrew": {},
+    "photo": "148.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/148.jpg?w=280&cx=44.74025974025974&cy=29.226730499642926&cz=2",
+    "photoCrop": {
+      "x": 44.74025974025974,
+      "y": 29.226730499642926,
+      "zoom": 2
+    }
+  },
+  {
+    "id": 5,
+    "name": "Ошеров Семен сын Вольфа (Шимон)",
+    "title": "",
+    "deathYear": 2018,
+    "deathMonth": 12,
+    "deathDay": 30,
+    "hebrew": {},
+    "photo": "5.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/5.jpg?w=280&cx=66.42857142857143&cy=3.571428571428571&cz=1.45",
+    "photoCrop": {
+      "x": 66.42857142857143,
+      "y": 3.571428571428571,
+      "zoom": 1.45
+    }
+  },
+  {
+    "id": 6,
+    "name": "Пясковский Моник сын Герша",
+    "title": "",
+    "deathYear": 2016,
+    "deathMonth": 2,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 7,
+    "name": "Фронштейн Исаак сын Якова (Исаак)",
+    "title": "",
+    "deathYear": 2009,
+    "deathMonth": 11,
+    "deathDay": 24,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 132,
+    "name": "Фердман Хонон Аронович",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "46.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/46.jpg"
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 9,
+    "name": "Шпикельман Гнесся дочь Якова",
+    "title": "",
+    "deathYear": 1990,
+    "deathMonth": 8,
+    "deathDay": 17,
+    "hebrew": {},
+    "photo": "9.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/9.jpg?w=280&cy=42.142857142857146",
+    "photoCrop": {
+      "x": 50,
+      "y": 42.142857142857146,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 10,
+    "name": "Шпикельман Михаил сын Соломона (Михаэль)",
+    "title": "",
+    "deathYear": 1996,
+    "deathMonth": 5,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "10.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/10.jpg?w=280&cx=54.54545454545455&cy=29.47374582918691&cz=1.1",
+    "photoCrop": {
+      "x": 54.54545454545455,
+      "y": 29.47374582918691,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": 11,
+    "name": "Шуриц Александр сын Давида (Исаак)",
+    "title": "",
+    "deathYear": 2017,
+    "deathMonth": 4,
+    "deathDay": 27,
+    "hebrew": {},
+    "photo": "11.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/11.jpg?w=280"
+  },
+  {
+    "id": 12,
+    "name": "Ханин Яков сын Ильи",
+    "title": "",
+    "deathYear": 2013,
+    "deathMonth": 1,
+    "deathDay": 29,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 13,
+    "name": "Тодер Борис сын Павла",
+    "title": "",
+    "deathYear": 2015,
+    "deathMonth": 9,
+    "deathDay": 5,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 14,
+    "name": "Ханин Кушелис сын Элияса",
+    "title": "",
+    "deathYear": 2015,
+    "deathMonth": 5,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 15,
+    "name": "Жеребцова (Рубанович) София дочь Александра",
+    "title": "",
+    "deathYear": 2016,
+    "deathMonth": 11,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "15-sofia.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/15-sofia.jpg?w=280&cx=51.42857142857143&cy=34.090909090909086&cz=1.1",
+    "photoCrop": {
+      "x": 51.42857142857143,
+      "y": 34.090909090909086,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": 16,
+    "name": "Зильберштейн Григорий сын Абрама",
+    "title": "",
+    "deathYear": 1983,
+    "deathMonth": 7,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "16-greg.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/16-greg.jpg?w=280"
+  },
+  {
+    "id": 17,
+    "name": "Раппопорт Анна дочь Ильи",
+    "title": "",
+    "deathYear": 1977,
+    "deathMonth": 8,
+    "deathDay": 6,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 18,
+    "name": "Каганицкая Елизавета",
+    "title": "",
+    "deathYear": 2018,
+    "deathMonth": 12,
+    "deathDay": 31,
+    "hebrew": {},
+    "photo": "18-elz.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/18-elz.jpg?w=280&cx=82.14285714285714&cy=0.7142857142857143",
+    "photoCrop": {
+      "x": 82.14285714285714,
+      "y": 0.7142857142857143,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 19,
+    "name": "Аникштейн Хая дочь Иделя",
+    "title": "",
+    "deathYear": 2014,
+    "deathMonth": 1,
+    "deathDay": 27,
+    "hebrew": {},
+    "photo": "19.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/19.jpg?w=280&cx=42.142857142857146&cy=7.142857142857146",
+    "photoCrop": {
+      "x": 42.142857142857146,
+      "y": 7.142857142857146,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 20,
+    "name": "Аникштейн Григорий Моисеевич",
+    "title": "",
+    "deathYear": 1992,
+    "deathMonth": 8,
+    "deathDay": 17,
+    "hebrew": {},
+    "photo": "20.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/20.jpg?w=280&cx=40&cy=25.486211901306238&cz=1.25",
+    "photoCrop": {
+      "x": 40,
+      "y": 25.486211901306238,
+      "zoom": 1.25
+    }
+  },
+  {
+    "id": 21,
+    "name": "Вайсбург Сарра Моисеевна ",
+    "title": "",
+    "deathYear": 2006,
+    "deathMonth": 11,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "21.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/21.jpg?w=280"
+  },
+  {
+    "id": 22,
+    "name": "Вайсбург Борис сын Лазаря",
+    "title": "",
+    "deathYear": 2009,
+    "deathMonth": 9,
+    "deathDay": 8,
+    "hebrew": {},
+    "photo": "22.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/22.jpg?w=280&cx=41.42857142857142&cy=2.1428571428571406&cz=1.8",
+    "photoCrop": {
+      "x": 41.42857142857142,
+      "y": 2.1428571428571406,
+      "zoom": 1.8
+    }
+  },
+  {
+    "id": 23,
+    "name": "Шейнин Моисей сын Самуила",
+    "title": "",
+    "deathYear": 1990,
+    "deathMonth": 6,
+    "deathDay": 14,
+    "hebrew": {},
+    "photo": "23.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/23.jpg?w=280"
+  },
+  {
+    "id": 24,
+    "name": "Шейнина Ольга дочь Ерухима",
+    "title": "",
+    "deathYear": 1998,
+    "deathMonth": 4,
+    "deathDay": 10,
+    "hebrew": {},
+    "photo": "24.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/24.jpg?w=280"
+  },
+  {
+    "id": 25,
+    "name": "Сирота Натан сын Абрама",
+    "title": "",
+    "deathYear": 2002,
+    "deathMonth": 1,
+    "deathDay": 13,
+    "hebrew": {},
+    "photo": "25.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/25.jpg?w=280"
+  },
+  {
+    "id": 27,
+    "name": "Сирота Абрам сын Соломона",
+    "title": "",
+    "deathYear": 1972,
+    "deathMonth": 8,
+    "deathDay": 18,
+    "hebrew": {},
+    "photo": "27.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/27.jpg?w=280&cx=70.71428571428572&cy=35&cz=1.9",
+    "photoCrop": {
+      "x": 70.71428571428572,
+      "y": 35,
+      "zoom": 1.9
+    }
+  },
+  {
+    "id": 28,
+    "name": "Сирота Мина дочь Лазаря",
+    "title": "",
+    "deathYear": 2007,
+    "deathMonth": 2,
+    "deathDay": 2,
+    "hebrew": {},
+    "photo": "28.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/28.jpg?w=280&cx=5.714285714285717&cy=10.714285714285715&cz=1.1",
+    "photoCrop": {
+      "x": 5.714285714285717,
+      "y": 10.714285714285715,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": 29,
+    "name": "Кесельман Фрида дочь Авраама",
+    "title": "",
+    "deathYear": 1984,
+    "deathMonth": 12,
+    "deathDay": 24,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 30,
+    "name": "Сирота Полина дочь Натана",
+    "title": "",
+    "deathYear": 2002,
+    "deathMonth": 7,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 31,
+    "name": "Кракушанская Ента дочь Дувида",
+    "title": "",
+    "deathYear": 2005,
+    "deathMonth": 10,
+    "deathDay": 3,
+    "hebrew": {},
+    "photo": "31.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/31.jpg?w=280"
+  },
+  {
+    "id": 32,
+    "name": "Кракушанский Герш сын Лейба",
+    "title": "",
+    "deathYear": 1976,
+    "deathMonth": 12,
+    "deathDay": 13,
+    "hebrew": {},
+    "photo": "32.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/32.jpg?w=280"
+  },
+  {
+    "id": 33,
+    "name": "Бикман Цина дочь Мойше",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "33.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/33.jpg?w=280&cx=55&cy=11.428571428571423",
+    "photoCrop": {
+      "x": 55,
+      "y": 11.428571428571423,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 34,
+    "name": "Бикман Дувид сын Шмуля ",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 35,
+    "name": "Кракушанский Дудл сын Лейб",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 36,
+    "name": "Кракушанская Роза дочь Лейба ",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "36.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/36.jpg?w=280&cx=54.285714285714285&cy=15.714285714285715&cz=1.85",
+    "photoCrop": {
+      "x": 54.285714285714285,
+      "y": 15.714285714285715,
+      "zoom": 1.85
+    }
+  },
+  {
+    "id": 37,
+    "name": "Кракушанский Копель сын Лейба",
+    "title": "",
+    "deathYear": 2000,
+    "deathMonth": 6,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "37.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/37.jpg?w=280&cx=48.57142857142858&cy=23.809523809523807&cz=2.1",
+    "photoCrop": {
+      "x": 48.57142857142858,
+      "y": 23.809523809523807,
+      "zoom": 2.1
+    }
+  },
+  {
+    "id": 38,
+    "name": "Глузман Шейва - Айзекс дочь Авраама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "38.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/38.jpg?w=280&cx=46.42857142857143&cy=23.57142857142857",
+    "photoCrop": {
+      "x": 46.42857142857143,
+      "y": 23.57142857142857,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 39,
+    "name": "Глузман Мойше сын Авраама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "39.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/39.jpg?w=280&cx=65.71428571428571&cy=14.285714285714285",
+    "photoCrop": {
+      "x": 65.71428571428571,
+      "y": 14.285714285714285,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 40,
+    "name": "Бикман Шмуль сын Араама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
   },
   {
     "id": 41,
@@ -415,95 +537,247 @@
     "deathDay": 10,
     "hebrew": {},
     "photo": "41.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/41.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/41.jpg?w=280&cx=58.57142857142857&cy=19.92143658810326&cz=1.65",
+    "photoCrop": {
+      "x": 58.57142857142857,
+      "y": 19.92143658810326,
+      "zoom": 1.65
+    }
+  },
+  {
+    "id": 42,
+    "name": "Вильдер Леонид сын Озяса",
+    "title": "",
+    "deathYear": 1994,
+    "deathMonth": 5,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "42.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/42.jpg?w=280"
+  },
+  {
+    "id": 43,
+    "name": "Коновалова Надежда дочь Авраама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "43.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/43.jpg?w=280&cx=45&cy=24.28571428571429&cz=2.55",
+    "photoCrop": {
+      "x": 45,
+      "y": 24.28571428571429,
+      "zoom": 2.55
+    }
+  },
+  {
+    "id": 44,
+    "name": "Коновалов Борис сын Авраама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "44.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/44.jpg?w=280&cx=42.14285714285714&cy=25.71428571428571&cz=2.1",
+    "photoCrop": {
+      "x": 42.14285714285714,
+      "y": 25.71428571428571,
+      "zoom": 2.1
+    }
   },
   {
     "id": 45,
-    "name": "Вильдер Фрида дочь Араама",
+    "name": "Вильдер Фрида дочь Араама ",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
     "photo": "45.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/45.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/45.jpg?w=280&cx=85&cy=37.85714285714286&cz=1.6",
+    "photoCrop": {
+      "x": 85,
+      "y": 37.85714285714286,
+      "zoom": 1.6
+    }
   },
   {
-    "id": 144,
-    "name": "Воронина (Этингова) Мария Давидовна (Муся)",
+    "id": 46,
+    "name": "Вильдер Озяс сын Авраама",
     "title": "",
-    "deathYear": 2019,
-    "deathMonth": 9,
-    "deathDay": 4,
-    "hebrew": {},
-    "photo": "144.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/144.jpg"
-  },
-  {
-    "id": 197,
-    "name": "Гершевич Аарон сын Гершона и Раисы",
-    "title": "",
-    "deathYear": 2026,
-    "deathMonth": 5,
-    "deathDay": 30,
-    "hebrew": {},
-    "photo": "197.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/197.jpg"
-  },
-  {
-    "id": 200,
-    "name": "Гершевич Абрам Исаевич (Авраам сын Ишаягу)",
-    "title": "",
-    "deathYear": 1996,
-    "deathMonth": 8,
-    "deathDay": 28,
-    "hebrew": {},
-    "photo": "1783226301687-opt.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783226301687-opt.jpg"
-  },
-  {
-    "id": 62,
-    "name": "Гинзбург Абрам сын Льва",
-    "title": "",
-    "deathYear": 1963,
-    "deathMonth": 1,
-    "deathDay": 6,
-    "hebrew": {},
-    "photo": "62.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/62.jpg"
-  },
-  {
-    "id": 61,
-    "name": "Гинзбург Анна дочь Самуила",
-    "title": "",
-    "deathYear": 2001,
-    "deathMonth": 1,
-    "deathDay": 24,
-    "hebrew": {},
-    "photo": "61.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/61.jpg"
-  },
-  {
-    "id": 65,
-    "name": "Гинзбург Виктория дочь Сэма",
-    "title": "",
-    "deathYear": 1993,
-    "deathMonth": 12,
-    "deathDay": 24,
-    "hebrew": {},
-    "photo": "65.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/65.jpg"
-  },
-  {
-    "id": 64,
-    "name": "Гинзбург Владимир сын Льва",
-    "title": "",
-    "deathYear": 1979,
+    "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "64.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/64.jpg"
+    "photo": "46.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/46.jpg?w=280&cx=17.142857142857146&cy=15&cz=1.8",
+    "photoCrop": {
+      "x": 17.142857142857146,
+      "y": 15,
+      "zoom": 1.8
+    }
+  },
+  {
+    "id": 48,
+    "name": "Шуриц Давид сын Авраама ",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 49,
+    "name": "Дворкина Геня дочь Араама ",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 50,
+    "name": "Бочевер Иосиф сын Моисея",
+    "title": "",
+    "deathYear": 1987,
+    "deathMonth": 1,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "50.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/50.jpg?w=280&cx=45.00000000000001&cy=18.571428571428573&cz=1.4",
+    "photoCrop": {
+      "x": 45.00000000000001,
+      "y": 18.571428571428573,
+      "zoom": 1.4
+    }
+  },
+  {
+    "id": 51,
+    "name": "Бочевер Израиль сын Моисея",
+    "title": "",
+    "deathYear": 1995,
+    "deathMonth": 12,
+    "deathDay": 26,
+    "hebrew": {},
+    "photo": "51.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/51.jpg?w=280&cx=7.142857142857142&cy=17.857142857142858&cz=1.25",
+    "photoCrop": {
+      "x": 7.142857142857142,
+      "y": 17.857142857142858,
+      "zoom": 1.25
+    }
+  },
+  {
+    "id": 52,
+    "name": "Бочевер Абрам сын Моисея",
+    "title": "",
+    "deathYear": 2018,
+    "deathMonth": 8,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "52.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/52.jpg?w=280&cy=37.5&cz=1.15",
+    "photoCrop": {
+      "x": 50,
+      "y": 37.5,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": 53,
+    "name": "Бочевер Зиновий сын Моисея (Залман)",
+    "title": "",
+    "deathYear": 2006,
+    "deathMonth": 1,
+    "deathDay": 3,
+    "hebrew": {},
+    "photo": "53.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/53.jpg?w=280&cx=47.142857142857146&cy=27.142857142857146&cz=1.6",
+    "photoCrop": {
+      "x": 47.142857142857146,
+      "y": 27.142857142857146,
+      "zoom": 1.6
+    }
+  },
+  {
+    "id": 54,
+    "name": "Хая-Сарра дочь Араама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 55,
+    "name": "Моисей сын Авраама",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": "",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 56,
+    "name": "Айзман Идель сын Шульмана",
+    "title": "",
+    "deathYear": 2017,
+    "deathMonth": 1,
+    "deathDay": 6,
+    "hebrew": {},
+    "photo": "56.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/56.jpg?w=280&cy=32.91733455461416&cz=1.1",
+    "photoCrop": {
+      "x": 50,
+      "y": 32.91733455461416,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": 57,
+    "name": "Айзман (Вайнштейн) Хася дочь Цудика",
+    "title": "",
+    "deathYear": 1994,
+    "deathMonth": 11,
+    "deathDay": 6,
+    "hebrew": {},
+    "photo": "57.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/57.jpg?w=280&cx=59.28571428571428&cy=1.4285714285714286&cz=1.35",
+    "photoCrop": {
+      "x": 59.28571428571428,
+      "y": 1.4285714285714286,
+      "zoom": 1.35
+    }
   },
   {
     "id": 60,
@@ -514,7 +788,39 @@
     "deathDay": 24,
     "hebrew": {},
     "photo": "60.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/60.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/60.jpg?w=280&cx=41.42857142857143&cy=5.714285714285715",
+    "photoCrop": {
+      "x": 41.42857142857143,
+      "y": 5.714285714285715,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 61,
+    "name": "Гинзбург Анна дочь Самуила",
+    "title": "",
+    "deathYear": 2001,
+    "deathMonth": 1,
+    "deathDay": 24,
+    "hebrew": {},
+    "photo": "61.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/61.jpg?w=280"
+  },
+  {
+    "id": 62,
+    "name": "Гинзбург Абрам сын Льва",
+    "title": "",
+    "deathYear": 1963,
+    "deathMonth": 1,
+    "deathDay": 6,
+    "hebrew": {},
+    "photo": "62.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/62.jpg?w=280&cx=3.5714285714285694&cy=23.57142857142857&cz=1.25",
+    "photoCrop": {
+      "x": 3.5714285714285694,
+      "y": 23.57142857142857,
+      "zoom": 1.25
+    }
   },
   {
     "id": 63,
@@ -528,52 +834,137 @@
     "photoUrl": ""
   },
   {
-    "id": 156,
-    "name": "Гитерман Хаим сын Абрам",
+    "id": 64,
+    "name": "Гинзбург Владимир сын Льва",
     "title": "",
-    "deathYear": 1977,
-    "deathMonth": 8,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "156.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/156.jpg"
-  },
-  {
-    "id": 155,
-    "name": "Гитерман Хая-Сура дочь Хаима Идела",
-    "title": "",
-    "deathYear": 2008,
-    "deathMonth": 1,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "155.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/155.jpg"
-  },
-  {
-    "id": 39,
-    "name": "Глузман Мойше сын Авраама",
-    "title": "",
-    "deathYear": 1941,
+    "deathYear": 1979,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "39.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/39.jpg"
+    "photo": "64.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/64.jpg?w=280"
   },
   {
-    "id": 38,
-    "name": "Глузман Шейва - Айзекс дочь Авраама",
+    "id": 65,
+    "name": "Гинзбург Виктория дочь Сэма",
     "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
+    "deathYear": 1993,
+    "deathMonth": 12,
+    "deathDay": 24,
     "hebrew": {},
-    "photo": "38.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/38.jpg"
+    "photo": "65.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/65.jpg?w=280&cx=46.42857142857143&cy=0.7142857142857172&cz=1.6",
+    "photoCrop": {
+      "x": 46.42857142857143,
+      "y": 0.7142857142857172,
+      "zoom": 1.6
+    }
   },
   {
-    "id": 101,
-    "name": "Годес",
+    "id": 66,
+    "name": "Тоболовская Ида дочь Авраама",
+    "title": "",
+    "deathYear": 1961,
+    "deathMonth": 12,
+    "deathDay": 17,
+    "hebrew": {},
+    "photo": "66.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/66.jpg?w=280"
+  },
+  {
+    "id": 67,
+    "name": "Тоболовский Сэм сын Авраама",
+    "title": "",
+    "deathYear": 1933,
+    "deathMonth": 1,
+    "deathDay": 8,
+    "hebrew": {},
+    "photo": "67.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/67.jpg?w=280&cx=47.857142857142854&cy=7.142857142857146",
+    "photoCrop": {
+      "x": 47.857142857142854,
+      "y": 7.142857142857146,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 68,
+    "name": "Шарогородский Самуил сын Бориса",
+    "title": "",
+    "deathYear": 1966,
+    "deathMonth": 1,
+    "deathDay": 2,
+    "hebrew": {},
+    "photo": "68.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/68.jpg?w=280&cx=1.4285714285714284&cy=3.5714285714285716&cz=1.35",
+    "photoCrop": {
+      "x": 1.4285714285714284,
+      "y": 3.5714285714285716,
+      "zoom": 1.35
+    }
+  },
+  {
+    "id": 69,
+    "name": "Шарогородская Бина дочь Моисея",
+    "title": "",
+    "deathYear": 1971,
+    "deathMonth": 7,
+    "deathDay": 1,
+    "hebrew": {},
+    "photo": "69.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/69.jpg?w=280&cy=36.63833805476865",
+    "photoCrop": {
+      "x": 50,
+      "y": 36.63833805476865,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 70,
+    "name": "Гольдзилбер Эммануил сын Моисея",
+    "title": "",
+    "deathYear": 1964,
+    "deathMonth": 12,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "70.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/70.jpg?w=280&cy=37.26273726273726",
+    "photoCrop": {
+      "x": 50,
+      "y": 37.26273726273726,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 71,
+    "name": "Санько Таба дочь Моисея",
+    "title": "",
+    "deathYear": 1966,
+    "deathMonth": 12,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "71.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/71.jpg?w=280&cy=39.28571428571429",
+    "photoCrop": {
+      "x": 50,
+      "y": 39.28571428571429,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 72,
+    "name": "Тоболовский Арнольд сын Сэма",
+    "title": "",
+    "deathYear": 1975,
+    "deathMonth": 12,
+    "deathDay": 14,
+    "hebrew": {},
+    "photo": "72.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/72.jpg?w=280"
+  },
+  {
+    "id": 73,
+    "name": "Гольдзилбер Полина  дочь Авраама",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
@@ -594,89 +985,39 @@
     "photoUrl": ""
   },
   {
-    "id": 73,
-    "name": "Гольдзилбер Полина  дочь Авраама",
+    "id": 75,
+    "name": "Илизаров Гавриил сын Абрама",
     "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 70,
-    "name": "Гольдзилбер Эммануил сын Моисея",
-    "title": "",
-    "deathYear": 1964,
-    "deathMonth": 12,
-    "deathDay": 15,
-    "hebrew": {},
-    "photo": "70.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/70.jpg"
-  },
-  {
-    "id": 99,
-    "name": "Дворкин Павел сын Шмуиля",
-    "title": "",
-    "deathYear": 1995,
-    "deathMonth": 5,
-    "deathDay": 16,
-    "hebrew": {},
-    "photo": "99.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/99.jpg"
-  },
-  {
-    "id": 49,
-    "name": "Дворкина Геня дочь Араама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 190,
-    "name": "Дмитриева Эсфирь дочь Марии и Семена",
-    "title": "",
-    "deathYear": 1983,
+    "deathYear": 1992,
     "deathMonth": 7,
-    "deathDay": 16,
+    "deathDay": 24,
     "hebrew": {},
-    "photo": "190.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/190.jpg"
+    "photo": "75.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/75.jpg?w=280&cx=53.57142857142858&cy=4.2857142857142865&cz=1.15",
+    "photoCrop": {
+      "x": 53.57142857142858,
+      "y": 4.2857142857142865,
+      "zoom": 1.15
+    }
   },
   {
-    "id": 129,
-    "name": "Добрынская (Мельц) Екатерина дочь Моисея",
+    "id": 76,
+    "name": "Илизарова Мария дочь Абрама",
     "title": "",
-    "deathYear": 2001,
-    "deathMonth": 12,
-    "deathDay": 1,
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
     "hebrew": {},
     "photo": "",
     "photoUrl": ""
   },
   {
-    "id": 174,
-    "name": "Дроздова (Штальвоссер) Фрида дочь Шлема",
+    "id": 77,
+    "name": "Илизаров Исаак сын Абрама",
     "title": "",
-    "deathYear": 2016,
+    "deathYear": 1941,
     "deathMonth": 1,
-    "deathDay": 26,
-    "hebrew": {},
-    "photo": "174.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/174.jpg"
-  },
-  {
-    "id": 3,
-    "name": "Дыхне Семен сын Мендела",
-    "title": "",
-    "deathYear": 2016,
-    "deathMonth": 5,
-    "deathDay": 11,
+    "deathDay": 9,
     "hebrew": {},
     "photo": "",
     "photoUrl": ""
@@ -704,272 +1045,159 @@
     "photoUrl": ""
   },
   {
-    "id": 15,
-    "name": "Жеребцова (Рубанович) София дочь Александра",
+    "id": 80,
+    "name": "Ланцберг Зинаида дочь Абрама (Зылпа)",
     "title": "",
-    "deathYear": 2016,
-    "deathMonth": 11,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "15-sofia.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/15-sofia.jpg"
-  },
-  {
-    "id": 175,
-    "name": "Загорская Эсфирь дочь Льва",
-    "title": "",
-    "deathYear": 2004,
+    "deathYear": 2010,
     "deathMonth": 6,
-    "deathDay": 21,
-    "hebrew": {},
-    "photo": "175.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/175.jpg"
-  },
-  {
-    "id": 136,
-    "name": "Зак Владимир сын Лейба",
-    "title": "",
-    "deathYear": 2012,
-    "deathMonth": 3,
-    "deathDay": 12,
-    "hebrew": {},
-    "photo": "136.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/136.jpg"
-  },
-  {
-    "id": 16,
-    "name": "Зильберштейн Григорий сын Абрама",
-    "title": "",
-    "deathYear": 1983,
-    "deathMonth": 7,
     "deathDay": 20,
     "hebrew": {},
-    "photo": "16-greg.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/16-greg.jpg"
+    "photo": "80.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/80.jpg?w=280&cy=30",
+    "photoCrop": {
+      "x": 50,
+      "y": 30,
+      "zoom": 1
+    }
   },
   {
-    "id": 196,
-    "name": "Зингель Ефим Хаим сын Меира и Цили",
+    "id": 81,
+    "name": "Ланцберг Марк сын Самойла (Меер)",
     "title": "",
-    "deathYear": 2024,
+    "deathYear": 2009,
+    "deathMonth": 8,
+    "deathDay": 30,
+    "hebrew": {},
+    "photo": "81.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/81.jpg?w=280&cy=30",
+    "photoCrop": {
+      "x": 50,
+      "y": 30,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 82,
+    "name": "Ланцберг Шмуль сын Эли",
+    "title": "",
+    "deathYear": 1972,
+    "deathMonth": 5,
+    "deathDay": 18,
+    "hebrew": {},
+    "photo": "82.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/82.jpg?w=280"
+  },
+  {
+    "id": 83,
+    "name": "Ланцберг Рухля дочь Боруха",
+    "title": "",
+    "deathYear": 1990,
     "deathMonth": 11,
     "deathDay": 28,
     "hebrew": {},
-    "photo": "196.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/196.jpg"
+    "photo": "83.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/83.jpg?w=280"
   },
   {
-    "id": 139,
-    "name": "Зуншайн Михаил Ошерович",
+    "id": 84,
+    "name": "Верник (Полищук) Роза дочь Иосифа",
     "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "139.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/139.jpg"
-  },
-  {
-    "id": 75,
-    "name": "Илизаров Гавриил сын Абрама",
-    "title": "",
-    "deathYear": 1992,
+    "deathYear": 1966,
     "deathMonth": 7,
-    "deathDay": 24,
-    "hebrew": {},
-    "photo": "75.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/75.jpg"
-  },
-  {
-    "id": 77,
-    "name": "Илизаров Исаак сын Абрама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 76,
-    "name": "Илизарова Мария дочь Абрама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 18,
-    "name": "Каганицкая Елизавета",
-    "title": "",
-    "deathYear": 2018,
-    "deathMonth": 12,
-    "deathDay": 31,
-    "hebrew": {},
-    "photo": "18-elz.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/18-elz.jpg"
-  },
-  {
-    "id": 173,
-    "name": "Канзбург Евгения дочь  Павла",
-    "title": "",
-    "deathYear": 2006,
-    "deathMonth": 4,
-    "deathDay": 18,
-    "hebrew": {},
-    "photo": "173.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/173.jpg"
-  },
-  {
-    "id": 4,
-    "name": "Кац Арнольд сын Михаила",
-    "title": "",
-    "deathYear": 2007,
-    "deathMonth": 1,
-    "deathDay": 22,
-    "hebrew": {},
-    "photo": "148.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/148.jpg"
-  },
-  {
-    "id": 146,
-    "name": "Кац Вера Исаковна",
-    "title": "",
-    "deathYear": 1977,
-    "deathMonth": 12,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "146.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/146.jpg"
-  },
-  {
-    "id": 108,
-    "name": "Кац Груня дочь Шимона",
-    "title": "",
-    "deathYear": 1989,
-    "deathMonth": 8,
-    "deathDay": 16,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 106,
-    "name": "Кац Давид сын Хаима",
-    "title": "",
-    "deathYear": 1992,
-    "deathMonth": 9,
-    "deathDay": 26,
-    "hebrew": {},
-    "photo": "106.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/106.jpg"
-  },
-  {
-    "id": 105,
-    "name": "Кац Евгения дочь Исаака",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 8,
-    "deathDay": 11,
-    "hebrew": {},
-    "photo": "105.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/105.jpg"
-  },
-  {
-    "id": 147,
-    "name": "Кац Михаил Генрихович",
-    "title": "",
-    "deathYear": 1981,
-    "deathMonth": 1,
     "deathDay": 4,
     "hebrew": {},
-    "photo": "147.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/147.jpg"
+    "photo": "84.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/84.jpg?w=280&cy=56.42857142857143",
+    "photoCrop": {
+      "x": 50,
+      "y": 56.42857142857143,
+      "zoom": 1
+    }
   },
   {
-    "id": 169,
-    "name": "Кац Семен сын Хаима",
-    "title": "",
-    "deathYear": 2022,
-    "deathMonth": 1,
-    "deathDay": 15,
-    "hebrew": {},
-    "photo": "169.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/169.jpg"
-  },
-  {
-    "id": 107,
-    "name": "Кац Хаим сын Давида",
+    "id": 85,
+    "name": "Верник Авраам сын Исаака",
     "title": "",
     "deathYear": 1976,
-    "deathMonth": 7,
-    "deathDay": 24,
+    "deathMonth": 9,
+    "deathDay": 29,
     "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
+    "photo": "85.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/85.jpg?w=280"
   },
   {
-    "id": 29,
-    "name": "Кесельман Фрида дочь Авраама",
+    "id": 86,
+    "name": "Буртман Михаил сын Абрама",
     "title": "",
-    "deathYear": 1984,
-    "deathMonth": 12,
-    "deathDay": 24,
+    "deathYear": 2007,
+    "deathMonth": 2,
+    "deathDay": 1,
     "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
+    "photo": "86.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/86.jpg?w=280&cy=37.5",
+    "photoCrop": {
+      "x": 50,
+      "y": 37.5,
+      "zoom": 1
+    }
   },
   {
-    "id": 170,
-    "name": "Клейман Владимир сын Давида",
+    "id": 87,
+    "name": "Берольская (Верник) Маня дочь Аврама",
+    "title": "",
+    "deathYear": 2021,
+    "deathMonth": 3,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "87.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/87.jpg?w=280&cy=34.423828125",
+    "photoCrop": {
+      "x": 50,
+      "y": 34.423828125,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 88,
+    "name": "Берольский Соломон сын Марка",
+    "title": "",
+    "deathYear": 2010,
+    "deathMonth": 3,
+    "deathDay": 24,
+    "hebrew": {},
+    "photo": "88.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/88.jpg?w=280&cx=18.571428571428573&cy=53.57142857142857&cz=1.35",
+    "photoCrop": {
+      "x": 18.571428571428573,
+      "y": 53.57142857142857,
+      "zoom": 1.35
+    }
+  },
+  {
+    "id": 89,
+    "name": "Рабинович Иосиф сын Исаака",
     "title": "",
     "deathYear": 1991,
-    "deathMonth": 10,
+    "deathMonth": 8,
     "deathDay": 15,
     "hebrew": {},
-    "photo": "170.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/170.jpg"
+    "photo": "89.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/89.jpg?w=280"
   },
   {
-    "id": 171,
-    "name": "Клейман Зелла дочь Моисея",
+    "id": 90,
+    "name": "Цифринович Илья сын Исроэля",
     "title": "",
-    "deathYear": 2011,
-    "deathMonth": 9,
-    "deathDay": 21,
+    "deathYear": 2020,
+    "deathMonth": 5,
+    "deathDay": 10,
     "hebrew": {},
-    "photo": "171.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/171.jpg"
+    "photo": "90.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/90.jpg?w=280"
   },
   {
-    "id": 44,
-    "name": "Коновалов Борис сын Авраама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "44.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/44.jpg"
-  },
-  {
-    "id": 43,
-    "name": "Коновалова Надежда дочь Авраама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "43.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/43.jpg"
-  },
-  {
-    "id": 104,
-    "name": "Кракушанская Гитель дочь Авраама",
+    "id": 91,
+    "name": "Цифринович Исроэль сын Авраама",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
@@ -979,41 +1207,19 @@
     "photoUrl": ""
   },
   {
-    "id": 31,
-    "name": "Кракушанская Ента дочь Дувида",
+    "id": 92,
+    "name": "Рохлина Этя дочь Лейба",
     "title": "",
-    "deathYear": 2005,
+    "deathYear": 2020,
     "deathMonth": 10,
-    "deathDay": 3,
+    "deathDay": 29,
     "hebrew": {},
-    "photo": "31.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/31.jpg"
+    "photo": "92.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/92.jpg?w=280"
   },
   {
-    "id": 36,
-    "name": "Кракушанская Роза дочь Лейба",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "36.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/36.jpg"
-  },
-  {
-    "id": 32,
-    "name": "Кракушанский Герш сын Лейба",
-    "title": "",
-    "deathYear": 1976,
-    "deathMonth": 12,
-    "deathDay": 13,
-    "hebrew": {},
-    "photo": "32.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/32.jpg"
-  },
-  {
-    "id": 35,
-    "name": "Кракушанский Дудл сын Лейб",
+    "id": 93,
+    "name": "Рохлин Лейб сын Авраама",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
@@ -1023,26 +1229,101 @@
     "photoUrl": ""
   },
   {
-    "id": 37,
-    "name": "Кракушанский Копель сын Лейба",
+    "id": 94,
+    "name": "Бикман Шифра дочь Дувида",
+    "title": "",
+    "deathYear": 1942,
+    "deathMonth": 12,
+    "deathDay": 18,
+    "hebrew": {},
+    "photo": "94.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/94.jpg?w=280&cx=52.14285714285714&cy=7.142857142857138&cz=1.4",
+    "photoCrop": {
+      "x": 52.14285714285714,
+      "y": 7.142857142857138,
+      "zoom": 1.4
+    }
+  },
+  {
+    "id": 96,
+    "name": "Бикман Ошер сын Дувида",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 97,
+    "name": "Бикман Герш сын Дувида",
+    "title": "",
+    "deathYear": 1979,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "97.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/97.jpg?w=280&cy=36.953125",
+    "photoCrop": {
+      "x": 50,
+      "y": 36.953125,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 98,
+    "name": "Мошкович Лия дочь Абрама",
     "title": "",
     "deathYear": 2000,
-    "deathMonth": 6,
-    "deathDay": 25,
+    "deathMonth": 3,
+    "deathDay": 2,
     "hebrew": {},
-    "photo": "37.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/37.jpg"
+    "photo": "98.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/98.jpg?w=280&cy=41.34993446920052",
+    "photoCrop": {
+      "x": 50,
+      "y": 41.34993446920052,
+      "zoom": 1
+    }
   },
   {
-    "id": 103,
-    "name": "Кракушанский Копель сын Лейба",
+    "id": 99,
+    "name": "Дворкин Павел сын Шмуиля",
+    "title": "",
+    "deathYear": 1995,
+    "deathMonth": 5,
+    "deathDay": 16,
+    "hebrew": {},
+    "photo": "99.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/99.jpg?w=280&cx=50.714285714285715&cy=25.714285714285715&cz=1.15",
+    "photoCrop": {
+      "x": 50.714285714285715,
+      "y": 25.714285714285715,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": 100,
+    "name": "Фрума дочь Авраама",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "37.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/37.jpg"
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 101,
+    "name": "Годес ",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
   },
   {
     "id": 102,
@@ -1056,114 +1337,96 @@
     "photoUrl": ""
   },
   {
-    "id": 157,
-    "name": "Крельштейн Меся дочь Липа",
+    "id": 104,
+    "name": "Кракушанская Гитель дочь Авраама",
     "title": "",
-    "deathYear": 2017,
-    "deathMonth": 9,
-    "deathDay": 30,
-    "hebrew": {},
-    "photo": "157.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/157.jpg"
-  },
-  {
-    "id": 195,
-    "name": "Куцкин Израиль сын Вольфа и Сары",
-    "title": "",
-    "deathYear": 1998,
-    "deathMonth": 9,
-    "deathDay": 12,
-    "hebrew": {},
-    "photo": "195.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/195.jpg"
-  },
-  {
-    "id": 80,
-    "name": "Ланцберг Зинаида дочь Абрама (Зылпа)",
-    "title": "",
-    "deathYear": 2010,
-    "deathMonth": 6,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "80.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/80.jpg"
-  },
-  {
-    "id": 81,
-    "name": "Ланцберг Марк сын Самойла (Меер)",
-    "title": "",
-    "deathYear": 2009,
-    "deathMonth": 8,
-    "deathDay": 30,
-    "hebrew": {},
-    "photo": "81.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/81.jpg"
-  },
-  {
-    "id": 83,
-    "name": "Ланцберг Рухля дочь Боруха",
-    "title": "",
-    "deathYear": 1990,
-    "deathMonth": 11,
-    "deathDay": 28,
-    "hebrew": {},
-    "photo": "83.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/83.jpg"
-  },
-  {
-    "id": 82,
-    "name": "Ланцберг Шмуль сын Эли",
-    "title": "",
-    "deathYear": 1972,
-    "deathMonth": 5,
-    "deathDay": 18,
-    "hebrew": {},
-    "photo": "82.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/82.jpg"
-  },
-  {
-    "id": 192,
-    "name": "Левит Анатолий сын Иосифа и Ривы",
-    "title": "",
-    "deathYear": 1998,
-    "deathMonth": 5,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "192.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/192.jpg"
-  },
-  {
-    "id": 193,
-    "name": "Левит Иосиф сын Арона и Рахиль",
-    "title": "",
-    "deathYear": 1943,
+    "deathYear": 1941,
     "deathMonth": 1,
-    "deathDay": 30,
+    "deathDay": 9,
     "hebrew": {},
     "photo": "",
     "photoUrl": ""
   },
   {
-    "id": 182,
-    "name": "Левит Михаил сын Иосифа и Ривы",
+    "id": 105,
+    "name": "Кац Евгения дочь Исаака",
     "title": "",
-    "deathYear": 2023,
-    "deathMonth": 1,
-    "deathDay": 23,
+    "deathYear": 2020,
+    "deathMonth": 8,
+    "deathDay": 11,
     "hebrew": {},
-    "photo": "182.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/182.jpg"
+    "photo": "105.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/105.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
   },
   {
-    "id": 194,
-    "name": "Левит Рива дочь Хаима и Чарны",
+    "id": 106,
+    "name": "Кац Давид сын Хаима",
     "title": "",
-    "deathYear": 1978,
-    "deathMonth": 12,
-    "deathDay": 12,
+    "deathYear": 1992,
+    "deathMonth": 9,
+    "deathDay": 26,
     "hebrew": {},
-    "photo": "194.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/194.jpg"
+    "photo": "106.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/106.jpg?w=280&cx=69.28571428571429&cy=17.142857142857146&cz=2.25",
+    "photoCrop": {
+      "x": 69.28571428571429,
+      "y": 17.142857142857146,
+      "zoom": 2.25
+    }
+  },
+  {
+    "id": 107,
+    "name": "Кац Хаим сын Давида",
+    "title": "",
+    "deathYear": 1976,
+    "deathMonth": 7,
+    "deathDay": 24,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 108,
+    "name": "Кац Груня дочь Шимона",
+    "title": "",
+    "deathYear": 1989,
+    "deathMonth": 8,
+    "deathDay": 16,
+    "hebrew": {},
+    "photo": "",
+    "photoUrl": ""
+  },
+  {
+    "id": 109,
+    "name": "Леокумович Иосиф сын Давида",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "109.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/109.jpg?w=280&cy=62.14285714285714&cz=1.1",
+    "photoCrop": {
+      "x": 50,
+      "y": 62.14285714285714,
+      "zoom": 1.1
+    }
+  },
+  {
+    "id": 110,
+    "name": "Леокумович Израиль сын Давида",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "110.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/110.jpg?w=280"
   },
   {
     "id": 111,
@@ -1188,26 +1451,219 @@
     "photoUrl": ""
   },
   {
-    "id": 110,
-    "name": "Леокумович Израиль сын Давида",
+    "id": 113,
+    "name": "Мирмильштейн Арон сын Шимона",
     "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
+    "deathYear": 1943,
+    "deathMonth": 8,
+    "deathDay": 14,
     "hebrew": {},
-    "photo": "110.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/110.jpg"
+    "photo": "113.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/113.jpg?w=280&cy=39.95412844036697",
+    "photoCrop": {
+      "x": 50,
+      "y": 39.95412844036697,
+      "zoom": 1
+    }
   },
   {
-    "id": 109,
-    "name": "Леокумович Иосиф сын Давида",
+    "id": 114,
+    "name": "Мирмильштейн (Овецкая) Хая-Геня дочь Боруха",
+    "title": "",
+    "deathYear": 1982,
+    "deathMonth": 7,
+    "deathDay": 2,
+    "hebrew": {},
+    "photo": "114.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/114.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 115,
+    "name": "Вайнер Семен сын Хаима (Шулем Хаймович)",
+    "title": "",
+    "deathYear": 1942,
+    "deathMonth": 9,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "115.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/115.jpg?w=280"
+  },
+  {
+    "id": 116,
+    "name": "Вайнер (Шнайдер) Роза дочь Иосифа",
+    "title": "",
+    "deathYear": 1989,
+    "deathMonth": 5,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "116.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/116.jpg?w=280&cy=42.85714285714286",
+    "photoCrop": {
+      "x": 50,
+      "y": 42.85714285714286,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 137,
+    "name": "Шпикельман (Акимов) Валерий Михайлович",
+    "title": "",
+    "deathYear": 2002,
+    "deathMonth": 12,
+    "deathDay": 19,
+    "hebrew": {},
+    "photo": "137.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/137.jpg?w=280&cx=2.857142857142861&cy=58.57142857142857",
+    "photoCrop": {
+      "x": 2.857142857142861,
+      "y": 58.57142857142857,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 117,
+    "name": "Вайнер Хаим сын Иосифа",
+    "title": "",
+    "deathYear": 1954,
+    "deathMonth": 1,
+    "deathDay": 30,
+    "hebrew": {},
+    "photo": "117.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/117.jpg?w=280&cx=50.714285714285715&cy=4.2857142857142865",
+    "photoCrop": {
+      "x": 50.714285714285715,
+      "y": 4.2857142857142865,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 118,
+    "name": "Мирмильштейн (Маркова) Раиса дочь Виктора",
+    "title": "",
+    "deathYear": 2019,
+    "deathMonth": 8,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "118.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/118.jpg?w=280"
+  },
+  {
+    "id": 119,
+    "name": "Маркова (Ушац) Берта дочь Исаака (Белла)",
+    "title": "",
+    "deathYear": 2019,
+    "deathMonth": 8,
+    "deathDay": 10,
+    "hebrew": {},
+    "photo": "119.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/119.jpg?w=280&cx=41.66666666666667&cy=37.542887305357624&cz=1.2",
+    "photoCrop": {
+      "x": 41.66666666666667,
+      "y": 37.542887305357624,
+      "zoom": 1.2
+    }
+  },
+  {
+    "id": 120,
+    "name": "Шапинко Семен сын Иосифа (Шломо)",
+    "title": "",
+    "deathYear": 2004,
+    "deathMonth": 7,
+    "deathDay": 8,
+    "hebrew": {},
+    "photo": "120.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/120.jpg?w=280&cx=58.57142857142857&cy=25.569632001484987&cz=1.65",
+    "photoCrop": {
+      "x": 58.57142857142857,
+      "y": 25.569632001484987,
+      "zoom": 1.65
+    }
+  },
+  {
+    "id": 134,
+    "name": "Орень Белла Ефимовна",
+    "title": "",
+    "deathYear": 2012,
+    "deathMonth": 11,
+    "deathDay": 17,
+    "hebrew": {},
+    "photo": "134.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/134.jpg?w=280&cx=34.48275862068966&cy=19.533772439622886&cz=1.45",
+    "photoCrop": {
+      "x": 34.48275862068966,
+      "y": 19.533772439622886,
+      "zoom": 1.45
+    }
+  },
+  {
+    "id": 136,
+    "name": "Зак Владимир сын Лейба",
+    "title": "",
+    "deathYear": 2012,
+    "deathMonth": 3,
+    "deathDay": 12,
+    "hebrew": {},
+    "photo": "136.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/136.jpg?w=280&cx=32.857142857142854&cy=3.571428571428571&cz=1.2",
+    "photoCrop": {
+      "x": 32.857142857142854,
+      "y": 3.571428571428571,
+      "zoom": 1.2
+    }
+  },
+  {
+    "id": 139,
+    "name": "Зуншайн Михаил Ошерович",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "109.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/109.jpg"
+    "photo": "139.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/139.jpg?w=280"
+  },
+  {
+    "id": 121,
+    "name": "Шапинко (Вайнер) Евгения Ефимовна",
+    "title": "",
+    "deathYear": 2007,
+    "deathMonth": 3,
+    "deathDay": 3,
+    "hebrew": {},
+    "photo": "121.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/121.jpg?w=280&cx=37.142857142857146&cy=10&cz=1.45",
+    "photoCrop": {
+      "x": 37.142857142857146,
+      "y": 10,
+      "zoom": 1.45
+    }
+  },
+  {
+    "id": 122,
+    "name": "Мельц Исаак сын Моисея",
+    "title": "",
+    "deathYear": 2009,
+    "deathMonth": 10,
+    "deathDay": 4,
+    "hebrew": {},
+    "photo": "122.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/122.jpg?w=280"
+  },
+  {
+    "id": 123,
+    "name": "Мельц (Лернер) Роза Михайловна",
+    "title": "",
+    "deathYear": 2007,
+    "deathMonth": 1,
+    "deathDay": 16,
+    "hebrew": {},
+    "photo": "123.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/123.jpg?w=280"
   },
   {
     "id": 124,
@@ -1218,29 +1674,7 @@
     "deathDay": 5,
     "hebrew": {},
     "photo": "124.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/124.jpg"
-  },
-  {
-    "id": 191,
-    "name": "Лившиц Ошер сын Пинхаса и Малки",
-    "title": "",
-    "deathYear": 1985,
-    "deathMonth": 11,
-    "deathDay": 15,
-    "hebrew": {},
-    "photo": "191.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/191.jpg"
-  },
-  {
-    "id": 176,
-    "name": "Мазина Людмила дочь Матвея",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 10,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "176.jpeg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/176.jpeg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/124.jpg?w=280"
   },
   {
     "id": 125,
@@ -1251,7 +1685,34 @@
     "deathDay": 4,
     "hebrew": {},
     "photo": "125.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/125.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/125.jpg?w=280"
+  },
+  {
+    "id": 141,
+    "name": "Бочевер Анна Борисовна",
+    "title": "",
+    "deathYear": 2016,
+    "deathMonth": 6,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "141.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/141.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 130,
+    "name": "Фердман Борис сын Ханона",
+    "title": "",
+    "deathYear": 2018,
+    "deathMonth": 9,
+    "deathDay": 10,
+    "hebrew": {},
+    "photo": "130.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/130.jpg?w=280"
   },
   {
     "id": 126,
@@ -1265,59 +1726,31 @@
     "photoUrl": ""
   },
   {
-    "id": 119,
-    "name": "Маркова (Ушац) Берта дочь Исаака (Белла)",
+    "id": 142,
+    "name": "Буторина Берта Григорьевна (Шапкайц)",
     "title": "",
-    "deathYear": 2019,
-    "deathMonth": 8,
-    "deathDay": 10,
+    "deathYear": 1996,
+    "deathMonth": 6,
+    "deathDay": 14,
     "hebrew": {},
-    "photo": "119.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/119.jpg"
+    "photo": "142.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/142.jpg?w=280"
   },
   {
-    "id": 140,
-    "name": "Махензон Мария Рафаиловна",
+    "id": 143,
+    "name": "Буторин Борис Викторович",
     "title": "",
-    "deathYear": 2020,
-    "deathMonth": 5,
-    "deathDay": 27,
+    "deathYear": 1990,
+    "deathMonth": 2,
+    "deathDay": 23,
     "hebrew": {},
-    "photo": "140.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/140.jpg"
-  },
-  {
-    "id": 123,
-    "name": "Мельц (Лернер) Роза Михайловна",
-    "title": "",
-    "deathYear": 2007,
-    "deathMonth": 1,
-    "deathDay": 16,
-    "hebrew": {},
-    "photo": "123.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/123.jpg"
-  },
-  {
-    "id": 128,
-    "name": "Мельц (Марко) Нина",
-    "title": "",
-    "deathYear": 1977,
-    "deathMonth": 3,
-    "deathDay": 24,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 122,
-    "name": "Мельц Исаак сын Моисея",
-    "title": "",
-    "deathYear": 2009,
-    "deathMonth": 10,
-    "deathDay": 4,
-    "hebrew": {},
-    "photo": "122.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/122.jpg"
+    "photo": "143.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/143.jpg?w=280&cy=33.125599232981784",
+    "photoCrop": {
+      "x": 50,
+      "y": 33.125599232981784,
+      "zoom": 1
+    }
   },
   {
     "id": 127,
@@ -1331,485 +1764,23 @@
     "photoUrl": ""
   },
   {
-    "id": 118,
-    "name": "Мирмильштейн (Маркова) Раиса дочь Виктора",
+    "id": 128,
+    "name": "Мельц (Марко) Нина",
     "title": "",
-    "deathYear": 2019,
-    "deathMonth": 8,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "118.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/118.jpg"
-  },
-  {
-    "id": 114,
-    "name": "Мирмильштейн (Овецкая) Хая-Геня дочь Боруха",
-    "title": "",
-    "deathYear": 1982,
-    "deathMonth": 7,
-    "deathDay": 2,
-    "hebrew": {},
-    "photo": "114.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/114.jpg"
-  },
-  {
-    "id": 113,
-    "name": "Мирмильштейн Арон сын Шимона",
-    "title": "",
-    "deathYear": 1943,
-    "deathMonth": 8,
-    "deathDay": 14,
-    "hebrew": {},
-    "photo": "113.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/113.jpg"
-  },
-  {
-    "id": 186,
-    "name": "Мирмильштейн Семен сын Арона и Хаи-Гени",
-    "title": "",
-    "deathYear": 2022,
-    "deathMonth": 12,
-    "deathDay": 31,
-    "hebrew": {},
-    "photo": "186.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/186.jpg"
-  },
-  {
-    "id": 55,
-    "name": "Моисей сын Авраама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 98,
-    "name": "Мошкович Лия дочь Абрама",
-    "title": "",
-    "deathYear": 2000,
+    "deathYear": 1977,
     "deathMonth": 3,
-    "deathDay": 2,
-    "hebrew": {},
-    "photo": "98.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/98.jpg"
-  },
-  {
-    "id": 183,
-    "name": "Натанзон Дебора дочь Моисея и Хаи.",
-    "title": "",
-    "deathYear": 1999,
-    "deathMonth": 2,
-    "deathDay": 22,
-    "hebrew": {},
-    "photo": "183.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/183.jpg"
-  },
-  {
-    "id": 184,
-    "name": "Натанзон Михаил сын Лейба и Берты",
-    "title": "",
-    "deathYear": 2009,
-    "deathMonth": 9,
-    "deathDay": 12,
-    "hebrew": {},
-    "photo": "184.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/184.jpg"
-  },
-  {
-    "id": 180,
-    "name": "Немировская Александра дочь Гирша",
-    "title": "",
-    "deathYear": 2021,
-    "deathMonth": 5,
-    "deathDay": 16,
-    "hebrew": {},
-    "photo": "180.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/180.jpg"
-  },
-  {
-    "id": 179,
-    "name": "Немировский Абрам Исаакович сын Исаака",
-    "title": "",
-    "deathYear": 2013,
-    "deathMonth": 4,
-    "deathDay": 7,
-    "hebrew": {},
-    "photo": "179.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/179.jpg"
-  },
-  {
-    "id": 134,
-    "name": "Орень Белла Ефимовна",
-    "title": "",
-    "deathYear": 2012,
-    "deathMonth": 11,
-    "deathDay": 17,
-    "hebrew": {},
-    "photo": "134.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/134.jpg"
-  },
-  {
-    "id": 199,
-    "name": "Орлов Виктор сын Нисона",
-    "title": "",
-    "deathYear": 2026,
-    "deathMonth": 6,
-    "deathDay": 10,
-    "hebrew": {},
-    "photo": "1782788201956-opt.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1782788201956-opt.jpg"
-  },
-  {
-    "id": 5,
-    "name": "Ошеров Семен сын Вольфа (Шимон)",
-    "title": "",
-    "deathYear": 2018,
-    "deathMonth": 12,
-    "deathDay": 30,
-    "hebrew": {},
-    "photo": "5.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/5.jpg"
-  },
-  {
-    "id": 150,
-    "name": "Пекелис Натан сын Нусина",
-    "title": "",
-    "deathYear": 1977,
-    "deathMonth": 12,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "150.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/150.jpg"
-  },
-  {
-    "id": 149,
-    "name": "Пекелис Рахиль Иосифовна",
-    "title": "",
-    "deathYear": 1987,
-    "deathMonth": 1,
-    "deathDay": 27,
-    "hebrew": {},
-    "photo": "149.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/149.jpg"
-  },
-  {
-    "id": 151,
-    "name": "Пекелис Сильвия Натановна",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 8,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "151.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/151.jpg"
-  },
-  {
-    "id": 6,
-    "name": "Пясковский Моник сын Герша",
-    "title": "",
-    "deathYear": 2016,
-    "deathMonth": 2,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 89,
-    "name": "Рабинович Иосиф сын Исаака",
-    "title": "",
-    "deathYear": 1991,
-    "deathMonth": 8,
-    "deathDay": 15,
-    "hebrew": {},
-    "photo": "89.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/89.jpg"
-  },
-  {
-    "id": 166,
-    "name": "Рабичев Шуня сын Моисея",
-    "title": "",
-    "deathYear": 1989,
-    "deathMonth": 7,
-    "deathDay": 3,
-    "hebrew": {},
-    "photo": "166.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/166.jpg"
-  },
-  {
-    "id": 17,
-    "name": "Раппопорт Анна дочь Ильи",
-    "title": "",
-    "deathYear": 1977,
-    "deathMonth": 8,
-    "deathDay": 6,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 93,
-    "name": "Рохлин Лейб сын Авраама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 92,
-    "name": "Рохлина Этя дочь Лейба",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 10,
-    "deathDay": 29,
-    "hebrew": {},
-    "photo": "92.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/92.jpg"
-  },
-  {
-    "id": 187,
-    "name": "Рывкина Генриетта дочь Боруха и Розалии",
-    "title": "",
-    "deathYear": 2022,
-    "deathMonth": 4,
-    "deathDay": 21,
-    "hebrew": {},
-    "photo": "187.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/187.jpg"
-  },
-  {
-    "id": 71,
-    "name": "Санько Таба дочь Моисея",
-    "title": "",
-    "deathYear": 1966,
-    "deathMonth": 12,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "71.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/71.jpg"
-  },
-  {
-    "id": 159,
-    "name": "Семья Дворкиных (Мошкович и Дворкин)",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "159.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/159.jpg"
-  },
-  {
-    "id": 27,
-    "name": "Сирота Абрам сын Соломона",
-    "title": "",
-    "deathYear": 1972,
-    "deathMonth": 8,
-    "deathDay": 18,
-    "hebrew": {},
-    "photo": "27.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/27.jpg"
-  },
-  {
-    "id": 28,
-    "name": "Сирота Мина дочь Лазаря",
-    "title": "",
-    "deathYear": 2007,
-    "deathMonth": 2,
-    "deathDay": 2,
-    "hebrew": {},
-    "photo": "28.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/28.jpg"
-  },
-  {
-    "id": 25,
-    "name": "Сирота Натан сын Абрама",
-    "title": "",
-    "deathYear": 2002,
-    "deathMonth": 1,
-    "deathDay": 13,
-    "hebrew": {},
-    "photo": "25.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/25.jpg"
-  },
-  {
-    "id": 30,
-    "name": "Сирота Полина дочь Натана",
-    "title": "",
-    "deathYear": 2002,
-    "deathMonth": 7,
-    "deathDay": 20,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 181,
-    "name": "Соскин Варлен сын Льва и Рахель",
-    "title": "",
-    "deathYear": 2021,
-    "deathMonth": 12,
-    "deathDay": 3,
-    "hebrew": {},
-    "photo": "181.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/181.jpg"
-  },
-  {
-    "id": 145,
-    "name": "Страбыкина Лилия Михайловна (Волчек Циля Менделевна)",
-    "title": "",
-    "deathYear": 2021,
-    "deathMonth": 6,
-    "deathDay": 25,
-    "hebrew": {},
-    "photo": "145.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/145.jpg"
-  },
-  {
-    "id": 178,
-    "name": "Стронгина Эстер дочь Гирша",
-    "title": "",
-    "deathYear": 1974,
-    "deathMonth": 5,
-    "deathDay": 7,
-    "hebrew": {},
-    "photo": "178.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/178.jpg"
-  },
-  {
-    "id": 164,
-    "name": "Таловская Идея дочь Павла",
-    "title": "",
-    "deathYear": 2011,
-    "deathMonth": 7,
-    "deathDay": 28,
-    "hebrew": {},
-    "photo": "164.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/164.jpg"
-  },
-  {
-    "id": 165,
-    "name": "Таловский Раймонд сын Израиля",
-    "title": "",
-    "deathYear": 2020,
-    "deathMonth": 5,
-    "deathDay": 26,
-    "hebrew": {},
-    "photo": "165.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/165.jpg"
-  },
-  {
-    "id": 66,
-    "name": "Тоболовская Ида дочь Авраама",
-    "title": "",
-    "deathYear": 1961,
-    "deathMonth": 12,
-    "deathDay": 17,
-    "hebrew": {},
-    "photo": "66.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/66.jpg"
-  },
-  {
-    "id": 72,
-    "name": "Тоболовский Арнольд сын Сэма",
-    "title": "",
-    "deathYear": 1975,
-    "deathMonth": 12,
-    "deathDay": 14,
-    "hebrew": {},
-    "photo": "72.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/72.jpg"
-  },
-  {
-    "id": 67,
-    "name": "Тоболовский Сэм сын Авраама",
-    "title": "",
-    "deathYear": 1933,
-    "deathMonth": 1,
-    "deathDay": 8,
-    "hebrew": {},
-    "photo": "67.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/67.jpg"
-  },
-  {
-    "id": 13,
-    "name": "Тодер Борис сын Павла",
-    "title": "",
-    "deathYear": 2015,
-    "deathMonth": 9,
-    "deathDay": 5,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 130,
-    "name": "Фердман Борис сын Ханона",
-    "title": "",
-    "deathYear": 2018,
-    "deathMonth": 9,
-    "deathDay": 10,
-    "hebrew": {},
-    "photo": "130.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/130.jpg"
-  },
-  {
-    "id": 132,
-    "name": "Фердман Хонон Аронович",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 177,
-    "name": "Фишман Янкель сын Самуила",
-    "title": "",
-    "deathYear": 2003,
-    "deathMonth": 6,
-    "deathDay": 22,
-    "hebrew": {},
-    "photo": "177.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/177.jpg"
-  },
-  {
-    "id": 189,
-    "name": "Фридман Мария дочь Энта и Соломона",
-    "title": "",
-    "deathYear": 2025,
-    "deathMonth": 4,
-    "deathDay": 23,
-    "hebrew": {},
-    "photo": "189.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/189.jpg"
-  },
-  {
-    "id": 7,
-    "name": "Фронштейн Исаак сын Якова (Исаак)",
-    "title": "",
-    "deathYear": 2009,
-    "deathMonth": 11,
     "deathDay": 24,
     "hebrew": {},
     "photo": "",
     "photoUrl": ""
   },
   {
-    "id": 100,
-    "name": "Фрума дочь Авраама",
+    "id": 129,
+    "name": "Добрынская (Мельц) Екатерина дочь Моисея",
     "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
+    "deathYear": 2001,
+    "deathMonth": 12,
+    "deathDay": 1,
     "hebrew": {},
     "photo": "",
     "photoUrl": ""
@@ -1837,180 +1808,132 @@
     "photoUrl": ""
   },
   {
-    "id": 14,
-    "name": "Ханин Кушелис сын Элияса",
-    "title": "",
-    "deathYear": 2015,
-    "deathMonth": 5,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 12,
-    "name": "Ханин Яков сын Ильи",
-    "title": "",
-    "deathYear": 2013,
-    "deathMonth": 1,
-    "deathDay": 29,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 54,
-    "name": "Хая-Сарра дочь Араама",
-    "title": "",
-    "deathYear": 1941,
-    "deathMonth": 1,
-    "deathDay": 9,
-    "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
-  },
-  {
-    "id": 90,
-    "name": "Цифринович Илья сын Исроэля",
+    "id": 140,
+    "name": "Махензон Мария Рафаиловна",
     "title": "",
     "deathYear": 2020,
     "deathMonth": 5,
-    "deathDay": 10,
+    "deathDay": 27,
     "hebrew": {},
-    "photo": "90.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/90.jpg"
+    "photo": "140.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/140.jpg?w=280&cx=40&cy=2.142857142857144",
+    "photoCrop": {
+      "x": 40,
+      "y": 2.142857142857144,
+      "zoom": 1
+    }
   },
   {
-    "id": 91,
-    "name": "Цифринович Исроэль сын Авраама",
+    "id": 144,
+    "name": "Воронина (Этингова) Мария Давидовна (Муся)",
     "title": "",
-    "deathYear": 1941,
+    "deathYear": 2019,
+    "deathMonth": 9,
+    "deathDay": 4,
+    "hebrew": {},
+    "photo": "144.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/144.jpg?w=280&cx=38.57142857142858&cy=36.42857142857143&cz=2.55",
+    "photoCrop": {
+      "x": 38.57142857142858,
+      "y": 36.42857142857143,
+      "zoom": 2.55
+    }
+  },
+  {
+    "id": 149,
+    "name": "Пекелис Рахиль Иосифовна",
+    "title": "",
+    "deathYear": 1987,
     "deathMonth": 1,
-    "deathDay": 9,
+    "deathDay": 27,
     "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
+    "photo": "149.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/149.jpg?w=280&cx=95&cy=6.428571428571428&cz=2.45",
+    "photoCrop": {
+      "x": 95,
+      "y": 6.428571428571428,
+      "zoom": 2.45
+    }
   },
   {
-    "id": 121,
-    "name": "Шапинко (Вайнер) Евгения Ефимовна",
+    "id": 150,
+    "name": "Пекелис Натан сын Нусина",
     "title": "",
-    "deathYear": 2007,
-    "deathMonth": 3,
-    "deathDay": 3,
-    "hebrew": {},
-    "photo": "121.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/121.jpg"
-  },
-  {
-    "id": 120,
-    "name": "Шапинко Семен сын Иосифа (Шломо)",
-    "title": "",
-    "deathYear": 2004,
-    "deathMonth": 7,
-    "deathDay": 8,
-    "hebrew": {},
-    "photo": "120.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/120.jpg"
-  },
-  {
-    "id": 69,
-    "name": "Шарогородская Бина дочь Моисея",
-    "title": "",
-    "deathYear": 1971,
-    "deathMonth": 7,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "69.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/69.jpg"
-  },
-  {
-    "id": 68,
-    "name": "Шарогородский Самуил сын Бориса",
-    "title": "",
-    "deathYear": 1966,
-    "deathMonth": 1,
-    "deathDay": 2,
-    "hebrew": {},
-    "photo": "68.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/68.jpg"
-  },
-  {
-    "id": 23,
-    "name": "Шейнин Моисей сын Самуила",
-    "title": "",
-    "deathYear": 1990,
-    "deathMonth": 6,
-    "deathDay": 14,
-    "hebrew": {},
-    "photo": "23.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/23.jpg"
-  },
-  {
-    "id": 24,
-    "name": "Шейнина Ольга дочь Ерухима",
-    "title": "",
-    "deathYear": 1998,
-    "deathMonth": 4,
-    "deathDay": 10,
-    "hebrew": {},
-    "photo": "24.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/24.jpg"
-  },
-  {
-    "id": 168,
-    "name": "Шерман Борис сын Тевеля",
-    "title": "",
-    "deathYear": 2008,
-    "deathMonth": 8,
-    "deathDay": 15,
-    "hebrew": {},
-    "photo": "168.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/168.jpg"
-  },
-  {
-    "id": 137,
-    "name": "Шпикельман (Акимов) Валерий Михайлович",
-    "title": "",
-    "deathYear": 2002,
+    "deathYear": 1977,
     "deathMonth": 12,
-    "deathDay": 19,
-    "hebrew": {},
-    "photo": "137.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/137.jpg"
-  },
-  {
-    "id": 9,
-    "name": "Шпикельман Гнесся дочь Якова",
-    "title": "",
-    "deathYear": 1990,
-    "deathMonth": 8,
-    "deathDay": 17,
-    "hebrew": {},
-    "photo": "9.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/9.jpg"
-  },
-  {
-    "id": 10,
-    "name": "Шпикельман Михаил сын Соломона (Михаэль)",
-    "title": "",
-    "deathYear": 1996,
-    "deathMonth": 5,
     "deathDay": 25,
     "hebrew": {},
-    "photo": "10.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/10.jpg"
+    "photo": "150.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/150.jpg?w=280&cx=86.42857142857142&cy=5&cz=1.45",
+    "photoCrop": {
+      "x": 86.42857142857142,
+      "y": 5,
+      "zoom": 1.45
+    }
   },
   {
-    "id": 161,
-    "name": "Шпикельман Яков сын Михаила",
+    "id": 151,
+    "name": "Пекелис Сильвия Натановна",
     "title": "",
-    "deathYear": 2022,
-    "deathMonth": 2,
-    "deathDay": 20,
+    "deathYear": 2020,
+    "deathMonth": 8,
+    "deathDay": 1,
     "hebrew": {},
-    "photo": "161.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/161.jpg"
+    "photo": "151.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/151.jpg?w=280&cx=95&cy=12.142857142857144&cz=1.85",
+    "photoCrop": {
+      "x": 95,
+      "y": 12.142857142857144,
+      "zoom": 1.85
+    }
+  },
+  {
+    "id": 145,
+    "name": "Страбыкина Лилия Михайловна (Волчек Циля Менделевна)",
+    "title": "",
+    "deathYear": 2021,
+    "deathMonth": 6,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "145.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/145.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 146,
+    "name": "Кац Вера Исаковна",
+    "title": "",
+    "deathYear": 1977,
+    "deathMonth": 12,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "146.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/146.jpg?w=280&cx=95.71428571428572&cy=4.285714285714286&cz=3",
+    "photoCrop": {
+      "x": 95.71428571428572,
+      "y": 4.285714285714286,
+      "zoom": 3
+    }
+  },
+  {
+    "id": 147,
+    "name": "Кац Михаил Генрихович",
+    "title": "",
+    "deathYear": 1981,
+    "deathMonth": 1,
+    "deathDay": 4,
+    "hebrew": {},
+    "photo": "147.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/147.jpg?w=280&cx=96.42857142857143&cy=6.428571428571424&cz=3",
+    "photoCrop": {
+      "x": 96.42857142857143,
+      "y": 6.428571428571424,
+      "zoom": 3
+    }
   },
   {
     "id": 158,
@@ -2021,29 +1944,687 @@
     "deathDay": 25,
     "hebrew": {},
     "photo": "158.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/158.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/158.jpg?w=280"
   },
   {
-    "id": 11,
-    "name": "Шуриц Александр сын Давида (Исаак)",
+    "id": 155,
+    "name": "Гитерман Хая-Сура дочь Хаима Идела",
+    "title": "",
+    "deathYear": 2008,
+    "deathMonth": 1,
+    "deathDay": 1,
+    "hebrew": {},
+    "photo": "155.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/155.jpg?w=280"
+  },
+  {
+    "id": 156,
+    "name": "Гитерман Хаим сын Абрам",
+    "title": "",
+    "deathYear": 1977,
+    "deathMonth": 8,
+    "deathDay": 1,
+    "hebrew": {},
+    "photo": "156.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/156.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 157,
+    "name": "Крельштейн Меся дочь Липа",
     "title": "",
     "deathYear": 2017,
-    "deathMonth": 4,
-    "deathDay": 27,
+    "deathMonth": 9,
+    "deathDay": 30,
     "hebrew": {},
-    "photo": "11.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/11.jpg"
+    "photo": "157.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/157.jpg?w=280&cy=36.59476117103236",
+    "photoCrop": {
+      "x": 50,
+      "y": 36.59476117103236,
+      "zoom": 1
+    }
   },
   {
-    "id": 48,
-    "name": "Шуриц Давид сын Авраама",
+    "id": 159,
+    "name": "Семья Дворкиных (Мошкович и Дворкин)",
     "title": "",
     "deathYear": 1941,
     "deathMonth": 1,
     "deathDay": 9,
     "hebrew": {},
-    "photo": "",
-    "photoUrl": ""
+    "photo": "159.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/159.jpg?w=280"
+  },
+  {
+    "id": 103,
+    "name": "Кракушанский Копель сын Лейба",
+    "title": "",
+    "deathYear": 1941,
+    "deathMonth": 1,
+    "deathDay": 9,
+    "hebrew": {},
+    "photo": "37.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/37.jpg?w=280&cx=47.857142857142854&cy=17.142857142857146&cz=2.15",
+    "photoCrop": {
+      "x": 47.857142857142854,
+      "y": 17.142857142857146,
+      "zoom": 2.15
+    }
+  },
+  {
+    "id": 161,
+    "name": "Шпикельман Яков сын Михаила",
+    "title": "",
+    "deathYear": 2022,
+    "deathMonth": 2,
+    "deathDay": 20,
+    "hebrew": {},
+    "photo": "161.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/161.jpg?w=280&cx=63.57142857142858&cy=5.714285714285714&cz=1.45",
+    "photoCrop": {
+      "x": 63.57142857142858,
+      "y": 5.714285714285714,
+      "zoom": 1.45
+    }
+  },
+  {
+    "id": 162,
+    "name": "Верба Вера дочь Израиля",
+    "title": "",
+    "deathYear": 2020,
+    "deathMonth": 6,
+    "deathDay": 19,
+    "hebrew": {},
+    "photo": "162.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/162.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 163,
+    "name": "Брегман Софья дочь Рувима",
+    "title": "",
+    "deathYear": 2021,
+    "deathMonth": 12,
+    "deathDay": 31,
+    "hebrew": {},
+    "photo": "163.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/163.jpg?w=280&cx=28.571428571428573&cy=12.857142857142861&cz=1.4",
+    "photoCrop": {
+      "x": 28.571428571428573,
+      "y": 12.857142857142861,
+      "zoom": 1.4
+    }
+  },
+  {
+    "id": 166,
+    "name": "Рабичев Шуня сын Моисея",
+    "title": "",
+    "deathYear": 1989,
+    "deathMonth": 7,
+    "deathDay": 3,
+    "hebrew": {},
+    "photo": "166.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/166.jpg?w=280&cy=34.900373599003736",
+    "photoCrop": {
+      "x": 50,
+      "y": 34.900373599003736,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 167,
+    "name": "Верба Иосиф сын Бориса",
+    "title": "",
+    "deathYear": 1999,
+    "deathMonth": 5,
+    "deathDay": 28,
+    "hebrew": {},
+    "photo": "167.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/167.jpg?w=280&cy=35.31810766721044",
+    "photoCrop": {
+      "x": 50,
+      "y": 35.31810766721044,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 168,
+    "name": "Шерман Борис сын Тевеля",
+    "title": "",
+    "deathYear": 2008,
+    "deathMonth": 8,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "168.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/168.jpg?w=280&cy=41.644562334217504",
+    "photoCrop": {
+      "x": 50,
+      "y": 41.644562334217504,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 169,
+    "name": "Кац Семен сын Хаима",
+    "title": "",
+    "deathYear": 2022,
+    "deathMonth": 1,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "169.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/169.jpg?w=280&cy=31.568123393316196&cz=1.25",
+    "photoCrop": {
+      "x": 50,
+      "y": 31.568123393316196,
+      "zoom": 1.25
+    }
+  },
+  {
+    "id": 165,
+    "name": "Таловский Раймонд сын Израиля",
+    "title": "",
+    "deathYear": 2020,
+    "deathMonth": 5,
+    "deathDay": 26,
+    "hebrew": {},
+    "photo": "165.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/165.jpg?w=280&cx=53.57142857142857&cy=7.142857142857146&cz=1.6",
+    "photoCrop": {
+      "x": 53.57142857142857,
+      "y": 7.142857142857146,
+      "zoom": 1.6
+    }
+  },
+  {
+    "id": 164,
+    "name": "Таловская Идея дочь Павла",
+    "title": "",
+    "deathYear": 2011,
+    "deathMonth": 7,
+    "deathDay": 28,
+    "hebrew": {},
+    "photo": "164.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/164.jpg?w=280"
+  },
+  {
+    "id": 170,
+    "name": "Клейман Владимир сын Давида",
+    "title": "",
+    "deathYear": 1991,
+    "deathMonth": 10,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "170.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/170.jpg?w=280&cy=37.755102040816325",
+    "photoCrop": {
+      "x": 50,
+      "y": 37.755102040816325,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 171,
+    "name": "Клейман Зелла дочь Моисея",
+    "title": "",
+    "deathYear": 2011,
+    "deathMonth": 9,
+    "deathDay": 21,
+    "hebrew": {},
+    "photo": "171.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/171.jpg?w=280&cy=40.78947368421053",
+    "photoCrop": {
+      "x": 50,
+      "y": 40.78947368421053,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 172,
+    "name": "Буторина (Богач) Софья дочь Павла",
+    "title": "",
+    "deathYear": 2022,
+    "deathMonth": 11,
+    "deathDay": 21,
+    "hebrew": {},
+    "photo": "172.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/172.jpg?w=280&cy=37.5",
+    "photoCrop": {
+      "x": 50,
+      "y": 37.5,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 173,
+    "name": "Канзбург Евгения дочь  Павла",
+    "title": "",
+    "deathYear": 2006,
+    "deathMonth": 4,
+    "deathDay": 18,
+    "hebrew": {},
+    "photo": "173.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/173.jpg?w=280&cx=61.42857142857143&cy=7.142857142857146&cz=1.6",
+    "photoCrop": {
+      "x": 61.42857142857143,
+      "y": 7.142857142857146,
+      "zoom": 1.6
+    }
+  },
+  {
+    "id": 175,
+    "name": "Загорская Эсфирь дочь Льва",
+    "title": "",
+    "deathYear": 2004,
+    "deathMonth": 6,
+    "deathDay": 21,
+    "hebrew": {},
+    "photo": "175.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/175.jpg?w=280&cy=33.333333333333336",
+    "photoCrop": {
+      "x": 50,
+      "y": 33.333333333333336,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 174,
+    "name": "Дроздова (Штальвоссер) Фрида дочь Шлема",
+    "title": "",
+    "deathYear": 2016,
+    "deathMonth": 1,
+    "deathDay": 26,
+    "hebrew": {},
+    "photo": "174.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/174.jpg?w=280"
+  },
+  {
+    "id": 176,
+    "name": "Мазина Людмила дочь Матвея",
+    "title": "",
+    "deathYear": 2020,
+    "deathMonth": 10,
+    "deathDay": 1,
+    "hebrew": {},
+    "photo": "176.jpeg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/176.jpeg?w=280"
+  },
+  {
+    "id": 177,
+    "name": "Фишман Янкель сын Самуила",
+    "title": "",
+    "deathYear": 2003,
+    "deathMonth": 6,
+    "deathDay": 22,
+    "hebrew": {},
+    "photo": "177.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/177.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 178,
+    "name": "Стронгина Эстер дочь Гирша",
+    "title": "",
+    "deathYear": 1974,
+    "deathMonth": 5,
+    "deathDay": 7,
+    "hebrew": {},
+    "photo": "178.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/178.jpg?w=280&cx=4.285714285714283&cy=14.285714285714285&cz=2.05",
+    "photoCrop": {
+      "x": 4.285714285714283,
+      "y": 14.285714285714285,
+      "zoom": 2.05
+    }
+  },
+  {
+    "id": 179,
+    "name": "Немировский Абрам Исаакович сын Исаака",
+    "title": "",
+    "deathYear": 2013,
+    "deathMonth": 4,
+    "deathDay": 7,
+    "hebrew": {},
+    "photo": "179.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/179.jpg?w=280&cx=49.285714285714285&cy=19.285714285714285&cz=1.3",
+    "photoCrop": {
+      "x": 49.285714285714285,
+      "y": 19.285714285714285,
+      "zoom": 1.3
+    }
+  },
+  {
+    "id": 180,
+    "name": "Немировская Александра дочь Гирша",
+    "title": "",
+    "deathYear": 2021,
+    "deathMonth": 5,
+    "deathDay": 16,
+    "hebrew": {},
+    "photo": "180.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/180.jpg?w=280"
+  },
+  {
+    "id": 181,
+    "name": "Соскин Варлен сын Льва и Рахель",
+    "title": "",
+    "deathYear": 2021,
+    "deathMonth": 12,
+    "deathDay": 3,
+    "hebrew": {},
+    "photo": "181.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/181.jpg?w=280&cy=36.79050567595459",
+    "photoCrop": {
+      "x": 50,
+      "y": 36.79050567595459,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 182,
+    "name": "Левит Михаил сын Иосифа и Ривы",
+    "title": "",
+    "deathYear": 2023,
+    "deathMonth": 1,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "182.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/182.jpg?w=280&cx=61.42857142857143&cy=20.71428571428571",
+    "photoCrop": {
+      "x": 61.42857142857143,
+      "y": 20.71428571428571,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 183,
+    "name": "Натанзон Дебора дочь Моисея и Хаи.",
+    "title": "",
+    "deathYear": 1999,
+    "deathMonth": 2,
+    "deathDay": 22,
+    "hebrew": {},
+    "photo": "183.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/183.jpg?w=280&cx=20.500993016849257&cz=1.65",
+    "photoCrop": {
+      "x": 20.500993016849257,
+      "y": 50,
+      "zoom": 1.65
+    }
+  },
+  {
+    "id": 184,
+    "name": "Натанзон Михаил сын Лейба и Берты",
+    "title": "",
+    "deathYear": 2009,
+    "deathMonth": 9,
+    "deathDay": 12,
+    "hebrew": {},
+    "photo": "184.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/184.jpg?w=280&cx=42.85714285714286&cy=18.571428571428573&cz=1.45",
+    "photoCrop": {
+      "x": 42.85714285714286,
+      "y": 18.571428571428573,
+      "zoom": 1.45
+    }
+  },
+  {
+    "id": 185,
+    "name": "Анна Мирмильштейн дочь Хайма и Розы",
+    "title": "",
+    "deathYear": 2023,
+    "deathMonth": 12,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "185.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/185.jpg?w=280&cx=44.285714285714285&cy=0.7142857142857135&cz=1.5",
+    "photoCrop": {
+      "x": 44.285714285714285,
+      "y": 0.7142857142857135,
+      "zoom": 1.5
+    }
+  },
+  {
+    "id": 186,
+    "name": "Мирмильштейн Семен сын Арона и Хаи-Гени",
+    "title": "",
+    "deathYear": 2022,
+    "deathMonth": 12,
+    "deathDay": 31,
+    "hebrew": {},
+    "photo": "186.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/186.jpg?w=280&cx=28.57142857142857&cy=0.7142857142857143&cz=2.1",
+    "photoCrop": {
+      "x": 28.57142857142857,
+      "y": 0.7142857142857143,
+      "zoom": 2.1
+    }
+  },
+  {
+    "id": 187,
+    "name": "Рывкина Генриетта дочь Боруха и Розалии",
+    "title": "",
+    "deathYear": 2022,
+    "deathMonth": 4,
+    "deathDay": 21,
+    "hebrew": {},
+    "photo": "187.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/187.jpg?w=280"
+  },
+  {
+    "id": 188,
+    "name": "Адонина Елена дочь Владимира и Эсфирь",
+    "title": "",
+    "deathYear": 2023,
+    "deathMonth": 4,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "188.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/188.jpg?w=280&cx=45&cy=55.714285714285715&cz=2",
+    "photoCrop": {
+      "x": 45,
+      "y": 55.714285714285715,
+      "zoom": 2
+    }
+  },
+  {
+    "id": 189,
+    "name": "Фридман Мария дочь Энта и Соломона",
+    "title": "",
+    "deathYear": 2025,
+    "deathMonth": 4,
+    "deathDay": 23,
+    "hebrew": {},
+    "photo": "189.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/189.jpg?w=280"
+  },
+  {
+    "id": 190,
+    "name": "Дмитриева Эсфирь дочь Марии и Семена ",
+    "title": "",
+    "deathYear": 1983,
+    "deathMonth": 7,
+    "deathDay": 16,
+    "hebrew": {},
+    "photo": "190.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/190.jpg?w=280&cy=27.065527065527064&cz=1.3",
+    "photoCrop": {
+      "x": 50,
+      "y": 27.065527065527064,
+      "zoom": 1.3
+    }
+  },
+  {
+    "id": 191,
+    "name": "Лившиц Ошер сын Пинхаса и Малки ",
+    "title": "",
+    "deathYear": 1985,
+    "deathMonth": 11,
+    "deathDay": 15,
+    "hebrew": {},
+    "photo": "191.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/191.jpg?w=280&cx=63.57142857142857&cy=5&cz=1.5",
+    "photoCrop": {
+      "x": 63.57142857142857,
+      "y": 5,
+      "zoom": 1.5
+    }
+  },
+  {
+    "id": 192,
+    "name": "Левит Анатолий сын Иосифа и Ривы",
+    "title": "",
+    "deathYear": 1998,
+    "deathMonth": 5,
+    "deathDay": 25,
+    "hebrew": {},
+    "photo": "192.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/192.jpg?w=280&cy=23.356401384083046",
+    "photoCrop": {
+      "x": 50,
+      "y": 23.356401384083046,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 193,
+    "name": "Левит Иосиф сын Арона и Рахиль",
+    "title": "",
+    "deathYear": 1943,
+    "deathMonth": 1,
+    "deathDay": 30,
+    "hebrew": {},
+    "photo": "193.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/193.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 194,
+    "name": "Левит Рива дочь Хаима и Чарны",
+    "title": "",
+    "deathYear": 1978,
+    "deathMonth": 12,
+    "deathDay": 12,
+    "hebrew": {},
+    "photo": "194.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/194.jpg?w=280&cy=23.356401384083046",
+    "photoCrop": {
+      "x": 50,
+      "y": 23.356401384083046,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 195,
+    "name": "Куцкин Израиль сын Вольфа и Сары",
+    "title": "",
+    "deathYear": 1998,
+    "deathMonth": 9,
+    "deathDay": 12,
+    "hebrew": {},
+    "photo": "195.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/195.jpg?w=280&cx=75&cy=17.857142857142854",
+    "photoCrop": {
+      "x": 75,
+      "y": 17.857142857142854,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 196,
+    "name": "Зингель Ефим Хаим сын Меира и Цили",
+    "title": "",
+    "deathYear": 2024,
+    "deathMonth": 11,
+    "deathDay": 28,
+    "hebrew": {},
+    "photo": "196.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/196.jpg?w=280&cx=55&cy=29.13189869711609&cz=1.15",
+    "photoCrop": {
+      "x": 55,
+      "y": 29.13189869711609,
+      "zoom": 1.15
+    }
+  },
+  {
+    "id": 197,
+    "name": "Гершевич Аарон сын Гершона и Раисы",
+    "title": "",
+    "deathYear": 2026,
+    "deathMonth": 5,
+    "deathDay": 30,
+    "hebrew": {},
+    "photo": "197.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/197.jpg?w=280&cx=48.57142857142858&cy=38.46153846153846&cz=1.3",
+    "photoCrop": {
+      "x": 48.57142857142858,
+      "y": 38.46153846153846,
+      "zoom": 1.3
+    }
+  },
+  {
+    "id": 199,
+    "name": "Орлов Виктор сын Нисона",
+    "title": "",
+    "deathYear": 2026,
+    "deathMonth": 6,
+    "deathDay": 10,
+    "hebrew": {},
+    "photo": "1782788201956-opt.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1782788201956-opt.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 200,
+    "name": "Гершевич Абрам Исаевич (Авраам сын Ишаягу)",
+    "title": "",
+    "deathYear": 1996,
+    "deathMonth": 8,
+    "deathDay": 28,
+    "hebrew": {},
+    "photo": "1783226301687-opt.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783226301687-opt.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
+  },
+  {
+    "id": 201,
+    "name": "Явнилович Михаил Аронович ",
+    "title": "",
+    "deathYear": 1964,
+    "deathMonth": 1,
+    "deathDay": 1,
+    "hebrew": {},
+    "photo": "1783227410052-opt.jpg",
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783227410052-opt.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
   },
   {
     "id": 202,
@@ -2054,17 +2635,11 @@
     "deathDay": 1,
     "hebrew": {},
     "photo": "1783227471256-opt.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783227471256-opt.jpg"
-  },
-  {
-    "id": 201,
-    "name": "Явнилович Михаил Аронович",
-    "title": "",
-    "deathYear": 1964,
-    "deathMonth": 1,
-    "deathDay": 1,
-    "hebrew": {},
-    "photo": "1783227410052-opt.jpg",
-    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783227410052-opt.jpg"
+    "photoUrl": "https://synagogue-kadish-shneur.amvera.io/photos/1783227471256-opt.jpg?w=280",
+    "photoCrop": {
+      "x": 50,
+      "y": 50,
+      "zoom": 1
+    }
   }
 ]
