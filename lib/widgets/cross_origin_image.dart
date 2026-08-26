@@ -21,16 +21,20 @@ class CrossOriginImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      url,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      filterQuality: FilterQuality.medium,
-      webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-      errorBuilder: (_, error, stackTrace) =>
-          this.error ?? const SizedBox.shrink(),
+    // HtmlElementView coordinates break under RTL; keep the overlay LTR.
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Image.network(
+        url,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        filterQuality: FilterQuality.medium,
+        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+        errorBuilder: (_, error, stackTrace) =>
+            this.error ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
