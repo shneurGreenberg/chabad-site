@@ -108,6 +108,20 @@
     window.addEventListener('flutter-first-frame', hideSplash);
     setTimeout(hideSplash, 8000);
   </script>
+  <script>
+    (function () {
+      var baseEl = document.querySelector('base');
+      var base = (baseEl && baseEl.getAttribute('href')) || '/';
+      if (base.charAt(base.length - 1) === '/') base = base.slice(0, -1);
+      var path = location.pathname || '/';
+      if (base && path.indexOf(base) === 0) {
+        path = path.slice(base.length) || '/';
+      }
+      if (path !== '/' && !location.hash) {
+        location.replace(base + '/#' + path + (location.search || ''));
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

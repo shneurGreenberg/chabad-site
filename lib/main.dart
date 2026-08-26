@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repository.dart';
@@ -12,6 +13,8 @@ import 'theme.dart';
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> main() async {
+  // Hash URLs so GitHub Pages can open /#/cemetery without a server 404.
+  setUrlStrategy(HashUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
   await CloudSync.instance.init();
   runApp(const ChabadApp());

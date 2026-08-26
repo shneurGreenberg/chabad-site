@@ -25,6 +25,15 @@ class _CemeteryPageState extends State<CemeteryPage> {
   static const _kaddishUrl =
       'https://synagogue-kadish-shneur.amvera.io/s/novosibirsk';
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AppRepository>().refreshKaddishGraves();
+    });
+  }
+
   bool _matches(Grave g, String q, String raw, String lang) {
     if (widget.highlightId != null && g.id == widget.highlightId) return true;
     if (q.isEmpty) return true;
@@ -33,6 +42,8 @@ class _CemeteryPageState extends State<CemeteryPage> {
         g.hebrewName.toLowerCase().contains(q) ||
         g.hebrewName.contains(raw) ||
         g.deathLabel.contains(raw) ||
+        g.hebrewDeathLabel.toLowerCase().contains(q) ||
+        g.hebrewDeathLabel.contains(raw) ||
         trLoc(g.notes, lang).toLowerCase().contains(q);
   }
 
@@ -135,6 +146,12 @@ class _GraveCard extends StatelessWidget {
                     Text(subtitle,
                         style: TextStyle(
                             color: AppColors.muted, fontSize: 13)),
+                  if (grave.hebrewDeathLabel.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(grave.hebrewDeathLabel,
+                        style: TextStyle(
+                            color: AppColors.muted, fontSize: 13)),
+                  ],
                   if (notes.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(notes,

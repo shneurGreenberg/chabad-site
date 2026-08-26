@@ -14,7 +14,9 @@ import '../services/notify.dart';
 import '../services/telegram.dart';
 import '../services/web_prefs.dart';
 import '../services/yahrzeit.dart';
+import '../services/cors_proxy.dart';
 import 'holidays.dart';
+import 'kaddish.dart';
 import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
@@ -75,8 +77,8 @@ class AppRepository extends ChangeNotifier {
     await TelegramService.instance.loadSavedAsync();
     await CloudSync.instance.init();
     await _hydrate();
-    await _loadKaddishGraves();
     await _pullCloud();
+    await _loadKaddishGraves();
     _hydrated = true;
     _notifyUi();
     try {
@@ -901,76 +903,56 @@ class AppRepository extends ChangeNotifier {
   }
 
   // ---------------------------------------------------------------------------
-  // Cemetery (loaded from JSON asset — not stored in snapshot)
+  // Cemetery (live kaddish API, with bundled JSON as fallback)
   // ---------------------------------------------------------------------------
   late final List<Grave> graves = [];
 
-  static const _kaddishAsset = 'assets/data/kaddish_novosibirsk.json';
-  static const _kaddishPhotoBase =
-      'https://synagogue-kadish-shneur.amvera.io/photos/';
+  Future<void> refreshKaddishGraves() => _loadKaddishGraves();
 
   Future<void> _loadKaddishGraves() async {
-    try {
-      final raw = await rootBundle.loadString(_kaddishAsset);
-      final list = jsonDecode(raw);
-      if (list is! List) return;
-      final fromFile = [
-        for (final item in list)
-          if (item is Map) _graveFromKaddish(Map<String, dynamic>.from(item)),
-      ];
-      if (graves.isEmpty || !_gravesEdited) {
-        graves
-          ..clear()
-          ..addAll(fromFile);
-        return;
-      }
-      final byId = {for (final g in fromFile) g.id: g};
-      for (final g in graves) {
-        final src = byId[g.id];
-        if (src == null) continue;
-        if (g.photoUrl == null || g.photoUrl!.trim().isEmpty) {
-          g.photoUrl = src.photoUrl;
-        }
-      }
-      final have = {for (final g in graves) g.id};
-      for (final g in fromFile) {
-        if (have.add(g.id)) graves.add(g);
-      }
-    } catch (_) {}
+    final bundled = await _loadBundledKaddishGraves();
+    if (bundled.isNotEmpty) {
+      _applyKaddishGraves(bundled);
+    }
+    final live = await _fetchLiveKaddishGraves();
+    final fromFile = mergeKaddishGraves(live, bundled);
+    if (fromFile.isEmpty) return;
+    _applyKaddishGraves(fromFile);
   }
 
-  Grave _graveFromKaddish(Map<String, dynamic> m) {
-    final photo = '${m['photo'] ?? ''}'.trim();
-    final givenUrl = '${m['photoUrl'] ?? ''}'.trim();
-    String? photoUrl;
-    if (givenUrl.isNotEmpty) {
-      photoUrl = givenUrl;
-    } else if (photo.isNotEmpty) {
-      photoUrl = '$_kaddishPhotoBase$photo';
+  void _applyKaddishGraves(List<Grave> fromFile) {
+    final custom = graves.where((g) => !g.id.startsWith('kaddish-')).toList();
+    graves
+      ..clear()
+      ..addAll(fromFile)
+      ..addAll(custom);
+    _notifyUi();
+  }
+
+  Future<List<Grave>> _loadBundledKaddishGraves() async {
+    try {
+      final raw =
+          await rootBundle.loadString('assets/data/kaddish_novosibirsk.json');
+      return [
+        for (final item in peopleFromKaddishJson(jsonDecode(raw)))
+          graveFromKaddish(item),
+      ];
+    } catch (_) {
+      return const [];
     }
-    final hebrew = m['hebrew'];
-    var hebrewName = '';
-    if (hebrew is String) {
-      hebrewName = hebrew.trim();
-    } else if (hebrew is Map) {
-      hebrewName = '${hebrew['name'] ?? hebrew['he'] ?? ''}'.trim();
+  }
+
+  Future<List<Grave>> _fetchLiveKaddishGraves() async {
+    for (final url in [kaddishPeopleApi, kaddishBoardApi]) {
+      try {
+        final res = await CorsProxy.getDirectOrProxy(url);
+        if (res.statusCode < 200 || res.statusCode >= 300) continue;
+        final people = peopleFromKaddishJson(jsonDecode(res.body));
+        if (people.isEmpty) continue;
+        return [for (final person in people) graveFromKaddish(person)];
+      } catch (_) {}
     }
-    final title = '${m['title'] ?? ''}'.trim();
-    return Grave(
-      id: 'kaddish-${m['id']}',
-      name: '${m['name'] ?? ''}'.trim(),
-      hebrewName: hebrewName,
-      birthYear: (m['birthYear'] as num?)?.toInt(),
-      deathYear: (m['deathYear'] as num?)?.toInt() ?? 0,
-      deathMonth: (m['deathMonth'] as num?)?.toInt(),
-      deathDay: (m['deathDay'] as num?)?.toInt(),
-      section: '${m['section'] ?? ''}'.trim(),
-      row: '${m['row'] ?? ''}'.trim(),
-      notes: title.isEmpty
-          ? const {}
-          : {'he': title, 'en': title, 'ru': title},
-      photoUrl: photoUrl,
-    );
+    return const [];
   }
 
   // ---------------------------------------------------------------------------
@@ -2152,7 +2134,11 @@ class AppRepository extends ChangeNotifier {
         'links': linksToJson(links),
         'events': [for (final e in events) eventToJson(e)],
         'orders': [for (final o in orders) orderToJson(o)],
-        if (_gravesEdited) 'graves': [for (final g in graves) graveToJson(g)],
+        if (_gravesEdited)
+          'graves': [
+            for (final g in graves)
+              if (!g.id.startsWith('kaddish-')) graveToJson(g),
+          ],
         'news': [for (final a in news) newsToJson(a)],
         'programs': [for (final p in programs) programToJson(p)],
         'products': [for (final p in products) productToJson(p)],
@@ -2280,10 +2266,20 @@ class AppRepository extends ChangeNotifier {
         ..addAll((m['orders'] as List).map(orderFromJson));
     }
     if (m['graves'] is List) {
-      _gravesEdited = true;
-      graves
-        ..clear()
-        ..addAll((m['graves'] as List).map(graveFromJson));
+      final loaded = [
+        for (final item in m['graves'] as List) graveFromJson(item),
+      ];
+      final custom =
+          loaded.where((g) => !g.id.startsWith('kaddish-')).toList();
+      if (custom.isNotEmpty) {
+        _gravesEdited = true;
+        final kaddish =
+            graves.where((g) => g.id.startsWith('kaddish-')).toList();
+        graves
+          ..clear()
+          ..addAll(kaddish)
+          ..addAll(custom);
+      }
     }
 
     final seq = (m['seq'] as num?)?.toInt();

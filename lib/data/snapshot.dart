@@ -551,6 +551,7 @@ Map<String, dynamic> graveToJson(Grave g) => {
       'row': g.row,
       'notes': locTo(g.notes),
       'photoUrl': g.photoUrl,
+      if (g.hebrewDeathLabel.isNotEmpty) 'hebrewDeathLabel': g.hebrewDeathLabel,
     };
 
 Grave graveFromJson(dynamic raw) {
@@ -567,6 +568,7 @@ Grave graveFromJson(dynamic raw) {
     row: '${m['row'] ?? ''}',
     notes: locFrom(m['notes']),
     photoUrl: '${m['photoUrl'] ?? ''}'.isEmpty ? null : '${m['photoUrl']}',
+    hebrewDeathLabel: '${m['hebrewDeathLabel'] ?? ''}',
   );
 }
 
