@@ -88,6 +88,12 @@ class _SiteShellState extends State<SiteShell> {
     if (oldWidget.currentRoute != widget.currentRoute) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scroll.hasClients) _scroll.jumpTo(0);
+        if (mounted && Scaffold.of(context).isDrawerOpen) {
+          Navigator.of(context).pop();
+        }
+        if (mounted && Scaffold.of(context).isEndDrawerOpen) {
+          Navigator.of(context).pop();
+        }
       });
     }
   }
@@ -119,7 +125,7 @@ class _SiteShellState extends State<SiteShell> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               widget.child,
-              const SizedBox(height: 40),
+              const SizedBox(height: 120),
               const _SiteFooter(),
             ],
           ),

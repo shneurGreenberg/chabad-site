@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
+import '../../services/links.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
-import '../../widgets/map_embed.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/playful_icons.dart';
 
@@ -167,15 +167,7 @@ class AboutPage extends StatelessWidget {
 
   Widget _map(BuildContext context, AppRepository repo, LocaleController loc) {
     final address = trLoc(repo.contact.address, loc.lang);
-    final key = repo.googleMapsApiKey.trim();
-    final url = key.isNotEmpty
-        ? googleMapsEmbedUrl(
-            apiKey: key,
-            lat: repo.location.latitude,
-            lon: repo.location.longitude,
-            address: address,
-          )
-        : osmEmbedUrl(repo.location.latitude, repo.location.longitude);
+    final googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=${repo.location.latitude},${repo.location.longitude}';
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Container(
@@ -184,37 +176,68 @@ class AboutPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
         ),
-        child: Stack(
-          children: [
-            Positioned.fill(child: MapEmbed(url: url)),
-            PositionedDirectional(
-              start: 16,
-              bottom: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10)
-                  ],
-                ),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  PlayfulIcon(Icons.place, color: AppColors.accent, size: 18),
-                  const SizedBox(width: 8),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 220),
-                    child: Text(
-                      address.isEmpty ? loc.t('about.address') : address,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+        child: InkWell(
+          onTap: () => openUrl(googleMapsUrl),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFFE0F2FE),
+                        AppColors.primary.withValues(alpha: 0.15),
+                      ],
                     ),
                   ),
-                ]),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      PlayfulIcon(Icons.map, color: AppColors.primary, size: 64),
+                      const SizedBox(height: 16),
+                      Text(
+                        loc.t('about.map'),
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+              PositionedDirectional(
+                start: 16,
+                bottom: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10)
+                    ],
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    PlayfulIcon(Icons.place, color: AppColors.accent, size: 18),
+                    const SizedBox(width: 8),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 220),
+                      child: Text(
+                        address.isEmpty ? loc.t('about.address') : address,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

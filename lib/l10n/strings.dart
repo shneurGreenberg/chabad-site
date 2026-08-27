@@ -346,6 +346,11 @@ const Map<String, Map<String, String>> _strings = {
   'store.books': {'he': 'ספרים', 'en': 'Books', 'ru': 'Книги'},
   'store.food': {'he': 'אוכל כשר', 'en': 'Kosher food', 'ru': 'Кошерная еда'},
   'store.addToCart': {'he': 'הוספה לסל', 'en': 'Add to cart', 'ru': 'В корзину'},
+  'store.contactForPrice': {
+    'he': 'צור קשר לתמחור',
+    'en': 'Contact for price',
+    'ru': 'Уточняйте цену'
+  },
   'store.cart': {'he': 'סל קניות', 'en': 'Cart', 'ru': 'Корзина'},
   'store.cart.empty': {
     'he': 'הסל ריק',
