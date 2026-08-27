@@ -134,66 +134,68 @@ class _GraveCard extends StatelessWidget {
     final subtitle = grave.hebrewName.isNotEmpty ? grave.name : '';
     final notes = trLoc(grave.notes, loc.lang);
     final death = grave.deathLabel;
-    return Card(
-      child: InkWell(
-        onTap: () => context.go('/cemetery/${grave.id}'),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _GravePhoto(url: grave.photoUrl),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 17)),
-                    if (subtitle.isNotEmpty)
-                      Text(subtitle,
-                          style: TextStyle(
-                              color: AppColors.muted, fontSize: 13)),
-                    if (grave.hebrewDeathLabel.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(grave.hebrewDeathLabel,
-                          style: TextStyle(
-                              color: AppColors.muted, fontSize: 13)),
-                    ],
-                    if (notes.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(notes,
-                          style: TextStyle(
+    return GestureDetector(
+      onTap: () => context.go('/cemetery/${grave.id}'),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _GravePhoto(url: grave.photoUrl),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 17)),
+                      if (subtitle.isNotEmpty)
+                        Text(subtitle,
+                            style: TextStyle(
+                                color: AppColors.muted, fontSize: 13)),
+                      if (grave.hebrewDeathLabel.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(grave.hebrewDeathLabel,
+                            style: TextStyle(
+                                color: AppColors.muted, fontSize: 13)),
+                      ],
+                      if (notes.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(notes,
+                            style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13)),
+                      ],
+                      const SizedBox(height: 10),
+                      Wrap(spacing: 8, runSpacing: 8, children: [
+                        if (grave.birthYear != null)
+                          Pill(
+                              '${loc.t('cemetery.born')} ${grave.birthYear}',
+                              color: const Color(0xFF0D9488)),
+                        if (death.isNotEmpty)
+                          Pill('${loc.t('cemetery.passed')} $death',
+                              color: const Color(0xFF64748B)),
+                        if (grave.section.isNotEmpty || grave.row.isNotEmpty)
+                          Pill(
+                              [
+                                if (grave.section.isNotEmpty)
+                                  '${loc.t('cemetery.section')} ${grave.section}',
+                                if (grave.row.isNotEmpty)
+                                  '${loc.t('cemetery.row')} ${grave.row}',
+                              ].join(' · '),
                               color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13)),
+                              icon: Icons.place_outlined),
+                      ]),
                     ],
-                    const SizedBox(height: 10),
-                    Wrap(spacing: 8, runSpacing: 8, children: [
-                      if (grave.birthYear != null)
-                        Pill(
-                            '${loc.t('cemetery.born')} ${grave.birthYear}',
-                            color: const Color(0xFF0D9488)),
-                      if (death.isNotEmpty)
-                        Pill('${loc.t('cemetery.passed')} $death',
-                            color: const Color(0xFF64748B)),
-                      if (grave.section.isNotEmpty || grave.row.isNotEmpty)
-                        Pill(
-                            [
-                              if (grave.section.isNotEmpty)
-                                '${loc.t('cemetery.section')} ${grave.section}',
-                              if (grave.row.isNotEmpty)
-                                '${loc.t('cemetery.row')} ${grave.row}',
-                            ].join(' · '),
-                            color: AppColors.primary,
-                            icon: Icons.place_outlined),
-                    ]),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
