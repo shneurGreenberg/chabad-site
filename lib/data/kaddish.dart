@@ -52,6 +52,27 @@ String photoUrlFromKaddish(String filename, dynamic crop) {
   return '$kaddishPhotoBase$name?${query.join('&')}';
 }
 
+/// Resolves a kaddish photo URL to a same-origin path for web deployment.
+/// During GitHub Pages deployment, photos are downloaded to kaddish-photos/.
+/// This function extracts the filename and returns the local path.
+String resolveKaddishPhotoUrl(String? url) {
+  final src = url?.trim() ?? '';
+  if (src.isEmpty) return '';
+  
+  // Extract filename from URLs like:
+  // - https://synagogue-kadish-shneur.amvera.io/photos/123.jpg?w=280
+  // - https://synagogue-kadish-shneur.amvera.io/photos/123.jpg
+  final uri = Uri.tryParse(src);
+  if (uri != null && uri.pathSegments.isNotEmpty) {
+    final filename = uri.pathSegments.last;
+    if (filename.isNotEmpty) {
+      return 'kaddish-photos/$filename';
+    }
+  }
+  
+  return src;
+}
+
 String hebrewDeathLabelFromKaddish(dynamic raw) {
   if (raw is String) return raw.trim();
   if (raw is Map) {

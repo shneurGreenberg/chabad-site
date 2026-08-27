@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../data/kaddish.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../services/web_prefs.dart';
@@ -99,20 +100,56 @@ class _CemeteryPageState extends State<CemeteryPage> {
           padTop: 16,
           child: graves.isEmpty
               ? const EmptyHint(icon: Icons.search_off)
-              : ResponsiveGrid(
+              : _LazyGraveGrid(
+                  graves: graves,
                   columns: gridColumns(context, max: 2),
-                  children: [
-                    for (final g in graves)
-                      HighlightAnchor(
-                        id: g.id,
-                        highlightId: widget.highlightId,
-                        child: _GraveCard(g),
-                      ),
-                  ],
+                  highlightId: widget.highlightId,
                 ),
         ),
       ],
     );
+  }
+}
+
+class _LazyGraveGrid extends StatelessWidget {
+  const _LazyGraveGrid({
+    required this.graves,
+    required this.columns,
+    this.highlightId,
+  });
+
+  final List<Grave> graves;
+  final int columns;
+  final String? highlightId;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      const spacing = 18.0;
+      final totalSpacing = spacing * (columns - 1);
+      final cellWidth = (constraints.maxWidth - totalSpacing) / columns;
+      final cellHeight = cellWidth * 0.65;
+
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columns,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
+          childAspectRatio: cellWidth / cellHeight,
+        ),
+        itemCount: graves.length,
+        itemBuilder: (context, index) {
+          final g = graves[index];
+          return HighlightAnchor(
+            id: g.id,
+            highlightId: highlightId,
+            child: _GraveCard(g),
+          );
+        },
+      );
+    });
   }
 }
 
@@ -212,10 +249,14 @@ class _GravePhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final src = url?.trim() ?? '';
     if (src.isEmpty) return _fallback();
+    
+    final localUrl = resolveKaddishPhotoUrl(src);
+    if (localUrl.isEmpty) return _fallback();
+    
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: CrossOriginImage(
-        url: src,
+        url: localUrl,
         width: 72,
         height: 96,
         fit: BoxFit.cover,
