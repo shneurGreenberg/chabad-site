@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import '../models.dart';
 import '../theme.dart';
 import '../util/youtube.dart';
@@ -918,24 +919,43 @@ class AppRepository extends ChangeNotifier {
   }
 
   /// Fetch full person details from the kaddish API, including biography.
+  /// Tries /api/people/:id first, then /api/board/person/:id.
+  /// CORS is allowed (Access-Control-Allow-Origin: *), so no proxy needed.
   Future<Grave?> fetchPersonDetail(String id) async {
     // Extract numeric ID from kaddish-XXX format
     final numericId = id.replaceFirst('kaddish-', '');
-    final url = '$kaddishPeopleApi/$numericId';
     
+    // Try /api/people/:id first
     try {
-      final res = await CorsProxy.getDirectOrProxy(url);
+      final peopleUrl = '$kaddishPeopleApi/$numericId';
+      final res = await http.get(Uri.parse(peopleUrl)).timeout(const Duration(seconds: 10));
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final json = jsonDecode(res.body);
-        if (json is Map<String, dynamic>) {
-          return graveFromKaddish(json);
+        final person = personFromApiResponse(json);
+        if (person != null) {
+          return graveFromKaddish(person);
         }
       }
     } catch (_) {
-      // API not available or error - return existing data
+      // Continue to board API fallback
     }
     
-    // Fallback to existing grave data
+    // Fallback to /api/board/person/:id
+    try {
+      final boardUrl = '$kaddishBoardPersonApi/$numericId';
+      final res = await http.get(Uri.parse(boardUrl)).timeout(const Duration(seconds: 10));
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final json = jsonDecode(res.body);
+        final person = personFromApiResponse(json);
+        if (person != null) {
+          return graveFromKaddish(person);
+        }
+      }
+    } catch (_) {
+      // API not available or error
+    }
+    
+    // Final fallback to existing grave data
     return graveById(id);
   }
 
