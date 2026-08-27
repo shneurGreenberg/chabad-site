@@ -919,16 +919,16 @@ class AppRepository extends ChangeNotifier {
   }
 
   /// Fetch full person details from the kaddish API, including biography.
-  /// Tries /api/people/:id first, then /api/board/person/:id.
+  /// Tries /api/board/person/:id first (live endpoint), then /api/people/:id as fallback.
   /// CORS is allowed (Access-Control-Allow-Origin: *), so no proxy needed.
   Future<Grave?> fetchPersonDetail(String id) async {
     // Extract numeric ID from kaddish-XXX format
     final numericId = id.replaceFirst('kaddish-', '');
     
-    // Try /api/people/:id first
+    // Try /api/board/person/:id first (live endpoint with biographies)
     try {
-      final peopleUrl = '$kaddishPeopleApi/$numericId';
-      final res = await http.get(Uri.parse(peopleUrl)).timeout(const Duration(seconds: 10));
+      final boardUrl = '$kaddishBoardPersonApi/$numericId';
+      final res = await http.get(Uri.parse(boardUrl)).timeout(const Duration(seconds: 10));
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final json = jsonDecode(res.body);
         final person = personFromApiResponse(json);
@@ -937,13 +937,13 @@ class AppRepository extends ChangeNotifier {
         }
       }
     } catch (_) {
-      // Continue to board API fallback
+      // Continue to people API fallback
     }
     
-    // Fallback to /api/board/person/:id
+    // Fallback to /api/people/:id (currently 404, will be available later)
     try {
-      final boardUrl = '$kaddishBoardPersonApi/$numericId';
-      final res = await http.get(Uri.parse(boardUrl)).timeout(const Duration(seconds: 10));
+      final peopleUrl = '$kaddishPeopleApi/$numericId';
+      final res = await http.get(Uri.parse(peopleUrl)).timeout(const Duration(seconds: 10));
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final json = jsonDecode(res.body);
         final person = personFromApiResponse(json);

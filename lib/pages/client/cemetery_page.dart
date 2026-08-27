@@ -338,18 +338,26 @@ class _CemeteryPersonPageState extends State<CemeteryPersonPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_person!.photoUrl != null &&
-                      _person!.photoUrl!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: CrossOriginImage(
-                        url: _person!.photoUrl!,
-                        width: 160,
-                        height: 210,
-                        fit: BoxFit.cover,
-                        error: _photoFallback(160, 210),
-                      ),
-                    )
-                  else
+                      _person!.photoUrl!.isNotEmpty) ...[
+                    Builder(
+                      builder: (context) {
+                        final sameOriginUrl = resolveKaddishPhotoUrl(_person!.photoUrl);
+                        if (sameOriginUrl != null && sameOriginUrl.isNotEmpty) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: CrossOriginImage(
+                              url: sameOriginUrl,
+                              width: 160,
+                              height: 210,
+                              fit: BoxFit.cover,
+                              error: _photoFallback(160, 210),
+                            ),
+                          );
+                        }
+                        return _photoFallback(160, 210);
+                      },
+                    ),
+                  ] else
                     _photoFallback(160, 210),
                   const SizedBox(width: 24),
                   Expanded(
