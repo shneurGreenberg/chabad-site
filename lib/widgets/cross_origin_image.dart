@@ -1,10 +1,12 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../services/cors_proxy.dart';
 
 /// Remote photo that still shows when the host does not send CORS headers.
-class CrossOriginImage extends StatefulWidget {
+///
+/// Uses native HTML <img> elements (via webHtmlElementStrategy.prefer) which
+/// can display cross-origin images without CORS headers. CORS is only required
+/// when reading pixel data (e.g. canvas); browsers allow <img> display without it.
+/// The LTR directionality wrapper fixes HtmlElementView coordinate issues under RTL.
+class CrossOriginImage extends StatelessWidget {
   const CrossOriginImage({
     super.key,
     required this.url,
@@ -23,101 +25,21 @@ class CrossOriginImage extends StatefulWidget {
   final Widget? error;
 
   @override
-  State<CrossOriginImage> createState() => _CrossOriginImageState();
-}
-
-class _CrossOriginImageState extends State<CrossOriginImage> {
-  Uint8List? _imageBytes;
-  bool _loading = true;
-  bool _failed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImage();
-  }
-
-  @override
-  void didUpdateWidget(CrossOriginImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.url != widget.url) {
-      setState(() {
-        _imageBytes = null;
-        _loading = true;
-        _failed = false;
-      });
-      _loadImage();
-    }
-  }
-
-  Future<void> _loadImage() async {
-    final url = widget.url.trim();
-    if (url.isEmpty) {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-          _failed = true;
-        });
-      }
-      return;
-    }
-
-    try {
-      http.Response res;
-      if (url.contains('synagogue-kadish-shneur.amvera.io/photos/')) {
-        res = await CorsProxy.getDirectOrProxy(url);
-      } else {
-        res = await http.get(Uri.parse(url));
-      }
-
-      if (res.statusCode >= 200 && res.statusCode < 300 && mounted) {
-        setState(() {
-          _imageBytes = res.bodyBytes;
-          _loading = false;
-          _failed = false;
-        });
-      } else if (mounted) {
-        setState(() {
-          _loading = false;
-          _failed = true;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-          _failed = true;
-        });
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // HtmlElementView coordinates break under RTL; keep the overlay LTR.
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: _loading
-          ? SizedBox(
-              width: widget.width,
-              height: widget.height,
-              child: const Center(
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            )
-          : _failed || _imageBytes == null
-              ? (widget.error ?? const SizedBox.shrink())
-              : Image.memory(
-                  _imageBytes!,
-                  width: widget.width,
-                  height: widget.height,
-                  fit: widget.fit,
-                  alignment: widget.alignment,
-                  filterQuality: FilterQuality.medium,
-                ),
+      child: Image.network(
+        url,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        filterQuality: FilterQuality.medium,
+        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+        errorBuilder: (_, error, stackTrace) =>
+            this.error ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
