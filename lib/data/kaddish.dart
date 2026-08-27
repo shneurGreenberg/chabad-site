@@ -4,6 +4,7 @@ import '../models.dart';
 const kaddishHost = 'https://synagogue-kadish-shneur.amvera.io';
 const kaddishPeopleApi = '$kaddishHost/s/novosibirsk/api/people';
 const kaddishBoardApi = '$kaddishHost/s/novosibirsk/api/board';
+const kaddishBoardPersonApi = '$kaddishHost/s/novosibirsk/api/board/person';
 const kaddishPhotoBase = '$kaddishHost/photos/';
 
 /// Files that exist on the photo host even when the board record has no photo.
@@ -81,6 +82,20 @@ String hebrewDeathLabelFromKaddish(dynamic raw) {
   return '';
 }
 
+/// Parse person from API response, handling both wrapped {person: {...}} and bare object.
+Map<String, dynamic>? personFromApiResponse(dynamic raw) {
+  if (raw is Map<String, dynamic>) {
+    // Try wrapped format first: {person: {...}}
+    final person = raw['person'];
+    if (person is Map<String, dynamic>) {
+      return person;
+    }
+    // Otherwise treat the response itself as the person object
+    return raw;
+  }
+  return null;
+}
+
 Grave graveFromKaddish(Map<String, dynamic> m) {
   final idRaw = m['id'];
   final id = idRaw == null ? '' : '$idRaw';
@@ -119,6 +134,7 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
   }
 
   final title = '${m['title'] ?? ''}'.trim();
+  final bioText = '${m['text'] ?? ''}'.trim();
   return Grave(
     id: 'kaddish-$id',
     name: '${m['name'] ?? ''}'.trim(),
@@ -132,6 +148,7 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
     notes: title.isEmpty ? const {} : {'he': title, 'en': title, 'ru': title},
     photoUrl: photoUrl,
     hebrewDeathLabel: hebrewDeathLabelFromKaddish(m['hebrewDateOfDeath']),
+    biographyHtml: bioText.isEmpty ? null : bioText,
   );
 }
 

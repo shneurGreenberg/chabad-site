@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import '../models.dart';
 import '../theme.dart';
 import '../util/youtube.dart';
@@ -908,6 +909,55 @@ class AppRepository extends ChangeNotifier {
   late final List<Grave> graves = [];
 
   Future<void> refreshKaddishGraves() => _loadKaddishGraves();
+
+  Grave? graveById(String id) {
+    try {
+      return graves.firstWhere((g) => g.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Fetch full person details from the kaddish API, including biography.
+  /// Tries /api/board/person/:id first (live endpoint), then /api/people/:id as fallback.
+  /// CORS is allowed (Access-Control-Allow-Origin: *), so no proxy needed.
+  Future<Grave?> fetchPersonDetail(String id) async {
+    // Extract numeric ID from kaddish-XXX format
+    final numericId = id.replaceFirst('kaddish-', '');
+    
+    // Try /api/board/person/:id first (live endpoint with biographies)
+    try {
+      final boardUrl = '$kaddishBoardPersonApi/$numericId';
+      final res = await http.get(Uri.parse(boardUrl)).timeout(const Duration(seconds: 10));
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final json = jsonDecode(res.body);
+        final person = personFromApiResponse(json);
+        if (person != null) {
+          return graveFromKaddish(person);
+        }
+      }
+    } catch (_) {
+      // Continue to people API fallback
+    }
+    
+    // Fallback to /api/people/:id (currently 404, will be available later)
+    try {
+      final peopleUrl = '$kaddishPeopleApi/$numericId';
+      final res = await http.get(Uri.parse(peopleUrl)).timeout(const Duration(seconds: 10));
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final json = jsonDecode(res.body);
+        final person = personFromApiResponse(json);
+        if (person != null) {
+          return graveFromKaddish(person);
+        }
+      }
+    } catch (_) {
+      // API not available or error
+    }
+    
+    // Final fallback to existing grave data
+    return graveById(id);
+  }
 
   Future<void> _loadKaddishGraves() async {
     final bundled = await _loadBundledKaddishGraves();

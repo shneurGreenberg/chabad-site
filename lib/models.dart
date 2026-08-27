@@ -257,6 +257,7 @@ class Grave {
     this.deathMonth,
     this.deathDay,
     this.hebrewDeathLabel = '',
+    this.biographyHtml,
   });
   final String id;
   String name;
@@ -270,6 +271,7 @@ class Grave {
   Loc notes;
   String? photoUrl;
   String hebrewDeathLabel;
+  String? biographyHtml;
 
   String get deathLabel {
     if (deathYear <= 0) return '';
