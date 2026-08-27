@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 /// Uses native HTML <img> elements (via webHtmlElementStrategy.prefer) which
 /// can display cross-origin images without CORS headers. CORS is only required
 /// when reading pixel data (e.g. canvas); browsers allow <img> display without it.
-/// The LTR directionality wrapper fixes HtmlElementView coordinate issues under RTL.
+///
+/// Uses Stack + Positioned.fill to fix HtmlElementView RTL positioning bug where
+/// platform views are positioned off-screen to the right in RTL contexts.
 class CrossOriginImage extends StatelessWidget {
   const CrossOriginImage({
     super.key,
@@ -26,19 +28,32 @@ class CrossOriginImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // HtmlElementView coordinates break under RTL; keep the overlay LTR.
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Image.network(
-        url,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        filterQuality: FilterQuality.medium,
-        webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-        errorBuilder: (_, error, stackTrace) =>
-            this.error ?? const SizedBox.shrink(),
+    // Stack with fallback as base and image overlay fixes RTL positioning.
+    // Positioned.fill forces the HtmlElementView to fill the Stack's box
+    // rather than using global screen coordinates.
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Show error widget as base layer (fallback if image fails)
+          if (error != null) error!,
+          // Overlay the actual image with explicit LTR + Positioned.fill
+          Positioned.fill(
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: Image.network(
+                url,
+                fit: fit,
+                alignment: alignment,
+                filterQuality: FilterQuality.medium,
+                webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
+                errorBuilder: (_, err, stack) => const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
