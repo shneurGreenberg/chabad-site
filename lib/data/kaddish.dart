@@ -119,6 +119,7 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
   }
 
   final title = '${m['title'] ?? ''}'.trim();
+  final bioText = '${m['text'] ?? ''}'.trim();
   return Grave(
     id: 'kaddish-$id',
     name: '${m['name'] ?? ''}'.trim(),
@@ -132,6 +133,7 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
     notes: title.isEmpty ? const {} : {'he': title, 'en': title, 'ru': title},
     photoUrl: photoUrl,
     hebrewDeathLabel: hebrewDeathLabelFromKaddish(m['hebrewDateOfDeath']),
+    biographyHtml: bioText.isEmpty ? null : bioText,
   );
 }
 

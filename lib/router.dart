@@ -69,6 +69,13 @@ final appRouter = GoRouter(
         ),
         _route('/events', (_) => const EventsPage()),
         _route('/cemetery', (s) => CemeteryPage(highlightId: _h(s))),
+        GoRoute(
+          path: '/cemetery/:id',
+          pageBuilder: (context, state) => NoTransitionPage<void>(
+            key: state.pageKey,
+            child: CemeteryPersonPage(id: state.pathParameters['id'] ?? ''),
+          ),
+        ),
         _route('/famous', (s) => FamousPage(highlightId: _h(s))),
         _route('/history', (_) => const HistoryPage()),
         _route('/store', (s) => StorePage(highlightId: _h(s))),

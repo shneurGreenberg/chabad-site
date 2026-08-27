@@ -909,6 +909,36 @@ class AppRepository extends ChangeNotifier {
 
   Future<void> refreshKaddishGraves() => _loadKaddishGraves();
 
+  Grave? graveById(String id) {
+    try {
+      return graves.firstWhere((g) => g.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Fetch full person details from the kaddish API, including biography.
+  Future<Grave?> fetchPersonDetail(String id) async {
+    // Extract numeric ID from kaddish-XXX format
+    final numericId = id.replaceFirst('kaddish-', '');
+    final url = '$kaddishPeopleApi/$numericId';
+    
+    try {
+      final res = await CorsProxy.getDirectOrProxy(url);
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final json = jsonDecode(res.body);
+        if (json is Map<String, dynamic>) {
+          return graveFromKaddish(json);
+        }
+      }
+    } catch (_) {
+      // API not available or error - return existing data
+    }
+    
+    // Fallback to existing grave data
+    return graveById(id);
+  }
+
   Future<void> _loadKaddishGraves() async {
     final bundled = await _loadBundledKaddishGraves();
     if (bundled.isNotEmpty) {
