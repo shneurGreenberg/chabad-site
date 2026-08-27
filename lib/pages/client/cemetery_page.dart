@@ -100,56 +100,23 @@ class _CemeteryPageState extends State<CemeteryPage> {
           padTop: 16,
           child: graves.isEmpty
               ? const EmptyHint(icon: Icons.search_off)
-              : _LazyGraveGrid(
-                  graves: graves,
+              : ResponsiveGrid(
                   columns: gridColumns(context, max: 2),
-                  highlightId: widget.highlightId,
+                  // Note: GridView.builder(shrinkWrap: true, physics: NeverScrollableScrollPhysics())
+                  // would still build all cells to measure extent (not virtualized).
+                  // ResponsiveGrid is simpler. Real perf win is removing HtmlElementView.
+                  children: [
+                    for (final g in graves)
+                      HighlightAnchor(
+                        id: g.id,
+                        highlightId: widget.highlightId,
+                        child: _GraveCard(g),
+                      ),
+                  ],
                 ),
         ),
       ],
     );
-  }
-}
-
-class _LazyGraveGrid extends StatelessWidget {
-  const _LazyGraveGrid({
-    required this.graves,
-    required this.columns,
-    this.highlightId,
-  });
-
-  final List<Grave> graves;
-  final int columns;
-  final String? highlightId;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      const spacing = 18.0;
-      final totalSpacing = spacing * (columns - 1);
-      final cellWidth = (constraints.maxWidth - totalSpacing) / columns;
-      final cellHeight = cellWidth * 0.65;
-
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: columns,
-          crossAxisSpacing: spacing,
-          mainAxisSpacing: spacing,
-          childAspectRatio: cellWidth / cellHeight,
-        ),
-        itemCount: graves.length,
-        itemBuilder: (context, index) {
-          final g = graves[index];
-          return HighlightAnchor(
-            id: g.id,
-            highlightId: highlightId,
-            child: _GraveCard(g),
-          );
-        },
-      );
-    });
   }
 }
 
