@@ -4,6 +4,7 @@ import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../services/links.dart';
+import '../../services/web_prefs.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
