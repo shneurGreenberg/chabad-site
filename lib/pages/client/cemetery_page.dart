@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../data/kaddish.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../services/web_prefs.dart';
@@ -101,6 +102,9 @@ class _CemeteryPageState extends State<CemeteryPage> {
               ? const EmptyHint(icon: Icons.search_off)
               : ResponsiveGrid(
                   columns: gridColumns(context, max: 2),
+                  // Note: GridView.builder(shrinkWrap: true, physics: NeverScrollableScrollPhysics())
+                  // would still build all cells to measure extent (not virtualized).
+                  // ResponsiveGrid is simpler. Real perf win is removing HtmlElementView.
                   children: [
                     for (final g in graves)
                       HighlightAnchor(
@@ -212,10 +216,14 @@ class _GravePhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final src = url?.trim() ?? '';
     if (src.isEmpty) return _fallback();
+    
+    final localUrl = resolveKaddishPhotoUrl(src);
+    if (localUrl.isEmpty) return _fallback();
+    
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: CrossOriginImage(
-        url: src,
+        url: localUrl,
         width: 72,
         height: 96,
         fit: BoxFit.cover,

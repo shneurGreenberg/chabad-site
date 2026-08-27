@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Remote photo that still shows when the host does not send CORS headers.
-///
-/// Uses native HTML <img> elements (via webHtmlElementStrategy.prefer) which
-/// can display cross-origin images without CORS headers. CORS is only required
-/// when reading pixel data (e.g. canvas); browsers allow <img> display without it.
-///
-/// Uses Stack + Positioned.fill to fix HtmlElementView RTL positioning bug where
-/// platform views are positioned off-screen to the right in RTL contexts.
+/// Remote photo optimized for canvas rendering on web.
 class CrossOriginImage extends StatelessWidget {
   const CrossOriginImage({
     super.key,
@@ -28,33 +21,21 @@ class CrossOriginImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Stack with fallback as base and image overlay fixes RTL positioning.
-    // Positioned.fill forces the HtmlElementView to fill the Stack's box
-    // rather than using global screen coordinates.
-    return SizedBox(
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final cacheW = width != null ? (width! * dpr * 2).round() : null;
+    final cacheH = height != null ? (height! * dpr * 2).round() : null;
+    
+    return Image.network(
+      url,
       width: width,
       height: height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Show error widget as base layer (fallback if image fails)
-          if (error != null) error!,
-          // Overlay the actual image with explicit LTR + Positioned.fill
-          Positioned.fill(
-            child: Directionality(
-              textDirection: TextDirection.ltr,
-              child: Image.network(
-                url,
-                fit: fit,
-                alignment: alignment,
-                filterQuality: FilterQuality.medium,
-                webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
-                errorBuilder: (_, err, stack) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-        ],
-      ),
+      fit: fit,
+      alignment: alignment,
+      filterQuality: FilterQuality.medium,
+      cacheWidth: cacheW,
+      cacheHeight: cacheH,
+      errorBuilder: (_, error, stackTrace) =>
+          this.error ?? const SizedBox.shrink(),
     );
   }
 }

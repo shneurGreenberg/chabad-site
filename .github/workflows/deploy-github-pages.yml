@@ -34,6 +34,25 @@ jobs:
       - name: Build web
         run: flutter build web --release --base-href /chabad-site/ --no-tree-shake-icons --no-wasm-dry-run
 
+      - name: Download kaddish cemetery photos
+        run: |
+          mkdir -p build/web/kaddish-photos
+          curl -fsSL https://synagogue-kadish-shneur.amvera.io/s/novosibirsk/api/board -o /tmp/board.json
+          echo "Downloading cemetery photos..."
+          cat /tmp/board.json | jq -r '.people[] | select(.photo != null and .photo != "") | .photo' | while read -r filename; do
+            if [ ! -z "$filename" ]; then
+              url="https://synagogue-kadish-shneur.amvera.io/photos/${filename}?w=280"
+              echo "Downloading: $url"
+              curl -fsSL -o "build/web/kaddish-photos/${filename}" "$url" --max-time 10 || echo "Failed to download $filename, skipping"
+            fi
+          done
+          PHOTO_COUNT=$(ls -1 build/web/kaddish-photos 2>/dev/null | wc -l)
+          echo "Downloaded $PHOTO_COUNT photos"
+          if [ "$PHOTO_COUNT" -eq 0 ]; then
+            echo "ERROR: No photos downloaded. Failing to prevent empty deployment."
+            exit 1
+          fi
+
       - name: GitHub Pages SPA fallback
         run: cp build/web/index.html build/web/404.html
 
