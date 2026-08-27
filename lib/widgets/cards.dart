@@ -176,6 +176,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.read<AppRepository>();
+    final hasPrice = product.price > 0;
     return HoverLift(
       child: Card(
       child: Column(
@@ -204,30 +205,38 @@ class ProductCard extends StatelessWidget {
                     style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
                 const SizedBox(height: 10),
                 Row(children: [
-                  Text('\$${product.price.toStringAsFixed(0)}',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 18,
-                          color: AppColors.primary)),
+                  if (hasPrice)
+                    Text('₽${product.price.toStringAsFixed(0)}',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                            color: AppColors.primary))
+                  else
+                    Text(loc.t('store.contactForPrice'),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.muted)),
                   const Spacer(),
-                  Tooltip(
-                    message: loc.t('store.addToCart'),
-                    child: FilledButton(
-                      onPressed: () {
-                        repo.addToCart(product.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(trLoc(product.name, loc.lang)),
-                            duration: const Duration(milliseconds: 900),
-                          ),
-                        );
-                      },
-                      style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10)),
-                      child: const PlayfulIcon(Icons.add_shopping_cart, size: 18),
-                    ).hoverLift(scale: 1.05),
-                  ),
+                  if (hasPrice)
+                    Tooltip(
+                      message: loc.t('store.addToCart'),
+                      child: FilledButton(
+                        onPressed: () {
+                          repo.addToCart(product.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(trLoc(product.name, loc.lang)),
+                              duration: const Duration(milliseconds: 900),
+                            ),
+                          );
+                        },
+                        style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10)),
+                        child: const PlayfulIcon(Icons.add_shopping_cart, size: 18),
+                      ).hoverLift(scale: 1.05),
+                    ),
                 ]),
               ],
             ),

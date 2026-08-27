@@ -2,12 +2,14 @@
 
 A community website for a Chabad house, built with **Flutter (web)**, featuring a
 public **client side** and an **admin side**, in **three languages** (Hebrew /
-English / Russian) with full RTL support. All content is currently **mock data**
-and is meant to be wired to a real backend / external CRM later.
+English / Russian) with full RTL support. The site is live at 
+[shneurgreenberg.github.io/chabad-site](https://shneurgreenberg.github.io/chabad-site/)
+and includes real Firebase backend integration for content management.
 
 אתר קהילתי לבית חב״ד, בנוי ב־**Flutter (web)**, עם **צד לקוח** ציבורי ו־**צד מנהל**,
-ב־**שלוש שפות** (עברית / אנגלית / רוסית) ותמיכה מלאה ב־RTL. כל התוכן כרגע
-**נתוני דמה** ומיועד לחיבור מאוחר יותר לשרת / מערכת CRM חיצונית.
+ב־**שלוש שפות** (עברית / אנגלית / רוסית) ותמיכה מלאה ב־RTL. האתר חי באתר 
+[shneurgreenberg.github.io/chabad-site](https://shneurgreenberg.github.io/chabad-site/)
+וכולל אינטגרציה אמיתית עם Firebase לניהול תוכן.
 
 ---
 
@@ -31,14 +33,9 @@ To run the app in a web browser you also need **Google Chrome** installed.
 ### 2. Get the code / הורדת הקוד
 
 ```bash
-git clone https://github.com/shneurGreenberg/flutter.git
-cd flutter
-# The app currently lives on this branch (until the PR is merged into main):
-git checkout cursor/setup-flutter-dev-environment-cee0
+git clone https://github.com/shneurgreenberg/chabad-site.git
+cd chabad-site
 ```
-
-> After the PR is merged into `main`, you can skip the `git checkout` step.
-> אחרי שתמזג את ה־PR ל־`main`, אפשר לדלג על שורת ה־`git checkout`.
 
 ### 3. Install dependencies / התקנת תלויות
 
@@ -68,9 +65,9 @@ Press `r` for hot reload, `R` for hot restart, `q` to quit.
 ### Admin side / צד המנהל
 
 Open the admin area at `/#/admin` (e.g. `http://localhost:8080/#/admin`).
-Login is a demo — **any email and password work**.
+Login with Firebase authentication or use the demo PIN if configured.
 
-נכנסים לאזור הניהול בכתובת `/#/admin`. ההתחברות היא הדגמה — **כל אימייל וסיסמה יתקבלו**.
+נכנסים לאזור הניהול בכתובת `/#/admin`. התחברות עם Firebase או PIN הדגמה אם מוגדר.
 
 ---
 

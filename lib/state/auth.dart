@@ -51,7 +51,7 @@ class AuthController extends ChangeNotifier {
         .map((e) => e.trim().toLowerCase())
         .where((e) => e.contains('@'))
         .toSet();
-    if (allow.isEmpty) return true;
+    if (allow.isEmpty) return false;
     return allow.contains(email);
   }
 

@@ -80,6 +80,7 @@ class _CemeteryPageState extends State<CemeteryPage> {
               ).hoverLift(),
               const SizedBox(height: 8),
               TextField(
+                autofocus: true,
                 decoration: InputDecoration(
                   prefixIcon: const PlayfulIcon(Icons.search),
                   hintText: loc.t('cemetery.search'),
