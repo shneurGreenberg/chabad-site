@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
-/// Custom WhatsApp logo painter — phone-in-speech-bubble glyph
+/// WhatsApp logo - simplified official mark (phone in speech bubble)
 class WhatsAppIcon extends StatelessWidget {
   const WhatsAppIcon({super.key, this.size = 24, this.color = Colors.white});
 
@@ -11,76 +12,63 @@ class WhatsAppIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size(size, size),
-      painter: _WhatsAppPainter(color),
+      painter: _WhatsAppIconPainter(color),
     );
   }
 }
 
-class _WhatsAppPainter extends CustomPainter {
-  _WhatsAppPainter(this.color);
+class _WhatsAppIconPainter extends CustomPainter {
+  _WhatsAppIconPainter(this.color);
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final scale = size.width / 308;
+    canvas.scale(scale);
+
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill
       ..isAntiAlias = true;
 
-    final w = size.width;
-    final h = size.height;
-    final cx = w / 2;
-    final cy = h / 2;
-
-    // Speech bubble outline circle
-    final outerRadius = w * 0.46;
-    final path = Path();
-    
-    // Main circle (speech bubble)
-    path.addOval(Rect.fromCircle(center: Offset(cx, cy * 0.92), radius: outerRadius));
-    
-    // Tail of speech bubble (bottom-left)
-    path.moveTo(cx - outerRadius * 0.5, cy + outerRadius * 0.65);
-    path.lineTo(cx - outerRadius * 0.85, cy + outerRadius * 1.15);
-    path.lineTo(cx - outerRadius * 0.25, cy + outerRadius * 0.85);
-    path.close();
+    // Official WhatsApp SVG path (simplified from Font Awesome / brand assets)
+    // This is the recognizable phone-in-circle logo
+    final path = ui.Path()
+      // Outer circle (chat bubble)
+      ..moveTo(154, 0)
+      ..cubicTo(238, 0, 308, 70, 308, 154)
+      ..cubicTo(308, 238, 238, 308, 154, 308)
+      ..cubicTo(123, 308, 94, 299, 69, 284)
+      ..lineTo(0, 308)
+      ..lineTo(24, 241)
+      ..cubicTo(9, 216, 0, 186, 0, 154)
+      ..cubicTo(0, 70, 70, 0, 154, 0)
+      ..close()
+      // Phone handset (inner path)
+      ..moveTo(225, 180)
+      ..cubicTo(223, 185, 214, 192, 209, 193)
+      ..cubicTo(204, 194, 201, 194, 180, 183)
+      ..cubicTo(159, 172, 142, 155, 131, 134)
+      ..cubicTo(120, 113, 120, 110, 121, 105)
+      ..cubicTo(122, 100, 129, 91, 134, 89)
+      ..cubicTo(139, 87, 142, 87, 144, 91)
+      ..lineTo(152, 107)
+      ..cubicTo(154, 111, 154, 114, 152, 116)
+      ..cubicTo(150, 118, 147, 121, 145, 123)
+      ..cubicTo(143, 125, 143, 128, 145, 131)
+      ..cubicTo(149, 139, 155, 147, 163, 153)
+      ..cubicTo(171, 159, 179, 165, 187, 169)
+      ..cubicTo(190, 171, 193, 171, 195, 169)
+      ..cubicTo(197, 167, 200, 164, 202, 162)
+      ..cubicTo(204, 160, 207, 160, 211, 162)
+      ..lineTo(227, 170)
+      ..cubicTo(231, 172, 227, 175, 225, 180)
+      ..close();
 
     canvas.drawPath(path, paint);
-
-    // Phone handset inside the bubble
-    final phonePaint = Paint()
-      ..color = Color(0xFF25D366) // WhatsApp green background shows through
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.08
-      ..strokeCap = StrokeCap.round
-      ..isAntiAlias = true;
-
-    // Draw the classic phone receiver curve
-    final phonePath = Path();
-    final phoneStartX = cx - w * 0.18;
-    final phoneStartY = cy - h * 0.08;
-    final phoneEndX = cx + w * 0.18;
-    final phoneEndY = cy + h * 0.08;
-    
-    phonePath.moveTo(phoneStartX, phoneStartY);
-    phonePath.cubicTo(
-      phoneStartX + w * 0.08, phoneStartY - h * 0.12,
-      phoneEndX - w * 0.08, phoneEndY + h * 0.12,
-      phoneEndX, phoneEndY,
-    );
-
-    // Fill background where phone will be drawn (create cutout effect)
-    final phoneErasePaint = Paint()
-      ..color = Color(0xFF25D366)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.15
-      ..strokeCap = StrokeCap.round
-      ..isAntiAlias = true;
-    
-    canvas.drawPath(phonePath, phoneErasePaint);
-    canvas.drawPath(phonePath, phonePaint..color = color);
   }
 
   @override
-  bool shouldRepaint(_WhatsAppPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(_WhatsAppIconPainter oldDelegate) => 
+      oldDelegate.color != color;
 }
