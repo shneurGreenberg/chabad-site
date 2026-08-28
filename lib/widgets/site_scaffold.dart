@@ -15,6 +15,7 @@ import 'hover.dart';
 import 'playful_icons.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
+import 'whatsapp_icon.dart';
 
 class NavItem {
   const NavItem(this.route, this.labelKey, this.icon);
@@ -822,7 +823,17 @@ class _SiteFooter extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(children: [
                         for (final s in repo.links.publicItems())
-                          HoverScale(child: _social(s.icon, s.url)),
+                          HoverScale(
+                            child: s.labelKey == 'social.whatsapp'
+                                ? _socialWhatsApp(s.url)
+                                : _social(s.icon, s.url),
+                          ),
+                        // If WhatsApp not in links but contact.phone can form wa.me URL
+                        if (repo.links.whatsapp.trim().isEmpty &&
+                            waMeUrl(repo.contact.phone) != null)
+                          HoverScale(
+                            child: _socialWhatsApp(waMeUrl(repo.contact.phone)!),
+                          ),
                       ]),
                     ],
                   ),
@@ -888,6 +899,23 @@ class _SiteFooter extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: PlayfulIcon(icon, color: Colors.white, size: 18),
+          ),
+        ),
+      );
+
+  Widget _socialWhatsApp(String url) => Padding(
+        padding: const EdgeInsetsDirectional.only(end: 8),
+        child: InkWell(
+          onTap: () => openUrl(url),
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const WhatsAppIcon(size: 18, color: Colors.white),
           ),
         ),
       );
@@ -986,7 +1014,7 @@ class _FloatContact extends StatelessWidget {
             foregroundColor: Colors.white,
             tooltip: loc.t('social.whatsapp'),
             onPressed: () => openUrl(wa),
-            child: const PlayfulIcon(Icons.chat, color: Colors.white),
+            child: const WhatsAppIcon(size: 26, color: Colors.white),
           ),
         if (wa != null && tel != null) const SizedBox(height: 10),
         if (tel != null)

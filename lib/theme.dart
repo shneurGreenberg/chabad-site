@@ -271,6 +271,7 @@ ThemeData buildAppTheme([SitePalette? palette]) {
     colorScheme: scheme,
     scaffoldBackgroundColor: p.surface,
     fontFamily: 'Heebo',
+    fontFamilyFallback: const ['Rubik'],
   );
 
   return base.copyWith(
