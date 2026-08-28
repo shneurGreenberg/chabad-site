@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'models.dart';
 
@@ -265,13 +266,16 @@ ThemeData buildAppTheme([SitePalette? palette]) {
     outline: p.muted,
   );
 
+  // Load Rubik for Cyrillic fallback (google_fonts registers it with CanvasKit)
+  final rubikFamily = GoogleFonts.rubik().fontFamily;
+  final fontFallback = rubikFamily != null ? [rubikFamily] : <String>[];
+
   final base = ThemeData(
     useMaterial3: true,
     brightness: brightness,
     colorScheme: scheme,
     scaffoldBackgroundColor: p.surface,
-    fontFamily: 'Heebo',
-    fontFamilyFallback: const ['Rubik'],
+    textTheme: GoogleFonts.heeboTextTheme(),
   );
 
   return base.copyWith(
@@ -389,23 +393,50 @@ ThemeData buildAppTheme([SitePalette? palette]) {
       displaySmall: base.textTheme.displaySmall?.copyWith(
         fontWeight: FontWeight.w800,
         color: p.ink,
+        fontFamilyFallback: fontFallback,
       ),
       headlineMedium: base.textTheme.headlineMedium?.copyWith(
         fontWeight: FontWeight.w800,
         color: p.ink,
+        fontFamilyFallback: fontFallback,
       ),
       titleLarge: base.textTheme.titleLarge?.copyWith(
         fontWeight: FontWeight.w700,
         color: p.ink,
+        fontFamilyFallback: fontFallback,
       ),
-      titleMedium: base.textTheme.titleMedium?.copyWith(color: p.ink),
-      titleSmall: base.textTheme.titleSmall?.copyWith(color: p.ink),
-      bodyMedium: base.textTheme.bodyMedium?.copyWith(color: p.ink),
-      bodyLarge: base.textTheme.bodyLarge?.copyWith(color: p.ink),
-      bodySmall: base.textTheme.bodySmall?.copyWith(color: p.muted),
-      labelLarge: base.textTheme.labelLarge?.copyWith(color: p.ink),
-      labelMedium: base.textTheme.labelMedium?.copyWith(color: p.muted),
-      labelSmall: base.textTheme.labelSmall?.copyWith(color: p.muted),
+      titleMedium: base.textTheme.titleMedium?.copyWith(
+        color: p.ink,
+        fontFamilyFallback: fontFallback,
+      ),
+      titleSmall: base.textTheme.titleSmall?.copyWith(
+        color: p.ink,
+        fontFamilyFallback: fontFallback,
+      ),
+      bodyMedium: base.textTheme.bodyMedium?.copyWith(
+        color: p.ink,
+        fontFamilyFallback: fontFallback,
+      ),
+      bodyLarge: base.textTheme.bodyLarge?.copyWith(
+        color: p.ink,
+        fontFamilyFallback: fontFallback,
+      ),
+      bodySmall: base.textTheme.bodySmall?.copyWith(
+        color: p.muted,
+        fontFamilyFallback: fontFallback,
+      ),
+      labelLarge: base.textTheme.labelLarge?.copyWith(
+        color: p.ink,
+        fontFamilyFallback: fontFallback,
+      ),
+      labelMedium: base.textTheme.labelMedium?.copyWith(
+        color: p.muted,
+        fontFamilyFallback: fontFallback,
+      ),
+      labelSmall: base.textTheme.labelSmall?.copyWith(
+        color: p.muted,
+        fontFamilyFallback: fontFallback,
+      ),
     ),
     pageTransitionsTheme: PageTransitionsTheme(
       builders: {
