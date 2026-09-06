@@ -15,6 +15,59 @@ class TouristPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
+    
+    // Safe access to touristInfo with null check
+    final touristInfo = repo.touristInfo;
+    final hasTouristInfo = touristInfo.isNotEmpty;
+    
+    final sections = [
+      _buildSection(
+        context,
+        TouristCategory.synagogue,
+        loc.t('tourist.synagogue'),
+        Icons.synagogue,
+        touristInfo
+            .where((t) => t.category == TouristCategory.synagogue)
+            .toList(),
+      ),
+      _buildSection(
+        context,
+        TouristCategory.kosherFood,
+        loc.t('tourist.kosherFood'),
+        Icons.restaurant,
+        touristInfo
+            .where((t) => t.category == TouristCategory.kosherFood)
+            .toList(),
+      ),
+      _buildSection(
+        context,
+        TouristCategory.hotels,
+        loc.t('tourist.hotels'),
+        Icons.hotel,
+        touristInfo
+            .where((t) => t.category == TouristCategory.hotels)
+            .toList(),
+      ),
+      _buildSection(
+        context,
+        TouristCategory.attractions,
+        loc.t('tourist.attractions'),
+        Icons.attractions,
+        touristInfo
+            .where((t) => t.category == TouristCategory.attractions)
+            .toList(),
+      ),
+      _buildSection(
+        context,
+        TouristCategory.dayTrips,
+        loc.t('tourist.dayTrips'),
+        Icons.explore,
+        touristInfo
+            .where((t) => t.category == TouristCategory.dayTrips)
+            .toList(),
+      ),
+    ];
+    
     return SiteScaffold(
       currentRoute: '/tourist',
       children: [
@@ -23,51 +76,27 @@ class TouristPage extends StatelessWidget {
           subtitle: loc.t('tourist.subtitle'),
           icon: Icons.info_outline,
         ),
-        _buildSection(
-          context,
-          TouristCategory.synagogue,
-          loc.t('tourist.synagogue'),
-          Icons.synagogue,
-          repo.touristInfo
-              .where((t) => t.category == TouristCategory.synagogue)
-              .toList(),
-        ),
-        _buildSection(
-          context,
-          TouristCategory.kosherFood,
-          loc.t('tourist.kosherFood'),
-          Icons.restaurant,
-          repo.touristInfo
-              .where((t) => t.category == TouristCategory.kosherFood)
-              .toList(),
-        ),
-        _buildSection(
-          context,
-          TouristCategory.hotels,
-          loc.t('tourist.hotels'),
-          Icons.hotel,
-          repo.touristInfo
-              .where((t) => t.category == TouristCategory.hotels)
-              .toList(),
-        ),
-        _buildSection(
-          context,
-          TouristCategory.attractions,
-          loc.t('tourist.attractions'),
-          Icons.attractions,
-          repo.touristInfo
-              .where((t) => t.category == TouristCategory.attractions)
-              .toList(),
-        ),
-        _buildSection(
-          context,
-          TouristCategory.dayTrips,
-          loc.t('tourist.dayTrips'),
-          Icons.explore,
-          repo.touristInfo
-              .where((t) => t.category == TouristCategory.dayTrips)
-              .toList(),
-        ),
+        if (!hasTouristInfo)
+          Section(
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Text(
+                  loc.lang == 'he'
+                      ? 'אין עדיין מידע לתיירים'
+                      : loc.lang == 'ru'
+                          ? 'Информация для туристов пока недоступна'
+                          : 'No tourist information available yet',
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          )
+        else
+          ...sections,
       ],
     );
   }
@@ -127,6 +156,19 @@ class TouristInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final color = Color(info.color);
+    
+    // Safe title extraction with fallback
+    final title = info.title[loc.lang] ?? 
+                  info.title['en'] ?? 
+                  info.title['he'] ?? 
+                  '';
+    
+    // Safe description extraction with fallback
+    final description = info.description[loc.lang] ?? 
+                        info.description['en'] ?? 
+                        info.description['he'] ?? 
+                        '';
+    
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -143,10 +185,30 @@ class TouristInfoCard extends StatelessWidget {
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: info.imageBytes != null && info.imageBytes!.isNotEmpty
-                    ? Image.memory(info.imageBytes!, fit: BoxFit.cover)
-                    : info.imageUrl!.startsWith('assets/')
-                        ? Image.asset(info.imageUrl!, fit: BoxFit.cover)
-                        : Image.network(info.imageUrl!, fit: BoxFit.cover),
+                    ? Image.memory(info.imageBytes!, 
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: color.withValues(alpha: 0.1),
+                          child: Icon(info.icon, color: color, size: 48),
+                        ))
+                    : info.imageUrl != null && info.imageUrl!.isNotEmpty
+                        ? (info.imageUrl!.startsWith('assets/')
+                            ? Image.asset(info.imageUrl!, 
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: color.withValues(alpha: 0.1),
+                                  child: Icon(info.icon, color: color, size: 48),
+                                ))
+                            : Image.network(info.imageUrl!, 
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: color.withValues(alpha: 0.1),
+                                  child: Icon(info.icon, color: color, size: 48),
+                                )))
+                        : Container(
+                            color: color.withValues(alpha: 0.1),
+                            child: Icon(info.icon, color: color, size: 48),
+                          ),
               ),
             ),
           if (info.hasImage) const SizedBox(height: 14),
@@ -162,7 +224,7 @@ class TouristInfoCard extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                trLoc(info.title, loc.lang),
+                title,
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -171,15 +233,17 @@ class TouristInfoCard extends StatelessWidget {
               ),
             ),
           ]),
-          const SizedBox(height: 12),
-          Text(
-            trLoc(info.description, loc.lang),
-            style: TextStyle(
-              color: AppColors.ink,
-              height: 1.5,
-              fontSize: 14,
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: TextStyle(
+                color: AppColors.ink,
+                height: 1.5,
+                fontSize: 14,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
