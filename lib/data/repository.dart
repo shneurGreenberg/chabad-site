@@ -81,15 +81,9 @@ class AppRepository extends ChangeNotifier {
 
   Future<void> _boot() async {
     try {
-      // Set a global timeout of 15 seconds for the entire boot process
-      await Future.any([
-        _bootCore(),
-        Future.delayed(const Duration(seconds: 15)).then((_) {
-          throw TimeoutException('Boot timeout after 15 seconds');
-        }),
-      ]);
+      await _bootCore();
     } catch (e) {
-      // On any error or timeout, ensure we still mark as ready with seed data
+      // On any error, ensure we still mark as ready with seed data
       debugPrint('Boot error: $e');
       if (!_cloudPulled) {
         _cloudPulled = true;
@@ -121,46 +115,38 @@ class AppRepository extends ChangeNotifier {
     }
     
     _hydrated = true;
+    _cloudPulled = true; // Mark as pulled immediately to show UI
+    _notifyUi(); // Show UI with hydrated seed data
     
+    // Continue loading in background without blocking UI
+    _loadBackgroundData();
+  }
+  
+  Future<void> _loadBackgroundData() async {
+    // Cloud pull with 5 second timeout
     try {
-      // Cloud pull with 8 second timeout
       await Future.any([
         _pullCloud(),
-        Future.delayed(const Duration(seconds: 8)).then((_) {
-          if (!_cloudPulled) {
-            _cloudPulled = true;
-          }
-        }),
+        Future.delayed(const Duration(seconds: 5)),
       ]);
     } catch (e) {
       debugPrint('Cloud pull failed: $e');
-      _cloudPulled = true;
     }
+    _notifyUi();
     
+    // Load Kaddish graves
     try {
       await _loadKaddishGraves();
     } catch (e) {
       debugPrint('Kaddish graves load failed: $e');
     }
     
-    // Retry refreshing times up to 3 times if it fails
-    var attempts = 0;
-    while (attempts < 3) {
-      try {
-        await refreshTimes();
-        break;
-      } catch (e) {
-        attempts++;
-        if (attempts >= 3) {
-          debugPrint('Failed to refresh times after 3 attempts: $e');
-          break;
-        }
-        await Future.delayed(Duration(milliseconds: 500 * attempts));
-      }
-    }
-    
-    if (!_cloudPulled) {
-      _cloudPulled = true;
+    // Refresh zmanim once without blocking (no retries during boot)
+    try {
+      await refreshTimes();
+    } catch (e) {
+      debugPrint('Failed to refresh times: $e');
+      // Keep seed data on error
     }
     _notifyUi();
   }
