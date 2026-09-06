@@ -1105,7 +1105,7 @@ class AppRepository extends ChangeNotifier {
       title: {'he': 'תיאטרון האופרה והבלט', 'en': 'Opera and Ballet Theatre', 'ru': 'Театр оперы и балета'},
       description: {
         'he': 'בניין תיאטרון האופרה והבלט של נובוסיבירסק הוא הגדול ברוסיה וסמל העיר. הוקם ב־1945, ואחד ממייסדיו היה המנצח היהודי איזידור זאק. כתובת: Krasny Prospekt 36.',
-        'en': 'The Novosibirsk Opera and Ballet Theatre building is the largest in Russia and the city's symbol. Opened in 1945; Jewish conductor Isidor Zak was a co-founder. Address: 36 Krasny Prospekt.',
+        'en': 'The Novosibirsk Opera and Ballet Theatre building is the largest in Russia and the city\'s symbol. Opened in 1945; Jewish conductor Isidor Zak was a co-founder. Address: 36 Krasny Prospekt.',
         'ru': 'Новосибирский театр оперы и балета — крупнейший в России и символ города. Открыт в 1945; один из основателей — дирижёр Исидор Зак. Адрес: Красный проспект, 36.',
       },
       category: TouristCategory.attractions,
