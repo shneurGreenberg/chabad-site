@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -79,12 +80,68 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> _boot() async {
-    await TelegramService.instance.loadSavedAsync();
-    await CloudSync.instance.init();
-    await _hydrate();
-    await _pullCloud();
-    await _loadKaddishGraves();
+    try {
+      // Set a global timeout of 15 seconds for the entire boot process
+      await Future.any([
+        _bootCore(),
+        Future.delayed(const Duration(seconds: 15)).then((_) {
+          throw TimeoutException('Boot timeout after 15 seconds');
+        }),
+      ]);
+    } catch (e) {
+      // On any error or timeout, ensure we still mark as ready with seed data
+      debugPrint('Boot error: $e');
+      if (!_cloudPulled) {
+        _cloudPulled = true;
+      }
+      if (!_hydrated) {
+        _hydrated = true;
+      }
+      _notifyUi();
+    }
+  }
+
+  Future<void> _bootCore() async {
+    try {
+      await TelegramService.instance.loadSavedAsync();
+    } catch (e) {
+      debugPrint('Telegram service load failed: $e');
+    }
+    
+    try {
+      await CloudSync.instance.init();
+    } catch (e) {
+      debugPrint('CloudSync init failed: $e');
+    }
+    
+    try {
+      await _hydrate();
+    } catch (e) {
+      debugPrint('Hydrate failed: $e');
+    }
+    
     _hydrated = true;
+    
+    try {
+      // Cloud pull with 8 second timeout
+      await Future.any([
+        _pullCloud(),
+        Future.delayed(const Duration(seconds: 8)).then((_) {
+          if (!_cloudPulled) {
+            _cloudPulled = true;
+          }
+        }),
+      ]);
+    } catch (e) {
+      debugPrint('Cloud pull failed: $e');
+      _cloudPulled = true;
+    }
+    
+    try {
+      await _loadKaddishGraves();
+    } catch (e) {
+      debugPrint('Kaddish graves load failed: $e');
+    }
     
     // Retry refreshing times up to 3 times if it fails
     var attempts = 0;
@@ -95,14 +152,16 @@ class AppRepository extends ChangeNotifier {
       } catch (e) {
         attempts++;
         if (attempts >= 3) {
-          // If all retries fail, keep the seed data but mark as ready
+          debugPrint('Failed to refresh times after 3 attempts: $e');
           break;
         }
         await Future.delayed(Duration(milliseconds: 500 * attempts));
       }
     }
     
-    _cloudPulled = true;
+    if (!_cloudPulled) {
+      _cloudPulled = true;
+    }
     _notifyUi();
   }
 
@@ -454,14 +513,21 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> refreshTimes() async {
-    final data = await LocationZmanimApi.fetchTimes(location);
-    zmanim
-      ..clear()
-      ..addAll(data.zmanim);
-    shabbat
-      ..clear()
-      ..addAll(data.shabbat);
-    notifyListeners();
+    try {
+      final data = await LocationZmanimApi.fetchTimes(location);
+      zmanim
+        ..clear()
+        ..addAll(data.zmanim);
+      shabbat
+        ..clear()
+        ..addAll(data.shabbat);
+      debugPrint('Zmanim refreshed: candle=${shabbat['candle']}, havdala=${shabbat['havdala']}, parasha_he=${shabbat['parasha_he']}');
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Failed to refresh zmanim: $e');
+      // Keep existing seed data on error
+      rethrow;
+    }
   }
 
   /// Called when the UI locale changes to refresh location name and zmanim.
@@ -1053,10 +1119,45 @@ class AppRepository extends ChangeNotifier {
   ];
 
   late final List<TourStop> tour = [
-    TourStop(id: _newId(), name: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, description: {'he': 'בית הכנסת והמרכז הקהילתי, רחוב שצ׳טינקינה 68. כיפה ומגן דוד — לב יהדות נובוסיבירסק.', 'en': 'Synagogue and community center, 68 Shchetinkina St. Dome and Star of David — the heart of Novosibirsk Jewry.', 'ru': 'Синагога и общинный центр, ул. Щетинкина, 68. Купол и звезда Давида — сердце еврейского Новосибирска.'}, color: 0xFF1D4ED8, icon: Icons.synagogue),
-    TourStop(id: _newId(), name: {'he': 'מקווה וחנות כשרה', 'en': 'Mikveh & kosher shop', 'ru': 'Миква и кошерный магазин'}, description: {'he': 'בתוך אותו בניין: מקווה לגברים ולנשים, חנות כשרה ואולם אירועים.', 'en': 'In the same building: men\'s and women\'s mikveh, kosher shop and banquet hall.', 'ru': 'В том же здании: миквы, кошерный магазин и праздничный зал.'}, color: 0xFF0D9488, icon: Icons.water_drop),
-    TourStop(id: _newId(), name: {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'}, description: {'he': 'בית הספר היהודי וגן הילדים, רחוב שקספיר 9ב.', 'en': 'The Jewish school and preschool, 9b Shakspira St.', 'ru': 'Еврейский лицей и детская группа, ул. Шекспира, 9Б.'}, color: 0xFF3B82F6, icon: Icons.school),
-    TourStop(id: _newId(), name: {'he': 'מרכז לב', 'en': 'Lev center', 'ru': 'Центр Лев'}, description: {'he': 'מרכז לילדים עם צרכים מיוחדים ובריכה, רחוב שקספיר 9א.', 'en': 'Center for children with special needs and a pool, 9a Shakspira St.', 'ru': 'Центр для детей с ОВЗ и бассейн, ул. Шекспира, 9А.'}, color: 0xFFEC4899, icon: Icons.favorite),
+    TourStop(
+      id: _newId(), 
+      name: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, 
+      description: {'he': 'בית הכנסת והמרכז הקהילתי, רחוב שצ׳טינקינה 68. כיפה ומגן דוד — לב יהדות נובוסיבירסק.', 'en': 'Synagogue and community center, 68 Shchetinkina St. Dome and Star of David — the heart of Novosibirsk Jewry.', 'ru': 'Синагога и общинный центр, ул. Щетинкина, 68. Купол и звезда Давида — сердце еврейского Новосибирска.'}, 
+      color: 0xFF1D4ED8, 
+      icon: Icons.synagogue,
+      panoramaUrl: _imgSynagogue,
+      photos: [
+        GalleryShot(id: _newId(), imageUrl: _imgSynagogue),
+        GalleryShot(id: _newId(), imageUrl: _imgHall),
+      ],
+    ),
+    TourStop(
+      id: _newId(), 
+      name: {'he': 'מקווה וחנות כשרה', 'en': 'Mikveh & kosher shop', 'ru': 'Миква и кошерный магазин'}, 
+      description: {'he': 'בתוך אותו בניין: מקווה לגברים ולנשים, חנות כשרה ואולם אירועים.', 'en': 'In the same building: men\'s and women\'s mikveh, kosher shop and banquet hall.', 'ru': 'В том же здании: миквы, кошерный магазин и праздничный зал.'}, 
+      color: 0xFF0D9488, 
+      icon: Icons.water_drop,
+      panoramaUrl: _imgHall,
+      photos: [
+        GalleryShot(id: _newId(), imageUrl: _imgHall),
+      ],
+    ),
+    TourStop(
+      id: _newId(), 
+      name: {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'}, 
+      description: {'he': 'בית הספר היהודי וגן הילדים, רחוב שקספיר 9ב.', 'en': 'The Jewish school and preschool, 9b Shakspira St.', 'ru': 'Еврейский лицей и детская группа, ул. Шекспира, 9Б.'}, 
+      color: 0xFF3B82F6, 
+      icon: Icons.school,
+      panoramaUrl: _imgSynagogue,
+    ),
+    TourStop(
+      id: _newId(), 
+      name: {'he': 'מרכז לב', 'en': 'Lev center', 'ru': 'Центр Лев'}, 
+      description: {'he': 'מרכז לילדים עם צרכים מיוחדים ובריכה, רחוב שקספיר 9א.', 'en': 'Center for children with special needs and a pool, 9a Shakspira St.', 'ru': 'Центр для детей с ОВЗ и бассейн, ул. Шекспира, 9А.'}, 
+      color: 0xFFEC4899, 
+      icon: Icons.favorite,
+      panoramaUrl: _imgHall,
+    ),
   ];
 
   // ---------------------------------------------------------------------------
@@ -2418,14 +2519,22 @@ class AppRepository extends ChangeNotifier {
         ..addAll((m['history'] as List).map(historyFromJson));
     }
     if (m['tour'] is List) {
-      tour
-        ..clear()
-        ..addAll((m['tour'] as List).map(tourFromJson));
+      final loaded = (m['tour'] as List).map(tourFromJson).toList();
+      // Only replace seed data if cloud has non-empty tour stops
+      if (loaded.isNotEmpty) {
+        tour
+          ..clear()
+          ..addAll(loaded);
+      }
     }
     if (m['touristInfo'] is List) {
-      touristInfo
-        ..clear()
-        ..addAll((m['touristInfo'] as List).map(touristInfoFromJson));
+      final loaded = (m['touristInfo'] as List).map(touristInfoFromJson).toList();
+      // Only replace seed data if cloud has non-empty tourist info
+      if (loaded.isNotEmpty) {
+        touristInfo
+          ..clear()
+          ..addAll(loaded);
+      }
     }
     if (m['shiurim'] is List) {
       shiurim
