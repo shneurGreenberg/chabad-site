@@ -54,6 +54,7 @@ class AppRepository extends ChangeNotifier {
   String _newId() => 'id${_seq++}';
   bool _hydrated = false;
   bool _cloudSeen = false;
+  bool _cloudPulled = false;
   Timer? _saveDebounce;
   void Function(String message)? onPersistWarning;
 
@@ -68,6 +69,9 @@ class AppRepository extends ChangeNotifier {
 
   void _notifyUi() => super.notifyListeners();
 
+  /// Returns true if initial data load is complete (hydrate + cloud pull done).
+  bool get isDataReady => _hydrated && _cloudPulled;
+
   @override
   void dispose() {
     _saveDebounce?.cancel();
@@ -81,6 +85,7 @@ class AppRepository extends ChangeNotifier {
     await _pullCloud();
     await _loadKaddishGraves();
     _hydrated = true;
+    _cloudPulled = true;
     _notifyUi();
     try {
       await refreshTimes();
@@ -2616,6 +2621,67 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
+  /// Selective version: only restore images to items that still exist.
+  /// Does NOT re-add deleted items. Used after cloud pull to prevent resurrection.
+  void _restoreUploadsSelective(_UploadKeep saved) {
+    // Only restore images to existing items; don't resurrect deleted items
+    for (final a in saved.news) {
+      final i = news.indexWhere((e) => e.id == a.id);
+      if (i >= 0 && !_hasBytes(news[i].imageBytes)) {
+        news[i].imageBytes = a.imageBytes;
+      }
+    }
+    for (final p in saved.programs) {
+      final i = programs.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(programs[i].imageBytes)) {
+        programs[i].imageBytes = p.imageBytes;
+      }
+    }
+    for (final p in saved.products) {
+      final i = products.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(products[i].imageBytes)) {
+        products[i].imageBytes = p.imageBytes;
+      }
+    }
+    for (final p in saved.gallery) {
+      final i = gallery.indexWhere((e) => e.id == p.id);
+      if (i >= 0) {
+        if (!_hasBytes(gallery[i].imageBytes)) {
+          gallery[i].imageBytes = p.imageBytes;
+        }
+        for (final shot in p.photos) {
+          final si = gallery[i].photos.indexWhere((s) => s.id == shot.id);
+          if (si >= 0 && !_hasBytes(gallery[i].photos[si].imageBytes)) {
+            gallery[i].photos[si].imageBytes = shot.imageBytes;
+          }
+        }
+      }
+    }
+    for (final e in saved.banners.entries) {
+      final current = banners[e.key];
+      if (current != null) {
+        if (!_hasBytes(current.bytes) && _hasBytes(e.value.bytes)) {
+          current.bytes = e.value.bytes;
+        }
+        for (var i = 0; i < e.value.extra.length && i < current.extra.length; i++) {
+          if (!_hasBytes(current.extra[i].bytes) &&
+              _hasBytes(e.value.extra[i].bytes)) {
+            current.extra[i].bytes = e.value.extra[i].bytes;
+          }
+        }
+      }
+    }
+    if (!_hasBytes(emblemBytes) && _hasBytes(saved.emblemBytes)) {
+      emblemBytes = saved.emblemBytes;
+    }
+    for (final p in saved.famous) {
+      final i = famous.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(famous[i].photoBytes)) {
+        famous[i].photoBytes = p.photoBytes;
+      }
+    }
+  }
+
   bool _hasBytes(Uint8List? bytes) => bytes != null && bytes.isNotEmpty;
 
   Future<void> _hydrateLocalImages(Map<String, dynamic>? m) async {
@@ -2820,20 +2886,34 @@ class AppRepository extends ChangeNotifier {
 
   Future<void> _pullCloud() async {
     final cloud = await CloudSync.instance.pull();
-    if (cloud == null) return;
+    if (cloud == null) {
+      _cloudPulled = true;
+      return;
+    }
     _cloudSeen = true;
+    
+    // Save items with local-only images (not yet uploaded)
     final saved = _captureUploads();
+    
     final seed = (cloud.snapshot['seed'] as num?)?.toInt() ?? 0;
     if (seed >= _contentSeed) {
       _applySnapshot(cloud.snapshot);
     } else {
       _mergeUserContent(cloud.snapshot);
     }
+    
+    // Restore local images to cloud items
     for (final e in cloud.images.entries) {
       _applyLocalImage(e.key, e.value);
     }
-    _restoreUploads(saved);
+    
+    // Only restore uploads for items that still exist after cloud merge
+    // This prevents deleted items from being resurrected
+    _restoreUploadsSelective(saved);
+    
     _ensureHistoricalFamous();
+    _cloudPulled = true;
+    
     try {
       await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
       for (final e in cloud.images.entries) {
