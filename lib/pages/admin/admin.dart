@@ -273,6 +273,7 @@ class _AdminShellState extends State<AdminShell> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final narrow = MediaQuery.sizeOf(context).width < 900;
+    final isDesktop = MediaQuery.sizeOf(context).width >= 1200;
 
     final auth = context.watch<AuthController>();
     final all = <_AdminSection>[
@@ -345,7 +346,7 @@ class _AdminShellState extends State<AdminShell> {
         children: [
           if (!narrow)
             Container(
-              width: 260,
+              width: isDesktop ? 280 : 260,
               color: AppColors.primaryDark,
               child: _railList(context, sections, loc),
             ),
@@ -361,9 +362,16 @@ class _AdminShellState extends State<AdminShell> {
                   }),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: sections[_index].panel,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isDesktop ? 1400 : 1100,
+                      ),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(isDesktop ? 32 : 24),
+                        child: sections[_index].panel,
+                      ),
+                    ),
                   ),
                 ),
               ],

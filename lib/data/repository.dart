@@ -1456,6 +1456,18 @@ class AppRepository extends ChangeNotifier {
     moveTour(oldIndex, newIndex);
   }
 
+  void addTourPhotos(TourStop stop, List<Uint8List> files) {
+    for (final bytes in files) {
+      stop.photos.add(GalleryShot(id: _newId(), imageBytes: bytes));
+    }
+    notifyListeners();
+  }
+
+  void deleteTourPhoto(TourStop stop, String photoId) {
+    stop.photos.removeWhere((p) => p.id == photoId);
+    notifyListeners();
+  }
+
   void _moveIn<T>(List<T> list, int from, int to) {
     if (from == to || from < 0 || from >= list.length) return;
     final dest = to.clamp(0, list.length - 1);
