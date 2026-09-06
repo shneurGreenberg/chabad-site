@@ -42,13 +42,13 @@ COPY . .
 # Build Flutter web with root base-href for custom domain
 RUN flutter build web --release --base-href / --no-tree-shake-icons --no-wasm-dry-run
 
-# Replace favicon and all icons with chabad emblem after build
-RUN cp assets/images/chabad-emblem.png build/web/favicon.png && \
-    cp assets/images/chabad-emblem.png build/web/icons/Icon-192.png && \
-    cp assets/images/chabad-emblem.png build/web/icons/Icon-512.png && \
-    cp assets/images/chabad-emblem.png build/web/icons/Icon-maskable-192.png && \
-    cp assets/images/chabad-emblem.png build/web/icons/Icon-maskable-512.png && \
-    echo "Replaced favicon and all icons with chabad emblem"
+# Replace favicon and all icons with community emblem after build
+RUN cp assets/images/community-emblem.png build/web/favicon.png && \
+    cp assets/images/community-emblem.png build/web/icons/Icon-192.png && \
+    cp assets/images/community-emblem.png build/web/icons/Icon-512.png && \
+    cp assets/images/community-emblem.png build/web/icons/Icon-maskable-192.png && \
+    cp assets/images/community-emblem.png build/web/icons/Icon-maskable-512.png && \
+    echo "Replaced favicon and all icons with community emblem"
 
 # Download kaddish cemetery photos (same as GitHub Pages workflow)
 RUN mkdir -p build/web/kaddish-photos && \

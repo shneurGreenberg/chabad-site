@@ -620,6 +620,10 @@ class AppRepository extends ChangeNotifier {
     'parasha_he': 'פרשת קדושים',
     'parasha_en': 'Parashat Kedoshim',
     'parasha_ru': 'Глава Кдошим',
+    'holiday_he': '',
+    'holiday_en': '',
+    'holiday_ru': '',
+    'is_holiday': '0',
   };
 
   // ---------------------------------------------------------------------------
@@ -1135,6 +1139,9 @@ class AppRepository extends ChangeNotifier {
       color: 0xFF3B82F6, 
       icon: Icons.school,
       panoramaUrl: _imgSynagogue,
+      photos: [
+        GalleryShot(id: _newId(), imageUrl: _imgSynagogue),
+      ],
     ),
     TourStop(
       id: _newId(), 
@@ -1143,6 +1150,9 @@ class AppRepository extends ChangeNotifier {
       color: 0xFFEC4899, 
       icon: Icons.favorite,
       panoramaUrl: _imgHall,
+      photos: [
+        GalleryShot(id: _newId(), imageUrl: _imgHall),
+      ],
     ),
   ];
 
@@ -2508,6 +2518,24 @@ class AppRepository extends ChangeNotifier {
       final loaded = (m['tour'] as List).map(tourFromJson).toList();
       // Only replace seed data if cloud has non-empty tour stops
       if (loaded.isNotEmpty) {
+        // Keep seed panorama/photos when cloud entries lack images.
+        final seedById = {for (final s in tour) s.id: s};
+        final seedByName = {
+          for (final s in tour) (s.name['en'] ?? s.name['he'] ?? ''): s,
+        };
+        for (final s in loaded) {
+          final seed = seedById[s.id] ??
+              seedByName[s.name['en'] ?? ''] ??
+              seedByName[s.name['he'] ?? ''];
+          if (seed == null) continue;
+          if (!s.hasPanorama && seed.hasPanorama) {
+            s.panoramaUrl = seed.panoramaUrl;
+            s.panoramaBytes = seed.panoramaBytes;
+          }
+          if (s.photos.isEmpty && seed.photos.isNotEmpty) {
+            s.photos = List.of(seed.photos);
+          }
+        }
         tour
           ..clear()
           ..addAll(loaded);

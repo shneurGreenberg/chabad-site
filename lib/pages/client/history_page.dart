@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository.dart';
@@ -140,7 +141,13 @@ class _TourCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(children: [
-            GradientImage(color: stop.color, icon: stop.icon, height: 150),
+            _smartImage(
+              url: stop.panoramaUrl,
+              bytes: stop.panoramaBytes,
+              height: 150,
+              color: stop.color,
+              icon: stop.icon,
+            ),
             Positioned.fill(
               child: Center(
                 child: Container(
@@ -211,17 +218,13 @@ class _TourDialogState extends State<_TourDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Stack(children: [
-              // Display panorama if available, otherwise gradient
-              if (hasPanorama && stop.panoramaBytes != null)
-                Image.memory(stop.panoramaBytes!,
-                    height: 280, width: double.infinity, fit: BoxFit.cover)
-              else if (hasPanorama && stop.panoramaUrl != null && stop.panoramaUrl!.isNotEmpty)
-                Image.network(stop.panoramaUrl!,
-                    height: 280, width: double.infinity, fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        GradientImage(color: stop.color, icon: stop.icon, height: 280))
-              else
-                GradientImage(color: stop.color, icon: stop.icon, height: 280),
+              _smartImage(
+                url: stop.panoramaUrl,
+                bytes: stop.panoramaBytes,
+                height: 280,
+                color: stop.color,
+                icon: stop.icon,
+              ),
               Positioned.fill(
                 child: Center(
                   child: PlayfulIcon(Icons.threesixty,
@@ -272,12 +275,16 @@ class _TourDialogState extends State<_TourDialog> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(6),
-                            child: photo.imageBytes != null
-                                ? Image.memory(photo.imageBytes!,
-                                    fit: BoxFit.cover)
+                            child: photo.imageBytes != null && photo.imageBytes!.isNotEmpty
+                                ? Image.memory(photo.imageBytes!, fit: BoxFit.cover)
                                 : (photo.imageUrl != null && photo.imageUrl!.isNotEmpty
-                                    ? Image.network(photo.imageUrl!,
-                                        fit: BoxFit.cover)
+                                    ? (photo.imageUrl!.startsWith('assets/')
+                                        ? Image.asset(photo.imageUrl!, fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                Container(color: AppColors.muted))
+                                        : Image.network(photo.imageUrl!, fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                Container(color: AppColors.muted)))
                                     : Container(color: AppColors.muted)),
                           ),
                         ),
@@ -342,4 +349,47 @@ class _TourDialogState extends State<_TourDialog> {
       ),
     );
   }
+}
+
+
+Widget _smartImage({
+  required String? url,
+  Uint8List? bytes,
+  required double height,
+  required int color,
+  required IconData icon,
+  BoxFit fit = BoxFit.cover,
+}) {
+  if (bytes != null && bytes.isNotEmpty) {
+    return Image.memory(
+      bytes,
+      height: height,
+      width: double.infinity,
+      fit: fit,
+      errorBuilder: (_, __, ___) =>
+          GradientImage(color: color, icon: icon, height: height),
+    );
+  }
+  final u = url?.trim() ?? '';
+  if (u.isEmpty) {
+    return GradientImage(color: color, icon: icon, height: height);
+  }
+  if (u.startsWith('assets/')) {
+    return Image.asset(
+      u,
+      height: height,
+      width: double.infinity,
+      fit: fit,
+      errorBuilder: (_, __, ___) =>
+          GradientImage(color: color, icon: icon, height: height),
+    );
+  }
+  return Image.network(
+    u,
+    height: height,
+    width: double.infinity,
+    fit: fit,
+    errorBuilder: (_, __, ___) =>
+        GradientImage(color: color, icon: icon, height: height),
+  );
 }
