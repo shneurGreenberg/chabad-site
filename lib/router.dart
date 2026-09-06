@@ -14,6 +14,7 @@ import 'pages/client/library_page.dart';
 import 'pages/client/news_page.dart';
 import 'pages/client/programs_page.dart';
 import 'pages/client/store_page.dart';
+import 'pages/client/tourist_page.dart';
 import 'pages/client/zmanim_page.dart';
 import 'widgets/site_scaffold.dart';
 
@@ -85,6 +86,7 @@ final appRouter = GoRouter(
               programId: s.uri.queryParameters['p'],
             )),
         _route('/about', (_) => const AboutPage()),
+        _route('/tourist', (_) => const TouristPage()),
       ],
     ),
     _route('/admin', (_) => const AdminPage()),

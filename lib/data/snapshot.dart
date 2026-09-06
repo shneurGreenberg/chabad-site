@@ -73,6 +73,8 @@ Map<String, dynamic> newsToJson(NewsArticle a) => {
       'telegramMessageId': a.telegramMessageId,
       'telegramPublishedId': a.telegramPublishedId,
       'telegramPublishedAt': a.telegramPublishedAt?.toIso8601String(),
+      'imageAlignX': a.imageAlignX,
+      'imageAlignY': a.imageAlignY,
     };
 
 NewsArticle newsFromJson(dynamic raw) {
@@ -97,6 +99,8 @@ NewsArticle newsFromJson(dynamic raw) {
     telegramMessageId: (m['telegramMessageId'] as num?)?.toInt(),
     telegramPublishedId: (m['telegramPublishedId'] as num?)?.toInt(),
     telegramPublishedAt: DateTime.tryParse('${m['telegramPublishedAt'] ?? ''}'),
+    imageAlignX: (m['imageAlignX'] as num?)?.toDouble() ?? 0,
+    imageAlignY: (m['imageAlignY'] as num?)?.toDouble() ?? 0,
   );
 }
 
@@ -110,6 +114,8 @@ Map<String, dynamic> programToJson(Program p) => {
       'color': p.color,
       'imageUrl': compactImageUrl(p.imageUrl),
       'imageId': imageIdOf('program', p.id, bytes: p.imageBytes),
+      'imageAlignX': p.imageAlignX,
+      'imageAlignY': p.imageAlignY,
     };
 
 Program programFromJson(dynamic raw) {
@@ -126,6 +132,8 @@ Program programFromJson(dynamic raw) {
     imageUrl: compactImageUrl(
       m['imageUrl'] is String ? '${m['imageUrl']}' : null,
     ),
+    imageAlignX: (m['imageAlignX'] as num?)?.toDouble() ?? 0,
+    imageAlignY: (m['imageAlignY'] as num?)?.toDouble() ?? 0,
   );
 }
 
@@ -517,6 +525,36 @@ TourStop tourFromJson(dynamic raw) {
     photos: m['photos'] is List
         ? (m['photos'] as List).map(galleryShotFromJson).toList()
         : null,
+  );
+}
+
+Map<String, dynamic> touristInfoToJson(TouristInfo t) => {
+      'id': t.id,
+      'title': locTo(t.title),
+      'description': locTo(t.description),
+      'category': t.category.name,
+      'icon': iconTo(t.icon),
+      'color': t.color,
+      'imageUrl': compactImageUrl(t.imageUrl),
+      'imageId': imageIdOf('tourist', t.id, bytes: t.imageBytes),
+    };
+
+TouristInfo touristInfoFromJson(dynamic raw) {
+  final m = Map<String, dynamic>.from(raw as Map);
+  return TouristInfo(
+    id: '${m['id']}',
+    title: locFrom(m['title']),
+    description: locFrom(m['description']),
+    category: TouristCategory.values.firstWhere(
+      (e) => e.name == m['category'],
+      orElse: () => TouristCategory.synagogue,
+    ),
+    icon: iconFrom(m['icon'], Icons.info_outline),
+    color: (m['color'] as num?)?.toInt() ?? 0xFF0EA5E9,
+    imageBytes: b64ToBytes(m['image']),
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
   );
 }
 

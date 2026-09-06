@@ -54,6 +54,7 @@ class AppRepository extends ChangeNotifier {
   String _newId() => 'id${_seq++}';
   bool _hydrated = false;
   bool _cloudSeen = false;
+  bool _cloudPulled = false;
   Timer? _saveDebounce;
   void Function(String message)? onPersistWarning;
 
@@ -68,6 +69,9 @@ class AppRepository extends ChangeNotifier {
 
   void _notifyUi() => super.notifyListeners();
 
+  /// Returns true if initial data load is complete (hydrate + cloud pull done).
+  bool get isDataReady => _hydrated && _cloudPulled;
+
   @override
   void dispose() {
     _saveDebounce?.cancel();
@@ -81,10 +85,25 @@ class AppRepository extends ChangeNotifier {
     await _pullCloud();
     await _loadKaddishGraves();
     _hydrated = true;
+    
+    // Retry refreshing times up to 3 times if it fails
+    var attempts = 0;
+    while (attempts < 3) {
+      try {
+        await refreshTimes();
+        break;
+      } catch (e) {
+        attempts++;
+        if (attempts >= 3) {
+          // If all retries fail, keep the seed data but mark as ready
+          break;
+        }
+        await Future.delayed(Duration(milliseconds: 500 * attempts));
+      }
+    }
+    
+    _cloudPulled = true;
     _notifyUi();
-    try {
-      await refreshTimes();
-    } catch (_) {}
   }
 
   // ---------------------------------------------------------------------------
@@ -443,6 +462,21 @@ class AppRepository extends ChangeNotifier {
       ..clear()
       ..addAll(data.shabbat);
     notifyListeners();
+  }
+
+  /// Called when the UI locale changes to refresh location name and zmanim.
+  Future<void> onLocaleChanged(String lang) async {
+    if (location.latitude == 0 && location.longitude == 0) return;
+    
+    try {
+      final place = await LocationZmanimApi.fromCoordinates(
+        location.latitude,
+        location.longitude,
+        lang: lang,
+      );
+      location.cityName = place.name;
+      await refreshTimes();
+    } catch (_) {}
   }
 
   int importTelegramPosts(List<TelegramPost> posts) {
@@ -1026,6 +1060,73 @@ class AppRepository extends ChangeNotifier {
   ];
 
   // ---------------------------------------------------------------------------
+  // Tourist Info
+  // ---------------------------------------------------------------------------
+  late final List<TouristInfo> touristInfo = [
+    TouristInfo(
+      id: _newId(),
+      title: {'he': 'תפילות והשתתפות בחיי הקהילה', 'en': 'Prayer services and community participation', 'ru': 'Молитвы и участие в жизни общины'},
+      description: {
+        'he': 'ברוכים הבאים לבית הכנסת בית מנחם! תפילות בימי שני וחמישי ב־09:30, בשבת ב־10:00. המבנה פתוח כל יום 09:00–17:00. סיורים בתיאום מראש. כתובת: רחוב שצ׳טינקינה 68.',
+        'en': 'Welcome to Beit Menachem synagogue! Prayer Monday and Thursday at 09:30, Shabbat at 10:00. Building open daily 09:00–17:00. Tours by appointment. Address: 68 Shchetinkina St.',
+        'ru': 'Добро пожаловать в синагогу Бейт Менахем! Молитвы в понедельник и четверг в 09:30, в субботу в 10:00. Здание открыто каждый день 09:00–17:00. Экскурсии по записи. Адрес: ул. Щетинкина, 68.',
+      },
+      category: TouristCategory.synagogue,
+      icon: Icons.synagogue,
+      color: 0xFF1D4ED8,
+      imageUrl: _imgSynagogue,
+    ),
+    TouristInfo(
+      id: _newId(),
+      title: {'he': 'חנות כשרה בבית מנחם', 'en': 'Kosher shop at Beit Menachem', 'ru': 'Кошерный магазин в Бейт Менахем'},
+      description: {
+        'he': 'החנות הכשרה בבית מנחם מציעה יודאיקה, ספרים קדושים, יין כשר, מצות ומזון כשר. פתוח ימי א׳–ה׳ 10:00–17:00. לקראת חגים — סעודות חמות להזמנה: +7 (383) 222-20-23.',
+        'en': 'The kosher shop at Beit Menachem offers judaica, holy books, kosher wine, matzah and kosher food. Open Sun–Thu 10:00–17:00. For holidays — hot meals to order: +7 (383) 222-20-23.',
+        'ru': 'Кошерный магазин в Бейт Менахем: иудаика, святые книги, кошерное вино, маца и кошерные продукты. Открыто вс–чт 10:00–17:00. К праздникам — горячие трапезы на заказ: +7 (383) 222-20-23.',
+      },
+      category: TouristCategory.kosherFood,
+      icon: Icons.storefront,
+      color: 0xFF059669,
+    ),
+    TouristInfo(
+      id: _newId(),
+      title: {'he': 'מלון מרינס פארק', 'en': 'Marins Park Hotel', 'ru': 'Отель Маринс Парк'},
+      description: {
+        'he': 'מלון בדירוג 4 כוכבים, 10 דקות הליכה מבית מנחם. חדרים נוחים, ארוחת בוקר, WiFi. כתובת: רחוב Oktyabrskaya 42. טלפון: +7 (383) 227-00-00.',
+        'en': '4-star hotel, 10-minute walk from Beit Menachem. Comfortable rooms, breakfast, WiFi. Address: 42 Oktyabrskaya St. Phone: +7 (383) 227-00-00.',
+        'ru': 'Отель 4 звезды, 10 минут пешком от Бейт Менахем. Комфортные номера, завтрак, WiFi. Адрес: ул. Октябрьская, 42. Телефон: +7 (383) 227-00-00.',
+      },
+      category: TouristCategory.hotels,
+      icon: Icons.hotel,
+      color: 0xFF7C3AED,
+    ),
+    TouristInfo(
+      id: _newId(),
+      title: {'he': 'תיאטרון האופרה והבלט', 'en': 'Opera and Ballet Theatre', 'ru': 'Театр оперы и балета'},
+      description: {
+        'he': 'בניין תיאטרון האופרה והבלט של נובוסיבירסק הוא הגדול ברוסיה וסמל העיר. הוקם ב־1945, ואחד ממייסדיו היה המנצח היהודי איזידור זאק. כתובת: Krasny Prospekt 36.',
+        'en': 'The Novosibirsk Opera and Ballet Theatre building is the largest in Russia and the city's symbol. Opened in 1945; Jewish conductor Isidor Zak was a co-founder. Address: 36 Krasny Prospekt.',
+        'ru': 'Новосибирский театр оперы и балета — крупнейший в России и символ города. Открыт в 1945; один из основателей — дирижёр Исидор Зак. Адрес: Красный проспект, 36.',
+      },
+      category: TouristCategory.attractions,
+      icon: Icons.theater_comedy,
+      color: 0xFFDB2777,
+    ),
+    TouristInfo(
+      id: _newId(),
+      title: {'he': 'אגם אוב והחוף', 'en': 'Ob Sea and beach', 'ru': 'Обское море и пляж'},
+      description: {
+        'he': 'מאגר מים ענק צפונית לעיר. בקיץ — חופים, שיט וספורט מים. מרחק כ־40 דקות נסיעה מנובוסיבירסק. אידיאלי לטיול יום.',
+        'en': 'A huge reservoir north of the city. In summer — beaches, boating and water sports. About 40-minute drive from Novosibirsk. Ideal for a day trip.',
+        'ru': 'Огромное водохранилище к северу от города. Летом — пляжи, катание на лодках и водные виды спорта. Около 40 минут езды от Новосибирска. Идеально для однодневной поездки.',
+      },
+      category: TouristCategory.dayTrips,
+      icon: Icons.water,
+      color: 0xFF0EA5E9,
+    ),
+  ];
+
+  // ---------------------------------------------------------------------------
   // Store
   // ---------------------------------------------------------------------------
   late final List<Product> products = [
@@ -1466,6 +1567,30 @@ class AppRepository extends ChangeNotifier {
   void deleteTourPhoto(TourStop stop, String photoId) {
     stop.photos.removeWhere((p) => p.id == photoId);
     notifyListeners();
+  }
+
+  TouristInfo newBlankTouristInfo() => TouristInfo(
+        id: _newId(),
+        title: {'he': '', 'en': '', 'ru': ''},
+        description: {'he': '', 'en': '', 'ru': ''},
+        category: TouristCategory.synagogue,
+      );
+
+  void addTouristInfo(TouristInfo t) {
+    touristInfo.add(t);
+    notifyListeners();
+  }
+
+  void deleteTouristInfo(String id) {
+    touristInfo.removeWhere((e) => e.id == id);
+    notifyListeners();
+  }
+
+  void moveTouristInfo(int from, int to) => _moveIn(touristInfo, from, to);
+
+  void reorderTouristInfo(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) newIndex -= 1;
+    moveTouristInfo(oldIndex, newIndex);
   }
 
   void _moveIn<T>(List<T> list, int from, int to) {
@@ -2190,6 +2315,7 @@ class AppRepository extends ChangeNotifier {
         'famous': [for (final p in famous) famousToJson(p)],
         'history': [for (final e in history) historyToJson(e)],
         'tour': [for (final s in tour) tourToJson(s)],
+        'touristInfo': [for (final t in touristInfo) touristInfoToJson(t)],
         'shiurim': [for (final s in shiurim) shiurToJson(s)],
         'campaigns': [for (final c in campaigns) locTo(c)],
         'campaignNotes': [for (final n in campaignNotes) locTo(n)],
@@ -2295,6 +2421,11 @@ class AppRepository extends ChangeNotifier {
       tour
         ..clear()
         ..addAll((m['tour'] as List).map(tourFromJson));
+    }
+    if (m['touristInfo'] is List) {
+      touristInfo
+        ..clear()
+        ..addAll((m['touristInfo'] as List).map(touristInfoFromJson));
     }
     if (m['shiurim'] is List) {
       shiurim
@@ -2620,6 +2751,67 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
+  /// Selective version: only restore images to items that still exist.
+  /// Does NOT re-add deleted items. Used after cloud pull to prevent resurrection.
+  void _restoreUploadsSelective(_UploadKeep saved) {
+    // Only restore images to existing items; don't resurrect deleted items
+    for (final a in saved.news) {
+      final i = news.indexWhere((e) => e.id == a.id);
+      if (i >= 0 && !_hasBytes(news[i].imageBytes)) {
+        news[i].imageBytes = a.imageBytes;
+      }
+    }
+    for (final p in saved.programs) {
+      final i = programs.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(programs[i].imageBytes)) {
+        programs[i].imageBytes = p.imageBytes;
+      }
+    }
+    for (final p in saved.products) {
+      final i = products.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(products[i].imageBytes)) {
+        products[i].imageBytes = p.imageBytes;
+      }
+    }
+    for (final p in saved.gallery) {
+      final i = gallery.indexWhere((e) => e.id == p.id);
+      if (i >= 0) {
+        if (!_hasBytes(gallery[i].imageBytes)) {
+          gallery[i].imageBytes = p.imageBytes;
+        }
+        for (final shot in p.photos) {
+          final si = gallery[i].photos.indexWhere((s) => s.id == shot.id);
+          if (si >= 0 && !_hasBytes(gallery[i].photos[si].imageBytes)) {
+            gallery[i].photos[si].imageBytes = shot.imageBytes;
+          }
+        }
+      }
+    }
+    for (final e in saved.banners.entries) {
+      final current = banners[e.key];
+      if (current != null) {
+        if (!_hasBytes(current.bytes) && _hasBytes(e.value.bytes)) {
+          current.bytes = e.value.bytes;
+        }
+        for (var i = 0; i < e.value.extra.length && i < current.extra.length; i++) {
+          if (!_hasBytes(current.extra[i].bytes) &&
+              _hasBytes(e.value.extra[i].bytes)) {
+            current.extra[i].bytes = e.value.extra[i].bytes;
+          }
+        }
+      }
+    }
+    if (!_hasBytes(emblemBytes) && _hasBytes(saved.emblemBytes)) {
+      emblemBytes = saved.emblemBytes;
+    }
+    for (final p in saved.famous) {
+      final i = famous.indexWhere((e) => e.id == p.id);
+      if (i >= 0 && !_hasBytes(famous[i].photoBytes)) {
+        famous[i].photoBytes = p.photoBytes;
+      }
+    }
+  }
+
   bool _hasBytes(Uint8List? bytes) => bytes != null && bytes.isNotEmpty;
 
   Future<void> _hydrateLocalImages(Map<String, dynamic>? m) async {
@@ -2684,6 +2876,10 @@ class AppRepository extends ChangeNotifier {
     for (final p in products) {
       final b = p.imageBytes;
       if (b != null && b.isNotEmpty) out['product:${p.id}'] = b;
+    }
+    for (final t in touristInfo) {
+      final b = t.imageBytes;
+      if (b != null && b.isNotEmpty) out['tourist:${t.id}'] = b;
     }
     for (final p in gallery) {
       final b = p.imageBytes;
@@ -2779,6 +2975,20 @@ class AppRepository extends ChangeNotifier {
           ));
           _noteId(id);
         }
+      case 'tourist':
+        final existing = touristInfo.where((t) => t.id == id);
+        if (existing.isNotEmpty) {
+          existing.first.imageBytes = bytes;
+        } else {
+          touristInfo.add(TouristInfo(
+            id: id,
+            title: const {'he': '', 'en': '', 'ru': ''},
+            description: const {'he': '', 'en': '', 'ru': ''},
+            category: TouristCategory.synagogue,
+            imageBytes: bytes,
+          ));
+          _noteId(id);
+        }
       case 'gallery':
         final split = id.split(':');
         final albumId = split.first;
@@ -2824,20 +3034,34 @@ class AppRepository extends ChangeNotifier {
 
   Future<void> _pullCloud() async {
     final cloud = await CloudSync.instance.pull();
-    if (cloud == null) return;
+    if (cloud == null) {
+      _cloudPulled = true;
+      return;
+    }
     _cloudSeen = true;
+    
+    // Save items with local-only images (not yet uploaded)
     final saved = _captureUploads();
+    
     final seed = (cloud.snapshot['seed'] as num?)?.toInt() ?? 0;
     if (seed >= _contentSeed) {
       _applySnapshot(cloud.snapshot);
     } else {
       _mergeUserContent(cloud.snapshot);
     }
+    
+    // Restore local images to cloud items
     for (final e in cloud.images.entries) {
       _applyLocalImage(e.key, e.value);
     }
-    _restoreUploads(saved);
+    
+    // Only restore uploads for items that still exist after cloud merge
+    // This prevents deleted items from being resurrected
+    _restoreUploadsSelective(saved);
+    
     _ensureHistoricalFamous();
+    _cloudPulled = true;
+    
     try {
       await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
       for (final e in cloud.images.entries) {

@@ -956,6 +956,113 @@ class _TourEditorState extends State<_TourEditor> {
   }
 }
 
+class ManageTouristPanel extends StatelessWidget {
+  const ManageTouristPanel({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final repo = context.watch<AppRepository>();
+    return _panel(
+      title: loc.t('admin.manage.tourist'),
+      actions: [
+        FilledButton.icon(
+          onPressed: () =>
+              _editTourist(context, repo, repo.newBlankTouristInfo(), isNew: true),
+          icon: const PlayfulIcon(Icons.add, size: 18),
+          label: Text(loc.t('common.add')),
+        ),
+      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(loc.t('admin.tourist.reorder'),
+              style: TextStyle(color: AppColors.muted, height: 1.4)),
+          const SizedBox(height: 8),
+          _reorderableColumn(
+            loc: loc,
+            length: repo.touristInfo.length,
+            idOf: (i) => repo.touristInfo[i].id,
+            onReorder: repo.reorderTouristInfo,
+            onMove: repo.moveTouristInfo,
+            leading: (i) => PlayfulIcon(repo.touristInfo[i].icon,
+                color: Color(repo.touristInfo[i].color)),
+            title: (i) => trLoc(repo.touristInfo[i].title, loc.lang),
+            subtitle: (i) => trLoc(repo.touristInfo[i].description, loc.lang),
+            onEdit: (i) => _editTourist(context, repo, repo.touristInfo[i]),
+            onDelete: (i) => repo.deleteTouristInfo(repo.touristInfo[i].id),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editTourist(BuildContext context, AppRepository repo, TouristInfo info,
+      {bool isNew = false}) {
+    final title = _locCtrls(info.title);
+    final desc = _locCtrls(info.description);
+    var category = info.category;
+    var imageBytes = info.imageBytes;
+    _showEditor(
+      context: context,
+      title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
+      child: StatefulBuilder(builder: (context, setSt) {
+        final loc = context.locWatch;
+        return Column(children: [
+          CoverImagePicker(
+            bytes: imageBytes,
+            url: info.imageUrl,
+            color: info.color,
+            icon: info.icon,
+            height: 180,
+            onChanged: (b) => setSt(() => imageBytes = b),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<TouristCategory>(
+            initialValue: category,
+            decoration: InputDecoration(labelText: loc.t('common.category')),
+            items: [
+              DropdownMenuItem(
+                  value: TouristCategory.synagogue,
+                  child: Text(loc.t('tourist.synagogue'))),
+              DropdownMenuItem(
+                  value: TouristCategory.kosherFood,
+                  child: Text(loc.t('tourist.kosherFood'))),
+              DropdownMenuItem(
+                  value: TouristCategory.hotels,
+                  child: Text(loc.t('tourist.hotels'))),
+              DropdownMenuItem(
+                  value: TouristCategory.attractions,
+                  child: Text(loc.t('tourist.attractions'))),
+              DropdownMenuItem(
+                  value: TouristCategory.dayTrips,
+                  child: Text(loc.t('tourist.dayTrips'))),
+            ],
+            onChanged: (v) => setSt(() => category = v ?? category),
+          ),
+          const SizedBox(height: 12),
+          LocFieldGroup(label: loc.t('common.name'), controllers: title),
+          LocFieldGroup(
+              label: loc.t('common.message'),
+              controllers: desc,
+              maxLines: 6),
+        ]);
+      }),
+      onSave: () {
+        _applyLoc(info.title, title);
+        _applyLoc(info.description, desc);
+        info.category = category;
+        info.imageBytes = imageBytes;
+        if (isNew) {
+          repo.addTouristInfo(info);
+        } else {
+          repo.refresh();
+        }
+        _disposeAll([...title.values, ...desc.values]);
+      },
+    );
+  }
+}
+
 class ManageLibraryPanel extends StatelessWidget {
   const ManageLibraryPanel({super.key});
   @override

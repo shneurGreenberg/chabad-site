@@ -29,6 +29,8 @@ class ChabadApp extends StatefulWidget {
 
 class _ChabadAppState extends State<ChabadApp> {
   late final AppRepository _repo = AppRepository();
+  late final LocaleController _locale = LocaleController();
+  String? _prevLang;
 
   @override
   void initState() {
@@ -40,19 +42,80 @@ class _ChabadAppState extends State<ChabadApp> {
         );
       });
     };
+    _locale.addListener(_onLocaleChanged);
+    _prevLang = _locale.lang;
+  }
+
+  void _onLocaleChanged() {
+    if (_prevLang != _locale.lang) {
+      _prevLang = _locale.lang;
+      _repo.onLocaleChanged(_locale.lang);
+    }
+  }
+
+  @override
+  void dispose() {
+    _locale.removeListener(_onLocaleChanged);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LocaleController()),
+        ChangeNotifierProvider.value(value: _locale),
         ChangeNotifierProvider.value(value: _repo),
         ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: Consumer2<LocaleController, AppRepository>(
         builder: (context, locale, repo, _) {
           AppColors.bind(repo.palette);
+          
+          // Show loading screen until data is fully loaded from localStorage + Firebase
+          if (!repo.isDataReady) {
+            return MaterialApp(
+              title: 'בית חב״ד בית מנחם — נובוסיבירסק',
+              debugShowCheckedModeBanner: false,
+              theme: buildAppTheme(repo.palette),
+              locale: locale.locale,
+              supportedLocales: const [Locale('he'), Locale('en'), Locale('ru')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              home: Directionality(
+                textDirection: locale.direction,
+                child: Scaffold(
+                  body: Container(
+                    decoration: BoxDecoration(gradient: AppColors.heroGradient),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: AppColors.accent),
+                          const SizedBox(height: 24),
+                          Text(
+                            locale.lang == 'he'
+                                ? 'טוען...'
+                                : locale.lang == 'ru'
+                                    ? 'Загрузка...'
+                                    : 'Loading...',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+          
           return MaterialApp.router(
             title: 'בית חב״ד בית מנחם — נובוסיבירסק',
             debugShowCheckedModeBanner: false,

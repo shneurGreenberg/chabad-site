@@ -11,6 +11,7 @@ import '../../services/web_prefs.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
+import '../../widgets/map_embed.dart';
 
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({super.key});
@@ -112,6 +113,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
       final (lat, lon) = await currentPosition();
       final place = await LocationZmanimApi.fromCoordinates(lat, lon, lang: loc.lang);
       if (!mounted) return;
+      // Update query field and trigger map display
+      _query.text = place.label;
+      setState(() => _results = [place]);
       await _apply(place);
     } catch (_) {
       if (!mounted) return;
@@ -149,6 +153,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+
+  String _mapUrl(double lat, double lon) {
+    final key = context.read<AppRepository>().googleMapsApiKey;
+    if (key.trim().isEmpty) {
+      return 'https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02},${lat - 0.02},${lon + 0.02},${lat + 0.02}&layer=mapnik&marker=$lat,$lon';
+    }
+    return 'https://www.google.com/maps?q=$lat,$lon&output=embed&key=$key';
   }
 
   @override
@@ -243,6 +255,27 @@ class _SettingsPanelState extends State<SettingsPanel> {
           _kv(loc.t('admin.settings.lat'), site.latitude.toStringAsFixed(4)),
           _kv(loc.t('admin.settings.lon'), site.longitude.toStringAsFixed(4)),
           _kv(loc.t('admin.settings.tz'), site.timezone),
+          const SizedBox(height: 12),
+          Container(
+            height: 300,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.ink.withValues(alpha: 0.1)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: MapIFrame(
+              url: _mapUrl(site.latitude, site.longitude),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            loc.lang == 'he'
+                ? 'לחצו על המפה כדי לבחור מיקום אחר, או השתמשו בחיפוש למעלה'
+                : loc.lang == 'ru'
+                    ? 'Нажмите на карту для выбора другого местоположения или используйте поиск выше'
+                    : 'Use the search above to select a different location',
+            style: TextStyle(color: AppColors.muted, fontSize: 12, height: 1.4),
+          ),
           const Divider(height: 32),
           TextField(
             controller: _mapsKey,

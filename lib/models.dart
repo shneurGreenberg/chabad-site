@@ -33,6 +33,8 @@ class NewsArticle {
     this.telegramMessageId,
     this.telegramPublishedId,
     this.telegramPublishedAt,
+    this.imageAlignX = 0,
+    this.imageAlignY = 0,
   });
 
   final String id;
@@ -49,6 +51,8 @@ class NewsArticle {
   int? telegramMessageId;
   int? telegramPublishedId;
   DateTime? telegramPublishedAt;
+  double imageAlignX;
+  double imageAlignY;
 
   bool get hasImage =>
       (imageBytes != null && imageBytes!.isNotEmpty) ||
@@ -58,6 +62,8 @@ class NewsArticle {
       source == NewsSource.telegram ||
       telegramMessageId != null ||
       telegramPublishedId != null;
+
+  Alignment get imageAlignment => Alignment(imageAlignX, imageAlignY);
 }
 
 class SiteLocation {
@@ -129,6 +135,8 @@ class Program {
     this.color = 0xFF0EA5E9,
     this.imageBytes,
     this.imageUrl,
+    this.imageAlignX = 0,
+    this.imageAlignY = 0,
   });
   final String id;
   Loc title;
@@ -139,10 +147,14 @@ class Program {
   int color;
   Uint8List? imageBytes;
   String? imageUrl;
+  double imageAlignX;
+  double imageAlignY;
 
   bool get hasImage =>
       (imageBytes != null && imageBytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
+
+  Alignment get imageAlignment => Alignment(imageAlignX, imageAlignY);
 }
 
 class GalleryShot {
@@ -691,6 +703,39 @@ class StoreOrder {
   DateTime date;
 }
 
+enum TouristCategory {
+  synagogue,
+  kosherFood,
+  hotels,
+  attractions,
+  dayTrips,
+}
+
+class TouristInfo {
+  TouristInfo({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.category,
+    this.icon = Icons.info_outline,
+    this.color = 0xFF0EA5E9,
+    this.imageBytes,
+    this.imageUrl,
+  });
+  final String id;
+  Loc title;
+  Loc description;
+  TouristCategory category;
+  IconData icon;
+  int color;
+  Uint8List? imageBytes;
+  String? imageUrl;
+
+  bool get hasImage =>
+      (imageBytes != null && imageBytes!.isNotEmpty) ||
+      (imageUrl != null && imageUrl!.isNotEmpty);
+}
+
 class OrderLine {
   OrderLine({
     required this.productId,
@@ -789,6 +834,7 @@ const bannerSlots = [
   BannerSlot(route: '/library', labelKey: 'nav.library'),
   BannerSlot(route: '/donate', labelKey: 'nav.donate'),
   BannerSlot(route: '/events', labelKey: 'nav.events'),
+  BannerSlot(route: '/tourist', labelKey: 'nav.tourist'),
   BannerSlot(route: '/contact', labelKey: 'nav.contact'),
   BannerSlot(route: '/about', labelKey: 'nav.about'),
 ];
