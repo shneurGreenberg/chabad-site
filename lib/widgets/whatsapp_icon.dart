@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 /// WhatsApp brand mark — CustomPainter (CanvasKit-safe, no asset/Image.asset).
-/// White glyph on transparent background for the green FAB.
-///
-/// Uses [Path.combine] difference (not BlendMode.dstOut/saveLayer), because
-/// CanvasKit on Flutter web does not apply dstOut reliably — only the bubble
-/// would show, looking like Icons.chat.
+/// White bubble on [color]; handset filled with brand green so it reads as a
+/// cutout on the green FAB without PathOperation/blend modes (CanvasKit often
+/// ignores difference/dstOut and leaves a plain bubble).
 class WhatsAppIcon extends StatelessWidget {
   const WhatsAppIcon({super.key, this.size = 24, this.color = Colors.white});
 
   final double size;
   final Color color;
+
+  /// Same green as the floating WhatsApp FAB.
+  static const Color brandGreen = Color(0xFF25D366);
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +33,18 @@ class _WhatsAppLogoPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final paint = Paint()
+
+    final bubblePaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill
       ..isAntiAlias = true;
 
-    // Speech bubble body + tail (single path)
+    final handsetPaint = Paint()
+      ..color = WhatsAppIcon.brandGreen
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    // Speech bubble body + tail
     final bubbleBody = Path()
       ..addOval(Rect.fromCircle(
         center: Offset(w * 0.52, h * 0.45),
@@ -49,8 +56,9 @@ class _WhatsAppLogoPainter extends CustomPainter {
       ..quadraticBezierTo(w * 0.26, h * 0.74, w * 0.22, h * 0.68)
       ..close();
     final bubbleWithTail = Path.combine(PathOperation.union, bubbleBody, tail);
+    canvas.drawPath(bubbleWithTail, bubblePaint);
 
-    // Handset silhouette (cut out of bubble)
+    // Handset silhouette — solid brand green (reads as cutout on green FAB)
     final phone = Path();
     final cx = w * 0.52;
     final cy = h * 0.45;
@@ -91,9 +99,7 @@ class _WhatsAppLogoPainter extends CustomPainter {
       cx - w * 0.14, cy + h * 0.08,
     );
     phone.close();
-
-    final logo = Path.combine(PathOperation.difference, bubbleWithTail, phone);
-    canvas.drawPath(logo, paint);
+    canvas.drawPath(phone, handsetPaint);
   }
 
   @override
