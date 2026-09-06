@@ -13,13 +13,20 @@ class ZmanimPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final isHoliday = repo.shabbat['is_holiday'] == '1';
-    final holiday = repo.shabbat['holiday_${loc.lang}'] ??
-        repo.shabbat['holiday_en'] ??
-        '';
-    final parasha = repo.shabbat['parasha_${loc.lang}'] ?? repo.shabbat['parasha_en']!;
-    final occasion = isHoliday && holiday.trim().isNotEmpty ? holiday.trim() : parasha;
-    final heading = isHoliday && holiday.trim().isNotEmpty
+    final holiday = (repo.shabbat['holiday_${loc.lang}'] ??
+            repo.shabbat['holiday_en'] ??
+            '')
+        .trim();
+    final parasha = (repo.shabbat['parasha_${loc.lang}'] ??
+            repo.shabbat['parasha_en'] ??
+            '')
+        .trim();
+    final isHoliday = repo.shabbat['is_holiday'] == '1' ||
+        (holiday.isNotEmpty && parasha.isEmpty);
+    final occasion = holiday.isNotEmpty
+        ? holiday
+        : (parasha.isNotEmpty ? parasha : loc.t('zmanim.shabbat'));
+    final heading = isHoliday && holiday.isNotEmpty
         ? loc.t('zmanim.holiday')
         : loc.t('zmanim.shabbat');
     return SiteScaffold(

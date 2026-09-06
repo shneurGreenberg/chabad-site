@@ -340,6 +340,25 @@ void botFromJson(BotConfig target, dynamic raw) {
       (m['itemsSynced'] as num?)?.toInt() ?? target.itemsSynced;
 }
 
+
+/// Empty/UTC tz with Novosibirsk coords yields noon candle times (e.g. 12:38).
+String normalizeTimezone(String raw, double lat, double lon, String fallback) {
+  final tz = raw.trim();
+  final upper = tz.toUpperCase();
+  final bad = tz.isEmpty ||
+      upper == 'UTC' ||
+      upper == 'ETC/UTC' ||
+      upper == 'GMT' ||
+      upper == 'ETC/GMT';
+  final nearNsk = (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
+  if (bad && nearNsk) return 'Asia/Novosibirsk';
+  if (tz.isEmpty) {
+    final fb = fallback.trim();
+    return fb.isEmpty ? 'Asia/Novosibirsk' : fb;
+  }
+  return tz;
+}
+
 Map<String, dynamic> locationToJson(SiteLocation l) => {
       'city': l.cityName,
       'query': l.query,
@@ -351,12 +370,14 @@ Map<String, dynamic> locationToJson(SiteLocation l) => {
 SiteLocation locationFromJson(dynamic raw, SiteLocation fallback) {
   if (raw is! Map) return fallback;
   final m = Map<String, dynamic>.from(raw);
+  final lat = (m['lat'] as num?)?.toDouble() ?? fallback.latitude;
+  final lon = (m['lon'] as num?)?.toDouble() ?? fallback.longitude;
   return SiteLocation(
     cityName: '${m['city'] ?? fallback.cityName}',
     query: '${m['query'] ?? fallback.query}',
-    latitude: (m['lat'] as num?)?.toDouble() ?? fallback.latitude,
-    longitude: (m['lon'] as num?)?.toDouble() ?? fallback.longitude,
-    timezone: '${m['tz'] ?? fallback.timezone}',
+    latitude: lat,
+    longitude: lon,
+    timezone: normalizeTimezone('${m['tz'] ?? ''}', lat, lon, fallback.timezone),
   );
 }
 

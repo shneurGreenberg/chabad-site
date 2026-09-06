@@ -469,12 +469,19 @@ class AppRepository extends ChangeNotifier {
           query.toLowerCase().contains('jerusalem')) {
         return;
       }
+      final lat = (m['lat'] as num?)?.toDouble() ?? location.latitude;
+      final lon = (m['lon'] as num?)?.toDouble() ?? location.longitude;
       location = SiteLocation(
         cityName: city.isEmpty ? location.cityName : city,
         query: query.isEmpty ? location.query : query,
-        latitude: (m['lat'] as num?)?.toDouble() ?? location.latitude,
-        longitude: (m['lon'] as num?)?.toDouble() ?? location.longitude,
-        timezone: m['tz'] as String? ?? location.timezone,
+        latitude: lat,
+        longitude: lon,
+        timezone: normalizeTimezone(
+          '${m['tz'] ?? ''}',
+          lat,
+          lon,
+          location.timezone,
+        ),
       );
     } catch (_) {}
   }
@@ -493,21 +500,68 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> setLocation(SiteLocation next) async {
+    next.timezone = normalizeTimezone(
+      next.timezone,
+      next.latitude,
+      next.longitude,
+      SiteLocation.novosibirsk().timezone,
+    );
     location = next;
     _persistLocation();
     await refreshTimes();
   }
 
+  /// Candle lighting in Novosibirsk is evening; 10:00–15:59 usually means UTC/bad tz.
+  bool _candleLooksInvalid([String? candle]) {
+    final c = (candle ?? shabbat['candle'] ?? '').trim();
+    if (c.isEmpty || c == '--:--') return true;
+    final parts = c.split(':');
+    if (parts.length < 2) return true;
+    final hour = int.tryParse(parts[0]) ?? -1;
+    return hour >= 10 && hour <= 15;
+  }
+
+  bool _ensureLocationTimezone() {
+    final before = location.timezone;
+    location.timezone = normalizeTimezone(
+      location.timezone,
+      location.latitude,
+      location.longitude,
+      SiteLocation.novosibirsk().timezone,
+    );
+    if (location.timezone != before) {
+      _persistLocation();
+      return true;
+    }
+    return false;
+  }
+
   Future<void> refreshTimes() async {
+    _ensureLocationTimezone();
     try {
-      final data = await LocationZmanimApi.fetchTimes(location);
+      var data = await LocationZmanimApi.fetchTimes(location);
+      // If Hebcal returned noon candles, force Asia/Novosibirsk and retry once.
+      if (_candleLooksInvalid(data.shabbat['candle'])) {
+        final fixed = normalizeTimezone(
+          '',
+          location.latitude,
+          location.longitude,
+          'Asia/Novosibirsk',
+        );
+        location.timezone = fixed;
+        _persistLocation();
+        data = await LocationZmanimApi.fetchTimes(location);
+      }
       zmanim
         ..clear()
         ..addAll(data.zmanim);
       shabbat
         ..clear()
         ..addAll(data.shabbat);
-      debugPrint('Zmanim refreshed: candle=${shabbat['candle']}, havdala=${shabbat['havdala']}, parasha_he=${shabbat['parasha_he']}');
+      debugPrint(
+        'Zmanim refreshed: candle=${shabbat['candle']}, havdala=${shabbat['havdala']}, '
+        'parasha_he=${shabbat['parasha_he']}, holiday_en=${shabbat['holiday_en']}, tz=${location.timezone}',
+      );
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to refresh zmanim: $e');

@@ -226,18 +226,31 @@ class LocationZmanimApi {
     final holidayRu = holidayName(shabbatRu);
     final hasHoliday = holidayEn.isNotEmpty || holidayHe.isNotEmpty;
 
+    // On major holidays Hebcal omits parashat — never leave occasion blank.
+    final parashaHeOut = heName.isNotEmpty
+        ? heName
+        : (hebrewFromEn.isNotEmpty ? hebrewFromEn : (holidayHe.isNotEmpty ? holidayHe : holidayEn));
+    final parashaEnOut = enName.isNotEmpty ? enName : holidayEn;
+    final parashaRuOut = ruName.isNotEmpty
+        ? ruName
+        : (enName.isNotEmpty ? enName : (holidayRu.isNotEmpty ? holidayRu : holidayEn));
+
+    final candle = itemTime(shabbatEn, 'candles');
+    final havdala = itemTime(shabbatEn, 'havdalah');
+
     return (
       zmanim: zmanim,
       shabbat: {
-        'candle': itemTime(shabbatEn, 'candles'),
-        'havdala': itemTime(shabbatEn, 'havdalah'),
-        'parasha_he': heName.isNotEmpty ? heName : hebrewFromEn,
-        'parasha_en': enName,
-        'parasha_ru': ruName.isNotEmpty ? ruName : enName,
+        'candle': candle,
+        'havdala': havdala,
+        'parasha_he': parashaHeOut,
+        'parasha_en': parashaEnOut,
+        'parasha_ru': parashaRuOut,
         'holiday_he': holidayHe.isNotEmpty ? holidayHe : holidayEn,
         'holiday_en': holidayEn,
         'holiday_ru': holidayRu.isNotEmpty ? holidayRu : holidayEn,
         'is_holiday': hasHoliday ? '1' : '0',
+        'fetched_at': DateTime.now().toUtc().toIso8601String(),
       },
     );
   }
