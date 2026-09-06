@@ -73,6 +73,8 @@ Map<String, dynamic> newsToJson(NewsArticle a) => {
       'telegramMessageId': a.telegramMessageId,
       'telegramPublishedId': a.telegramPublishedId,
       'telegramPublishedAt': a.telegramPublishedAt?.toIso8601String(),
+      'imageAlignX': a.imageAlignX,
+      'imageAlignY': a.imageAlignY,
     };
 
 NewsArticle newsFromJson(dynamic raw) {
@@ -97,6 +99,8 @@ NewsArticle newsFromJson(dynamic raw) {
     telegramMessageId: (m['telegramMessageId'] as num?)?.toInt(),
     telegramPublishedId: (m['telegramPublishedId'] as num?)?.toInt(),
     telegramPublishedAt: DateTime.tryParse('${m['telegramPublishedAt'] ?? ''}'),
+    imageAlignX: (m['imageAlignX'] as num?)?.toDouble() ?? 0,
+    imageAlignY: (m['imageAlignY'] as num?)?.toDouble() ?? 0,
   );
 }
 
@@ -110,6 +114,8 @@ Map<String, dynamic> programToJson(Program p) => {
       'color': p.color,
       'imageUrl': compactImageUrl(p.imageUrl),
       'imageId': imageIdOf('program', p.id, bytes: p.imageBytes),
+      'imageAlignX': p.imageAlignX,
+      'imageAlignY': p.imageAlignY,
     };
 
 Program programFromJson(dynamic raw) {
@@ -126,6 +132,8 @@ Program programFromJson(dynamic raw) {
     imageUrl: compactImageUrl(
       m['imageUrl'] is String ? '${m['imageUrl']}' : null,
     ),
+    imageAlignX: (m['imageAlignX'] as num?)?.toDouble() ?? 0,
+    imageAlignY: (m['imageAlignY'] as num?)?.toDouble() ?? 0,
   );
 }
 

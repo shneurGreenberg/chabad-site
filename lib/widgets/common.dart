@@ -188,6 +188,7 @@ class GradientImage extends StatelessWidget {
     this.badge,
     this.bytes,
     this.url,
+    this.alignment = Alignment.center,
   });
   final int color;
   final IconData? icon;
@@ -197,6 +198,7 @@ class GradientImage extends StatelessWidget {
   final Widget? badge;
   final Uint8List? bytes;
   final String? url;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +214,7 @@ class GradientImage extends StatelessWidget {
               Image.memory(
                 bytes!,
                 fit: BoxFit.cover,
+                alignment: alignment,
                 gaplessPlayback: true,
                 cacheWidth: imageDecodePx(
                     context, MediaQuery.sizeOf(context).width.clamp(200, 900)),
@@ -227,10 +230,11 @@ class GradientImage extends StatelessWidget {
       final cacheW = imageDecodePx(
           context, MediaQuery.sizeOf(context).width.clamp(200, 900));
       final img = url!.startsWith('assets/')
-          ? Image.asset(url!, fit: BoxFit.cover, cacheWidth: cacheW)
+          ? Image.asset(url!, fit: BoxFit.cover, alignment: alignment, cacheWidth: cacheW)
           : Image.network(
               url!,
               fit: BoxFit.cover,
+              alignment: alignment,
               cacheWidth: cacheW,
               filterQuality: FilterQuality.low,
             );

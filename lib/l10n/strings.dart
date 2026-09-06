@@ -190,6 +190,7 @@ const Map<String, Map<String, String>> _strings = {
   'common.delete': {'he': 'מחיקה', 'en': 'Delete', 'ru': 'Удалить'},
   'common.close': {'he': 'סגירה', 'en': 'Close', 'ru': 'Закрыть'},
   'common.name': {'he': 'שם', 'en': 'Name', 'ru': 'Имя'},
+  'common.position': {'he': 'מיקום', 'en': 'Position', 'ru': 'Позиция'},
   'common.email': {'he': 'אימייל', 'en': 'Email', 'ru': 'Эл. почта'},
   'common.phone': {'he': 'טלפון', 'en': 'Phone', 'ru': 'Телефон'},
   'common.message': {'he': 'הודעה', 'en': 'Message', 'ru': 'Сообщение'},
