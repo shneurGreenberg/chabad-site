@@ -88,7 +88,9 @@ class AuthController extends ChangeNotifier {
         return null;
       }
     }
-    CloudSync.instance.adminSession = true;
+    // Local-only fallback: unlock admin UI without Firebase Auth.
+    // Do not set adminSession — cloud writes require signedIn.
+    CloudSync.instance.adminSession = false;
     _role = AdminRole.admin;
     _loggedIn = true;
     _email = trimmed;

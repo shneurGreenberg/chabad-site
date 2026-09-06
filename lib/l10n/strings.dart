@@ -571,6 +571,16 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Open Firestore console',
     'ru': 'Открыть консоль Firestore'
   },
+  'admin.cloud.localOnly': {
+    'he': 'סנכרון ענן: מקומי בלבד (אין התחברות Firebase)',
+    'en': 'Cloud sync: local only (not signed in to Firebase)',
+    'ru': 'Облако: только локально (нет входа в Firebase)'
+  },
+  'admin.cloud.connected': {
+    'he': 'סנכרון ענן: מחובר',
+    'en': 'Cloud sync: connected',
+    'ru': 'Облако: подключено'
+  },
 
   'admin.settings.mapsKey': {
     'he': 'מפתח Google Maps (רשות)',
