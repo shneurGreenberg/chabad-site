@@ -263,7 +263,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               borderRadius: BorderRadius.circular(12),
             ),
             clipBehavior: Clip.antiAlias,
-            child: MapIFrame(
+            child: MapEmbed(
               url: _mapUrl(site.latitude, site.longitude),
             ),
           ),
