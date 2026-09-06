@@ -83,6 +83,7 @@ const Map<String, Map<String, String>> _strings = {
   'nav.contact': {'he': 'הרשמה', 'en': 'Register', 'ru': 'Регистрация'},
   'nav.about': {'he': 'אודות', 'en': 'About', 'ru': 'О нас'},
   'nav.events': {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
+  'nav.tourist': {'he': 'מידע לתייר', 'en': 'Tourist Info', 'ru': 'Информация для туристов'},
   'nav.admin': {'he': 'ניהול', 'en': 'Admin', 'ru': 'Админ'},
   'nav.menu': {'he': 'תפריט', 'en': 'Menu', 'ru': 'Меню'},
 
@@ -1321,4 +1322,46 @@ const Map<String, Map<String, String>> _strings = {
   'events.when': {'he': 'תאריך ושעה (ISO)', 'en': 'Date and time (ISO)', 'ru': 'Дата и время (ISO)'},
   'events.capacity': {'he': 'מכסה (0=בלי הגבלה)', 'en': 'Capacity (0=unlimited)', 'ru': 'Лимит (0=без лимита)'},
   'search.group.events': {'he': 'אירועים', 'en': 'Events', 'ru': 'События'},
+
+  // Tourist Info
+  'tourist.subtitle': {
+    'he': 'מידע שימושי לתיירים ומבקרים — בית כנסת, אוכל כשר, לינה ואטרקציות',
+    'en': 'Useful information for tourists and visitors — synagogue, kosher food, accommodation and attractions',
+    'ru': 'Полезная информация для туристов и гостей — синагога, кошерная еда, проживание и достопримечательности',
+  },
+  'tourist.synagogue': {
+    'he': 'בית הכנסת',
+    'en': 'Synagogue',
+    'ru': 'Синагога',
+  },
+  'tourist.kosherFood': {
+    'he': 'אוכל כשר להזמנה',
+    'en': 'Kosher food to order',
+    'ru': 'Кошерная еда на заказ',
+  },
+  'tourist.hotels': {
+    'he': 'מלונות קרובים',
+    'en': 'Nearby hotels',
+    'ru': 'Ближайшие отели',
+  },
+  'tourist.attractions': {
+    'he': 'מקומות מעניינים בעיר',
+    'en': 'Places to visit in the city',
+    'ru': 'Интересные места города',
+  },
+  'tourist.dayTrips': {
+    'he': 'טיולי יום באזור',
+    'en': 'Day trips in the area',
+    'ru': 'Поездки по окрестностям',
+  },
+  'admin.manage.tourist': {
+    'he': 'מידע לתיירים',
+    'en': 'Tourist Information',
+    'ru': 'Информация для туристов',
+  },
+  'admin.tourist.reorder': {
+    'he': 'גררו או השתמשו בחצים כדי לסדר את הפריטים.',
+    'en': 'Drag or use the arrows to arrange the items.',
+    'ru': 'Перетащите или используйте стрелки, чтобы расположить элементы.',
+  },
 };

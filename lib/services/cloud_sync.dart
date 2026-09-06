@@ -159,6 +159,14 @@ class CloudSync {
           prune: prune);
       await _syncList(db, 'orders', _asMaps(snapshot['orders']), images, null,
           prune: prune);
+      await _syncList(
+        db,
+        'touristInfo',
+        _asMaps(snapshot['touristInfo']),
+        images,
+        'tourist',
+        prune: prune,
+      );
       await _syncBanners(db, snapshot['banners'], images, prune: prune);
       await _syncMedia(db, images, now, prune: prune);
       lastError = null;
@@ -194,6 +202,7 @@ class CloudSync {
         snapshot['subscribers'] = await _loadList(db, 'subscribers');
         snapshot['events'] = await _loadList(db, 'events');
         snapshot['orders'] = await _loadList(db, 'orders');
+        snapshot['touristInfo'] = await _loadList(db, 'touristInfo');
         snapshot['banners'] = await _loadBanners(db);
       }
 

@@ -520,6 +520,36 @@ TourStop tourFromJson(dynamic raw) {
   );
 }
 
+Map<String, dynamic> touristInfoToJson(TouristInfo t) => {
+      'id': t.id,
+      'title': locTo(t.title),
+      'description': locTo(t.description),
+      'category': t.category.name,
+      'icon': iconTo(t.icon),
+      'color': t.color,
+      'imageUrl': compactImageUrl(t.imageUrl),
+      'imageId': imageIdOf('tourist', t.id, bytes: t.imageBytes),
+    };
+
+TouristInfo touristInfoFromJson(dynamic raw) {
+  final m = Map<String, dynamic>.from(raw as Map);
+  return TouristInfo(
+    id: '${m['id']}',
+    title: locFrom(m['title']),
+    description: locFrom(m['description']),
+    category: TouristCategory.values.firstWhere(
+      (e) => e.name == m['category'],
+      orElse: () => TouristCategory.synagogue,
+    ),
+    icon: iconFrom(m['icon'], Icons.info_outline),
+    color: (m['color'] as num?)?.toInt() ?? 0xFF0EA5E9,
+    imageBytes: b64ToBytes(m['image']),
+    imageUrl: compactImageUrl(
+      m['imageUrl'] is String ? '${m['imageUrl']}' : null,
+    ),
+  );
+}
+
 Map<String, dynamic> shiurToJson(Shiur s) => {
       'id': s.id,
       'title': locTo(s.title),

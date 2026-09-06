@@ -62,6 +62,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /touristInfo/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     match /leads/{id} {
       allow read, update, delete: if isAdmin();
       allow create: if true;
@@ -306,6 +310,8 @@ class _AdminShellState extends State<AdminShell> {
           const ManageFamousPanel()),
       _AdminSection(loc.t('admin.manage.history'), Icons.account_balance_outlined,
           const ManageHistoryPanel()),
+      _AdminSection(loc.t('nav.tourist'), Icons.explore_outlined,
+          const ManageTouristPanel()),
       _AdminSection(loc.t('admin.manage.library'), Icons.menu_book_outlined,
           const ManageLibraryPanel(),
           jump: AdminJump.library),

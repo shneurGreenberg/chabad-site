@@ -39,6 +39,7 @@ const moreNav = [
   NavItem('/famous', 'nav.famous', Icons.star_outline),
   NavItem('/history', 'nav.history', Icons.account_balance_outlined),
   NavItem('/library', 'nav.library', Icons.menu_book_outlined),
+  NavItem('/tourist', 'nav.tourist', Icons.explore_outlined),
   NavItem('/about', 'nav.about', Icons.info_outline),
 ];
 
