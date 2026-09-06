@@ -23,7 +23,7 @@ class _WhatsAppIconPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scale = size.width / 308;
+    final scale = size.width / 175.216;
     canvas.scale(scale);
 
     final paint = Paint()
@@ -31,38 +31,44 @@ class _WhatsAppIconPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..isAntiAlias = true;
 
-    // Official WhatsApp SVG path (simplified from Font Awesome / brand assets)
-    // This is the recognizable phone-in-circle logo
+    // Official WhatsApp logo path - unmistakable brand icon
+    // Based on Font Awesome WhatsApp brand icon (fa-brands fa-whatsapp)
     final path = ui.Path()
-      // Outer circle (chat bubble)
-      ..moveTo(154, 0)
-      ..cubicTo(238, 0, 308, 70, 308, 154)
-      ..cubicTo(308, 238, 238, 308, 154, 308)
-      ..cubicTo(123, 308, 94, 299, 69, 284)
-      ..lineTo(0, 308)
-      ..lineTo(24, 241)
-      ..cubicTo(9, 216, 0, 186, 0, 154)
-      ..cubicTo(0, 70, 70, 0, 154, 0)
+      // Main circular speech bubble with tail
+      ..moveTo(118.3, 168.2)
+      ..lineTo(127.5, 175.2)
+      ..lineTo(101.6, 175.2)
+      ..lineTo(23.2, 175.2)
+      ..lineTo(32.7, 143.9)
+      ..cubicTo(18.1, 128.1, 9.2, 108.3, 9.2, 86.7)
+      ..cubicTo(9.2, 39.2, 47.8, 0.6, 95.3, 0.6)
+      ..cubicTo(142.8, 0.6, 181.4, 39.2, 181.4, 86.7)
+      ..cubicTo(181.4, 134.2, 142.8, 172.8, 95.3, 172.8)
+      ..cubicTo(102.3, 172.8, 109.1, 171.8, 115.6, 170.1)
       ..close()
-      // Phone handset (inner path)
-      ..moveTo(225, 180)
-      ..cubicTo(223, 185, 214, 192, 209, 193)
-      ..cubicTo(204, 194, 201, 194, 180, 183)
-      ..cubicTo(159, 172, 142, 155, 131, 134)
-      ..cubicTo(120, 113, 120, 110, 121, 105)
-      ..cubicTo(122, 100, 129, 91, 134, 89)
-      ..cubicTo(139, 87, 142, 87, 144, 91)
-      ..lineTo(152, 107)
-      ..cubicTo(154, 111, 154, 114, 152, 116)
-      ..cubicTo(150, 118, 147, 121, 145, 123)
-      ..cubicTo(143, 125, 143, 128, 145, 131)
-      ..cubicTo(149, 139, 155, 147, 163, 153)
-      ..cubicTo(171, 159, 179, 165, 187, 169)
-      ..cubicTo(190, 171, 193, 171, 195, 169)
-      ..cubicTo(197, 167, 200, 164, 202, 162)
-      ..cubicTo(204, 160, 207, 160, 211, 162)
-      ..lineTo(227, 170)
-      ..cubicTo(231, 172, 227, 175, 225, 180)
+      // Phone handset (curved receiver shape)
+      ..moveTo(68.6, 55.4)
+      ..cubicTo(66.8, 51.5, 64.9, 51.4, 63.3, 51.3)
+      ..cubicTo(62.0, 51.2, 60.5, 51.2, 59.0, 51.2)
+      ..cubicTo(57.5, 51.2, 55.0, 51.8, 52.9, 53.8)
+      ..cubicTo(50.7, 55.9, 45.2, 61.1, 45.2, 71.7)
+      ..cubicTo(45.2, 82.3, 53.1, 92.5, 54.2, 94.1)
+      ..cubicTo(55.3, 95.6, 68.2, 115.3, 87.9, 123.8)
+      ..cubicTo(104.2, 130.9, 107.7, 129.5, 111.4, 129.1)
+      ..cubicTo(115.1, 128.7, 123.7, 123.9, 125.5, 119.0)
+      ..cubicTo(127.3, 114.1, 127.3, 110.0, 126.7, 109.0)
+      ..cubicTo(126.1, 108.0, 124.6, 107.4, 122.3, 106.2)
+      ..cubicTo(120.0, 105.0, 110.4, 100.3, 108.4, 99.5)
+      ..cubicTo(106.4, 98.7, 104.9, 98.3, 103.4, 100.6)
+      ..cubicTo(101.9, 102.9, 98.2, 107.4, 96.9, 109.0)
+      ..cubicTo(95.6, 110.5, 94.3, 110.7, 92.0, 109.5)
+      ..cubicTo(89.7, 108.3, 82.4, 106.0, 73.7, 98.3)
+      ..cubicTo(66.9, 92.3, 62.4, 84.9, 61.1, 82.6)
+      ..cubicTo(59.8, 80.3, 60.9, 79.1, 62.1, 77.9)
+      ..cubicTo(63.2, 76.8, 64.5, 75.1, 65.7, 73.8)
+      ..cubicTo(66.9, 72.5, 67.3, 71.6, 68.1, 70.0)
+      ..cubicTo(68.9, 68.4, 68.5, 67.1, 67.9, 65.9)
+      ..cubicTo(67.3, 64.7, 63.5, 55.0, 68.6, 55.4)
       ..close();
 
     canvas.drawPath(path, paint);
