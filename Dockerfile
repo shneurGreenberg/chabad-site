@@ -16,9 +16,8 @@ RUN apt-get update && apt-get install -y \
     jq \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone Flutter SDK
-ARG FLUTTER_VERSION=3.24.5
-RUN git clone --depth 1 --branch ${FLUTTER_VERSION} https://github.com/flutter/flutter.git /flutter
+# Clone Flutter SDK (stable channel for Dart SDK ^3.12.2 compatibility)
+RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /flutter
 
 # Add Flutter to PATH
 ENV PATH="/flutter/bin:${PATH}"
