@@ -112,14 +112,19 @@ class LocationZmanimApi {
   ) async {
     final lat = loc.latitude;
     final lon = loc.longitude;
+    final nearNsk = (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
     var tzid = loc.timezone.trim();
-    if ((lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5) {
+    if (nearNsk) {
       tzid = 'Asia/Novosibirsk';
     }
     final tz = Uri.encodeQueryComponent(tzid);
+    // Novosibirsk geonameid has built-in tz on Hebcal — prefer it near NSK.
+    final locQuery = nearNsk
+        ? 'geonameid=1496747&tzid=$tz'
+        : 'latitude=$lat&longitude=$lon&tzid=$tz';
 
     final zmanimJson = await _json(
-      'https://www.hebcal.com/zmanim?cfg=json&latitude=$lat&longitude=$lon&tzid=$tz',
+      'https://www.hebcal.com/zmanim?cfg=json&$locQuery',
     );
     final times = (zmanimJson['times'] as Map?) ?? {};
 
@@ -136,7 +141,6 @@ class LocationZmanimApi {
           afterT.endsWith('Z') ||
           afterT.contains('+00');
       final hour = int.tryParse(hhmm.substring(0, 2)) ?? -1;
-      final nearNsk = (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
       if (nearNsk && utcish && hour >= 10 && hour <= 15) {
         final min = int.tryParse(hhmm.substring(3, 5)) ?? 0;
         final localHour = (hour + 7) % 24;
@@ -163,15 +167,15 @@ class LocationZmanimApi {
     ];
 
     final shabbatEn = await _json(
-      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&latitude=$lat&longitude=$lon&tzid=$tz',
+      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&$locQuery',
     );
     final shabbatHe = await _json(
-      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=h&latitude=$lat&longitude=$lon&tzid=$tz',
+      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=h&$locQuery',
     );
     Map<String, dynamic> shabbatRu = const {};
     try {
       shabbatRu = await _json(
-        'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=ru&latitude=$lat&longitude=$lon&tzid=$tz',
+        'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=ru&$locQuery',
       );
     } catch (_) {}
 
