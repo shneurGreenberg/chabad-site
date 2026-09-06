@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 /// WhatsApp brand mark — CustomPainter (CanvasKit-safe, no asset/Image.asset).
 /// White glyph on transparent background for the green FAB.
+///
+/// Uses [Path.combine] difference (not BlendMode.dstOut/saveLayer), because
+/// CanvasKit on Flutter web does not apply dstOut reliably — only the bubble
+/// would show, looking like Icons.chat.
 class WhatsAppIcon extends StatelessWidget {
   const WhatsAppIcon({super.key, this.size = 24, this.color = Colors.white});
 
@@ -28,23 +32,23 @@ class _WhatsAppLogoPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final white = Paint()
+    final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill
       ..isAntiAlias = true;
 
-    // Speech bubble body
-    final bubble = Path()
+    // Speech bubble body + tail (single path)
+    final bubbleBody = Path()
       ..addOval(Rect.fromCircle(
         center: Offset(w * 0.52, h * 0.45),
         radius: w * 0.36,
       ));
-    // Tail (bottom-start)
     final tail = Path()
       ..moveTo(w * 0.22, h * 0.68)
       ..quadraticBezierTo(w * 0.08, h * 0.95, w * 0.32, h * 0.78)
       ..quadraticBezierTo(w * 0.26, h * 0.74, w * 0.22, h * 0.68)
       ..close();
+    final bubbleWithTail = Path.combine(PathOperation.union, bubbleBody, tail);
 
     // Handset silhouette (cut out of bubble)
     final phone = Path();
@@ -88,17 +92,8 @@ class _WhatsAppLogoPainter extends CustomPainter {
     );
     phone.close();
 
-    canvas.saveLayer(Offset.zero & size, Paint());
-    canvas.drawPath(bubble, white);
-    canvas.drawPath(tail, white);
-    canvas.drawPath(
-      phone,
-      Paint()
-        ..blendMode = BlendMode.dstOut
-        ..style = PaintingStyle.fill
-        ..isAntiAlias = true,
-    );
-    canvas.restore();
+    final logo = Path.combine(PathOperation.difference, bubbleWithTail, phone);
+    canvas.drawPath(logo, paint);
   }
 
   @override
