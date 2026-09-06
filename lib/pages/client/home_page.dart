@@ -127,11 +127,20 @@ class _Hero extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final wide = MediaQuery.sizeOf(context).width >= 980;
+    final isHoliday = repo.shabbat['is_holiday'] == '1';
+    final holiday = switch (loc.lang) {
+      'he' => repo.shabbat['holiday_he'] ?? '',
+      'ru' => repo.shabbat['holiday_ru'] ?? '',
+      _ => repo.shabbat['holiday_en'] ?? '',
+    };
     final parasha = switch (loc.lang) {
       'he' => repo.shabbat['parasha_he']!,
       'ru' => repo.shabbat['parasha_ru']!,
       _ => repo.shabbat['parasha_en']!,
     };
+    final occasion = isHoliday && holiday.trim().isNotEmpty
+        ? holiday.trim()
+        : parasha;
 
     final copy = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,9 +204,10 @@ class _Hero extends StatelessWidget {
     );
 
     final shabbatCard = _ShabbatCard(
-      parasha: parasha,
+      parasha: occasion,
       candle: repo.shabbat['candle']!,
       havdala: repo.shabbat['havdala']!,
+      isHoliday: isHoliday && holiday.trim().isNotEmpty,
     );
 
     final banner = repo.bannerFor('/');
@@ -267,10 +277,12 @@ class _ShabbatCard extends StatelessWidget {
     required this.parasha,
     required this.candle,
     required this.havdala,
+    this.isHoliday = false,
   });
   final String parasha;
   final String candle;
   final String havdala;
+  final bool isHoliday;
 
   @override
   Widget build(BuildContext context) {
@@ -296,11 +308,15 @@ class _ShabbatCard extends StatelessWidget {
               Row(children: [
                 PlayfulIcon(Icons.local_fire_department, color: AppColors.accentSoft),
                 const SizedBox(width: 8),
-                Text(loc.t('zmanim.shabbat'),
+                Expanded(
+                  child: Text(
+                    isHoliday ? loc.t('zmanim.holiday') : loc.t('zmanim.shabbat'),
                     style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
-                        fontSize: 18)),
+                        fontSize: 18),
+                  ),
+                ),
               ]),
               const SizedBox(height: 8),
               Text(parasha,
@@ -310,8 +326,10 @@ class _ShabbatCard extends StatelessWidget {
                       fontSize: 14.5)),
               const SizedBox(height: 18),
               _row(loc.t('zmanim.candle'), candle),
-              const SizedBox(height: 10),
-              _row(loc.t('zmanim.havdala'), havdala),
+              if (havdala.trim().isNotEmpty && havdala != '--:--') ...[
+                const SizedBox(height: 10),
+                _row(loc.t('zmanim.havdala'), havdala),
+              ],
               const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,

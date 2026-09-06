@@ -214,6 +214,16 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Зажигание свечей'
   },
   'zmanim.havdala': {'he': 'צאת השבת', 'en': 'Havdalah', 'ru': 'Исход субботы'},
+  'zmanim.holiday': {
+    'he': 'חג',
+    'en': 'Holiday',
+    'ru': 'Праздник',
+  },
+  'zmanim.holidayTimes': {
+    'he': 'זמני החג',
+    'en': 'Holiday times',
+    'ru': 'Время праздника',
+  },
 
   // Programs
   'programs.subtitle': {

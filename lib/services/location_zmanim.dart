@@ -175,10 +175,56 @@ class LocationZmanimApi {
       return hebrewFallback ?? '';
     }
 
+    /// Major holiday title near candle lighting (e.g. Rosh Hashana).
+    String holidayName(Map<String, dynamic> json, {bool hebrew = false}) {
+      String fromCandlesMemo() {
+        for (final item in json['items'] as List? ?? const []) {
+          if (item is! Map) continue;
+          if (item['category'] != 'candles') continue;
+          final memo = (item['memo'] as String?)?.trim() ?? '';
+          if (memo.isNotEmpty) return memo;
+        }
+        return '';
+      }
+
+      for (final item in json['items'] as List? ?? const []) {
+        if (item is! Map) continue;
+        if (item['category'] != 'holiday') continue;
+        final sub = '${item['subcat'] ?? ''}';
+        final yomtov = item['yomtov'] == true;
+        if (!(yomtov || sub == 'major' || sub == 'modern')) continue;
+        if (hebrew) {
+          final h = (item['hebrew'] as String?)?.trim();
+          if (h != null && h.isNotEmpty) return h;
+        }
+        final title = (item['title'] as String?)?.trim() ?? '';
+        if (title.toLowerCase().startsWith('erev ')) continue;
+        if (title.isNotEmpty) return title;
+      }
+      final memo = fromCandlesMemo();
+      if (memo.isNotEmpty) return memo;
+      for (final item in json['items'] as List? ?? const []) {
+        if (item is! Map) continue;
+        if (item['category'] != 'holiday') continue;
+        if (hebrew) {
+          final h = (item['hebrew'] as String?)?.trim();
+          if (h != null && h.isNotEmpty) return h;
+        }
+        final title = (item['title'] as String?)?.trim();
+        if (title != null && title.isNotEmpty) return title;
+      }
+      return '';
+    }
+
     final heName = parasha(shabbatHe, hebrewFallback: '');
     final enName = parasha(shabbatEn);
     final ruName = parasha(shabbatRu);
     final hebrewFromEn = parasha(shabbatEn, hebrewFallback: 'x');
+
+    final holidayHe = holidayName(shabbatHe, hebrew: true);
+    final holidayEn = holidayName(shabbatEn);
+    final holidayRu = holidayName(shabbatRu);
+    final hasHoliday = holidayEn.isNotEmpty || holidayHe.isNotEmpty;
 
     return (
       zmanim: zmanim,
@@ -188,6 +234,10 @@ class LocationZmanimApi {
         'parasha_he': heName.isNotEmpty ? heName : hebrewFromEn,
         'parasha_en': enName,
         'parasha_ru': ruName.isNotEmpty ? ruName : enName,
+        'holiday_he': holidayHe.isNotEmpty ? holidayHe : holidayEn,
+        'holiday_en': holidayEn,
+        'holiday_ru': holidayRu.isNotEmpty ? holidayRu : holidayEn,
+        'is_holiday': hasHoliday ? '1' : '0',
       },
     );
   }

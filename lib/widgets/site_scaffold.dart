@@ -16,7 +16,6 @@ import 'playful_icons.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
 import 'whatsapp_icon.dart';
-import 'whatsapp_icon.dart';
 
 class NavItem {
   const NavItem(this.route, this.labelKey, this.icon);
@@ -1101,7 +1100,7 @@ class _FloatContact extends StatelessWidget {
             foregroundColor: Colors.white,
             tooltip: loc.t('social.whatsapp'),
             onPressed: () => openUrl(wa),
-            child: const WhatsAppIcon(size: 26, color: Colors.white),
+            child: const WhatsAppIcon(size: 28, color: Colors.white),
           ),
         if (wa != null && tel != null) const SizedBox(height: 10),
         if (tel != null)

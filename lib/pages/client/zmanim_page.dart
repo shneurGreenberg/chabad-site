@@ -13,7 +13,15 @@ class ZmanimPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
+    final isHoliday = repo.shabbat['is_holiday'] == '1';
+    final holiday = repo.shabbat['holiday_${loc.lang}'] ??
+        repo.shabbat['holiday_en'] ??
+        '';
     final parasha = repo.shabbat['parasha_${loc.lang}'] ?? repo.shabbat['parasha_en']!;
+    final occasion = isHoliday && holiday.trim().isNotEmpty ? holiday.trim() : parasha;
+    final heading = isHoliday && holiday.trim().isNotEmpty
+        ? loc.t('zmanim.holiday')
+        : loc.t('zmanim.shabbat');
     return SiteScaffold(
       currentRoute: '/zmanim',
       children: [
@@ -49,13 +57,13 @@ class ZmanimPage extends StatelessWidget {
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       PlayfulIcon(Icons.local_fire_department, color: AppColors.accent),
                       const SizedBox(width: 8),
-                      Text(loc.t('zmanim.shabbat'),
+                      Text(heading,
                           style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w800,
                               fontSize: 20)),
                     ]),
-                    Pill(parasha, color: AppColors.accent),
+                    Pill(occasion, color: AppColors.accent),
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -64,7 +72,9 @@ class ZmanimPage extends StatelessWidget {
                   runSpacing: 16,
                   children: [
                     _big(loc.t('zmanim.candle'), repo.shabbat['candle']!),
-                    _big(loc.t('zmanim.havdala'), repo.shabbat['havdala']!),
+                    if ((repo.shabbat['havdala'] ?? '').trim().isNotEmpty &&
+                        repo.shabbat['havdala'] != '--:--')
+                      _big(loc.t('zmanim.havdala'), repo.shabbat['havdala']!),
                   ],
                 ),
               ],

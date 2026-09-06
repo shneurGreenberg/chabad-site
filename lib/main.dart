@@ -13,9 +13,12 @@ import 'theme.dart';
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> main() async {
-  // Hash URLs so GitHub Pages can open /#/cemetery without a server 404.
+  // Hash URLs so GitHub Pages / Amvera can open /#/cemetery without a server 404.
+  // MUST run before GoRouter is constructed (see createAppRouter in router.dart).
   setUrlStrategy(HashUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
+  // Construct router only after HashUrlStrategy so deep links (#/tourist, #/history) match.
+  createAppRouter();
   await CloudSync.instance.init();
   runApp(const ChabadApp());
 }
