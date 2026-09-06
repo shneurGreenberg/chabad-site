@@ -29,6 +29,8 @@ class ChabadApp extends StatefulWidget {
 
 class _ChabadAppState extends State<ChabadApp> {
   late final AppRepository _repo = AppRepository();
+  late final LocaleController _locale = LocaleController();
+  String? _prevLang;
 
   @override
   void initState() {
@@ -40,13 +42,28 @@ class _ChabadAppState extends State<ChabadApp> {
         );
       });
     };
+    _locale.addListener(_onLocaleChanged);
+    _prevLang = _locale.lang;
+  }
+
+  void _onLocaleChanged() {
+    if (_prevLang != _locale.lang) {
+      _prevLang = _locale.lang;
+      _repo.onLocaleChanged(_locale.lang);
+    }
+  }
+
+  @override
+  void dispose() {
+    _locale.removeListener(_onLocaleChanged);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LocaleController()),
+        ChangeNotifierProvider.value(value: _locale),
         ChangeNotifierProvider.value(value: _repo),
         ChangeNotifierProvider(create: (_) => AuthController()),
       ],

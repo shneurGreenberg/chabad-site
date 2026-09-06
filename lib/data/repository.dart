@@ -85,19 +85,25 @@ class AppRepository extends ChangeNotifier {
     await _pullCloud();
     await _loadKaddishGraves();
     _hydrated = true;
-    _cloudPulled = true;
-    _notifyUi();
-    try {
-      await refreshTimes();
-    } catch (e) {
-      // Retry once after a delay if initial fetch fails
-      await Future.delayed(const Duration(seconds: 2));
+    
+    // Retry refreshing times up to 3 times if it fails
+    var attempts = 0;
+    while (attempts < 3) {
       try {
         await refreshTimes();
-      } catch (_) {
-        // Keep default times if API is unavailable
+        break;
+      } catch (e) {
+        attempts++;
+        if (attempts >= 3) {
+          // If all retries fail, keep the seed data but mark as ready
+          break;
+        }
+        await Future.delayed(Duration(milliseconds: 500 * attempts));
       }
     }
+    
+    _cloudPulled = true;
+    _notifyUi();
   }
 
   // ---------------------------------------------------------------------------
@@ -456,6 +462,21 @@ class AppRepository extends ChangeNotifier {
       ..clear()
       ..addAll(data.shabbat);
     notifyListeners();
+  }
+
+  /// Called when the UI locale changes to refresh location name and zmanim.
+  Future<void> onLocaleChanged(String lang) async {
+    if (location.latitude == 0 && location.longitude == 0) return;
+    
+    try {
+      final place = await LocationZmanimApi.fromCoordinates(
+        location.latitude,
+        location.longitude,
+        lang: lang,
+      );
+      location.cityName = place.name;
+      await refreshTimes();
+    } catch (_) {}
   }
 
   int importTelegramPosts(List<TelegramPost> posts) {

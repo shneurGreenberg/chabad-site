@@ -71,7 +71,9 @@ class LocationZmanimApi {
           raw['country'],
         ].whereType<String>().where((s) => s.trim().isNotEmpty).join(', ');
         return GeoPlace(
-          name: (name == null || name.isEmpty) ? 'מיקום נוכחי' : name,
+          name: (name == null || name.isEmpty) 
+              ? (lang == 'he' ? 'מיקום נוכחי' : lang == 'ru' ? 'Текущее местоположение' : 'Current location')
+              : name,
           latitude: lat,
           longitude: lon,
           timezone: tz,
@@ -81,7 +83,7 @@ class LocationZmanimApi {
     } catch (_) {}
     final tz = await lookupTimezone(lat, lon);
     return GeoPlace(
-      name: 'מיקום נוכחי',
+      name: lang == 'he' ? 'מיקום נוכחי' : lang == 'ru' ? 'Текущее местоположение' : 'Current location',
       latitude: lat,
       longitude: lon,
       timezone: tz,
@@ -191,7 +193,10 @@ class LocationZmanimApi {
   }
 
   static Future<Map<String, dynamic>> _json(String url) async {
-    final res = await CorsProxy.getDirectOrProxy(url);
+    // Add timestamp to prevent browser caching of stale zmanim data
+    final sep = url.contains('?') ? '&' : '?';
+    final cacheBust = '${sep}_t=${DateTime.now().millisecondsSinceEpoch}';
+    final res = await CorsProxy.getDirectOrProxy('$url$cacheBust');
     final body = res.body.trim();
     if (body.startsWith('<')) {
       throw Exception('blocked');
