@@ -341,19 +341,62 @@ void botFromJson(BotConfig target, dynamic raw) {
 }
 
 
-/// Empty/UTC tz with Novosibirsk coords yields noon candle times (e.g. 12:38).
+/// Empty/UTC-equivalent tz with Novosibirsk coords yields noon candle times (e.g. 12:38).
+bool isUtcEquivalentTimezone(String raw) {
+  final tz = raw.trim();
+  if (tz.isEmpty) return true;
+  final upper = tz.toUpperCase().replaceAll(' ', '');
+  const exact = {
+    'UTC',
+    'Z',
+    'GMT',
+    'GMT0',
+    'GMT+0',
+    'GMT-0',
+    'GMT+00',
+    'GMT-00',
+    'GMT+00:00',
+    'GMT-00:00',
+    'UTC+0',
+    'UTC-0',
+    'UTC+00',
+    'UTC-00',
+    'UTC+00:00',
+    'UTC-00:00',
+    '+00:00',
+    '-00:00',
+    'ETC/UTC',
+    'ETC/GMT',
+    'ETC/GMT0',
+    'ETC/GMT+0',
+    'ETC/GMT-0',
+    'ETC/GMT+00',
+    'ETC/GMT-00',
+    'ETC/UCT',
+    'UCT',
+    'UNIVERSAL',
+    'ZULU',
+  };
+  if (exact.contains(upper)) return true;
+  if (RegExp(r'^(UTC|GMT|ETC/GMT|ETC/UTC)?[+\-]?0{1,2}(:00)?$', caseSensitive: false)
+      .hasMatch(upper)) {
+    return true;
+  }
+  return false;
+}
+
+bool nearNovosibirsk(double lat, double lon) =>
+    (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
+
 String normalizeTimezone(String raw, double lat, double lon, String fallback) {
   final tz = raw.trim();
-  final upper = tz.toUpperCase();
-  final bad = tz.isEmpty ||
-      upper == 'UTC' ||
-      upper == 'ETC/UTC' ||
-      upper == 'GMT' ||
-      upper == 'ETC/GMT';
-  final nearNsk = (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
-  if (bad && nearNsk) return 'Asia/Novosibirsk';
+  final bad = isUtcEquivalentTimezone(tz);
+  final nearNsk = nearNovosibirsk(lat, lon);
+  // For NSK coords always prefer Asia/Novosibirsk when tz is missing/UTC-like.
+  if (nearNsk && bad) return 'Asia/Novosibirsk';
   if (tz.isEmpty) {
     final fb = fallback.trim();
+    if (nearNsk) return 'Asia/Novosibirsk';
     return fb.isEmpty ? 'Asia/Novosibirsk' : fb;
   }
   return tz;

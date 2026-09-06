@@ -127,10 +127,16 @@ class _Hero extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final wide = MediaQuery.sizeOf(context).width >= 980;
+    final holidayHe = (repo.shabbat['holiday_he'] ?? '').trim();
+    final holidayEn = (repo.shabbat['holiday_en'] ?? '').trim();
+    final holidayRu = (repo.shabbat['holiday_ru'] ?? '').trim();
+    // RU: prefer holiday_ru, then EN/HE memo titles (e.g. Rosh Hashana / Рош а-Шана).
     final holiday = switch (loc.lang) {
-      'he' => repo.shabbat['holiday_he'] ?? '',
-      'ru' => repo.shabbat['holiday_ru'] ?? '',
-      _ => repo.shabbat['holiday_en'] ?? '',
+      'he' => holidayHe.isNotEmpty ? holidayHe : holidayEn,
+      'ru' => holidayRu.isNotEmpty
+          ? holidayRu
+          : (holidayEn.isNotEmpty ? holidayEn : holidayHe),
+      _ => holidayEn.isNotEmpty ? holidayEn : holidayHe,
     }.trim();
     final parasha = switch (loc.lang) {
       'he' => repo.shabbat['parasha_he'] ?? '',
@@ -138,8 +144,12 @@ class _Hero extends StatelessWidget {
       _ => repo.shabbat['parasha_en'] ?? '',
     }.trim();
     final isHoliday = repo.shabbat['is_holiday'] == '1' ||
-        (holiday.isNotEmpty && parasha.isEmpty);
-    // Never blank: holiday name, else parsha, else generic Shabbat label.
+        (holiday.isNotEmpty &&
+            (parasha.isEmpty ||
+                holiday.toLowerCase().contains('rosh') ||
+                holiday.contains('ראש') ||
+                holiday.contains('Рош')));
+    // Never blank under Суббота: holiday memo/name or parsha.
     final occasion = holiday.isNotEmpty
         ? holiday
         : (parasha.isNotEmpty ? parasha : loc.t('zmanim.shabbat'));
@@ -321,11 +331,13 @@ class _ShabbatCard extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 8),
-              Text(parasha,
-                  style: TextStyle(
-                      color: AppColors.accentSoft.withValues(alpha: 0.95),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.5)),
+              Text(
+                parasha.trim().isEmpty ? loc.t('zmanim.shabbat') : parasha,
+                style: TextStyle(
+                    color: AppColors.accentSoft.withValues(alpha: 0.95),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.5),
+              ),
               const SizedBox(height: 18),
               _row(loc.t('zmanim.candle'), candle),
               if (havdala.trim().isNotEmpty && havdala != '--:--') ...[

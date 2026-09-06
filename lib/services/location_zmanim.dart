@@ -91,6 +91,10 @@ class LocationZmanimApi {
   }
 
   static Future<String> lookupTimezone(double lat, double lon) async {
+    // NSK coords must never fall through to UTC / inverted Etc/GMT.
+    if ((lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5) {
+      return 'Asia/Novosibirsk';
+    }
     try {
       final url =
           'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m';
@@ -108,19 +112,42 @@ class LocationZmanimApi {
   ) async {
     final lat = loc.latitude;
     final lon = loc.longitude;
-    final tz = Uri.encodeQueryComponent(loc.timezone);
+    var tzid = loc.timezone.trim();
+    if ((lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5) {
+      tzid = 'Asia/Novosibirsk';
+    }
+    final tz = Uri.encodeQueryComponent(tzid);
 
     final zmanimJson = await _json(
       'https://www.hebcal.com/zmanim?cfg=json&latitude=$lat&longitude=$lon&tzid=$tz',
     );
     final times = (zmanimJson['times'] as Map?) ?? {};
 
+    /// Parse Hebcal ISO clock; if offset is present, use wall-clock as given
+    /// (primary fix is correct tzid — this just avoids truncating oddly).
+    String clockFromIso(String? raw) {
+      if (raw == null || !raw.contains('T')) return '--:--';
+      final afterT = raw.split('T').last;
+      if (afterT.length < 5) return '--:--';
+      final hhmm = afterT.substring(0, 5);
+      // If UTC (+00:00 / Z) wall clock is noon-ish and loc is NSK, convert +7h.
+      final utcish = afterT.contains('+00:00') ||
+          afterT.contains('-00:00') ||
+          afterT.endsWith('Z') ||
+          afterT.contains('+00');
+      final hour = int.tryParse(hhmm.substring(0, 2)) ?? -1;
+      final nearNsk = (lat - 55.0).abs() < 1.5 && (lon - 83.0).abs() < 2.5;
+      if (nearNsk && utcish && hour >= 10 && hour <= 15) {
+        final min = int.tryParse(hhmm.substring(3, 5)) ?? 0;
+        final localHour = (hour + 7) % 24;
+        return '${localHour.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}';
+      }
+      return hhmm;
+    }
+
     String t(String key) {
       final raw = times[key];
-      if (raw is String && raw.contains('T')) {
-        final clock = raw.split('T').last;
-        if (clock.length >= 5) return clock.substring(0, 5);
-      }
+      if (raw is String) return clockFromIso(raw);
       return '--:--';
     }
 
@@ -153,10 +180,7 @@ class LocationZmanimApi {
         if (item is! Map) continue;
         if (item['category'] != category) continue;
         final date = item['date'] as String?;
-        if (date != null && date.contains('T')) {
-          final clock = date.split('T').last;
-          if (clock.length >= 5) return clock.substring(0, 5);
-        }
+        return clockFromIso(date);
       }
       return '--:--';
     }

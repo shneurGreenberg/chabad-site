@@ -123,25 +123,23 @@ class AppRepository extends ChangeNotifier {
   }
   
   Future<void> _loadBackgroundData() async {
-    // Cloud pull with 5 second timeout
+    // Await cloud pull (timeout) so a late UTC location cannot overwrite after zmanim.
     try {
-      await Future.any([
-        _pullCloud(),
-        Future.delayed(const Duration(seconds: 5)),
-      ]);
+      await _pullCloud().timeout(const Duration(seconds: 8));
     } catch (e) {
-      debugPrint('Cloud pull failed: $e');
+      debugPrint('Cloud pull failed/timed out: $e');
+      _cloudPulled = true;
     }
     _notifyUi();
-    
+
     // Load Kaddish graves
     try {
       await _loadKaddishGraves();
     } catch (e) {
       debugPrint('Kaddish graves load failed: $e');
     }
-    
-    // Refresh zmanim once without blocking (no retries during boot)
+
+    // After hydrate + cloud, always refresh zmanim/shabbat from network (wins over seed).
     try {
       await refreshTimes();
     } catch (e) {
@@ -523,12 +521,17 @@ class AppRepository extends ChangeNotifier {
 
   bool _ensureLocationTimezone() {
     final before = location.timezone;
-    location.timezone = normalizeTimezone(
-      location.timezone,
-      location.latitude,
-      location.longitude,
-      SiteLocation.novosibirsk().timezone,
-    );
+    // Near NSK: always use Asia/Novosibirsk before Hebcal (not only on retry).
+    if (nearNovosibirsk(location.latitude, location.longitude)) {
+      location.timezone = 'Asia/Novosibirsk';
+    } else {
+      location.timezone = normalizeTimezone(
+        location.timezone,
+        location.latitude,
+        location.longitude,
+        SiteLocation.novosibirsk().timezone,
+      );
+    }
     if (location.timezone != before) {
       _persistLocation();
       return true;
@@ -536,12 +539,53 @@ class AppRepository extends ChangeNotifier {
     return false;
   }
 
+  bool _shabbatOccasionEmpty(Map<String, String> s) {
+    bool blank(String? v) => (v ?? '').trim().isEmpty;
+    return blank(s['holiday_he']) &&
+        blank(s['holiday_en']) &&
+        blank(s['holiday_ru']) &&
+        blank(s['parasha_he']) &&
+        blank(s['parasha_en']) &&
+        blank(s['parasha_ru']);
+  }
+
+  /// Prefer fresher network shabbat over stale in-memory/seed when candle/occasion bad.
+  void _applyShabbatFromNetwork(Map<String, String> incoming) {
+    final candle = (incoming['candle'] ?? '').trim();
+    final nearNsk = nearNovosibirsk(location.latitude, location.longitude);
+    if (nearNsk && _candleLooksInvalid(candle)) {
+      debugPrint('Skip applying noon candle for NSK: $candle');
+      return;
+    }
+    if (_shabbatOccasionEmpty(incoming) && !_shabbatOccasionEmpty(shabbat)) {
+      // Keep previous occasion labels; still take times if valid.
+      final keep = Map<String, String>.from(shabbat);
+      shabbat
+        ..clear()
+        ..addAll(incoming);
+      for (final k in ['holiday_he', 'holiday_en', 'holiday_ru', 'parasha_he', 'parasha_en', 'parasha_ru', 'is_holiday']) {
+        if ((shabbat[k] ?? '').trim().isEmpty && (keep[k] ?? '').trim().isNotEmpty) {
+          shabbat[k] = keep[k]!;
+        }
+      }
+      return;
+    }
+    shabbat
+      ..clear()
+      ..addAll(incoming);
+  }
+
   Future<void> refreshTimes() async {
     _ensureLocationTimezone();
     try {
       var data = await LocationZmanimApi.fetchTimes(location);
-      // If Hebcal returned noon candles, force Asia/Novosibirsk and retry once.
-      if (_candleLooksInvalid(data.shabbat['candle'])) {
+      // Never keep 12:xx candle for NSK — force Asia/Novosibirsk and retry.
+      if (nearNovosibirsk(location.latitude, location.longitude) &&
+          _candleLooksInvalid(data.shabbat['candle'])) {
+        location.timezone = 'Asia/Novosibirsk';
+        _persistLocation();
+        data = await LocationZmanimApi.fetchTimes(location);
+      } else if (_candleLooksInvalid(data.shabbat['candle'])) {
         final fixed = normalizeTimezone(
           '',
           location.latitude,
@@ -552,15 +596,22 @@ class AppRepository extends ChangeNotifier {
         _persistLocation();
         data = await LocationZmanimApi.fetchTimes(location);
       }
-      zmanim
-        ..clear()
-        ..addAll(data.zmanim);
-      shabbat
-        ..clear()
-        ..addAll(data.shabbat);
+      // Final guard: never store noon candles for NSK.
+      if (nearNovosibirsk(location.latitude, location.longitude) &&
+          _candleLooksInvalid(data.shabbat['candle'])) {
+        debugPrint(
+          'Rejecting invalid NSK candle ${data.shabbat['candle']} — keeping prior evening seed/fetch',
+        );
+      } else {
+        zmanim
+          ..clear()
+          ..addAll(data.zmanim);
+        _applyShabbatFromNetwork(data.shabbat);
+      }
       debugPrint(
         'Zmanim refreshed: candle=${shabbat['candle']}, havdala=${shabbat['havdala']}, '
-        'parasha_he=${shabbat['parasha_he']}, holiday_en=${shabbat['holiday_en']}, tz=${location.timezone}',
+        'parasha_he=${shabbat['parasha_he']}, holiday_en=${shabbat['holiday_en']}, '
+        'holiday_ru=${shabbat['holiday_ru']}, tz=${location.timezone}',
       );
       notifyListeners();
     } catch (e) {
@@ -669,15 +720,15 @@ class AppRepository extends ChangeNotifier {
   ];
 
   final Map<String, String> shabbat = {
-    'candle': '19:06',
-    'havdala': '20:18',
-    'parasha_he': 'פרשת קדושים',
-    'parasha_en': 'Parashat Kedoshim',
-    'parasha_ru': 'Глава Кдошим',
-    'holiday_he': '',
-    'holiday_en': '',
-    'holiday_ru': '',
-    'is_holiday': '0',
+    'candle': '19:38',
+    'havdala': '20:38',
+    'parasha_he': 'ראש השנה',
+    'parasha_en': 'Rosh Hashana',
+    'parasha_ru': 'Рош а-Шана',
+    'holiday_he': 'ראש השנה',
+    'holiday_en': 'Rosh Hashana',
+    'holiday_ru': 'Рош а-Шана',
+    'is_holiday': '1',
   };
 
   // ---------------------------------------------------------------------------
@@ -2500,6 +2551,17 @@ class AppRepository extends ChangeNotifier {
     googleMapsApiKey = '${m['mapsKey'] ?? googleMapsApiKey}';
     paletteId = SitePalettes.byId('${m['paletteId'] ?? paletteId}').id;
     location = locationFromJson(m['location'], location);
+    // Cloud/local may re-apply UTC — normalize and force NSK before persist.
+    if (nearNovosibirsk(location.latitude, location.longitude)) {
+      location.timezone = 'Asia/Novosibirsk';
+    } else {
+      location.timezone = normalizeTimezone(
+        location.timezone,
+        location.latitude,
+        location.longitude,
+        SiteLocation.novosibirsk().timezone,
+      );
+    }
     _persistLocation();
     siteCopyFromJson(siteCopy, m['siteCopy']);
     contactFromJson(contact, m['contact']);
