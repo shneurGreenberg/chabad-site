@@ -41,12 +41,6 @@ class AppRepository extends ChangeNotifier {
   static const _imgPrefix = 'chabad_img:';
   static const _quotaHe =
       'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. התוכן נשמר גם ב-Firestore כשהשרת זמין.';
-  static const _cloudDeniedHe =
-      'השמירה לשרת נחסמה. בקונסול Firebase: Firestore → Rules — הדביקו את הכללים מהמנהל ולחצו Publish. Storage לא צריך.';
-  static const _cloudFailHe =
-      'השמירה לשרת נכשלה. התוכן נשמר מקומית בדפדפן. בדקו Firestore → Data אחרי שמירה מהמנהל.';
-  static const _cloudUnavailableHe =
-      'אין חיבור ל-Firestore. ודאו שהדאטאבייס (default) נוצר בפרויקט chabad-site-c60ae.';
 
   String? cloudError;
   DateTime? cloudOkAt;
@@ -3334,18 +3328,12 @@ class AppRepository extends ChangeNotifier {
     cloudError = err;
     cloudOkAt = err == null ? CloudSync.instance.lastOkAt : null;
     _notifyUi();
-    if (err == null || err == 'not-signed-in') return;
-    if (err == 'permission-denied') {
-      onPersistWarning?.call(_cloudDeniedHe);
-    } else if (err == 'unavailable') {
-      onPersistWarning?.call(_cloudUnavailableHe);
-    } else {
-      onPersistWarning?.call(_cloudFailHe);
-    }
+    // Auto-save: local IndexedDB already persisted. Never SnackBar on background
+    // cloud results (not-signed-in / permission-denied / unavailable / fail).
+    // Status lives in cloudError for admin chrome; publishToCloud() is explicit.
   }
 
   Future<String?> publishToCloud() async {
-    CloudSync.instance.adminSession = true;
     await _persistNow();
     return cloudError;
   }

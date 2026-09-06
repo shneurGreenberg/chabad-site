@@ -472,12 +472,13 @@ class _AdminShellState extends State<AdminShell> {
   Future<void> _publish(BuildContext context, LocaleController loc) async {
     final err = await context.read<AppRepository>().publishToCloud();
     if (!context.mounted) return;
+    final msg = err == null
+        ? loc.t('admin.cloud.ok')
+        : (err == 'not-signed-in'
+            ? loc.t('admin.cloud.localOnly')
+            : loc.t('admin.cloud.blocked'));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          err == null ? loc.t('admin.cloud.ok') : loc.t('admin.cloud.blocked'),
-        ),
-      ),
+      SnackBar(content: Text(msg)),
     );
   }
 
@@ -570,7 +571,55 @@ class _CloudSyncBar extends StatelessWidget {
     final repo = context.watch<AppRepository>();
     final err = repo.cloudError;
     final ok = err == null && repo.cloudOkAt != null;
-    if (ok || err == null) return const SizedBox.shrink();
+    if (ok) {
+      return Material(
+        color: const Color(0xFFF0FDF4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(children: [
+            const PlayfulIcon(Icons.cloud_done_outlined,
+                size: 18, color: Color(0xFF166534)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                loc.t('admin.cloud.connected'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    color: Color(0xFF166534),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13),
+              ),
+            ),
+          ]),
+        ),
+      );
+    }
+    // Local admin / no Firebase Auth: quiet status, no SnackBar spam.
+    if (err == null || err == 'not-signed-in') {
+      return Material(
+        color: const Color(0xFFF8FAFC),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(children: [
+            const PlayfulIcon(Icons.cloud_queue_outlined,
+                size: 18, color: Color(0xFF64748B)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                loc.t('admin.cloud.localOnly'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13),
+              ),
+            ),
+          ]),
+        ),
+      );
+    }
     final blocked = err == 'permission-denied';
     final fg = blocked ? const Color(0xFF991B1B) : const Color(0xFF92400E);
     return Material(

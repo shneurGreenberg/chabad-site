@@ -24,7 +24,7 @@ class CloudSync {
 
   static const _maxDataUrlChars = 700000;
 
-  /// Set while the admin UI is open (local fallback or Firebase Auth).
+  /// UI hint only — does not authorize Firestore writes (push requires signedIn).
   bool adminSession = false;
 
   String? lastError;
@@ -73,7 +73,7 @@ class CloudSync {
   }
 
   /// Writes content collections + one `media` doc per image.
-  /// Tries even without Auth (Firestore test-mode / open window).
+  /// Requires Firebase Auth (signedIn). Local adminSession alone does not authorize writes.
   /// Returns null on success, or an error code.
   Future<String?> push({
     required Map<String, dynamic> snapshot,
@@ -85,7 +85,7 @@ class CloudSync {
       lastError = 'unavailable';
       return 'unavailable';
     }
-    if (!signedIn && !adminSession) {
+    if (!signedIn) {
       lastError = 'not-signed-in';
       return 'not-signed-in';
     }
