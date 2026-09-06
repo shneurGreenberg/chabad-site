@@ -127,20 +127,22 @@ class _Hero extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final wide = MediaQuery.sizeOf(context).width >= 980;
-    final isHoliday = repo.shabbat['is_holiday'] == '1';
     final holiday = switch (loc.lang) {
       'he' => repo.shabbat['holiday_he'] ?? '',
       'ru' => repo.shabbat['holiday_ru'] ?? '',
       _ => repo.shabbat['holiday_en'] ?? '',
-    };
+    }.trim();
     final parasha = switch (loc.lang) {
-      'he' => repo.shabbat['parasha_he']!,
-      'ru' => repo.shabbat['parasha_ru']!,
-      _ => repo.shabbat['parasha_en']!,
-    };
-    final occasion = isHoliday && holiday.trim().isNotEmpty
-        ? holiday.trim()
-        : parasha;
+      'he' => repo.shabbat['parasha_he'] ?? '',
+      'ru' => repo.shabbat['parasha_ru'] ?? '',
+      _ => repo.shabbat['parasha_en'] ?? '',
+    }.trim();
+    final isHoliday = repo.shabbat['is_holiday'] == '1' ||
+        (holiday.isNotEmpty && parasha.isEmpty);
+    // Never blank: holiday name, else parsha, else generic Shabbat label.
+    final occasion = holiday.isNotEmpty
+        ? holiday
+        : (parasha.isNotEmpty ? parasha : loc.t('zmanim.shabbat'));
 
     final copy = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,7 +209,7 @@ class _Hero extends StatelessWidget {
       parasha: occasion,
       candle: repo.shabbat['candle']!,
       havdala: repo.shabbat['havdala']!,
-      isHoliday: isHoliday && holiday.trim().isNotEmpty,
+      isHoliday: isHoliday && holiday.isNotEmpty,
     );
 
     final banner = repo.bannerFor('/');
