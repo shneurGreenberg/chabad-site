@@ -60,6 +60,13 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
+# Fix for flutter_html 3.0.0 compatibility issue with html package.
+# flutter_html 3.0.0 calls qs.matches() which was removed in html 0.15.7+.
+# This override pins html to 0.15.6 until flutter_html releases a fix.
+# See: https://github.com/Sub6Resources/flutter_html/issues/1522
+dependency_overrides:
+  html: 0.15.6
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
