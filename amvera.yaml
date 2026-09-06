@@ -1,0 +1,14 @@
+# Amvera deployment configuration for Chabad site
+# Custom domain: www.jewishsib.com
+
+meta:
+  environment: docker
+  toolchain:
+    name: docker
+    version: latest
+
+build:
+  dockerfile: Dockerfile
+
+run:
+  containerPort: 80
