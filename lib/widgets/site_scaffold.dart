@@ -15,6 +15,7 @@ import 'hover.dart';
 import 'playful_icons.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
+import 'whatsapp_icon.dart';
 
 class NavItem {
   const NavItem(this.route, this.labelKey, this.icon);
@@ -176,19 +177,7 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
                     if (!mobile) ...[
                       const SizedBox(width: 8),
                       Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              for (final item in primaryNav)
-                                _NavLink(
-                                  item: item,
-                                  active: navIsActive(currentRoute, item.route),
-                                ),
-                              _MoreMenu(currentRoute: currentRoute),
-                            ],
-                          ),
-                        ),
+                        child: _ResponsiveNav(currentRoute: currentRoute),
                       ),
                       const HeaderSearch(),
                       const SizedBox(width: 8),
@@ -283,6 +272,57 @@ class _SiteHeader extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Responsive nav that collapses items into "more" menu when they don't fit.
+/// Russian labels are longer, so fewer items are shown at narrow widths.
+class _ResponsiveNav extends StatelessWidget {
+  const _ResponsiveNav({required this.currentRoute});
+  final String currentRoute;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final isRussian = loc.lang == 'ru';
+    
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        
+        // Calculate how many primary items to show based on width and language
+        // Russian labels are longer, so we need more space per item
+        final itemWidth = isRussian ? 140.0 : 110.0; // Approximate width per nav item
+        final moreMenuWidth = 120.0; // Space for "Меню" / "תפריט"
+        final availableForItems = width - moreMenuWidth;
+        final maxVisibleItems = (availableForItems / itemWidth).floor().clamp(0, primaryNav.length);
+        
+        // At very narrow widths or for Russian at medium widths, show fewer items
+        final visibleCount = isRussian && width < 900
+            ? (maxVisibleItems - 1).clamp(0, primaryNav.length) // Extra conservative for Russian
+            : maxVisibleItems;
+        
+        final visibleItems = primaryNav.take(visibleCount).toList();
+        final hiddenItems = primaryNav.skip(visibleCount).toList();
+        
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (final item in visibleItems)
+                _NavLink(
+                  item: item,
+                  active: navIsActive(currentRoute, item.route),
+                ),
+              _MoreMenu(
+                currentRoute: currentRoute,
+                extraItems: hiddenItems,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -435,8 +475,12 @@ class _NavChrome extends StatelessWidget {
 }
 
 class _MoreMenu extends StatefulWidget {
-  const _MoreMenu({required this.currentRoute});
+  const _MoreMenu({
+    required this.currentRoute,
+    this.extraItems = const [],
+  });
   final String currentRoute;
+  final List<NavItem> extraItems; // Primary items that didn't fit
   @override
   State<_MoreMenu> createState() => _MoreMenuState();
 }
@@ -499,6 +543,36 @@ class _MoreMenuState extends State<_MoreMenu> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Show hidden primary nav items first (if any)
+                      for (final item in widget.extraItems)
+                        InkWell(
+                          onTap: () {
+                            _overButton = false;
+                            _overMenu = false;
+                            _remove();
+                            this.context.go(item.route);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            child: Row(children: [
+                              PlayfulIcon(item.icon,
+                                  size: 18, color: AppColors.primary),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(loc.t(item.labelKey))),
+                            ]),
+                          ),
+                        ),
+                      // Divider if we have both extra and more items
+                      if (widget.extraItems.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Divider(
+                            color: AppColors.ink.withValues(alpha: 0.1),
+                            height: 1,
+                          ),
+                        ),
+                      // Regular "more" nav items
                       for (final item in moreNav)
                         InkWell(
                           onTap: () {
@@ -533,8 +607,8 @@ class _MoreMenuState extends State<_MoreMenu> {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final moreActive =
-        moreNav.any((i) => navIsActive(widget.currentRoute, i.route));
+    final allMoreItems = [...widget.extraItems, ...moreNav];
+    final moreActive = allMoreItems.any((i) => navIsActive(widget.currentRoute, i.route));
     return CompositedTransformTarget(
       link: _link,
       child: MouseRegion(
@@ -822,7 +896,17 @@ class _SiteFooter extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(children: [
                         for (final s in repo.links.publicItems())
-                          HoverScale(child: _social(s.icon, s.url)),
+                          HoverScale(
+                            child: s.labelKey == 'social.whatsapp'
+                                ? _socialWhatsApp(s.url)
+                                : _social(s.icon, s.url),
+                          ),
+                        // If WhatsApp not in links but contact.phone can form wa.me URL
+                        if (repo.links.whatsapp.trim().isEmpty &&
+                            waMeUrl(repo.contact.phone) != null)
+                          HoverScale(
+                            child: _socialWhatsApp(waMeUrl(repo.contact.phone)!),
+                          ),
                       ]),
                     ],
                   ),
@@ -888,6 +972,23 @@ class _SiteFooter extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: PlayfulIcon(icon, color: Colors.white, size: 18),
+          ),
+        ),
+      );
+
+  Widget _socialWhatsApp(String url) => Padding(
+        padding: const EdgeInsetsDirectional.only(end: 8),
+        child: InkWell(
+          onTap: () => openUrl(url),
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const WhatsAppIcon(size: 18, color: Colors.white),
           ),
         ),
       );
@@ -986,7 +1087,7 @@ class _FloatContact extends StatelessWidget {
             foregroundColor: Colors.white,
             tooltip: loc.t('social.whatsapp'),
             onPressed: () => openUrl(wa),
-            child: const PlayfulIcon(Icons.chat, color: Colors.white),
+            child: const WhatsAppIcon(size: 26, color: Colors.white),
           ),
         if (wa != null && tel != null) const SizedBox(height: 10),
         if (tel != null)

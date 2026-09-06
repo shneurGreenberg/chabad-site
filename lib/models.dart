@@ -606,6 +606,8 @@ class SiteLinks {
         ),
       if (website.trim().isNotEmpty)
         (icon: Icons.language, url: website.trim(), labelKey: 'social.website'),
+      if (whatsapp.trim().isNotEmpty)
+        (icon: Icons.chat, url: whatsapp.trim(), labelKey: 'social.whatsapp'),
     ];
   }
 }
