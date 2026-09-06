@@ -4,12 +4,14 @@ A community website for a Chabad house, built with **Flutter (web)**, featuring 
 public **client side** and an **admin side**, in **three languages** (Hebrew /
 English / Russian) with full RTL support. The site is live at 
 [shneurgreenberg.github.io/chabad-site](https://shneurgreenberg.github.io/chabad-site/)
-and includes real Firebase backend integration for content management.
+and [www.jewishsib.com](https://www.jewishsib.com), with full Firebase backend 
+integration for content management.
 
 אתר קהילתי לבית חב״ד, בנוי ב־**Flutter (web)**, עם **צד לקוח** ציבורי ו־**צד מנהל**,
 ב־**שלוש שפות** (עברית / אנגלית / רוסית) ותמיכה מלאה ב־RTL. האתר חי באתר 
 [shneurgreenberg.github.io/chabad-site](https://shneurgreenberg.github.io/chabad-site/)
-וכולל אינטגרציה אמיתית עם Firebase לניהול תוכן.
+ו־[www.jewishsib.com](https://www.jewishsib.com), וכולל אינטגרציה אמיתית עם Firebase 
+לניהול תוכן.
 
 ---
 
@@ -89,6 +91,50 @@ to ensure Chrome is installed and run once:
 ```bash
 flutter config --enable-web
 ```
+
+---
+
+## Deployment / פריסה
+
+### GitHub Pages
+
+The site is automatically deployed to GitHub Pages on every push to `main` via 
+the workflow in `.github/workflows/deploy-github-pages.yml`. The GitHub Pages 
+deployment uses `--base-href /chabad-site/` for the repository path.
+
+האתר מפרוס אוטומטית ל־GitHub Pages בכל push ל־`main` דרך workflow שב־
+`.github/workflows/deploy-github-pages.yml`. פריסת GitHub Pages משתמשת ב־
+`--base-href /chabad-site/` עבור נתיב הריפו.
+
+### Amvera (Production - www.jewishsib.com)
+
+The production site at [www.jewishsib.com](https://www.jewishsib.com) is deployed 
+on **Amvera** using Docker. Files included:
+
+- `Dockerfile` - Multi-stage build (Flutter + nginx)
+- `amvera.yaml` - Amvera configuration
+- `nginx.conf` - SPA routing with hash-based navigation
+
+האתר הפרודקשן באתר [www.jewishsib.com](https://www.jewishsib.com) מפרוס על **Amvera** 
+באמצעות Docker. קבצים שנכללים:
+
+- `Dockerfile` - בניה רב-שלבית (Flutter + nginx)
+- `amvera.yaml` - הגדרות Amvera
+- `nginx.conf` - ניתוב SPA עם ניווט מבוסס hash
+
+**To deploy to Amvera:**
+
+1. Create a new project on Amvera (suggested name: `chabad-site` or `jewishsib`)
+2. Add the Amvera git remote to your local repository
+3. Push to the Amvera git remote to trigger deployment
+4. Configure custom domain `www.jewishsib.com` in Amvera dashboard
+
+**כדי לפרוס ל־Amvera:**
+
+1. צור פרויקט חדש ב־Amvera (שם מוצע: `chabad-site` או `jewishsib`)
+2. הוסף את ה־remote של Amvera למאגר המקומי שלך
+3. בצע push ל־remote של Amvera כדי להפעיל את הפריסה
+4. הגדר דומיין מותאם אישית `www.jewishsib.com` בלוח הבקרה של Amvera
 
 ---
 
