@@ -42,6 +42,10 @@ COPY . .
 # Build Flutter web with root base-href for custom domain
 RUN flutter build web --release --base-href / --no-tree-shake-icons --no-wasm-dry-run
 
+# Replace favicon and icons with chabad emblem after build
+RUN cp assets/images/chabad-emblem.png build/web/favicon.png && \
+    echo "Replaced favicon with chabad emblem"
+
 # Download kaddish cemetery photos (same as GitHub Pages workflow)
 RUN mkdir -p build/web/kaddish-photos && \
     curl -fsSL https://synagogue-kadish-shneur.amvera.io/s/novosibirsk/api/board -o /tmp/board.json && \
