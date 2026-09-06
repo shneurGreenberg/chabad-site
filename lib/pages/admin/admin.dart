@@ -874,6 +874,38 @@ class _NewsEditorState extends State<_NewsEditor> {
                       onChanged: (b) =>
                           setState(() => widget.article.imageBytes = b),
                     ),
+                    if (widget.article.hasImage) ...[
+                      const SizedBox(height: 12),
+                      Text('${loc.t('common.position')} / Focal Point',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Text('X:', style: TextStyle(color: AppColors.muted)),
+                        Expanded(
+                          child: Slider(
+                            value: widget.article.imageAlignX,
+                            min: -1,
+                            max: 1,
+                            divisions: 20,
+                            label: widget.article.imageAlignX.toStringAsFixed(1),
+                            onChanged: (v) => setState(() => widget.article.imageAlignX = v),
+                          ),
+                        ),
+                      ]),
+                      Row(children: [
+                        Text('Y:', style: TextStyle(color: AppColors.muted)),
+                        Expanded(
+                          child: Slider(
+                            value: widget.article.imageAlignY,
+                            min: -1,
+                            max: 1,
+                            divisions: 20,
+                            label: widget.article.imageAlignY.toStringAsFixed(1),
+                            onChanged: (v) => setState(() => widget.article.imageAlignY = v),
+                          ),
+                        ),
+                      ]),
+                    ],
                     const SizedBox(height: 12),
                     LocFieldGroup(label: loc.t('common.name'), controllers: _title),
                     const SizedBox(height: 8),
@@ -1055,6 +1087,38 @@ class _ProgramEditorState extends State<_ProgramEditor> {
                     onChanged: (b) =>
                         setState(() => widget.program.imageBytes = b),
                   ),
+                  if (widget.program.hasImage) ...[
+                    const SizedBox(height: 12),
+                    Text('${loc.t('common.position')} / Focal Point',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      Text('X:', style: TextStyle(color: AppColors.muted)),
+                      Expanded(
+                        child: Slider(
+                          value: widget.program.imageAlignX,
+                          min: -1,
+                          max: 1,
+                          divisions: 20,
+                          label: widget.program.imageAlignX.toStringAsFixed(1),
+                          onChanged: (v) => setState(() => widget.program.imageAlignX = v),
+                        ),
+                      ),
+                    ]),
+                    Row(children: [
+                      Text('Y:', style: TextStyle(color: AppColors.muted)),
+                      Expanded(
+                        child: Slider(
+                          value: widget.program.imageAlignY,
+                          min: -1,
+                          max: 1,
+                          divisions: 20,
+                          label: widget.program.imageAlignY.toStringAsFixed(1),
+                          onChanged: (v) => setState(() => widget.program.imageAlignY = v),
+                        ),
+                      ),
+                    ]),
+                  ],
                   LocFieldGroup(label: loc.t('common.name'), controllers: _title),
                   LocFieldGroup(
                       label: loc.t('common.message'),
@@ -1295,6 +1359,9 @@ class _ProductEditorState extends State<_ProductEditor> {
       widget.repo.refresh();
     }
     Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.loc.t('admin.settings.saved'))),
+    );
   }
 }
 
@@ -1497,49 +1564,137 @@ class CrmPanel extends StatelessWidget {
                   style: TextStyle(color: AppColors.muted, fontSize: 12)),
             ),
           ],
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: [
-                DataColumn(label: Text(loc.t('common.name'))),
-                DataColumn(label: Text(loc.t('common.email'))),
-                DataColumn(label: Text(loc.t('common.phone'))),
-                DataColumn(label: Text(loc.t('common.topic'))),
-                DataColumn(label: Text(loc.t('common.date'))),
-                DataColumn(label: Text(loc.t('common.status'))),
-              ],
-              rows: [
-                for (final lead in repo.leads)
-                  DataRow(cells: [
-                    DataCell(Text(lead.name)),
-                    DataCell(Text(lead.email)),
-                    DataCell(PhoneText(lead.phone)),
-                    DataCell(Text(trLoc(lead.topic, loc.lang))),
-                    DataCell(Text(DateFormat.yMMMd(loc.lang).format(lead.date))),
-                    DataCell(
-                      PopupMenuButton<LeadStatus>(
-                        onSelected: (s) => repo.setLeadStatus(lead, s),
-                        itemBuilder: (context) {
-                          final loc = context.read<LocaleController>();
-                          return [
-                            PopupMenuItem(
-                                value: LeadStatus.fresh,
-                                child: Text(loc.t('admin.lead.fresh'))),
-                            PopupMenuItem(
-                                value: LeadStatus.contacted,
-                                child: Text(loc.t('admin.lead.contacted'))),
-                            PopupMenuItem(
-                                value: LeadStatus.member,
-                                child: Text(loc.t('admin.lead.member'))),
-                          ];
-                        },
-                        child: _LeadStatusChip(status: lead.status),
-                      ),
+          child: repo.leads.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PlayfulIcon(Icons.contacts_outlined,
+                            size: 48, color: AppColors.muted),
+                        const SizedBox(height: 12),
+                        Text(
+                          loc.t('admin.crm.empty') == 'admin.crm.empty'
+                              ? loc.lang == 'he'
+                                  ? 'אין נרשמים עדיין'
+                                  : loc.lang == 'ru'
+                                      ? 'Заявок пока нет'
+                                      : 'No leads yet'
+                              : loc.t('admin.crm.empty'),
+                          style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
-                  ]),
-              ],
-            ),
-          ),
+                  ),
+                )
+              : Column(
+                  children: [
+                    for (final lead in repo.leads)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: AppColors.ink.withValues(alpha: 0.06)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor:
+                                      AppColors.primary.withValues(alpha: 0.12),
+                                  child: PlayfulIcon(Icons.person,
+                                      color: AppColors.primary, size: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(lead.name,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 15)),
+                                      const SizedBox(height: 2),
+                                      Text(lead.email,
+                                          style: TextStyle(
+                                              color: AppColors.muted,
+                                              fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton<LeadStatus>(
+                                  onSelected: (s) => repo.setLeadStatus(lead, s),
+                                  itemBuilder: (context) {
+                                    final loc = context.read<LocaleController>();
+                                    return [
+                                      PopupMenuItem(
+                                          value: LeadStatus.fresh,
+                                          child: Text(loc.t('admin.lead.fresh'))),
+                                      PopupMenuItem(
+                                          value: LeadStatus.contacted,
+                                          child: Text(loc.t('admin.lead.contacted'))),
+                                      PopupMenuItem(
+                                          value: LeadStatus.member,
+                                          child: Text(loc.t('admin.lead.member'))),
+                                    ];
+                                  },
+                                  child: _LeadStatusChip(status: lead.status),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 8,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    PlayfulIcon(Icons.phone,
+                                        size: 14, color: AppColors.muted),
+                                    const SizedBox(width: 6),
+                                    PhoneText(lead.phone),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    PlayfulIcon(Icons.topic,
+                                        size: 14, color: AppColors.muted),
+                                    const SizedBox(width: 6),
+                                    Text(trLoc(lead.topic, loc.lang),
+                                        style: TextStyle(fontSize: 13)),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    PlayfulIcon(Icons.calendar_today,
+                                        size: 14, color: AppColors.muted),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                        DateFormat.yMMMd(loc.lang)
+                                            .format(lead.date),
+                                        style: TextStyle(fontSize: 13)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
         ),
         const SizedBox(height: 16),
         _panelCard(

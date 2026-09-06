@@ -41,6 +41,7 @@ class NewsCard extends StatelessWidget {
               height: 150,
               bytes: article.imageBytes,
               url: article.imageUrl,
+              alignment: article.imageAlignment,
               badge: article.source == NewsSource.telegram
                   ? const Pill('Telegram', color: Color(0xFF0EA5E9), icon: Icons.send)
                   : null,
@@ -119,6 +120,7 @@ class ProgramCard extends StatelessWidget {
               height: 120,
               bytes: program.imageBytes,
               url: program.imageUrl,
+              alignment: program.imageAlignment,
             ),
             Padding(
               padding: const EdgeInsets.all(18),

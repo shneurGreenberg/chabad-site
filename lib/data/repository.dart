@@ -84,7 +84,15 @@ class AppRepository extends ChangeNotifier {
     _notifyUi();
     try {
       await refreshTimes();
-    } catch (_) {}
+    } catch (e) {
+      // Retry once after a delay if initial fetch fails
+      await Future.delayed(const Duration(seconds: 2));
+      try {
+        await refreshTimes();
+      } catch (_) {
+        // Keep default times if API is unavailable
+      }
+    }
   }
 
   // ---------------------------------------------------------------------------
