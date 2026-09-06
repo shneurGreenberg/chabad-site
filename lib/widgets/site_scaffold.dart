@@ -16,6 +16,7 @@ import 'playful_icons.dart';
 import 'newsletter.dart';
 import 'site_search.dart';
 import 'whatsapp_icon.dart';
+import 'whatsapp_icon.dart';
 
 class NavItem {
   const NavItem(this.route, this.labelKey, this.icon);
@@ -122,7 +123,7 @@ class _SiteShellState extends State<SiteShell> {
       body: PrimaryScrollController.none(
         child: SingleChildScrollView(
           controller: _scroll,
-          physics: const ClampingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -702,33 +703,45 @@ class _CartButton extends StatelessWidget {
     if (count <= 0) return const SizedBox.shrink();
     final loc = context.locWatch;
     return HoverScale(
-      child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        IconButton(
-          tooltip: loc.t('store.cart'),
-          onPressed: () => context.go('/store'),
-          icon: const PlayfulIcon(Icons.shopping_cart_outlined),
-        ),
-        if (count > 0)
-          PositionedDirectional(
-            end: 4,
-            top: 4,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                  color: AppColors.accent, shape: BoxShape.circle),
-              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-              child: Text('$count',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryDark)),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.go('/store'),
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: PlayfulIcon(Icons.shopping_cart_outlined),
+                ),
+                if (count > 0)
+                  PositionedDirectional(
+                    end: 0,
+                    top: 0,
+                    child: GestureDetector(
+                      onTap: () => context.go('/store'),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            color: AppColors.accent, shape: BoxShape.circle),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Text('$count',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryDark)),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
-      ],
-    ),
+        ),
+      ),
     );
   }
 }

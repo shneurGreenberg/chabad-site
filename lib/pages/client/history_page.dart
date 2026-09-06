@@ -192,20 +192,36 @@ class _TourDialog extends StatefulWidget {
 
 class _TourDialogState extends State<_TourDialog> {
   late int _i = widget.initial;
+  int _photoIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final stop = widget.stops[_i];
+    final hasPanorama = stop.hasPanorama;
+    final hasPhotos = stop.photos.isNotEmpty;
+    final displayPhotos = stop.photos.where((p) => p.hasImage).toList();
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
+        constraints: const BoxConstraints(maxWidth: 680, maxHeight: 720),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Stack(children: [
-              GradientImage(color: stop.color, icon: stop.icon, height: 240),
+              // Display panorama if available, otherwise gradient
+              if (hasPanorama && stop.panoramaBytes != null)
+                Image.memory(stop.panoramaBytes!,
+                    height: 280, width: double.infinity, fit: BoxFit.cover)
+              else if (hasPanorama && stop.panoramaUrl != null && stop.panoramaUrl!.isNotEmpty)
+                Image.network(stop.panoramaUrl!,
+                    height: 280, width: double.infinity, fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        GradientImage(color: stop.color, icon: stop.icon, height: 280))
+              else
+                GradientImage(color: stop.color, icon: stop.icon, height: 280),
               Positioned.fill(
                 child: Center(
                   child: PlayfulIcon(Icons.threesixty,
@@ -227,43 +243,99 @@ class _TourDialogState extends State<_TourDialog> {
                     color: Colors.black.withValues(alpha: 0.5)),
               ),
             ]),
+            // Photo gallery section if photos exist
+            if (hasPhotos && displayPhotos.isNotEmpty) ...[
+              Container(
+                height: 120,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: displayPhotos.length,
+                  itemBuilder: (context, idx) {
+                    final photo = displayPhotos[idx];
+                    final isSelected = idx == _photoIndex;
+                    return Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 8),
+                      child: GestureDetector(
+                        onTap: () => setState(() => _photoIndex = idx),
+                        child: Container(
+                          width: 96,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.accent
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: photo.imageBytes != null
+                                ? Image.memory(photo.imageBytes!,
+                                    fit: BoxFit.cover)
+                                : (photo.imageUrl != null && photo.imageUrl!.isNotEmpty
+                                    ? Image.network(photo.imageUrl!,
+                                        fit: BoxFit.cover)
+                                    : Container(color: AppColors.muted)),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(trLoc(stop.name, loc.lang),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 20,
+                            color: AppColors.ink)),
+                    const SizedBox(height: 6),
+                    Text(trLoc(stop.description, loc.lang),
+                        style: TextStyle(color: AppColors.muted, height: 1.5)),
+                    if (hasPhotos && displayPhotos.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text('${loc.t('gallery.photos')}: ${displayPhotos.length}',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary)),
+                    ],
+                  ],
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(trLoc(stop.name, loc.lang),
-                      style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 20,
-                          color: AppColors.ink)),
-                  const SizedBox(height: 6),
-                  Text(trLoc(stop.description, loc.lang),
-                      style: TextStyle(color: AppColors.muted, height: 1.5)),
-                  const SizedBox(height: 16),
-                  Row(children: [
-                    OutlinedButton.icon(
-                      onPressed: _i > 0 ? () => setState(() => _i--) : null,
-                      icon: const PlayfulIcon(Icons.chevron_left),
-                      label: Text(loc.t('common.previous')),
-                    ).hoverLift(),
-                    const Spacer(),
-                    FilledButton.icon(
-                      onPressed: _i < widget.stops.length - 1
-                          ? () => setState(() => _i++)
-                          : () => Navigator.pop(context),
-                      icon: PlayfulIcon(
-                        _i < widget.stops.length - 1
-                            ? Icons.chevron_right
-                            : Icons.check,
-                      ),
-                      label: Text(_i < widget.stops.length - 1
-                          ? loc.t('common.next')
-                          : loc.t('common.close')),
-                    ).hoverLift(),
-                  ]),
-                ],
-              ),
+              child: Row(children: [
+                OutlinedButton.icon(
+                  onPressed: _i > 0 ? () => setState(() => _i--) : null,
+                  icon: const PlayfulIcon(Icons.chevron_left),
+                  label: Text(loc.t('common.previous')),
+                ).hoverLift(),
+                const Spacer(),
+                FilledButton.icon(
+                  onPressed: _i < widget.stops.length - 1
+                      ? () => setState(() => _i++)
+                      : () => Navigator.pop(context),
+                  icon: PlayfulIcon(
+                    _i < widget.stops.length - 1
+                        ? Icons.chevron_right
+                        : Icons.check,
+                  ),
+                  label: Text(_i < widget.stops.length - 1
+                      ? loc.t('common.next')
+                      : loc.t('common.close')),
+                ).hoverLift(),
+              ]),
             ),
           ],
         ),

@@ -1119,6 +1119,11 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Drag or use the arrows to arrange the tour stops.',
     'ru': 'Перетащите или используйте стрелки, чтобы выстроить остановки экскурсии.',
   },
+  'admin.tour.addPanorama': {
+    'he': 'הוספת תמונת פנורמה',
+    'en': 'Add panorama photo',
+    'ru': 'Добавить панораму',
+  },
   'admin.moveUp': {'he': 'למעלה', 'en': 'Move up', 'ru': 'Выше'},
   'admin.moveDown': {'he': 'למטה', 'en': 'Move down', 'ru': 'Ниже'},
   'admin.manage.tour': {'he': 'סיור', 'en': 'Tour', 'ru': 'Экскурсия'},

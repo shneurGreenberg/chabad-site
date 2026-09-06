@@ -724,28 +724,234 @@ class ManageHistoryPanel extends StatelessWidget {
 
   void _editTour(BuildContext context, AppRepository repo, TourStop stop,
       {bool isNew = false}) {
-    final name = _locCtrls(stop.name);
-    final desc = _locCtrls(stop.description);
-    _showEditor(
+    showDialog(
       context: context,
-      title: isNew ? context.loc.t('admin.newItem') : context.loc.t('common.edit'),
-      child: Column(children: [
-        LocFieldGroup(label: context.loc.t('common.name'), controllers: name),
-        LocFieldGroup(
-            label: context.loc.t('common.message'),
-            controllers: desc,
-            maxLines: 4),
-      ]),
-      onSave: () {
-        _applyLoc(stop.name, name);
-        _applyLoc(stop.description, desc);
-        if (isNew) {
-          repo.addTour(stop);
-        } else {
-          repo.refresh();
-        }
-        _disposeAll([...name.values, ...desc.values]);
-      },
+      builder: (_) => _TourEditor(stop: stop, isNew: isNew, repo: repo),
+    );
+  }
+}
+
+class _TourEditor extends StatefulWidget {
+  const _TourEditor({required this.stop, required this.isNew, required this.repo});
+  final TourStop stop;
+  final bool isNew;
+  final AppRepository repo;
+  @override
+  State<_TourEditor> createState() => _TourEditorState();
+}
+
+class _TourEditorState extends State<_TourEditor> {
+  late final _name = _locCtrls(widget.stop.name);
+  late final _desc = _locCtrls(widget.stop.description);
+
+  @override
+  void dispose() {
+    _disposeAll([..._name.values, ..._desc.values]);
+    super.dispose();
+  }
+
+  Future<void> _addPhotos() async {
+    final picked = await ImagePicker().pickMultiImage(
+      maxWidth: 1800,
+      imageQuality: 86,
+    );
+    if (picked.isEmpty) return;
+    final files = <Uint8List>[];
+    for (final f in picked) {
+      files.add(await f.readAsBytes());
+    }
+    if (!mounted) return;
+    widget.repo.addTourPhotos(widget.stop, files);
+    setState(() {});
+  }
+
+  Future<void> _pickPanorama() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 4096,
+      imageQuality: 90,
+    );
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (!mounted) return;
+    setState(() {
+      widget.stop.panoramaBytes = bytes;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 700, maxHeight: 720),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(children: [
+                Text(widget.isNew ? loc.t('admin.newItem') : loc.t('common.edit'),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: AppColors.ink)),
+                const Spacer(),
+                IconButton(
+                    icon: PlayfulIcon(Icons.close, color: AppColors.ink),
+                    onPressed: () => Navigator.pop(context)),
+              ]),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(children: [
+                  // Panorama picker
+                  if (widget.stop.hasPanorama || widget.stop.panoramaBytes != null)
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: widget.stop.panoramaBytes != null
+                              ? Image.memory(widget.stop.panoramaBytes!,
+                                  height: 180, width: double.infinity, fit: BoxFit.cover)
+                              : const SizedBox(height: 180),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: const PlayfulIcon(Icons.close, color: Colors.white),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.black.withValues(alpha: 0.6),
+                            ),
+                            onPressed: () => setState(() {
+                              widget.stop.panoramaBytes = null;
+                              widget.stop.panoramaUrl = null;
+                            }),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    OutlinedButton.icon(
+                      onPressed: _pickPanorama,
+                      icon: const PlayfulIcon(Icons.panorama, size: 18),
+                      label: Text(loc.t('admin.tour.addPanorama')),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
+                      ),
+                    ).hoverLift(),
+                  const SizedBox(height: 16),
+                  // Photos grid
+                  if (widget.stop.photos.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          Expanded(
+                            child: Text(loc.t('admin.gallery.photos'),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: AppColors.ink)),
+                          ),
+                          TextButton.icon(
+                            onPressed: _addPhotos,
+                            icon: const PlayfulIcon(Icons.add, size: 18),
+                            label: Text(loc.t('common.add')),
+                          ),
+                        ]),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final photo in widget.stop.photos)
+                              Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: photo.imageBytes != null
+                                        ? Image.memory(photo.imageBytes!,
+                                            width: 100, height: 100, fit: BoxFit.cover)
+                                        : Container(
+                                            width: 100,
+                                            height: 100,
+                                            color: AppColors.muted.withValues(alpha: 0.2),
+                                          ),
+                                  ),
+                                  Positioned(
+                                    top: 2,
+                                    right: 2,
+                                    child: IconButton(
+                                      icon: const PlayfulIcon(Icons.close, size: 16),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: Colors.black.withValues(alpha: 0.6),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.all(4),
+                                        minimumSize: const Size(24, 24),
+                                      ),
+                                      onPressed: () {
+                                        widget.repo.deleteTourPhoto(widget.stop, photo.id);
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    )
+                  else
+                    OutlinedButton.icon(
+                      onPressed: _addPhotos,
+                      icon: const PlayfulIcon(Icons.add_photo_alternate, size: 18),
+                      label: Text(loc.t('admin.gallery.addPhotos')),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
+                      ),
+                    ).hoverLift(),
+                  const SizedBox(height: 16),
+                  LocFieldGroup(label: loc.t('common.name'), controllers: _name),
+                  const SizedBox(height: 12),
+                  LocFieldGroup(
+                      label: loc.t('common.message'),
+                      controllers: _desc,
+                      maxLines: 4),
+                ]),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                TextButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const PlayfulIcon(Icons.close, size: 18),
+                  label: Text(loc.t('common.cancel')),
+                ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  onPressed: () {
+                    _applyLoc(widget.stop.name, _name);
+                    _applyLoc(widget.stop.description, _desc);
+                    if (widget.isNew) {
+                      widget.repo.addTour(widget.stop);
+                    } else {
+                      widget.repo.refresh();
+                    }
+                    Navigator.pop(context);
+                  },
+                  icon: const PlayfulIcon(Icons.save_outlined, size: 18),
+                  label: Text(loc.t('common.save')),
+                ),
+              ]),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

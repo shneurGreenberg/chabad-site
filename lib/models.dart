@@ -376,12 +376,24 @@ class TourStop {
     required this.description,
     required this.color,
     this.icon = Icons.location_on_outlined,
-  });
+    this.panoramaBytes,
+    this.panoramaUrl,
+    List<GalleryShot>? photos,
+  }) : photos = photos ?? [];
   String id;
   Loc name;
   Loc description;
   int color;
   IconData icon;
+  Uint8List? panoramaBytes;
+  String? panoramaUrl;
+  List<GalleryShot> photos;
+
+  bool get hasPanorama =>
+      (panoramaBytes != null && panoramaBytes!.isNotEmpty) ||
+      (panoramaUrl != null && panoramaUrl!.isNotEmpty);
+
+  int get photoCount => photos.length;
 }
 
 enum ProductCategory { judaica, books, food }

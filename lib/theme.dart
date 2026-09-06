@@ -308,7 +308,8 @@ ThemeData buildAppTheme([SitePalette? palette]) {
       style: FilledButton.styleFrom(
         backgroundColor: p.primary,
         foregroundColor: p.onPrimary,
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        minimumSize: const Size(88, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
       ).copyWith(
@@ -334,8 +335,9 @@ ThemeData buildAppTheme([SitePalette? palette]) {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: p.primary,
-        side: BorderSide(color: p.primary, width: 1.4),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+        side: BorderSide(color: p.primary, width: 1.6),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 17),
+        minimumSize: const Size(88, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
       ).copyWith(
@@ -386,7 +388,7 @@ ThemeData buildAppTheme([SitePalette? palette]) {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: p.primary, width: 1.6),
+        borderSide: BorderSide(color: p.primary, width: 2.2),
       ),
     ),
     textTheme: base.textTheme.copyWith(

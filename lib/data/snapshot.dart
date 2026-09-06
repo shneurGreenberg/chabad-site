@@ -507,6 +507,10 @@ Map<String, dynamic> tourToJson(TourStop s) => {
       'description': locTo(s.description),
       'color': s.color,
       'icon': iconTo(s.icon),
+      if (s.panoramaUrl != null && s.panoramaUrl!.isNotEmpty)
+        'panoramaUrl': s.panoramaUrl,
+      if (s.photos.isNotEmpty)
+        'photos': [for (final p in s.photos) galleryShotToJson(s.id, p)],
     };
 
 TourStop tourFromJson(dynamic raw) {
@@ -517,6 +521,10 @@ TourStop tourFromJson(dynamic raw) {
     description: locFrom(m['description']),
     color: (m['color'] as num?)?.toInt() ?? 0xFF1D4ED8,
     icon: iconFrom(m['icon'], Icons.location_on_outlined),
+    panoramaUrl: m['panoramaUrl'] as String?,
+    photos: m['photos'] is List
+        ? (m['photos'] as List).map(galleryShotFromJson).toList()
+        : null,
   );
 }
 
