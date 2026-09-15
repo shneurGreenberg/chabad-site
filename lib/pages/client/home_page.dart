@@ -552,8 +552,8 @@ class _ZmanimStrip extends StatelessWidget {
         Text(name, style: TextStyle(color: AppColors.muted, fontSize: 13)),
         const SizedBox(width: 10),
         Text(time,
-            style: const TextStyle(
-                color: Color(0xFF0B1C3A),
+            style: TextStyle(
+                color: AppColors.ink,
                 fontWeight: FontWeight.w800,
                 fontSize: 16)),
       ]),
