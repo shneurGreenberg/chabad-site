@@ -1,11 +1,11 @@
 # Multi-stage Dockerfile for Flutter web on Amvera (fast path).
-# Avoids cloning Flutter from git and downloading hundreds of kaddish photos
-# during image build - those made Amvera builds hang while git tip advanced.
+# Pin Flutter 3.47.4 so Dart SDK satisfies pubspec (stable briefly had 3.12.0).
+# Skip Flutter git clone + kaddish photo crawl (those hung prior Amvera builds).
 
-FROM ghcr.io/cirruslabs/flutter:stable AS build
+FROM ghcr.io/cirruslabs/flutter:3.47.4 AS build
 WORKDIR /app
 COPY pubspec.yaml pubspec.lock ./
-RUN flutter config --enable-web && flutter pub get
+RUN flutter --version && flutter config --enable-web && flutter pub get
 COPY . .
 RUN flutter build web --release --base-href / --no-tree-shake-icons --no-wasm-dry-run
 RUN cp assets/images/community-emblem.png build/web/favicon.png \
@@ -14,7 +14,7 @@ RUN cp assets/images/community-emblem.png build/web/favicon.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-192.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-512.png \
  && mkdir -p build/web/kaddish-photos \
- && BUILD_ID="v29-$(date -u +%Y%m%dT%H%M%SZ)" \
+ && BUILD_ID="v30-$(date -u +%Y%m%dT%H%M%SZ)" \
  && echo "$BUILD_ID" > build/web/build-id.txt \
  && echo "<!-- $BUILD_ID -->" >> build/web/index.html \
  && cp build/web/index.html build/web/404.html \
@@ -25,4 +25,5 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/build/web /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+
 
