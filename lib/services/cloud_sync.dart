@@ -34,6 +34,8 @@ class CloudSync {
   bool get signedIn =>
       enabled && FirebaseAuth.instance.currentUser != null;
 
+  String? get currentEmail => FirebaseAuth.instance.currentUser?.email;
+
   Future<void> init() async {
     if (!DefaultFirebaseOptions.isConfigured || _initialized) return;
     try {
