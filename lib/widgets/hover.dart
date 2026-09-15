@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import '../theme.dart';
 
 const Duration kHoverDuration = Duration(milliseconds: 200);
 
 /// Premium web hover: scale + optional gold lift. Layout size never changes.
+///
+/// Uses [AnimatedScale] instead of `flutter_animate` so scrolling a grid of
+/// cards cannot detach a RenderObject that an animation still paints.
 class HoverLift extends StatefulWidget {
   const HoverLift({
     super.key,
@@ -30,7 +32,7 @@ class _HoverLiftState extends State<HoverLift> {
   bool _hovering = false;
 
   void _set(bool value) {
-    if (!widget.enabled || _hovering == value) return;
+    if (!mounted || !widget.enabled || _hovering == value) return;
     setState(() => _hovering = value);
   }
 
@@ -38,8 +40,9 @@ class _HoverLiftState extends State<HoverLift> {
   Widget build(BuildContext context) {
     if (!widget.enabled) return widget.child;
     final reduce = MediaQuery.disableAnimationsOf(context);
-    final target = _hovering && !reduce ? 1.0 : 0.0;
+    final duration = reduce ? Duration.zero : kHoverDuration;
     final rtl = Directionality.of(context) == TextDirection.rtl;
+    final on = _hovering && !reduce;
 
     Widget child = widget.child;
     if (widget.underline) {
@@ -53,22 +56,20 @@ class _HoverLiftState extends State<HoverLift> {
             end: 8,
             bottom: 0,
             child: IgnorePointer(
-              child: Container(
-                height: 2,
-                decoration: BoxDecoration(
-                  gradient: AppColors.goldGradient,
-                  borderRadius: BorderRadius.all(Radius.circular(2)),
-                ),
-              )
-                  .animate(target: target)
-                  .scaleX(
-                    begin: 0,
-                    end: 1,
-                    duration: kHoverDuration,
-                    curve: Curves.easeOutCubic,
-                    alignment:
-                        rtl ? Alignment.centerRight : Alignment.centerLeft,
+              child: AnimatedScale(
+                duration: duration,
+                curve: Curves.easeOutCubic,
+                scale: on ? 1 : 0,
+                alignment:
+                    rtl ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  height: 2,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.goldGradient,
+                    borderRadius: const BorderRadius.all(Radius.circular(2)),
                   ),
+                ),
+              ),
             ),
           ),
         ],
@@ -79,36 +80,28 @@ class _HoverLiftState extends State<HoverLift> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => _set(true),
       onExit: (_) => _set(false),
-      onHover: (_) => _set(true),
-      child: child
-          .animate(target: target)
-          .scale(
-            begin: const Offset(1, 1),
-            end: Offset(widget.scale, widget.scale),
-            duration: kHoverDuration,
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.center,
-          )
-          .custom(
-            duration: kHoverDuration,
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              final painted = child;
-              if (!widget.lift || value == 0) return painted;
-              return DecoratedBox(
-                decoration: BoxDecoration(
-                  boxShadow: [
+      child: AnimatedScale(
+        scale: on ? widget.scale : 1,
+        duration: duration,
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.center,
+        child: AnimatedContainer(
+          duration: duration,
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            boxShadow: widget.lift && on
+                ? [
                     BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.20 * value),
-                      blurRadius: 18 * value,
-                      offset: Offset(0, 7 * value),
+                      color: AppColors.gold.withValues(alpha: 0.20),
+                      blurRadius: 18,
+                      offset: const Offset(0, 7),
                     ),
-                  ],
-                ),
-                child: child,
-              );
-            },
+                  ]
+                : const [],
           ),
+          child: child,
+        ),
+      ),
     );
   }
 }
@@ -161,13 +154,10 @@ class _HoverAwareState extends State<HoverAware> {
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) {
-        if (!_hovering) setState(() => _hovering = true);
+        if (mounted && !_hovering) setState(() => _hovering = true);
       },
       onExit: (_) {
-        if (_hovering) setState(() => _hovering = false);
-      },
-      onHover: (_) {
-        if (!_hovering) setState(() => _hovering = true);
+        if (mounted && _hovering) setState(() => _hovering = false);
       },
       child: widget.builder(_hovering),
     );

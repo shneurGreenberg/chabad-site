@@ -177,9 +177,10 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final repo = context.watch<AppRepository>();
+    final repo = context.read<AppRepository>();
     final hasPrice = product.price > 0;
-    final qty = repo.cart[product.id] ?? 0;
+    final qty =
+        context.select<AppRepository, int>((r) => r.cart[product.id] ?? 0);
     return HoverLift(
       child: Card(
       child: Column(
@@ -250,7 +251,7 @@ class ProductCard extends StatelessWidget {
                             ],
                           ],
                         ),
-                      ).hoverLift(scale: 1.05),
+                      ),
                     ),
                 ]),
               ],
