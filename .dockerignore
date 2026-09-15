@@ -1,0 +1,14 @@
+.git
+.github
+_inspect
+build
+.dart_tool
+.idea
+android
+ios
+linux
+macos
+windows
+test
+**/*.md
+.gitignore
