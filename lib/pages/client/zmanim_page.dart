@@ -21,14 +21,10 @@ class ZmanimPage extends StatelessWidget {
             repo.shabbat['parasha_en'] ??
             '')
         .trim();
-    final isHoliday = repo.shabbat['is_holiday'] == '1' ||
-        (holiday.isNotEmpty && parasha.isEmpty);
-    final occasion = holiday.isNotEmpty
-        ? holiday
-        : (parasha.isNotEmpty ? parasha : loc.t('zmanim.shabbat'));
-    final heading = isHoliday && holiday.isNotEmpty
-        ? loc.t('zmanim.holiday')
-        : loc.t('zmanim.shabbat');
+    final holidayCandle = (repo.shabbat['holiday_candle'] ?? '').trim();
+    final holidayHavdala = (repo.shabbat['holiday_havdala'] ?? '').trim();
+    final isHoliday = repo.shabbat['is_holiday'] == '1' && holiday.isNotEmpty;
+    final occasion = parasha.isNotEmpty ? parasha : loc.t('zmanim.nextShabbat');
     return SiteScaffold(
       currentRoute: '/zmanim',
       children: [
@@ -64,7 +60,7 @@ class ZmanimPage extends StatelessWidget {
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       PlayfulIcon(Icons.local_fire_department, color: AppColors.accent),
                       const SizedBox(width: 8),
-                      Text(heading,
+                      Text(loc.t('zmanim.shabbat'),
                           style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w800,
@@ -82,6 +78,12 @@ class ZmanimPage extends StatelessWidget {
                     if ((repo.shabbat['havdala'] ?? '').trim().isNotEmpty &&
                         repo.shabbat['havdala'] != '--:--')
                       _big(loc.t('zmanim.havdala'), repo.shabbat['havdala']!),
+                    if (isHoliday && holiday.isNotEmpty)
+                      _big(loc.t('zmanim.holiday'), holiday),
+                    if (holidayCandle.isNotEmpty && holidayCandle != '--:--')
+                      _big(loc.t('zmanim.candle'), holidayCandle),
+                    if (holidayHavdala.isNotEmpty && holidayHavdala != '--:--')
+                      _big(loc.t('zmanim.motzeiChag'), holidayHavdala),
                   ],
                 ),
               ],

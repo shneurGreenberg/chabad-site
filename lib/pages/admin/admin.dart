@@ -62,6 +62,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /shiurim/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
     match /touristInfo/{id} {
       allow read: if true;
       allow write: if isAdmin();
@@ -932,43 +936,15 @@ class _NewsEditorState extends State<_NewsEditor> {
                   children: [
                     CoverImagePicker(
                       bytes: widget.article.imageBytes,
+                      url: widget.article.imageUrl,
                       color: widget.article.imageColor,
                       icon: widget.article.icon,
+                      alignY: widget.article.imageAlignY,
+                      onAlignY: (v) =>
+                          setState(() => widget.article.imageAlignY = v),
                       onChanged: (b) =>
                           setState(() => widget.article.imageBytes = b),
                     ),
-                    if (widget.article.hasImage) ...[
-                      const SizedBox(height: 12),
-                      Text('${loc.t('common.position')} / Focal Point',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      Row(children: [
-                        Text('X:', style: TextStyle(color: AppColors.muted)),
-                        Expanded(
-                          child: Slider(
-                            value: widget.article.imageAlignX,
-                            min: -1,
-                            max: 1,
-                            divisions: 20,
-                            label: widget.article.imageAlignX.toStringAsFixed(1),
-                            onChanged: (v) => setState(() => widget.article.imageAlignX = v),
-                          ),
-                        ),
-                      ]),
-                      Row(children: [
-                        Text('Y:', style: TextStyle(color: AppColors.muted)),
-                        Expanded(
-                          child: Slider(
-                            value: widget.article.imageAlignY,
-                            min: -1,
-                            max: 1,
-                            divisions: 20,
-                            label: widget.article.imageAlignY.toStringAsFixed(1),
-                            onChanged: (v) => setState(() => widget.article.imageAlignY = v),
-                          ),
-                        ),
-                      ]),
-                    ],
                     const SizedBox(height: 12),
                     LocFieldGroup(label: loc.t('common.name'), controllers: _title),
                     const SizedBox(height: 8),
@@ -1145,43 +1121,15 @@ class _ProgramEditorState extends State<_ProgramEditor> {
                 child: Column(children: [
                   CoverImagePicker(
                     bytes: widget.program.imageBytes,
+                    url: widget.program.imageUrl,
                     color: widget.program.color,
                     icon: widget.program.icon,
+                    alignY: widget.program.imageAlignY,
+                    onAlignY: (v) =>
+                        setState(() => widget.program.imageAlignY = v),
                     onChanged: (b) =>
                         setState(() => widget.program.imageBytes = b),
                   ),
-                  if (widget.program.hasImage) ...[
-                    const SizedBox(height: 12),
-                    Text('${loc.t('common.position')} / Focal Point',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      Text('X:', style: TextStyle(color: AppColors.muted)),
-                      Expanded(
-                        child: Slider(
-                          value: widget.program.imageAlignX,
-                          min: -1,
-                          max: 1,
-                          divisions: 20,
-                          label: widget.program.imageAlignX.toStringAsFixed(1),
-                          onChanged: (v) => setState(() => widget.program.imageAlignX = v),
-                        ),
-                      ),
-                    ]),
-                    Row(children: [
-                      Text('Y:', style: TextStyle(color: AppColors.muted)),
-                      Expanded(
-                        child: Slider(
-                          value: widget.program.imageAlignY,
-                          min: -1,
-                          max: 1,
-                          divisions: 20,
-                          label: widget.program.imageAlignY.toStringAsFixed(1),
-                          onChanged: (v) => setState(() => widget.program.imageAlignY = v),
-                        ),
-                      ),
-                    ]),
-                  ],
                   LocFieldGroup(label: loc.t('common.name'), controllers: _title),
                   LocFieldGroup(
                       label: loc.t('common.message'),

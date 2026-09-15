@@ -63,7 +63,8 @@ class NewsArticle {
       telegramMessageId != null ||
       telegramPublishedId != null;
 
-  Alignment get imageAlignment => Alignment(imageAlignX, imageAlignY);
+  /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
+  Alignment get imageAlignment => Alignment(0, imageAlignY);
 }
 
 class SiteLocation {
@@ -154,7 +155,8 @@ class Program {
       (imageBytes != null && imageBytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
 
-  Alignment get imageAlignment => Alignment(imageAlignX, imageAlignY);
+  /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
+  Alignment get imageAlignment => Alignment(0, imageAlignY);
 }
 
 class GalleryShot {
@@ -721,6 +723,9 @@ class TouristInfo {
     this.color = 0xFF0EA5E9,
     this.imageBytes,
     this.imageUrl,
+    this.rating,
+    this.websiteUrl = '',
+    this.mapsUrl = '',
   });
   final String id;
   Loc title;
@@ -730,6 +735,9 @@ class TouristInfo {
   int color;
   Uint8List? imageBytes;
   String? imageUrl;
+  double? rating;
+  String websiteUrl;
+  String mapsUrl;
 
   bool get hasImage =>
       (imageBytes != null && imageBytes!.isNotEmpty) ||
@@ -765,7 +773,8 @@ class BannerSlide {
   bool get hasImage =>
       (bytes != null && bytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
-  Alignment get alignment => Alignment(alignX, alignY);
+  /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
+  Alignment get alignment => Alignment(0, alignY);
 
   BannerSlide copy() => BannerSlide(
         bytes: bytes,
@@ -794,7 +803,8 @@ class PageBanner {
       (bytes != null && bytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty) ||
       extra.any((s) => s.hasImage);
-  Alignment get alignment => Alignment(alignX, alignY);
+  /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
+  Alignment get alignment => Alignment(0, alignY);
 
   List<BannerSlide> get allSlides {
     final out = <BannerSlide>[];

@@ -601,6 +601,9 @@ Map<String, dynamic> touristInfoToJson(TouristInfo t) => {
       'color': t.color,
       'imageUrl': compactImageUrl(t.imageUrl),
       'imageId': imageIdOf('tourist', t.id, bytes: t.imageBytes),
+      if (t.rating != null) 'rating': t.rating,
+      if (t.websiteUrl.trim().isNotEmpty) 'websiteUrl': t.websiteUrl.trim(),
+      if (t.mapsUrl.trim().isNotEmpty) 'mapsUrl': t.mapsUrl.trim(),
     };
 
 TouristInfo touristInfoFromJson(dynamic raw) {
@@ -619,6 +622,9 @@ TouristInfo touristInfoFromJson(dynamic raw) {
     imageUrl: compactImageUrl(
       m['imageUrl'] is String ? '${m['imageUrl']}' : null,
     ),
+    rating: (m['rating'] as num?)?.toDouble(),
+    websiteUrl: '${m['websiteUrl'] ?? ''}',
+    mapsUrl: '${m['mapsUrl'] ?? ''}',
   );
 }
 

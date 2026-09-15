@@ -62,8 +62,9 @@ class PhoneText extends StatelessWidget {
   Widget build(BuildContext context) {
     final href = telUrl(number);
     Widget child = Text(
-      number,
+      isolateLtr(number),
       textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
       style: style,
       maxLines: maxLines,
       overflow: overflow,
@@ -82,6 +83,92 @@ class PhoneText extends StatelessWidget {
         child: child,
       ),
     );
+  }
+}
+
+/// Clickable email that stays LTR inside RTL copy.
+class EmailText extends StatelessWidget {
+  const EmailText(this.email, {super.key, this.style});
+  final String email;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    final href = mailtoUrl(email: email);
+    Widget child = Text(
+      isolateLtr(email),
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+      style: (style ?? const TextStyle()).copyWith(
+        decoration: href == null ? null : TextDecoration.underline,
+      ),
+    );
+    if (href != null) {
+      child = InkWell(
+        onTap: () => openUrl(href),
+        mouseCursor: SystemMouseCursors.click,
+        child: child,
+      );
+    }
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: child,
+      ),
+    );
+  }
+}
+
+/// Turns every email and phone number inside [text] into a tappable LTR link.
+class LinkedContactText extends StatelessWidget {
+  const LinkedContactText(this.text, {super.key, this.style, this.linkColor});
+  final String text;
+  final TextStyle? style;
+  final Color? linkColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = style ?? DefaultTextStyle.of(context).style;
+    final matches = findContactMatches(text);
+    if (matches.isEmpty) {
+      return Text(text, style: base);
+    }
+    final spans = <InlineSpan>[];
+    var cursor = 0;
+    for (final m in matches) {
+      if (m.start > cursor) {
+        spans.add(TextSpan(text: text.substring(cursor, m.start), style: base));
+      }
+      final color = linkColor ?? AppColors.primary;
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: InkWell(
+              onTap: () => openUrl(m.url),
+              mouseCursor: SystemMouseCursors.click,
+              child: Text(
+                isolateLtr(m.text),
+                textDirection: TextDirection.ltr,
+                style: base.copyWith(
+                  color: color,
+                  decoration: TextDecoration.underline,
+                  decorationColor: color,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      cursor = m.end;
+    }
+    if (cursor < text.length) {
+      spans.add(TextSpan(text: text.substring(cursor), style: base));
+    }
+    return Text.rich(TextSpan(style: base, children: spans));
   }
 }
 

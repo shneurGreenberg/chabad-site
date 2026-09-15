@@ -13,12 +13,15 @@ class MapIFrame extends StatelessWidget {
       onElementCreated: (element) {
         final iframe = element as web.HTMLIFrameElement;
         iframe.src = url;
-        iframe.style.border = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
+        iframe.allowFullscreen = true;
+        iframe.title = 'Map';
+        iframe.style
+          ..border = 'none'
+          ..width = '100%'
+          ..height = '100%'
+          ..display = 'block';
         iframe.setAttribute('loading', 'lazy');
         iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-        iframe.setAttribute('allowfullscreen', 'true');
         iframe.setAttribute(
           'allow',
           'geolocation; fullscreen; clipboard-write',

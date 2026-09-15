@@ -166,117 +166,172 @@ class LocationZmanimApi {
       Zman(name: {'he': 'צאת הכוכבים', 'en': 'Nightfall', 'ru': 'Появление звёзд'}, time: t('tzeit'), kind: ZmanKind.stars),
     ];
 
-    final shabbatEn = await _json(
-      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&$locQuery',
-    );
-    final shabbatHe = await _json(
-      'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=h&$locQuery',
-    );
-    Map<String, dynamic> shabbatRu = const {};
+    final today = DateTime.now();
+    final startDay = DateTime(today.year, today.month, today.day);
+    final endDay = startDay.add(const Duration(days: 16));
+    String ymd(DateTime d) =>
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final range = 'start=${ymd(startDay)}&end=${ymd(endDay)}';
+
+    Future<Map<String, dynamic>> cal(String lg) => _json(
+          'https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=off&mod=off'
+          '&nx=off&ss=off&mf=off&c=on&s=on&M=on&$locQuery&$range'
+          '${lg.isEmpty ? '' : '&lg=$lg'}',
+        );
+
+    Map<String, dynamic> calEn = const {};
+    Map<String, dynamic> calHe = const {};
+    Map<String, dynamic> calRu = const {};
     try {
-      shabbatRu = await _json(
-        'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&lg=ru&$locQuery',
-      );
+      calEn = await cal('');
+    } catch (_) {}
+    try {
+      calHe = await cal('h');
+    } catch (_) {}
+    try {
+      calRu = await cal('ru');
     } catch (_) {}
 
-    String itemTime(Map<String, dynamic> json, String category) {
-      for (final item in json['items'] as List? ?? const []) {
-        if (item is! Map) continue;
-        if (item['category'] != category) continue;
-        final date = item['date'] as String?;
-        return clockFromIso(date);
-      }
-      return '--:--';
+    DateTime? itemWhen(Map item) => DateTime.tryParse('${item['date'] ?? ''}');
+
+    List<Map<String, dynamic>> itemsOf(Map<String, dynamic> json) {
+      final raw = json['items'];
+      if (raw is! List) return const [];
+      return [
+        for (final item in raw)
+          if (item is Map) Map<String, dynamic>.from(item),
+      ];
     }
 
-    String parasha(Map<String, dynamic> json, {String? hebrewFallback}) {
-      for (final item in json['items'] as List? ?? const []) {
-        if (item is! Map) continue;
+    String clockOf(Map item) => clockFromIso(item['date'] as String?);
+
+    Map<String, dynamic>? firstMatching(
+      List<Map<String, dynamic>> items,
+      bool Function(Map<String, dynamic>, DateTime) pred,
+    ) {
+      Map<String, dynamic>? best;
+      DateTime? bestAt;
+      for (final item in items) {
+        final at = itemWhen(item);
+        if (at == null || !pred(item, at)) continue;
+        if (bestAt == null || at.isBefore(bestAt)) {
+          best = item;
+          bestAt = at;
+        }
+      }
+      return best;
+    }
+
+    final enItems = itemsOf(calEn);
+    final heItems = itemsOf(calHe);
+    final ruItems = itemsOf(calRu);
+
+    final shabbatCandles = firstMatching(enItems, (item, at) {
+      if (item['category'] != 'candles') return false;
+      return at.weekday == DateTime.friday &&
+          !DateTime(at.year, at.month, at.day).isBefore(startDay);
+    });
+    final shabbatHavdala = firstMatching(enItems, (item, at) {
+      if (item['category'] != 'havdalah') return false;
+      return at.weekday == DateTime.saturday &&
+          !DateTime(at.year, at.month, at.day).isBefore(startDay);
+    });
+    final holidayCandles = firstMatching(enItems, (item, at) {
+      if (item['category'] != 'candles') return false;
+      if (at.weekday == DateTime.friday) return false;
+      return !DateTime(at.year, at.month, at.day).isBefore(startDay);
+    });
+    final holidayHavdalaItem = firstMatching(enItems, (item, at) {
+      if (item['category'] != 'havdalah') return false;
+      if (at.weekday == DateTime.saturday) return false;
+      return !DateTime(at.year, at.month, at.day).isBefore(startDay);
+    });
+
+    String parashaOf(List<Map<String, dynamic>> items, {bool hebrew = false}) {
+      for (final item in items) {
         if (item['category'] != 'parashat') continue;
-        if (hebrewFallback != null) {
-          final h = item['hebrew'] as String?;
-          if (h != null && h.trim().isNotEmpty) return h.trim();
-        }
-        final title = (item['title'] as String?)?.trim();
-        if (title != null && title.isNotEmpty) return title;
-      }
-      return hebrewFallback ?? '';
-    }
-
-    /// Major holiday title near candle lighting (e.g. Rosh Hashana).
-    String holidayName(Map<String, dynamic> json, {bool hebrew = false}) {
-      String fromCandlesMemo() {
-        for (final item in json['items'] as List? ?? const []) {
-          if (item is! Map) continue;
-          if (item['category'] != 'candles') continue;
-          final memo = (item['memo'] as String?)?.trim() ?? '';
-          if (memo.isNotEmpty) return memo;
-        }
-        return '';
-      }
-
-      for (final item in json['items'] as List? ?? const []) {
-        if (item is! Map) continue;
-        if (item['category'] != 'holiday') continue;
-        final sub = '${item['subcat'] ?? ''}';
-        final yomtov = item['yomtov'] == true;
-        if (!(yomtov || sub == 'major' || sub == 'modern')) continue;
         if (hebrew) {
-          final h = (item['hebrew'] as String?)?.trim();
-          if (h != null && h.isNotEmpty) return h;
+          final h = '${item['hebrew'] ?? ''}'.trim();
+          if (h.isNotEmpty) return h;
         }
-        final title = (item['title'] as String?)?.trim() ?? '';
-        if (title.toLowerCase().startsWith('erev ')) continue;
+        final title = '${item['title'] ?? ''}'.trim();
         if (title.isNotEmpty) return title;
-      }
-      final memo = fromCandlesMemo();
-      if (memo.isNotEmpty) return memo;
-      for (final item in json['items'] as List? ?? const []) {
-        if (item is! Map) continue;
-        if (item['category'] != 'holiday') continue;
-        if (hebrew) {
-          final h = (item['hebrew'] as String?)?.trim();
-          if (h != null && h.isNotEmpty) return h;
-        }
-        final title = (item['title'] as String?)?.trim();
-        if (title != null && title.isNotEmpty) return title;
       }
       return '';
     }
 
-    final heName = parasha(shabbatHe, hebrewFallback: '');
-    final enName = parasha(shabbatEn);
-    final ruName = parasha(shabbatRu);
-    final hebrewFromEn = parasha(shabbatEn, hebrewFallback: 'x');
+    String holidayOf(List<Map<String, dynamic>> items, {bool hebrew = false}) {
+      for (final item in items) {
+        if (item['category'] != 'holiday') continue;
+        final sub = '${item['subcat'] ?? ''}';
+        final yomtov = item['yomtov'] == true;
+        if (!(yomtov || sub == 'major')) continue;
+        final title = '${item['title'] ?? ''}'.trim();
+        if (title.toLowerCase().startsWith('erev ')) continue;
+        final at = itemWhen(item);
+        if (at != null && DateTime(at.year, at.month, at.day).isBefore(startDay)) {
+          continue;
+        }
+        if (hebrew) {
+          final h = '${item['hebrew'] ?? ''}'.trim();
+          if (h.isNotEmpty) return h;
+        }
+        if (title.isNotEmpty) return title;
+      }
+      return '';
+    }
 
-    final holidayHe = holidayName(shabbatHe, hebrew: true);
-    final holidayEn = holidayName(shabbatEn);
-    final holidayRu = holidayName(shabbatRu);
-    final hasHoliday = holidayEn.isNotEmpty || holidayHe.isNotEmpty;
+    var candle = shabbatCandles == null ? '--:--' : clockOf(shabbatCandles);
+    var havdala = shabbatHavdala == null ? '--:--' : clockOf(shabbatHavdala);
+    final holidayCandle =
+        holidayCandles == null ? '' : clockOf(holidayCandles);
+    final holidayHavdala =
+        holidayHavdalaItem == null ? '' : clockOf(holidayHavdalaItem);
 
-    // On major holidays Hebcal omits parashat — never leave occasion blank.
-    final parashaHeOut = heName.isNotEmpty
-        ? heName
-        : (hebrewFromEn.isNotEmpty ? hebrewFromEn : (holidayHe.isNotEmpty ? holidayHe : holidayEn));
-    final parashaEnOut = enName.isNotEmpty ? enName : holidayEn;
-    final parashaRuOut = ruName.isNotEmpty
-        ? ruName
-        : (enName.isNotEmpty ? enName : (holidayRu.isNotEmpty ? holidayRu : holidayEn));
+    // If the 16-day calendar missed Friday (network hole), fall back to /shabbat.
+    if (candle == '--:--' || havdala == '--:--') {
+      try {
+        final shabbatEn = await _json(
+          'https://www.hebcal.com/shabbat?cfg=json&leyning=1&M=on&c=on&$locQuery',
+        );
+        String itemTime(Map<String, dynamic> json, String category) {
+          for (final item in json['items'] as List? ?? const []) {
+            if (item is! Map) continue;
+            if (item['category'] != category) continue;
+            return clockFromIso(item['date'] as String?);
+          }
+          return '--:--';
+        }
+        if (candle == '--:--') candle = itemTime(shabbatEn, 'candles');
+        if (havdala == '--:--') havdala = itemTime(shabbatEn, 'havdalah');
+      } catch (_) {}
+    }
 
-    final candle = itemTime(shabbatEn, 'candles');
-    final havdala = itemTime(shabbatEn, 'havdalah');
+    final heName = parashaOf(heItems, hebrew: true);
+    final enName = parashaOf(enItems);
+    final ruName = parashaOf(ruItems);
+    final hebrewFromEn = parashaOf(enItems, hebrew: true);
+
+    final holidayHe = holidayOf(heItems, hebrew: true);
+    final holidayEn = holidayOf(enItems);
+    final holidayRu = holidayOf(ruItems);
+    final hasHoliday = holidayEn.isNotEmpty ||
+        holidayHe.isNotEmpty ||
+        holidayCandle.isNotEmpty;
 
     return (
       zmanim: zmanim,
-      shabbat: {
+      shabbat: <String, String>{
         'candle': candle,
         'havdala': havdala,
-        'parasha_he': parashaHeOut,
-        'parasha_en': parashaEnOut,
-        'parasha_ru': parashaRuOut,
+        'parasha_he': heName.isNotEmpty ? heName : hebrewFromEn,
+        'parasha_en': enName,
+        'parasha_ru': ruName.isNotEmpty ? ruName : enName,
         'holiday_he': holidayHe.isNotEmpty ? holidayHe : holidayEn,
         'holiday_en': holidayEn,
         'holiday_ru': holidayRu.isNotEmpty ? holidayRu : holidayEn,
+        'holiday_candle': holidayCandle,
+        'holiday_havdala': holidayHavdala,
         'is_holiday': hasHoliday ? '1' : '0',
         'fetched_at': DateTime.now().toUtc().toIso8601String(),
       },

@@ -143,16 +143,7 @@ class _Hero extends StatelessWidget {
       'ru' => repo.shabbat['parasha_ru'] ?? '',
       _ => repo.shabbat['parasha_en'] ?? '',
     }.trim();
-    final isHoliday = repo.shabbat['is_holiday'] == '1' ||
-        (holiday.isNotEmpty &&
-            (parasha.isEmpty ||
-                holiday.toLowerCase().contains('rosh') ||
-                holiday.contains('ראש') ||
-                holiday.contains('Рош')));
-    // Never blank under Суббота: holiday memo/name or parsha.
-    final occasion = holiday.isNotEmpty
-        ? holiday
-        : (parasha.isNotEmpty ? parasha : loc.t('zmanim.shabbat'));
+    final isHoliday = repo.shabbat['is_holiday'] == '1' && holiday.isNotEmpty;
 
     final copy = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,9 +207,12 @@ class _Hero extends StatelessWidget {
     );
 
     final shabbatCard = _ShabbatCard(
-      parasha: occasion,
-      candle: repo.shabbat['candle']!,
-      havdala: repo.shabbat['havdala']!,
+      parasha: parasha.trim().isEmpty ? loc.t('zmanim.shabbat') : parasha,
+      candle: repo.shabbat['candle'] ?? '--:--',
+      havdala: repo.shabbat['havdala'] ?? '--:--',
+      holiday: holiday,
+      holidayCandle: repo.shabbat['holiday_candle'] ?? '',
+      holidayHavdala: repo.shabbat['holiday_havdala'] ?? '',
       isHoliday: isHoliday && holiday.isNotEmpty,
     );
 
@@ -289,16 +283,25 @@ class _ShabbatCard extends StatelessWidget {
     required this.parasha,
     required this.candle,
     required this.havdala,
+    this.holiday = '',
+    this.holidayCandle = '',
+    this.holidayHavdala = '',
     this.isHoliday = false,
   });
   final String parasha;
   final String candle;
   final String havdala;
+  final String holiday;
+  final String holidayCandle;
+  final String holidayHavdala;
   final bool isHoliday;
 
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    final showHolidayTimes = isHoliday ||
+        holidayCandle.trim().isNotEmpty ||
+        holidayHavdala.trim().isNotEmpty;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -322,7 +325,7 @@ class _ShabbatCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isHoliday ? loc.t('zmanim.holiday') : loc.t('zmanim.shabbat'),
+                    loc.t('zmanim.shabbat'),
                     style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -332,7 +335,7 @@ class _ShabbatCard extends StatelessWidget {
               ]),
               const SizedBox(height: 8),
               Text(
-                parasha.trim().isEmpty ? loc.t('zmanim.shabbat') : parasha,
+                parasha.trim().isEmpty ? loc.t('zmanim.nextShabbat') : parasha,
                 style: TextStyle(
                     color: AppColors.accentSoft.withValues(alpha: 0.95),
                     fontWeight: FontWeight.w600,
@@ -343,6 +346,26 @@ class _ShabbatCard extends StatelessWidget {
               if (havdala.trim().isNotEmpty && havdala != '--:--') ...[
                 const SizedBox(height: 10),
                 _row(loc.t('zmanim.havdala'), havdala),
+              ],
+              if (showHolidayTimes && holiday.trim().isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  '${loc.t('zmanim.holiday')}: $holiday',
+                  style: TextStyle(
+                      color: AppColors.accentSoft.withValues(alpha: 0.95),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14),
+                ),
+                if (holidayCandle.trim().isNotEmpty &&
+                    holidayCandle != '--:--') ...[
+                  const SizedBox(height: 10),
+                  _row(loc.t('zmanim.candle'), holidayCandle),
+                ],
+                if (holidayHavdala.trim().isNotEmpty &&
+                    holidayHavdala != '--:--') ...[
+                  const SizedBox(height: 10),
+                  _row(loc.t('zmanim.motzeiChag'), holidayHavdala),
+                ],
               ],
               const SizedBox(height: 18),
               SizedBox(
@@ -517,20 +540,22 @@ class _ZmanimStrip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.16)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         if (icon != null) ...[
-          PlayfulIcon(icon, size: 16, color: color, kind: kind),
+          PlayfulIcon(icon, size: 16, color: AppColors.primary, kind: kind),
           const SizedBox(width: 6),
         ],
         Text(name, style: TextStyle(color: AppColors.muted, fontSize: 13)),
         const SizedBox(width: 10),
         Text(time,
-            style: TextStyle(
-                color: color, fontWeight: FontWeight.w800, fontSize: 16)),
+            style: const TextStyle(
+                color: Color(0xFF0B1C3A),
+                fontWeight: FontWeight.w800,
+                fontSize: 16)),
       ]),
     );
   }

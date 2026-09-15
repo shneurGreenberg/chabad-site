@@ -7,6 +7,7 @@ import '../../services/links.dart';
 import '../../services/web_prefs.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
+import '../../widgets/map_embed.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/playful_icons.dart';
 
@@ -49,6 +50,49 @@ class AboutPage extends StatelessWidget {
             );
           }),
         ),
+        if (repo.touristInfo.any((t) => t.category == TouristCategory.hotels))
+          Section(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SectionHeader(
+                  title: loc.t('about.hotels'),
+                  subtitle: loc.t('about.hotels.sub'),
+                ),
+                const SizedBox(height: 16),
+                ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [
+                    for (final h in repo.touristInfo
+                        .where((t) => t.category == TouristCategory.hotels))
+                      _PlaceCard(h),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        if (repo.touristInfo
+            .any((t) => t.category == TouristCategory.attractions))
+          Section(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SectionHeader(
+                  title: loc.t('about.attractions'),
+                  subtitle: loc.t('about.attractions.sub'),
+                ),
+                const SizedBox(height: 16),
+                ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [
+                    for (final a in repo.touristInfo
+                        .where((t) => t.category == TouristCategory.attractions))
+                      _PlaceCard(a),
+                  ],
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -104,7 +148,7 @@ class AboutPage extends StatelessWidget {
             children: [
               _row(Icons.location_on_outlined, trLoc(repo.contact.address, loc.lang)),
               _row(Icons.phone_outlined, repo.contact.phone, phone: true),
-              _row(Icons.email_outlined, repo.contact.email),
+              _row(Icons.email_outlined, repo.contact.email, email: true),
               for (final s in repo.contact.staff) ...[
                 const SizedBox(height: 6),
                 _row(
@@ -153,7 +197,9 @@ class AboutPage extends StatelessWidget {
     });
   }
 
-  Widget _row(IconData icon, String text, {bool phone = false}) => Padding(
+  Widget _row(IconData icon, String text,
+          {bool phone = false, bool email = false}) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           PlayfulIcon(icon, size: 18, color: AppColors.muted),
@@ -161,86 +207,163 @@ class AboutPage extends StatelessWidget {
           Expanded(
             child: phone
                 ? PhoneText(text, style: const TextStyle(height: 1.4))
-                : Text(text, style: const TextStyle(height: 1.4)),
+                : email || looksLikeEmail(text)
+                    ? EmailText(text, style: const TextStyle(height: 1.4))
+                    : LinkedContactText(text, style: const TextStyle(height: 1.4)),
           ),
         ]),
       );
 
   Widget _map(BuildContext context, AppRepository repo, LocaleController loc) {
     final address = trLoc(repo.contact.address, loc.lang);
-    final googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=${repo.location.latitude},${repo.location.longitude}';
+    final wide = MediaQuery.sizeOf(context).width >= 860;
+    final googleMapsUrl = googleMapsSearchUrl(
+      lat: repo.location.latitude,
+      lon: repo.location.longitude,
+      address: address,
+    );
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        height: 360,
+        width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
         ),
-        child: InkWell(
-          onTap: () => openUrl(googleMapsUrl),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFFE0F2FE),
-                        AppColors.primary.withValues(alpha: 0.15),
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      PlayfulIcon(Icons.map, color: AppColors.primary, size: 64),
-                      const SizedBox(height: 16),
-                      Text(
-                        loc.t('about.map'),
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              PositionedDirectional(
-                start: 16,
-                bottom: 16,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.card,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10)
-                    ],
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            LocationMap(
+              lat: repo.location.latitude,
+              lon: repo.location.longitude,
+              height: wide ? 420 : 280,
+              onOpen: () => openUrl(googleMapsUrl),
+            ),
+            Material(
+              color: AppColors.card,
+              child: InkWell(
+                onTap: () => openUrl(googleMapsUrl),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  child: Row(children: [
                     PlayfulIcon(Icons.place, color: AppColors.accent, size: 18),
                     const SizedBox(width: 8),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 220),
-                      child: Text(
-                        address.isEmpty ? loc.t('about.address') : address,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            address.isEmpty ? loc.t('about.address') : address,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            loc.t('about.openMaps'),
+                            style: TextStyle(
+                                color: AppColors.muted, fontSize: 12),
+                          ),
+                        ],
                       ),
                     ),
+                    PlayfulIcon(Icons.open_in_new,
+                        size: 16, color: AppColors.muted),
                   ]),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+}
+
+class _PlaceCard extends StatelessWidget {
+  const _PlaceCard(this.info);
+  final TouristInfo info;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final title = trLoc(info.title, loc.lang);
+    final desc = trLoc(info.description, loc.lang);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            PlayfulIcon(info.icon, color: Color(info.color)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 16)),
+            ),
+          ]),
+          if (info.rating != null) ...[
+            const SizedBox(height: 8),
+            _RatingRow(info.rating!),
+          ],
+          if (desc.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            LinkedContactText(
+              desc,
+              style: TextStyle(color: AppColors.muted, height: 1.4, fontSize: 13.5),
+            ),
+          ],
+          if (info.websiteUrl.trim().isNotEmpty ||
+              info.mapsUrl.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              if (info.websiteUrl.trim().isNotEmpty)
+                OutlinedButton.icon(
+                  onPressed: () => openUrl(info.websiteUrl.trim()),
+                  icon: const PlayfulIcon(Icons.language, size: 16),
+                  label: Text(loc.t('about.website')),
+                ),
+              if (info.mapsUrl.trim().isNotEmpty)
+                OutlinedButton.icon(
+                  onPressed: () => openUrl(info.mapsUrl.trim()),
+                  icon: const PlayfulIcon(Icons.map_outlined, size: 16),
+                  label: Text(loc.t('about.google')),
+                ),
+            ]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RatingRow extends StatelessWidget {
+  const _RatingRow(this.rating);
+  final double rating;
+
+  @override
+  Widget build(BuildContext context) {
+    final full = rating.floor().clamp(0, 5);
+    final half = (rating - full) >= 0.4;
+    return Row(children: [
+      for (var i = 0; i < 5; i++)
+        Icon(
+          i < full
+              ? Icons.star
+              : (half && i == full)
+                  ? Icons.star_half
+                  : Icons.star_border,
+          size: 16,
+          color: const Color(0xFFC9A227),
+        ),
+      const SizedBox(width: 6),
+      Text(rating.toStringAsFixed(1),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+    ]);
   }
 }

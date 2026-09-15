@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
+import '../../services/web_prefs.dart';
 import '../../theme.dart';
-import '../../widgets/cards.dart';
 import '../../widgets/common.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/playful_icons.dart';
@@ -108,7 +108,6 @@ class TouristPage extends StatelessWidget {
     IconData icon,
     List<TouristInfo> items,
   ) {
-    final loc = context.locWatch;
     if (items.isEmpty) return const SizedBox.shrink();
     return Section(
       child: Column(
@@ -235,7 +234,7 @@ class TouristInfoCard extends StatelessWidget {
           ]),
           if (description.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text(
+            LinkedContactText(
               description,
               style: TextStyle(
                 color: AppColors.ink,
@@ -243,6 +242,43 @@ class TouristInfoCard extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
+          ],
+          if (info.rating != null) ...[
+            const SizedBox(height: 10),
+            Row(children: [
+              for (var i = 0; i < 5; i++)
+                Icon(
+                  i < info.rating!.floor()
+                      ? Icons.star
+                      : (info.rating! - info.rating!.floor() >= 0.4 &&
+                              i == info.rating!.floor())
+                          ? Icons.star_half
+                          : Icons.star_border,
+                  size: 16,
+                  color: const Color(0xFFC9A227),
+                ),
+              const SizedBox(width: 6),
+              Text(info.rating!.toStringAsFixed(1),
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+            ]),
+          ],
+          if (info.websiteUrl.trim().isNotEmpty ||
+              info.mapsUrl.trim().isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              if (info.websiteUrl.trim().isNotEmpty)
+                OutlinedButton.icon(
+                  onPressed: () => openUrl(info.websiteUrl.trim()),
+                  icon: const PlayfulIcon(Icons.language, size: 16),
+                  label: Text(loc.t('about.website')),
+                ),
+              if (info.mapsUrl.trim().isNotEmpty)
+                OutlinedButton.icon(
+                  onPressed: () => openUrl(info.mapsUrl.trim()),
+                  icon: const PlayfulIcon(Icons.map_outlined, size: 16),
+                  label: Text(loc.t('about.google')),
+                ),
+            ]),
           ],
         ],
       ),

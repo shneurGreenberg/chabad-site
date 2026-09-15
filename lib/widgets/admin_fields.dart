@@ -162,6 +162,8 @@ class CoverImagePicker extends StatelessWidget {
     this.color = 0xFF1E3A8A,
     this.icon = Icons.image_outlined,
     this.height = 160,
+    this.alignY = 0,
+    this.onAlignY,
   });
   final Uint8List? bytes;
   final String? url;
@@ -169,6 +171,8 @@ class CoverImagePicker extends StatelessWidget {
   final int color;
   final IconData icon;
   final double height;
+  final double alignY;
+  final ValueChanged<double>? onAlignY;
 
   Future<void> _pick() async {
     final picked = await ImagePicker().pickImage(
@@ -186,6 +190,32 @@ class CoverImagePicker extends StatelessWidget {
     final hasBytes = bytes != null && bytes!.isNotEmpty;
     final fallback = url?.trim() ?? '';
     final hasUrl = fallback.isNotEmpty;
+    final alignment = Alignment(0, alignY);
+    Widget preview;
+    if (hasBytes) {
+      preview = Image.memory(
+        bytes!,
+        fit: BoxFit.cover,
+        alignment: alignment,
+        gaplessPlayback: true,
+        width: double.infinity,
+        height: double.infinity,
+      );
+    } else if (hasUrl) {
+      preview = fallback.startsWith('assets/')
+          ? Image.asset(fallback,
+              fit: BoxFit.cover,
+              alignment: alignment,
+              width: double.infinity,
+              height: double.infinity)
+          : Image.network(fallback,
+              fit: BoxFit.cover,
+              alignment: alignment,
+              width: double.infinity,
+              height: double.infinity);
+    } else {
+      preview = GradientImage(color: color, icon: icon, height: height);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -200,15 +230,35 @@ class CoverImagePicker extends StatelessWidget {
           child: SizedBox(
             height: height,
             width: double.infinity,
-            child: hasBytes
-                ? Image.memory(bytes!, fit: BoxFit.cover, gaplessPlayback: true)
-                : hasUrl
-                    ? (fallback.startsWith('assets/')
-                        ? Image.asset(fallback, fit: BoxFit.cover)
-                        : Image.network(fallback, fit: BoxFit.cover))
-                    : GradientImage(color: color, icon: icon, height: height),
+            child: LayoutBuilder(builder: (context, box) {
+              final image = preview;
+              if (onAlignY == null || !(hasBytes || hasUrl)) return image;
+              return GestureDetector(
+                onVerticalDragUpdate: (d) {
+                  final ny = (alignY - d.delta.dy / (box.maxHeight / 2))
+                      .clamp(-1.0, 1.0);
+                  onAlignY!(ny);
+                },
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.resizeUpDown,
+                  child: image,
+                ),
+              );
+            }),
           ),
         ),
+        if (onAlignY != null && (hasBytes || hasUrl)) ...[
+          const SizedBox(height: 8),
+          Text(loc.t('admin.banners.alignY'),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          Slider(
+            value: alignY.clamp(-1.0, 1.0),
+            min: -1,
+            max: 1,
+            label: alignY.toStringAsFixed(2),
+            onChanged: onAlignY,
+          ),
+        ],
         const SizedBox(height: 10),
         Wrap(
           spacing: 8,

@@ -39,6 +39,7 @@ class AppRepository extends ChangeNotifier {
   static const _imgHall = 'assets/images/beit-menachem-2.jpg';
   static const _snapKey = 'chabad_site_snapshot';
   static const _imgPrefix = 'chabad_img:';
+  static const _cartKey = 'chabad_cart';
   static const _quotaHe =
       'השמירה המקומית נכשלה — נסו תמונה קטנה יותר. התוכן נשמר גם ב-Firestore כשהשרת זמין.';
 
@@ -50,6 +51,9 @@ class AppRepository extends ChangeNotifier {
   bool _hydrated = false;
   bool _cloudSeen = false;
   bool _cloudPulled = false;
+  bool _diskHadSnapshot = false;
+  int _diskSeq = 0;
+  DateTime? _diskUpdatedAt;
   Timer? _saveDebounce;
   void Function(String message)? onPersistWarning;
 
@@ -533,35 +537,11 @@ class AppRepository extends ChangeNotifier {
     return false;
   }
 
-  bool _shabbatOccasionEmpty(Map<String, String> s) {
-    bool blank(String? v) => (v ?? '').trim().isEmpty;
-    return blank(s['holiday_he']) &&
-        blank(s['holiday_en']) &&
-        blank(s['holiday_ru']) &&
-        blank(s['parasha_he']) &&
-        blank(s['parasha_en']) &&
-        blank(s['parasha_ru']);
-  }
-
-  /// Prefer fresher network shabbat over stale in-memory/seed when candle/occasion bad.
   void _applyShabbatFromNetwork(Map<String, String> incoming) {
     final candle = (incoming['candle'] ?? '').trim();
     final nearNsk = nearNovosibirsk(location.latitude, location.longitude);
-    if (nearNsk && _candleLooksInvalid(candle)) {
+    if (nearNsk && _candleLooksInvalid(candle) && candle != '--:--') {
       debugPrint('Skip applying noon candle for NSK: $candle');
-      return;
-    }
-    if (_shabbatOccasionEmpty(incoming) && !_shabbatOccasionEmpty(shabbat)) {
-      // Keep previous occasion labels; still take times if valid.
-      final keep = Map<String, String>.from(shabbat);
-      shabbat
-        ..clear()
-        ..addAll(incoming);
-      for (final k in ['holiday_he', 'holiday_en', 'holiday_ru', 'parasha_he', 'parasha_en', 'parasha_ru', 'is_holiday']) {
-        if ((shabbat[k] ?? '').trim().isEmpty && (keep[k] ?? '').trim().isNotEmpty) {
-          shabbat[k] = keep[k]!;
-        }
-      }
       return;
     }
     shabbat
@@ -714,15 +694,17 @@ class AppRepository extends ChangeNotifier {
   ];
 
   final Map<String, String> shabbat = {
-    'candle': '19:38',
-    'havdala': '20:38',
-    'parasha_he': 'ראש השנה',
-    'parasha_en': 'Rosh Hashana',
-    'parasha_ru': 'Рош а-Шана',
-    'holiday_he': 'ראש השנה',
-    'holiday_en': 'Rosh Hashana',
-    'holiday_ru': 'Рош а-Шана',
-    'is_holiday': '1',
+    'candle': '--:--',
+    'havdala': '--:--',
+    'parasha_he': '',
+    'parasha_en': '',
+    'parasha_ru': '',
+    'holiday_he': '',
+    'holiday_en': '',
+    'holiday_ru': '',
+    'holiday_candle': '',
+    'holiday_havdala': '',
+    'is_holiday': '0',
   };
 
   // ---------------------------------------------------------------------------
@@ -1288,13 +1270,58 @@ class AppRepository extends ChangeNotifier {
       id: _newId(),
       title: {'he': 'מלון מרינס פארק', 'en': 'Marins Park Hotel', 'ru': 'Отель Маринс Парк'},
       description: {
-        'he': 'מלון בדירוג 4 כוכבים, 10 דקות הליכה מבית מנחם. חדרים נוחים, ארוחת בוקר, WiFi. כתובת: רחוב Oktyabrskaya 42. טלפון: +7 (383) 227-00-00.',
-        'en': '4-star hotel, 10-minute walk from Beit Menachem. Comfortable rooms, breakfast, WiFi. Address: 42 Oktyabrskaya St. Phone: +7 (383) 227-00-00.',
-        'ru': 'Отель 4 звезды, 10 минут пешком от Бейт Менахем. Комфортные номера, завтрак, WiFi. Адрес: ул. Октябрьская, 42. Телефон: +7 (383) 227-00-00.',
+        'he': 'מלון בדירוג 4 כוכבים, כ־10 דקות הליכה מבית מנחם. חדרים נוחים, ארוחת בוקר, WiFi. כתובת: רחוב אוקטיאברסקאיה 42.',
+        'en': '4-star hotel, about a 10-minute walk from Beit Menachem. Comfortable rooms, breakfast, WiFi. Address: 42 Oktyabrskaya St.',
+        'ru': 'Отель 4 звезды, около 10 минут пешком от Бейт Менахем. Комфортные номера, завтрак, WiFi. Адрес: ул. Октябрьская, 42.',
       },
       category: TouristCategory.hotels,
       icon: Icons.hotel,
       color: 0xFF7C3AED,
+      rating: 4.3,
+      websiteUrl: 'https://marinsparkhotels.ru',
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=Marins+Park+Hotel+Novosibirsk',
+    ),
+    TouristInfo(
+      id: 'nsk-hotel-hilton',
+      title: {
+        'he': 'דאבלטרי הילטון נובוסיבירסק',
+        'en': 'DoubleTree by Hilton Novosibirsk',
+        'ru': 'DoubleTree by Hilton Новосибирск',
+      },
+      description: {
+        'he': 'מלון 4 כוכבים במרכז העיר, קרוב לרחוב קרסני פרוספקט ולבית האופרה. חדרים מודרניים, חדר כושר וארוחת בוקר.',
+        'en': '4-star hotel in the city center, near Krasny Prospekt and the opera house. Modern rooms, gym and breakfast.',
+        'ru': 'Отель 4 звезды в центре, рядом с Красным проспектом и театром оперы. Современные номера, спортзал и завтрак.',
+      },
+      category: TouristCategory.hotels,
+      icon: Icons.hotel,
+      color: 0xFF2563EB,
+      rating: 4.5,
+      websiteUrl:
+          'https://www.hilton.com/en/hotels/ovbnsdi-doubletree-novosibirsk/',
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+Novosibirsk',
+    ),
+    TouristInfo(
+      id: 'nsk-hotel-marriott',
+      title: {
+        'he': 'מריוט נובוסיבירסק',
+        'en': 'Marriott Novosibirsk',
+        'ru': 'Marriott Новосибирск',
+      },
+      description: {
+        'he': 'מלון עסקים במרכז נובוסיבירסק, במרחק נסיעה קצר מבית מנחם. דירוג גבוה, מסעדה וחדר כושר.',
+        'en': 'Business hotel in central Novosibirsk, a short ride from Beit Menachem. Strong rating, restaurant and gym.',
+        'ru': 'Бизнес-отель в центре Новосибирска, недалеко от Бейт Менахем. Высокий рейтинг, ресторан и спортзал.',
+      },
+      category: TouristCategory.hotels,
+      icon: Icons.hotel,
+      color: 0xFF0F766E,
+      rating: 4.6,
+      websiteUrl: 'https://www.marriott.com/en-us/hotels/ovbmc-novosibirsk-marriott-hotel/',
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=Novosibirsk+Marriott+Hotel',
     ),
     TouristInfo(
       id: _newId(),
@@ -1307,6 +1334,45 @@ class AppRepository extends ChangeNotifier {
       category: TouristCategory.attractions,
       icon: Icons.theater_comedy,
       color: 0xFFDB2777,
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=Novosibirsk+Opera+and+Ballet+Theatre',
+    ),
+    TouristInfo(
+      id: 'nsk-attr-wheel',
+      title: {
+        'he': 'גלגל הענק של נובוסיבירסק',
+        'en': 'Novosibirsk Ferris wheel',
+        'ru': 'Колесо обозрения Новосибирска',
+      },
+      description: {
+        'he': 'גלגל ענק על הטיילת המיכאילובסקית — תצפית על האוב, הגשרים ומרכז העיר. פתוח רוב ימות השנה, במיוחד בערב.',
+        'en': 'A Ferris wheel on Mikhailovskaya Embankment with views of the Ob, the bridges and the city center. Open most of the year, especially in the evening.',
+        'ru': 'Колесо обозрения на Михайловской набережной: вид на Обь, мосты и центр. Открыто большую часть года, особенно вечером.',
+      },
+      category: TouristCategory.attractions,
+      icon: Icons.attractions,
+      color: 0xFFEA580C,
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=Колесо+обозрения+Михайловская+набережная+Новосибирск',
+      websiteUrl: 'https://www.google.com/maps/search/?api=1&query=Novosibirsk+Ferris+wheel',
+    ),
+    TouristInfo(
+      id: 'nsk-attr-embankment',
+      title: {
+        'he': 'הטיילת המיכאילובסקית',
+        'en': 'Mikhailovskaya Embankment',
+        'ru': 'Михайловская набережная',
+      },
+      description: {
+        'he': 'טיילת העיר לאורך נהר האוב: הליכה, אופניים, בתי קפה וגלגל הענק. מקום מרכזי לערב או לשבת אחה״צ.',
+        'en': 'The city promenade along the Ob River: walking, bikes, cafés and the Ferris wheel. A main place for an evening or Shabbat afternoon.',
+        'ru': 'Городская набережная вдоль Оби: прогулки, велосипеды, кафе и колесо обозрения. Удобно вечером или в субботу днём.',
+      },
+      category: TouristCategory.attractions,
+      icon: Icons.directions_walk,
+      color: 0xFF0284C7,
+      mapsUrl:
+          'https://www.google.com/maps/search/?api=1&query=Михайловская+набережная+Новосибирск',
     ),
     TouristInfo(
       id: _newId(),
@@ -1551,6 +1617,7 @@ class AppRepository extends ChangeNotifier {
 
   void addToCart(String id) {
     _cart[id] = (_cart[id] ?? 0) + 1;
+    unawaited(_persistCart());
     notifyListeners();
   }
 
@@ -1562,12 +1629,41 @@ class AppRepository extends ChangeNotifier {
     } else {
       _cart[id] = n;
     }
+    unawaited(_persistCart());
     notifyListeners();
   }
 
   void clearCart() {
     _cart.clear();
+    unawaited(_persistCart());
     notifyListeners();
+  }
+
+  Future<void> _persistCart() async {
+    try {
+      await persistPut(_cartKey, jsonEncode(_cart));
+    } catch (_) {}
+  }
+
+  Future<void> _loadCart(Map<String, dynamic>? snap) async {
+    Map<String, dynamic>? src;
+    final raw = await persistGet(_cartKey);
+    if (raw != null && raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) src = Map<String, dynamic>.from(decoded);
+      } catch (_) {}
+    }
+    if (src == null && snap != null && snap['cart'] is Map) {
+      src = Map<String, dynamic>.from(snap['cart'] as Map);
+    }
+    if (src == null) return;
+    _cart
+      ..clear()
+      ..addAll({
+        for (final e in src.entries) '${e.key}': (e.value as num?)?.toInt() ?? 0,
+      });
+    _cart.removeWhere((_, qty) => qty <= 0);
   }
 
   // ---------------------------------------------------------------------------
@@ -2343,7 +2439,23 @@ class AppRepository extends ChangeNotifier {
   void setEmblemImage(Uint8List bytes) {
     emblemBytes = compressSiteImage(bytes);
     emblemUrl = null;
+    unawaited(_persistEmblemNow());
     notifyListeners();
+  }
+
+  Future<void> _persistEmblemNow() async {
+    try {
+      if (emblemBytes != null && emblemBytes!.isNotEmpty) {
+        await persistPut(
+          '${_imgPrefix}emblem:logo',
+          bytesToB64(emblemBytes!)!,
+        );
+      }
+    } catch (e) {
+      if (isQuotaExceeded(e)) {
+        onPersistWarning?.call(_quotaHe);
+      }
+    }
   }
 
   void clearEmblem() {
@@ -2531,6 +2643,7 @@ class AppRepository extends ChangeNotifier {
           for (final e in banners.entries) e.key: bannerToJson(e.value),
         },
         if (emblemUrl != null && emblemUrl!.isNotEmpty) 'emblemUrl': emblemUrl,
+        // Cart is stored separately per browser; keep a copy only as local fallback.
         'cart': _cart,
         'leads': [for (final l in leads) leadToJson(l)],
         'donations': [for (final d in donations) donationToJson(d)],
@@ -2587,16 +2700,13 @@ class AppRepository extends ChangeNotifier {
       }
     }
     final emblem = '${m['emblemUrl'] ?? ''}'.trim();
-    if (emblem.isNotEmpty) emblemUrl = emblem;
-    if (m['cart'] is Map) {
-      _cart
-        ..clear()
-        ..addAll({
-          for (final e in (m['cart'] as Map).entries)
-            '${e.key}': (e.value as num?)?.toInt() ?? 0,
-        });
-      _cart.removeWhere((_, qty) => qty <= 0);
+    if (emblem.isNotEmpty) {
+      final incomingDefault = emblem == 'assets/images/chabad-emblem.png';
+      if (!incomingDefault || !_hasBytes(emblemBytes)) {
+        emblemUrl = emblem;
+      }
     }
+    // Cart is per-browser — never apply from a shared snapshot/cloud pull.
     if (m['leads'] is List) {
       leads
         ..clear()
@@ -2660,7 +2770,7 @@ class AppRepository extends ChangeNotifier {
           ..addAll(loaded);
       }
     }
-    if (m['shiurim'] is List) {
+    if (m['shiurim'] is List && (m['shiurim'] as List).isNotEmpty) {
       shiurim
         ..clear()
         ..addAll((m['shiurim'] as List).map(shiurFromJson));
@@ -2763,6 +2873,7 @@ class AppRepository extends ChangeNotifier {
       } catch (_) {}
     }
     if (m != null) {
+      _rememberDiskMeta(m);
       final seed = (m['seed'] as num?)?.toInt() ?? 0;
       if (seed >= _contentSeed) {
         _applySnapshot(m);
@@ -2770,9 +2881,139 @@ class AppRepository extends ChangeNotifier {
         _mergeUserContent(m);
       }
     }
+    await _loadCart(m);
     await _hydrateLocalImages(m);
+    _ensureTouristDefaults();
     _ensureHistoricalFamous();
   }
+
+  void _rememberDiskMeta(Map<String, dynamic> m) {
+    _diskHadSnapshot = true;
+    _diskSeq = (m['seq'] as num?)?.toInt() ?? _seq;
+    _diskUpdatedAt = DateTime.tryParse('${m['updatedAt'] ?? ''}');
+  }
+
+  /// Local edits win over a stale cloud snapshot (compare updatedAt, then seq).
+  bool _localSnapshotFresherThan(Map<String, dynamic> cloud) {
+    if (!_diskHadSnapshot) return false;
+    final cloudAt = DateTime.tryParse('${cloud['updatedAt'] ?? ''}');
+    final cloudSeq = (cloud['seq'] as num?)?.toInt() ?? 0;
+    final localAt = _diskUpdatedAt;
+    if (localAt != null && cloudAt != null) {
+      final delta = localAt.difference(cloudAt);
+      if (delta.abs() > const Duration(seconds: 2)) {
+        return localAt.isAfter(cloudAt);
+      }
+    } else if (localAt != null && cloudAt == null) {
+      return true;
+    }
+    return _diskSeq > cloudSeq;
+  }
+
+  void _ensureTouristDefaults() {
+    for (final extra in _touristExtras()) {
+      final i = touristInfo.indexWhere((e) =>
+          e.id == extra.id ||
+          (e.title['en'] ?? '') == (extra.title['en'] ?? ''));
+      if (i < 0) {
+        touristInfo.add(extra);
+        continue;
+      }
+      final cur = touristInfo[i];
+      if ((cur.rating == null || cur.rating == 0) && extra.rating != null) {
+        cur.rating = extra.rating;
+      }
+      if (cur.websiteUrl.trim().isEmpty && extra.websiteUrl.trim().isNotEmpty) {
+        cur.websiteUrl = extra.websiteUrl;
+      }
+      if (cur.mapsUrl.trim().isEmpty && extra.mapsUrl.trim().isNotEmpty) {
+        cur.mapsUrl = extra.mapsUrl;
+      }
+    }
+  }
+
+  List<TouristInfo> _touristExtras() => [
+        TouristInfo(
+          id: 'nsk-hotel-hilton',
+          title: {
+            'he': 'דאבלטרי הילטון נובוסיבירסק',
+            'en': 'DoubleTree by Hilton Novosibirsk',
+            'ru': 'DoubleTree by Hilton Новосибирск',
+          },
+          description: {
+            'he': 'מלון 4 כוכבים במרכז העיר, קרוב לרחוב קרסני פרוספקט ולבית האופרה.',
+            'en': '4-star hotel in the city center, near Krasny Prospekt and the opera house.',
+            'ru': 'Отель 4 звезды в центре, рядом с Красным проспектом и театром оперы.',
+          },
+          category: TouristCategory.hotels,
+          icon: Icons.hotel,
+          color: 0xFF2563EB,
+          rating: 4.5,
+          websiteUrl:
+              'https://www.hilton.com/en/hotels/ovbnsdi-doubletree-novosibirsk/',
+          mapsUrl:
+              'https://www.google.com/maps/search/?api=1&query=DoubleTree+by+Hilton+Novosibirsk',
+        ),
+        TouristInfo(
+          id: 'nsk-hotel-marriott',
+          title: {
+            'he': 'מריוט נובוסיבירסק',
+            'en': 'Marriott Novosibirsk',
+            'ru': 'Marriott Новосибирск',
+          },
+          description: {
+            'he': 'מלון עסקים במרכז נובוסיבירסק, במרחק נסיעה קצר מבית מנחם.',
+            'en': 'Business hotel in central Novosibirsk, a short ride from Beit Menachem.',
+            'ru': 'Бизнес-отель в центре Новосибирска, недалеко от Бейт Менахем.',
+          },
+          category: TouristCategory.hotels,
+          icon: Icons.hotel,
+          color: 0xFF0F766E,
+          rating: 4.6,
+          websiteUrl:
+              'https://www.marriott.com/en-us/hotels/ovbmc-novosibirsk-marriott-hotel/',
+          mapsUrl:
+              'https://www.google.com/maps/search/?api=1&query=Novosibirsk+Marriott+Hotel',
+        ),
+        TouristInfo(
+          id: 'nsk-attr-wheel',
+          title: {
+            'he': 'גלגל הענק של נובוסיבירסק',
+            'en': 'Novosibirsk Ferris wheel',
+            'ru': 'Колесо обозрения Новосибирска',
+          },
+          description: {
+            'he': 'גלגל ענק על הטיילת המיכאילובסקית — תצפית על האוב, הגשרים ומרכז העיר.',
+            'en': 'A Ferris wheel on Mikhailovskaya Embankment with views of the Ob, the bridges and the city center.',
+            'ru': 'Колесо обозрения на Михайловской набережной: вид на Обь, мосты и центр.',
+          },
+          category: TouristCategory.attractions,
+          icon: Icons.attractions,
+          color: 0xFFEA580C,
+          mapsUrl:
+              'https://www.google.com/maps/search/?api=1&query=Колесо+обозрения+Михайловская+набережная+Новосибирск',
+          websiteUrl:
+              'https://www.google.com/maps/search/?api=1&query=Novosibirsk+Ferris+wheel',
+        ),
+        TouristInfo(
+          id: 'nsk-attr-embankment',
+          title: {
+            'he': 'הטיילת המיכאילובסקית',
+            'en': 'Mikhailovskaya Embankment',
+            'ru': 'Михайловская набережная',
+          },
+          description: {
+            'he': 'טיילת העיר לאורך נהר האוב: הליכה, אופניים, בתי קפה וגלגל הענק.',
+            'en': 'The city promenade along the Ob River: walking, bikes, cafés and the Ferris wheel.',
+            'ru': 'Городская набережная вдоль Оби: прогулки, велосипеды, кафе и колесо обозрения.',
+          },
+          category: TouristCategory.attractions,
+          icon: Icons.directions_walk,
+          color: 0xFF0284C7,
+          mapsUrl:
+              'https://www.google.com/maps/search/?api=1&query=Михайловская+набережная+Новосибирск',
+        ),
+      ];
 
   bool _jsonHasUpload(Map item) {
     final imageId = item['imageId'];
@@ -2907,6 +3148,7 @@ class AppRepository extends ChangeNotifier {
         famous: [for (final p in famous) if (_hasBytes(p.photoBytes)) p],
       );
 
+  // ignore: unused_element — kept as a full restore path if a future merge needs it.
   void _restoreUploads(_UploadKeep saved) {
     for (final a in saved.news) {
       final i = news.indexWhere((e) => e.id == a.id);
@@ -3272,33 +3514,68 @@ class AppRepository extends ChangeNotifier {
       return;
     }
     _cloudSeen = true;
-    
-    // Save items with local-only images (not yet uploaded)
+
+    final cartKeep = Map<String, int>.from(_cart);
+    final emblemKeep = emblemBytes;
+    final emblemUrlKeep = emblemUrl;
     final saved = _captureUploads();
-    
-    final seed = (cloud.snapshot['seed'] as num?)?.toInt() ?? 0;
-    if (seed >= _contentSeed) {
-      _applySnapshot(cloud.snapshot);
+    final localWins = _localSnapshotFresherThan(cloud.snapshot);
+
+    if (localWins) {
+      // Stale cloud must not replace newer IndexedDB content (logo, store, shiurim).
+      for (final e in cloud.images.entries) {
+        if (!_collectImages().containsKey(e.key)) {
+          _applyLocalImage(e.key, e.value);
+        }
+      }
+      if (!_hasBytes(emblemBytes) && _hasBytes(emblemKeep)) {
+        emblemBytes = emblemKeep;
+      }
+      if ((emblemUrl == null || emblemUrl!.isEmpty) &&
+          emblemUrlKeep != null &&
+          emblemUrlKeep.isNotEmpty) {
+        emblemUrl = emblemUrlKeep;
+      }
     } else {
-      _mergeUserContent(cloud.snapshot);
+      final seed = (cloud.snapshot['seed'] as num?)?.toInt() ?? 0;
+      if (seed >= _contentSeed) {
+        _applySnapshot(cloud.snapshot);
+      } else {
+        _mergeUserContent(cloud.snapshot);
+      }
+      for (final e in cloud.images.entries) {
+        _applyLocalImage(e.key, e.value);
+      }
+      _restoreUploadsSelective(saved);
+      if (!_hasBytes(emblemBytes) && _hasBytes(emblemKeep)) {
+        emblemBytes = emblemKeep;
+      }
+      if (!hasCustomEmblem &&
+          emblemUrlKeep != null &&
+          emblemUrlKeep.isNotEmpty &&
+          emblemUrlKeep != 'assets/images/chabad-emblem.png') {
+        emblemUrl = emblemUrlKeep;
+      }
+      _rememberDiskMeta({
+        ...cloud.snapshot,
+        'seq': cloud.snapshot['seq'] ?? _seq,
+      });
     }
-    
-    // Restore local images to cloud items
-    for (final e in cloud.images.entries) {
-      _applyLocalImage(e.key, e.value);
-    }
-    
-    // Only restore uploads for items that still exist after cloud merge
-    // This prevents deleted items from being resurrected
-    _restoreUploadsSelective(saved);
-    
+
+    _cart
+      ..clear()
+      ..addAll(cartKeep);
+    _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _cloudPulled = true;
-    
+
     try {
       await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
-      for (final e in cloud.images.entries) {
-        await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
+      await _persistCart();
+      if (!localWins) {
+        for (final e in cloud.images.entries) {
+          await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
+        }
       }
       for (final e in _collectImages().entries) {
         await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
@@ -3312,13 +3589,20 @@ class AppRepository extends ChangeNotifier {
     final snap = _encodeSnapshot();
     try {
       await persistPut(_snapKey, jsonEncode(snap));
+      await _persistCart();
       for (final e in images.entries) {
         await persistPut('$_imgPrefix${e.key}', bytesToB64(e.value)!);
       }
+      _rememberDiskMeta(snap);
     } catch (e) {
       if (isQuotaExceeded(e)) {
         onPersistWarning?.call(_quotaHe);
       }
+    }
+    if (!CloudSync.instance.signedIn) {
+      cloudError = CloudSync.instance.enabled ? 'not-signed-in' : cloudError;
+      _notifyUi();
+      return;
     }
     final err = await CloudSync.instance.push(
       snapshot: snap,
@@ -3328,9 +3612,8 @@ class AppRepository extends ChangeNotifier {
     cloudError = err;
     cloudOkAt = err == null ? CloudSync.instance.lastOkAt : null;
     _notifyUi();
-    // Auto-save: local IndexedDB already persisted. Never SnackBar on background
-    // cloud results (not-signed-in / permission-denied / unavailable / fail).
-    // Status lives in cloudError for admin chrome; publishToCloud() is explicit.
+    // Local IndexedDB already persisted. Cloud permission-denied must not
+    // undo that save — status lives in cloudError for admin chrome.
   }
 
   Future<String?> publishToCloud() async {

@@ -155,14 +155,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
     }
   }
 
-  String _mapUrl(double lat, double lon) {
-    final key = context.read<AppRepository>().googleMapsApiKey;
-    if (key.trim().isEmpty) {
-      return 'https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02},${lat - 0.02},${lon + 0.02},${lat + 0.02}&layer=mapnik&marker=$lat,$lon';
-    }
-    return 'https://www.google.com/maps?q=$lat,$lon&output=embed&key=$key';
-  }
-
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
@@ -263,17 +255,24 @@ class _SettingsPanelState extends State<SettingsPanel> {
               borderRadius: BorderRadius.circular(12),
             ),
             clipBehavior: Clip.antiAlias,
-            child: MapEmbed(
-              url: _mapUrl(site.latitude, site.longitude),
+            child: LocationMap(
+              lat: site.latitude,
+              lon: site.longitude,
+              height: 300,
+              onOpen: () => openUrl(googleMapsSearchUrl(
+                lat: site.latitude,
+                lon: site.longitude,
+                address: site.cityName,
+              )),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             loc.lang == 'he'
-                ? 'לחצו על המפה כדי לבחור מיקום אחר, או השתמשו בחיפוש למעלה'
+                ? 'לחצו על המפה כדי לפתוח בגוגל מפות, או השתמשו בחיפוש למעלה'
                 : loc.lang == 'ru'
-                    ? 'Нажмите на карту для выбора другого местоположения или используйте поиск выше'
-                    : 'Use the search above to select a different location',
+                    ? 'Нажмите на карту, чтобы открыть Google Карты, или используйте поиск выше'
+                    : 'Tap the map to open Google Maps, or use the search above',
             style: TextStyle(color: AppColors.muted, fontSize: 12, height: 1.4),
           ),
           const Divider(height: 32),

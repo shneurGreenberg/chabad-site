@@ -38,6 +38,26 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    match /shiurim/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /famous/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /history/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /tour/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /touristInfo/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // Visitor submissions: create only. Names and emails stay off the public read path.
     match /leads/{id} {
