@@ -470,6 +470,11 @@ const Map<String, Map<String, String>> _strings = {
   'about.address': {'he': 'כתובת', 'en': 'Address', 'ru': 'Адрес'},
   'about.contact': {'he': 'צור קשר', 'en': 'Contact', 'ru': 'Контакты'},
   'about.map': {'he': 'מפה', 'en': 'Map', 'ru': 'Карта'},
+  'about.openMaps': {
+    'he': 'פתח בגוגל מפות',
+    'en': 'Open in Google Maps',
+    'ru': 'Открыть в Google Картах',
+  },
   'about.hotels': {
     'he': 'מלונות באזור',
     'en': 'Nearby hotels',

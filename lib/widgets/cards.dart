@@ -177,8 +177,9 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final repo = context.read<AppRepository>();
+    final repo = context.watch<AppRepository>();
     final hasPrice = product.price > 0;
+    final qty = repo.cart[product.id] ?? 0;
     return HoverLift(
       child: Card(
       child: Column(
@@ -226,7 +227,7 @@ class ProductCard extends StatelessWidget {
                       child: FilledButton(
                         onPressed: () {
                           repo.addToCart(product.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.maybeOf(context)?.showSnackBar(
                             SnackBar(
                               content: Text(trLoc(product.name, loc.lang)),
                               duration: const Duration(milliseconds: 900),
@@ -236,7 +237,19 @@ class ProductCard extends StatelessWidget {
                         style: FilledButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 10)),
-                        child: const PlayfulIcon(Icons.add_shopping_cart, size: 18),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const PlayfulIcon(Icons.add_shopping_cart,
+                                size: 18),
+                            if (qty > 0) ...[
+                              const SizedBox(width: 6),
+                              Text('$qty',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w800)),
+                            ],
+                          ],
+                        ),
                       ).hoverLift(scale: 1.05),
                     ),
                 ]),

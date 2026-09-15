@@ -217,12 +217,6 @@ class AboutPage extends StatelessWidget {
   Widget _map(BuildContext context, AppRepository repo, LocaleController loc) {
     final address = trLoc(repo.contact.address, loc.lang);
     final wide = MediaQuery.sizeOf(context).width >= 860;
-    final embed = siteMapEmbedUrl(
-      lat: repo.location.latitude,
-      lon: repo.location.longitude,
-      apiKey: repo.googleMapsApiKey,
-      address: address,
-    );
     final googleMapsUrl = googleMapsSearchUrl(
       lat: repo.location.latitude,
       lon: repo.location.longitude,
@@ -231,41 +225,50 @@ class AboutPage extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        height: wide ? 480 : 320,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Positioned.fill(child: MapEmbed(url: embed)),
-            PositionedDirectional(
-              start: 16,
-              bottom: 16,
-              child: Material(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(12),
-                elevation: 4,
-                child: InkWell(
-                  onTap: () => openUrl(googleMapsUrl),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      PlayfulIcon(Icons.place,
-                          color: AppColors.accent, size: 18),
-                      const SizedBox(width: 8),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 260),
-                        child: Text(
-                          address.isEmpty ? loc.t('about.address') : address,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
+            LocationMap(
+              lat: repo.location.latitude,
+              lon: repo.location.longitude,
+              height: wide ? 420 : 280,
+              onOpen: () => openUrl(googleMapsUrl),
+            ),
+            Material(
+              color: AppColors.card,
+              child: InkWell(
+                onTap: () => openUrl(googleMapsUrl),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  child: Row(children: [
+                    PlayfulIcon(Icons.place, color: AppColors.accent, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            address.isEmpty ? loc.t('about.address') : address,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            loc.t('about.openMaps'),
+                            style: TextStyle(
+                                color: AppColors.muted, fontSize: 12),
+                          ),
+                        ],
                       ),
-                    ]),
-                  ),
+                    ),
+                    PlayfulIcon(Icons.open_in_new,
+                        size: 16, color: AppColors.muted),
+                  ]),
                 ),
               ),
             ),

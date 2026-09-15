@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/data/holidays.dart';
 import 'package:flutter_app/services/links.dart';
+import 'package:flutter_app/widgets/map_embed.dart';
 
 void main() {
   group('contact links', () {
@@ -22,6 +23,20 @@ void main() {
 
     test('telUrl keeps country code', () {
       expect(telUrl('+7 (383) 222-20-23'), 'tel:+73832222023');
+    });
+  });
+
+  group('static maps', () {
+    test('Novosibirsk tile URL is OSM z/x/y', () {
+      final url = osmTileUrl(55.0284, 82.9283);
+      expect(url, startsWith('https://tile.openstreetmap.org/16/'));
+      expect(url.endsWith('.png'), isTrue);
+    });
+
+    test('candidate list prefers Yandex then OSM', () {
+      final urls = staticMapCandidateUrls(55.0284, 82.9283);
+      expect(urls.first, contains('static-maps.yandex.ru'));
+      expect(urls[1], contains('openstreetmap.de'));
     });
   });
 
