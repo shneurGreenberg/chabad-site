@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:web/web.dart' as web;
@@ -36,7 +36,9 @@ class YoutubeIFrameState extends State<YoutubeIFrame> {
       }
       if (host != null) {
         host.style.pointerEvents = 'none';
-        host.replaceChildren();
+        while (host.firstChild != null) {
+          host.firstChild!.remove();
+        }
       }
     } catch (_) {}
     // Let the browser drop the plugin surface before Flutter removes the view.
@@ -102,3 +104,4 @@ class YoutubeIFrameState extends State<YoutubeIFrame> {
 void openYoutubeWatch(String videoId) {
   web.window.open(youtubeWatchUrl(videoId), '_blank');
 }
+
