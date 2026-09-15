@@ -27,6 +27,11 @@ void main() {
   });
 
   group('static maps', () {
+    test('Novosibirsk default uses bundled map', () {
+      expect(LocationMap.nearNovosibirsk(55.0284, 82.9283), isTrue);
+      expect(LocationMap.nearNovosibirsk(32.0, 34.0), isFalse);
+    });
+
     test('Novosibirsk tile URL is OSM z/x/y', () {
       final url = osmTileUrl(55.0284, 82.9283);
       expect(url, startsWith('https://tile.openstreetmap.org/16/'));

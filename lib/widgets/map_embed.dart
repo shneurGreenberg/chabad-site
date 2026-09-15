@@ -112,29 +112,45 @@ class LocationMap extends StatelessWidget {
   final double height;
   final VoidCallback? onOpen;
 
+  static bool nearNovosibirsk(double lat, double lon) =>
+      (lat - 55.0284).abs() < 0.05 && (lon - 82.9283).abs() < 0.05;
+
   @override
   Widget build(BuildContext context) {
+    final bundled = nearNovosibirsk(lat, lon);
     return SizedBox(
       height: height,
       width: double.infinity,
       child: Material(
-        color: const Color(0xFFD6E4F5),
+        color: const Color(0xFFC5D4E8),
         child: InkWell(
           onTap: onOpen,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              _StaticMapImage(lat: lat, lon: lon),
-              const IgnorePointer(
-                child: Align(
-                  alignment: Alignment(0, -0.05),
-                  child: PlayfulIcon(
-                    Icons.location_on,
-                    size: 44,
-                    color: Color(0xFFC62828),
+              const CustomPaint(painter: _MapGridPainter()),
+              if (bundled)
+                Image.asset(
+                  'assets/images/map-novosibirsk.png',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  filterQuality: FilterQuality.medium,
+                  errorBuilder: (_, _, _) => _StaticMapImage(lat: lat, lon: lon),
+                )
+              else
+                _StaticMapImage(lat: lat, lon: lon),
+              if (!bundled)
+                const IgnorePointer(
+                  child: Align(
+                    alignment: Alignment(0, -0.05),
+                    child: PlayfulIcon(
+                      Icons.location_on,
+                      size: 44,
+                      color: Color(0xFFC62828),
+                    ),
                   ),
                 ),
-              ),
               const Positioned(
                 left: 8,
                 bottom: 8,
@@ -160,6 +176,41 @@ class LocationMap extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MapGridPainter extends CustomPainter {
+  const _MapGridPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = const Color(0xFFD5E4F4),
+    );
+    final stroke = Paint()
+      ..color = const Color(0xFF9BB4CE)
+      ..strokeWidth = 1.2;
+    const step = 28.0;
+    for (var x = 0.0; x < size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), stroke);
+    }
+    for (var y = 0.0; y < size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), stroke);
+    }
+    final river = Paint()
+      ..color = const Color(0xFF7EB6D9)
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(
+      Offset(0, size.height * 0.62),
+      Offset(size.width, size.height * 0.38),
+      river,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _StaticMapImage extends StatefulWidget {
@@ -202,6 +253,7 @@ class _StaticMapImageState extends State<_StaticMapImage> {
       width: double.infinity,
       height: double.infinity,
       filterQuality: FilterQuality.medium,
+      webHtmlElementStrategy: WebHtmlElementStrategy.never,
       errorBuilder: (_, _, _) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted && _i < _urls.length) {
