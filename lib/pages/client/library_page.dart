@@ -263,12 +263,16 @@ class _ShiurPlayerDialog extends StatefulWidget {
 class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
   bool _showPlayer = true;
 
-  Future<void> _close() async {
+  void _close() {
+    if (!mounted) return;
+    // Drop the embed from the tree first so its iframe is torn down (audio
+    // stops, no orphaned platform view lingers), then dismiss immediately.
+    // Popping deterministically in the same frame avoids the earlier
+    // delayed-pop path that could leave the dialog feeling "stuck".
     if (_showPlayer) {
       setState(() => _showPlayer = false);
-      await Future<void>.delayed(const Duration(milliseconds: 40));
     }
-    if (mounted) Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   @override
