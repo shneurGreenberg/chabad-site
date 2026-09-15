@@ -87,6 +87,8 @@ class AuthController extends ChangeNotifier {
         notifyListeners();
         return null;
       }
+      // Firebase reachable but Auth failed for a non-credential reason
+      // (network / provider off). Unlock local editor; cloud push stays blocked.
     }
     // Local-only fallback: unlock admin UI without Firebase Auth.
     // Do not set adminSession — cloud writes require signedIn.
@@ -95,7 +97,7 @@ class AuthController extends ChangeNotifier {
     _loggedIn = true;
     _email = trimmed;
     notifyListeners();
-    return null;
+    return 'local-only';
   }
 
   void logout() {

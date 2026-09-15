@@ -143,6 +143,17 @@ class _AdminLoginState extends State<AdminLogin> {
           adminEmails: emails,
         );
     if (!mounted) return;
+    // local-only: admin UI opens; show banner via cloudError on first persist.
+    if (err == 'local-only') {
+      final repo = context.read<AppRepository>();
+      repo.cloudError = 'not-signed-in';
+      repo.refresh();
+      setState(() {
+        _busy = false;
+        _error = null;
+      });
+      return;
+    }
     setState(() {
       _busy = false;
       _error = err;

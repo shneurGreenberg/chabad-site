@@ -247,6 +247,8 @@ class _ShiurCard extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: true,
+      // Controlled close via PopScope so the YouTube iframe is torn down
+      // before the route pops (otherwise Flutter web freezes under a ghost iframe).
       builder: (_) => _ShiurPlayerDialog(shiur: shiur),
     );
   }
@@ -262,12 +264,27 @@ class _ShiurPlayerDialog extends StatefulWidget {
 
 class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
   bool _showPlayer = true;
+  bool _closing = false;
+  bool _allowPop = false;
+  final GlobalKey<YoutubeIFrameState> _ytKey = GlobalKey<YoutubeIFrameState>();
 
   Future<void> _close() async {
+    if (_closing) return;
+    _closing = true;
     if (_showPlayer) {
-      setState(() => _showPlayer = false);
-      await Future<void>.delayed(const Duration(milliseconds: 40));
+      // Tear down the platform iframe BEFORE removing it from the tree / popping.
+      try {
+        await _ytKey.currentState?.teardown();
+      } catch (_) {}
+      if (mounted) setState(() => _showPlayer = false);
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      await WidgetsBinding.instance.endOfFrame;
     }
+    if (!mounted) return;
+    // PopScope blocks Navigator.pop while canPop is false — flip the gate first.
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -275,7 +292,13 @@ class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final id = youtubeIdFrom(widget.shiur.youtubeUrl);
-    return Dialog(
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _close();
+      },
+      child: Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       clipBehavior: Clip.hardEdge,
@@ -305,7 +328,7 @@ class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
                     )
                   : ColoredBox(
                       color: const Color(0xFF111827),
-                      child: YoutubeEmbed(videoId: id),
+                      child: YoutubeEmbed(playerKey: _ytKey, videoId: id),
                     ),
             ),
             Padding(
@@ -350,6 +373,7 @@ class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
           ],
         ),
       ),
+    ),
     );
   }
 }

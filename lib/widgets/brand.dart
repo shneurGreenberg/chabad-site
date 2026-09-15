@@ -21,7 +21,7 @@ class ChabadEmblem extends StatelessWidget {
       bytes = repo.emblemBytes;
       url = repo.emblemUrl;
     } catch (_) {
-      url = 'assets/images/chabad-emblem.png';
+      url = 'assets/images/community-emblem.png';
     }
 
     Widget mark;
