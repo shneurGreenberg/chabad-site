@@ -213,7 +213,17 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Candle lighting',
     'ru': 'Зажигание свечей'
   },
-  'zmanim.havdala': {'he': 'צאת השבת', 'en': 'Havdalah', 'ru': 'Исход субботы'},
+  'zmanim.havdala': {'he': 'צאת השבת', 'en': 'Havdalah / Shabbat ends', 'ru': 'Исход субботы'},
+  'zmanim.motzeiChag': {
+    'he': 'צאת החג',
+    'en': 'Holiday ends',
+    'ru': 'Исход праздника',
+  },
+  'zmanim.nextShabbat': {
+    'he': 'השבת הבאה',
+    'en': 'Next Shabbat',
+    'ru': 'Следующая суббота',
+  },
   'zmanim.holiday': {
     'he': 'חג',
     'en': 'Holiday',
@@ -460,6 +470,28 @@ const Map<String, Map<String, String>> _strings = {
   'about.address': {'he': 'כתובת', 'en': 'Address', 'ru': 'Адрес'},
   'about.contact': {'he': 'צור קשר', 'en': 'Contact', 'ru': 'Контакты'},
   'about.map': {'he': 'מפה', 'en': 'Map', 'ru': 'Карта'},
+  'about.hotels': {
+    'he': 'מלונות באזור',
+    'en': 'Nearby hotels',
+    'ru': 'Отели рядом',
+  },
+  'about.hotels.sub': {
+    'he': 'דירוג, אתר וקישור לגוגל מפות',
+    'en': 'Ratings, websites and Google Maps links',
+    'ru': 'Рейтинг, сайты и ссылки на Google Maps',
+  },
+  'about.attractions': {
+    'he': 'אטרקציות',
+    'en': 'Attractions',
+    'ru': 'Достопримечательности',
+  },
+  'about.attractions.sub': {
+    'he': 'כולל גלגל הענק והטיילת המיכאילובסקית',
+    'en': 'Including the Ferris wheel and the river promenade',
+    'ru': 'В том числе колесо обозрения и набережная',
+  },
+  'about.website': {'he': 'אתר', 'en': 'Website', 'ru': 'Сайт'},
+  'about.google': {'he': 'גוגל מפות', 'en': 'Google Maps', 'ru': 'Google Карты'},
 
   // Footer
   'footer.quicklinks': {
@@ -557,9 +589,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Вставьте в Firestore → Rules и Publish:'
   },
   'admin.cloud.blockedShort': {
-    'he': 'השמירה לשרת נחסמה — לחצו לפרטים',
-    'en': 'Server save blocked — tap for details',
-    'ru': 'Сохранение на сервер заблокировано — подробности'
+    'he': 'השרת חוסם כתיבה — השמירה המקומית בדפדפן נשארה. לחצו לפרטים (כללי Firestore)',
+    'en': 'Server blocked the write — this browser still has the local save. Tap for Firestore rules.',
+    'ru': 'Сервер отклонил запись — локальное сохранение в браузере осталось. Правила Firestore.',
   },
   'admin.cloud.details': {
     'he': 'פרטים',
@@ -771,9 +803,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Синий баннер по умолчанию'
   },
   'admin.banners.hint': {
-    'he': 'גררו את התמונה בתצוגה כדי לבחור איזה חלק יוצג — בכל עמוד באתר. אפשר גם כמה תמונות שמתחלפות לבד.',
-    'en': 'Drag the photo in the preview to choose the crop — on every page. You can also add several photos that rotate.',
-    'ru': 'Перетащите фото в превью, чтобы выбрать кадр — на каждой странице. Можно несколько снимков.'
+    'he': 'גררו את התמונה למעלה או למטה כדי לבחור את המיקוד האנכי — בכל עמוד באתר. אפשר גם כמה תמונות שמתחלפות לבד.',
+    'en': 'Drag the photo up or down to set vertical crop — on every page. You can also add several photos that rotate.',
+    'ru': 'Перетащите фото вверх или вниз, чтобы выбрать вертикальный кадр. Можно несколько снимков.'
   },
   'admin.banners.drag': {
     'he': 'גררו את התמונה כדי לכוון את החיתוך',

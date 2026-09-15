@@ -941,7 +941,8 @@ class _SiteFooter extends StatelessWidget {
                           trLoc(repo.contact.address, loc.lang)),
                       _contactRow(Icons.phone_outlined, repo.contact.phone,
                           phone: true),
-                      _contactRow(Icons.email_outlined, repo.contact.email),
+                      _contactRow(Icons.email_outlined, repo.contact.email,
+                          email: true),
                       for (final s in repo.contact.staff) ...[
                         _contactRow(
                           Icons.badge_outlined,
@@ -1049,7 +1050,8 @@ class _SiteFooter extends StatelessWidget {
     );
   }
 
-  Widget _contactRow(IconData icon, String text, {bool phone = false}) =>
+  Widget _contactRow(IconData icon, String text,
+          {bool phone = false, bool email = false}) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Row(
@@ -1066,11 +1068,22 @@ class _SiteFooter extends StatelessWidget {
                           fontSize: 13,
                           height: 1.4),
                     )
-                  : Text(text,
-                      style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          fontSize: 13,
-                          height: 1.4)),
+                  : email || looksLikeEmail(text)
+                      ? EmailText(
+                          text,
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 13,
+                              height: 1.4),
+                        )
+                      : LinkedContactText(
+                          text,
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 13,
+                              height: 1.4),
+                          linkColor: AppColors.accentSoft,
+                        ),
             ),
           ],
         ),

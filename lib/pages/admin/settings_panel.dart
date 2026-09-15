@@ -157,10 +157,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   String _mapUrl(double lat, double lon) {
     final key = context.read<AppRepository>().googleMapsApiKey;
-    if (key.trim().isEmpty) {
-      return 'https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02},${lat - 0.02},${lon + 0.02},${lat + 0.02}&layer=mapnik&marker=$lat,$lon';
-    }
-    return 'https://www.google.com/maps?q=$lat,$lon&output=embed&key=$key';
+    return siteMapEmbedUrl(lat: lat, lon: lon, apiKey: key);
   }
 
   @override

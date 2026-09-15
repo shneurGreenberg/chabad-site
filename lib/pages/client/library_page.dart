@@ -244,76 +244,110 @@ class _ShiurCard extends StatelessWidget {
   }
 
   void _play(BuildContext context) {
-    final loc = context.read<LocaleController>();
-    final id = youtubeIdFrom(shiur.youtubeUrl);
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 840),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: id == null
-                    ? DecoratedBox(
-                        decoration:
-                            BoxDecoration(gradient: AppColors.heroGradient),
-                        child: const Center(
-                          child: PlayfulIcon(Icons.menu_book_outlined,
-                              color: Colors.white, size: 64),
-                        ),
-                      )
-                    : Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: YoutubeEmbed(videoId: id),
+      barrierDismissible: true,
+      builder: (_) => _ShiurPlayerDialog(shiur: shiur),
+    );
+  }
+}
+
+class _ShiurPlayerDialog extends StatefulWidget {
+  const _ShiurPlayerDialog({required this.shiur});
+  final Shiur shiur;
+
+  @override
+  State<_ShiurPlayerDialog> createState() => _ShiurPlayerDialogState();
+}
+
+class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
+  bool _showPlayer = true;
+
+  Future<void> _close() async {
+    if (_showPlayer) {
+      setState(() => _showPlayer = false);
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final id = youtubeIdFrom(widget.shiur.youtubeUrl);
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      clipBehavior: Clip.hardEdge,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 840),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: IconButton(
+                tooltip: loc.t('common.close'),
+                onPressed: _close,
+                icon: const PlayfulIcon(Icons.close),
+              ),
+            ),
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: id == null || !_showPlayer
+                  ? DecoratedBox(
+                      decoration:
+                          BoxDecoration(gradient: AppColors.heroGradient),
+                      child: const Center(
+                        child: PlayfulIcon(Icons.menu_book_outlined,
+                            color: Colors.white, size: 64),
                       ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(trLoc(shiur.title, loc.lang),
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 18)),
-                    const SizedBox(height: 6),
-                    Text(trLoc(shiur.rabbi, loc.lang),
-                        style: const TextStyle(color: Colors.black54)),
-                    if (id == null) ...[
-                      const SizedBox(height: 10),
-                      Text(loc.t('library.noVideo'),
-                          style: TextStyle(
-                              color: AppColors.muted, height: 1.4)),
-                    ],
-                    const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.end,
-                      children: [
-                        if (id != null)
-                          OutlinedButton.icon(
-                            onPressed: () => openYoutubeWatch(id),
-                            icon: const PlayfulIcon(Icons.open_in_new, size: 18),
-                            label: Text(loc.t('library.openYoutube')),
-                          ).hoverLift(),
-                        FilledButton.icon(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const PlayfulIcon(Icons.check, size: 18),
-                          label: Text(loc.t('common.close')),
-                        ).hoverLift(),
-                      ],
+                    )
+                  : ColoredBox(
+                      color: const Color(0xFF111827),
+                      child: YoutubeEmbed(videoId: id),
                     ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(trLoc(widget.shiur.title, loc.lang),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 18)),
+                  const SizedBox(height: 6),
+                  Text(trLoc(widget.shiur.rabbi, loc.lang),
+                      style: const TextStyle(color: Colors.black54)),
+                  if (id == null) ...[
+                    const SizedBox(height: 10),
+                    Text(loc.t('library.noVideo'),
+                        style: TextStyle(
+                            color: AppColors.muted, height: 1.4)),
                   ],
-                ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      if (id != null)
+                        OutlinedButton.icon(
+                          onPressed: () => openYoutubeWatch(id),
+                          icon: const PlayfulIcon(Icons.open_in_new, size: 18),
+                          label: Text(loc.t('library.openYoutube')),
+                        ).hoverLift(),
+                      FilledButton.icon(
+                        onPressed: _close,
+                        icon: const PlayfulIcon(Icons.check, size: 18),
+                        label: Text(loc.t('common.close')),
+                      ).hoverLift(),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -308,6 +308,7 @@ class _ClockPainter extends CustomPainter {
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = math.max(1.4, size.shortestSide * 0.08);
+    canvas.drawCircle(c, r, Paint()..color = Colors.white);
     canvas.drawCircle(c, r, ring);
     canvas.drawCircle(c, 1.3, Paint()..color = color);
 

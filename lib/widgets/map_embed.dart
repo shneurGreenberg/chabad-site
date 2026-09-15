@@ -34,3 +34,32 @@ String googleMapsEmbedUrl({
       : Uri.encodeQueryComponent('$lat,$lon');
   return 'https://www.google.com/maps/embed/v1/place?key=$apiKey&q=$q';
 }
+
+String googleMapsSearchUrl({
+  required double lat,
+  required double lon,
+  String address = '',
+}) {
+  final q = address.trim().isNotEmpty
+      ? Uri.encodeQueryComponent(address.trim())
+      : Uri.encodeQueryComponent('$lat,$lon');
+  return 'https://www.google.com/maps/search/?api=1&query=$q';
+}
+
+/// OSM always works without a key; Google Embed is used when [apiKey] is set.
+String siteMapEmbedUrl({
+  required double lat,
+  required double lon,
+  String apiKey = '',
+  String address = '',
+}) {
+  if (apiKey.trim().isNotEmpty) {
+    return googleMapsEmbedUrl(
+      apiKey: apiKey.trim(),
+      lat: lat,
+      lon: lon,
+      address: address,
+    );
+  }
+  return osmEmbedUrl(lat, lon);
+}

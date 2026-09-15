@@ -190,16 +190,7 @@ class _BannerEditor extends StatelessWidget {
               slide: slides[i],
               height: previewH,
               label: loc.t(slot.labelKey),
-              onPan: (x, y) => repo.setSlideAlign(slot.route, i, x: x, y: y),
-            ),
-            Text(loc.t('admin.banners.alignX'),
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-            Slider(
-              value: slides[i].alignX,
-              min: -1,
-              max: 1,
-              label: slides[i].alignX.toStringAsFixed(2),
-              onChanged: (v) => repo.setSlideAlign(slot.route, i, x: v),
+              onPan: (y) => repo.setSlideAlign(slot.route, i, x: 0, y: y),
             ),
             Text(loc.t('admin.banners.alignY'),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
@@ -208,7 +199,8 @@ class _BannerEditor extends StatelessWidget {
               min: -1,
               max: 1,
               label: slides[i].alignY.toStringAsFixed(2),
-              onChanged: (v) => repo.setSlideAlign(slot.route, i, y: v),
+              onChanged: (v) =>
+                  repo.setSlideAlign(slot.route, i, x: 0, y: v),
             ),
           ],
           if (slides.isEmpty)
@@ -241,7 +233,7 @@ class _BannerCropPreview extends StatelessWidget {
   final BannerSlide slide;
   final double height;
   final String label;
-  final void Function(double x, double y) onPan;
+  final void Function(double y) onPan;
 
   @override
   Widget build(BuildContext context) {
@@ -253,15 +245,13 @@ class _BannerCropPreview extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, box) {
             return GestureDetector(
-              onPanUpdate: (d) {
-                final nx = (slide.alignX - d.delta.dx / (box.maxWidth / 2))
-                    .clamp(-1.0, 1.0);
+              onVerticalDragUpdate: (d) {
                 final ny = (slide.alignY - d.delta.dy / (box.maxHeight / 2))
                     .clamp(-1.0, 1.0);
-                onPan(nx, ny);
+                onPan(ny);
               },
               child: MouseRegion(
-                cursor: SystemMouseCursors.grab,
+                cursor: SystemMouseCursors.resizeUpDown,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [

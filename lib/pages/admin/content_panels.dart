@@ -1003,6 +1003,10 @@ class ManageTouristPanel extends StatelessWidget {
       {bool isNew = false}) {
     final title = _locCtrls(info.title);
     final desc = _locCtrls(info.description);
+    final website = TextEditingController(text: info.websiteUrl);
+    final maps = TextEditingController(text: info.mapsUrl);
+    final rating = TextEditingController(
+        text: info.rating == null ? '' : info.rating!.toString());
     var category = info.category;
     var imageBytes = info.imageBytes;
     _showEditor(
@@ -1048,6 +1052,21 @@ class ManageTouristPanel extends StatelessWidget {
               label: loc.t('common.message'),
               controllers: desc,
               maxLines: 6),
+          TextField(
+            controller: rating,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(labelText: loc.t('about.hotels.sub')),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: website,
+            decoration: InputDecoration(labelText: loc.t('about.website')),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: maps,
+            decoration: InputDecoration(labelText: loc.t('about.google')),
+          ),
         ]);
       }),
       onSave: () {
@@ -1055,12 +1074,15 @@ class ManageTouristPanel extends StatelessWidget {
         _applyLoc(info.description, desc);
         info.category = category;
         info.imageBytes = imageBytes;
+        info.websiteUrl = website.text.trim();
+        info.mapsUrl = maps.text.trim();
+        info.rating = double.tryParse(rating.text.trim().replaceAll(',', '.'));
         if (isNew) {
           repo.addTouristInfo(info);
         } else {
           repo.refresh();
         }
-        _disposeAll([...title.values, ...desc.values]);
+        _disposeAll([...title.values, ...desc.values, website, maps, rating]);
       },
     );
   }
