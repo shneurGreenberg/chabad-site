@@ -213,10 +213,10 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Candle lighting',
     'ru': 'Зажигание свечей'
   },
-  'zmanim.havdala': {'he': 'צאת השבת', 'en': 'Havdalah / Shabbat ends', 'ru': 'Исход субботы'},
+  'zmanim.havdala': {'he': 'מוצאי שבת', 'en': 'Motzaei Shabbat / Havdalah', 'ru': 'Исход субботы'},
   'zmanim.motzeiChag': {
-    'he': 'צאת החג',
-    'en': 'Holiday ends',
+    'he': 'מוצאי חג',
+    'en': 'Motzaei Chag / Holiday ends',
     'ru': 'Исход праздника',
   },
   'zmanim.nextShabbat': {
@@ -609,9 +609,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Открыть консоль Firestore'
   },
   'admin.cloud.localOnly': {
-    'he': 'סנכרון ענן: מקומי בלבד (אין התחברות Firebase)',
-    'en': 'Cloud sync: local only (not signed in to Firebase)',
-    'ru': 'Облако: только локально (нет входа в Firebase)'
+    'he': 'ענן: מקומי בלבד — התחברו עם משתמש Firebase Auth ואז «שמור לשרת»',
+    'en': 'Cloud: local only — sign in with a Firebase Auth user, then Save to server',
+    'ru': 'Облако: только локально — войдите через Firebase Auth, затем «Сохранить на сервер»'
   },
   'admin.cloud.connected': {
     'he': 'סנכרון ענן: מחובר',
@@ -647,14 +647,14 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Вход администратора'
   },
   'admin.login.hint': {
-    'he': 'כל אימייל וסיסמה יפתחו את המנהל. השמירה עולה ל-Firestore (בלי Storage).',
-    'en': 'Any email and password open admin. Saves go to Firestore (no Storage).',
-    'ru': 'Любые почта и пароль откроют админку. Сохранение идёт в Firestore (без Storage).'
+    'he': 'עריכה מקומית בדפדפן. לשמירה לשרת נדרש Firebase Auth.',
+    'en': 'Local browser editing. Save-to-server needs Firebase Auth.',
+    'ru': 'Локальное редактирование в браузере. Для сервера нужен Firebase Auth.'
   },
   'admin.login.firebaseHint': {
-    'he': 'אם Authentication פעיל — התחברו עם המשתמש. אחרת כל אימייל/סיסמה יעבדו, והשמירה ל-Firestore תנסה בכל מקרה.',
-    'en': 'If Authentication is on, sign in with that user. Otherwise any email/password works, and Firestore writes are still attempted.',
-    'ru': 'Если Authentication включён — войдите этим пользователем. Иначе подойдут любые данные, запись в Firestore всё равно пробуется.'
+    'he': 'ל«שמור לשרת» חובה משתמש Firebase Authentication (Authentication → Users). בלי זה נשמר רק בדפדפן זה. אחרי כניסה מוצלחת — גם Publish לכללי Firestore אם הכתיבה נחסמת.',
+    'en': 'Save-to-server requires a Firebase Authentication user (Authentication → Users). Without it, edits stay in this browser only. After a successful sign-in, Publish Firestore rules if writes are still blocked.',
+    'ru': '«Сохранить на сервер» требует пользователя Firebase Authentication (Authentication → Users). Иначе правки только в этом браузере. После входа — Publish правил Firestore, если запись блокируется.'
   },
   'admin.login.button': {'he': 'כניסה', 'en': 'Log in', 'ru': 'Войти'},
   'admin.login.error': {

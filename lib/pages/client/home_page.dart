@@ -389,20 +389,22 @@ class _ShabbatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
       ),
       child: Row(children: [
         Expanded(
           child: Text(label,
-              style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8), fontSize: 14)),
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
         ),
         Text(time,
-            style: TextStyle(
-                color: AppColors.accentSoft,
-                fontWeight: FontWeight.w800,
-                fontSize: 20)),
+            style: const TextStyle(
+                color: Color(0xFFFFF6D8),
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+                letterSpacing: 0.3)),
       ]),
     );
   }
@@ -549,13 +551,17 @@ class _ZmanimStrip extends StatelessWidget {
           PlayfulIcon(icon, size: 16, color: AppColors.primary, kind: kind),
           const SizedBox(width: 6),
         ],
-        Text(name, style: TextStyle(color: AppColors.muted, fontSize: 13)),
+        Text(name,
+            style: TextStyle(
+                color: AppColors.ink.withValues(alpha: 0.72),
+                fontSize: 13,
+                fontWeight: FontWeight.w600)),
         const SizedBox(width: 10),
         Text(time,
             style: const TextStyle(
                 color: Color(0xFF0B1C3A),
-                fontWeight: FontWeight.w800,
-                fontSize: 16)),
+                fontWeight: FontWeight.w900,
+                fontSize: 17)),
       ]),
     );
   }

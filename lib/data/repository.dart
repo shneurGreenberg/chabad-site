@@ -99,50 +99,45 @@ class AppRepository extends ChangeNotifier {
     } catch (e) {
       debugPrint('Telegram service load failed: $e');
     }
-    
+
     try {
       await CloudSync.instance.init();
     } catch (e) {
       debugPrint('CloudSync init failed: $e');
     }
-    
+
     try {
       await _hydrate();
     } catch (e) {
       debugPrint('Hydrate failed: $e');
     }
-    
+
     _hydrated = true;
-    _cloudPulled = true; // Mark as pulled immediately to show UI
-    _notifyUi(); // Show UI with hydrated seed data
-    
-    // Continue loading in background without blocking UI
-    _loadBackgroundData();
-  }
-  
-  Future<void> _loadBackgroundData() async {
-    // Await cloud pull (timeout) so a late UTC location cannot overwrite after zmanim.
+    // Keep splash until cloud finishes (or times out). Marking ready early painted
+    // seed defaults (legacy emblem / stale parsha) as if they were live content.
     try {
       await _pullCloud().timeout(const Duration(seconds: 8));
     } catch (e) {
       debugPrint('Cloud pull failed/timed out: $e');
-      _cloudPulled = true;
     }
+    _cloudPulled = true;
     _notifyUi();
 
-    // Load Kaddish graves
+    // Kaddish + live zmanim in background — do not block first real paint.
+    unawaited(_loadBackgroundData());
+  }
+
+  Future<void> _loadBackgroundData() async {
     try {
       await _loadKaddishGraves();
     } catch (e) {
       debugPrint('Kaddish graves load failed: $e');
     }
 
-    // After hydrate + cloud, always refresh zmanim/shabbat from network (wins over seed).
     try {
       await refreshTimes();
     } catch (e) {
       debugPrint('Failed to refresh times: $e');
-      // Keep seed data on error
     }
     _notifyUi();
   }
@@ -2427,14 +2422,20 @@ class AppRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  static const _defaultEmblemAsset = 'assets/images/community-emblem.png';
+  static const _legacyEmblemAsset = 'assets/images/chabad-emblem.png';
+
+  bool _isPackagedEmblem(String? url) =>
+      url == _defaultEmblemAsset || url == _legacyEmblemAsset;
+
   Uint8List? emblemBytes;
-  String? emblemUrl = 'assets/images/chabad-emblem.png';
+  String? emblemUrl = _defaultEmblemAsset;
 
   bool get hasCustomEmblem =>
       (emblemBytes != null && emblemBytes!.isNotEmpty) ||
       (emblemUrl != null &&
           emblemUrl!.isNotEmpty &&
-          emblemUrl != 'assets/images/chabad-emblem.png');
+          !_isPackagedEmblem(emblemUrl));
 
   void setEmblemImage(Uint8List bytes) {
     emblemBytes = compressSiteImage(bytes);
@@ -2460,7 +2461,7 @@ class AppRepository extends ChangeNotifier {
 
   void clearEmblem() {
     emblemBytes = null;
-    emblemUrl = 'assets/images/chabad-emblem.png';
+    emblemUrl = _defaultEmblemAsset;
     unawaited(persistDelete('${_imgPrefix}emblem:logo'));
     notifyListeners();
   }
@@ -2701,7 +2702,7 @@ class AppRepository extends ChangeNotifier {
     }
     final emblem = '${m['emblemUrl'] ?? ''}'.trim();
     if (emblem.isNotEmpty) {
-      final incomingDefault = emblem == 'assets/images/chabad-emblem.png';
+      final incomingDefault = _isPackagedEmblem(emblem);
       if (!incomingDefault || !_hasBytes(emblemBytes)) {
         emblemUrl = emblem;
       }
@@ -3553,7 +3554,7 @@ class AppRepository extends ChangeNotifier {
       if (!hasCustomEmblem &&
           emblemUrlKeep != null &&
           emblemUrlKeep.isNotEmpty &&
-          emblemUrlKeep != 'assets/images/chabad-emblem.png') {
+          !_isPackagedEmblem(emblemUrlKeep)) {
         emblemUrl = emblemUrlKeep;
       }
       _rememberDiskMeta({
