@@ -618,6 +618,11 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Cloud sync: connected',
     'ru': 'Облако: подключено'
   },
+  'admin.cloud.signedInAs': {
+    'he': 'מחובר כ־',
+    'en': 'Signed in as',
+    'ru': 'Вход выполнен:'
+  },
 
   'admin.settings.mapsKey': {
     'he': 'מפתח Google Maps (רשות)',
@@ -671,6 +676,21 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'Firebase לא זמין כרגע — בדקו שהשירותים פעילים בקונסול',
     'en': 'Firebase is unavailable — enable it in the console',
     'ru': 'Firebase недоступен — включите сервисы в консоли'
+  },
+  'admin.login.tooMany': {
+    'he': 'יותר מדי ניסיונות — נסו שוב בעוד כמה דקות',
+    'en': 'Too many attempts — try again in a few minutes',
+    'ru': 'Слишком много попыток — повторите через несколько минут'
+  },
+  'admin.login.disabled': {
+    'he': 'המשתמש מושבת ב-Firebase Auth',
+    'en': 'This Firebase Auth user is disabled',
+    'ru': 'Пользователь Firebase Auth отключён'
+  },
+  'admin.login.network': {
+    'he': 'שגיאת רשת בכניסה ל-Firebase — בדקו חיבור ו-Authorized domains',
+    'en': 'Firebase sign-in network error — check connection and Authorized domains',
+    'ru': 'Сетевая ошибка входа Firebase — проверьте сеть и Authorized domains'
   },
   'admin.logout': {'he': 'יציאה', 'en': 'Log out', 'ru': 'Выйти'},
   'admin.dashboard': {'he': 'לוח בקרה', 'en': 'Dashboard', 'ru': 'Панель'},

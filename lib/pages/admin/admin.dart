@@ -143,16 +143,11 @@ class _AdminLoginState extends State<AdminLogin> {
           adminEmails: emails,
         );
     if (!mounted) return;
-    // local-only: admin UI opens; show banner via cloudError on first persist.
-    if (err == 'local-only') {
+    if (err == null) {
       final repo = context.read<AppRepository>();
-      repo.cloudError = 'not-signed-in';
+      // Signed into Firebase Auth — clear stale local-only banner.
+      repo.cloudError = null;
       repo.refresh();
-      setState(() {
-        _busy = false;
-        _error = null;
-      });
-      return;
     }
     setState(() {
       _busy = false;
@@ -166,6 +161,13 @@ class _AdminLoginState extends State<AdminLogin> {
         return loc.t('admin.login.empty');
       case 'unavailable':
         return loc.t('admin.login.unavailable');
+      case 'too-many-requests':
+        return loc.t('admin.login.tooMany');
+      case 'user-disabled':
+        return loc.t('admin.login.disabled');
+      case 'network-request-failed':
+      case 'unknown':
+        return loc.t('admin.login.network');
       default:
         return loc.t('admin.login.error');
     }
@@ -584,9 +586,15 @@ class _CloudSyncBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
+    final auth = context.watch<AuthController>();
     final err = repo.cloudError;
-    final ok = err == null && repo.cloudOkAt != null;
-    if (ok) {
+    final signedIn = auth.cloudSignedIn;
+    final email = auth.email.trim();
+
+    if (signedIn) {
+      final label = email.isEmpty
+          ? loc.t('admin.cloud.connected')
+          : "${loc.t('admin.cloud.signedInAs')} $email";
       return Material(
         color: const Color(0xFFF0FDF4),
         child: Padding(
@@ -597,7 +605,7 @@ class _CloudSyncBar extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                loc.t('admin.cloud.connected'),
+                label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -610,7 +618,8 @@ class _CloudSyncBar extends StatelessWidget {
         ),
       );
     }
-    // Local admin / no Firebase Auth: quiet status, no SnackBar spam.
+
+    // Not signed into Firebase Auth — local browser edits only.
     if (err == null || err == 'not-signed-in') {
       return Material(
         color: const Color(0xFFF8FAFC),

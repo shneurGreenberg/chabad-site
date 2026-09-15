@@ -51,6 +51,7 @@ class AppRepository extends ChangeNotifier {
   bool _hydrated = false;
   bool _cloudSeen = false;
   bool _cloudPulled = false;
+  bool _timesReady = false;
   bool _diskHadSnapshot = false;
   int _diskSeq = 0;
   DateTime? _diskUpdatedAt;
@@ -68,8 +69,8 @@ class AppRepository extends ChangeNotifier {
 
   void _notifyUi() => super.notifyListeners();
 
-  /// Returns true if initial data load is complete (hydrate + cloud pull done).
-  bool get isDataReady => _hydrated && _cloudPulled;
+  /// Ready when local hydrate, cloud pull, and first zmanim fetch attempt finish.
+  bool get isDataReady => _hydrated && _cloudPulled && _timesReady;
 
   @override
   void dispose() {
@@ -88,6 +89,9 @@ class AppRepository extends ChangeNotifier {
       }
       if (!_hydrated) {
         _hydrated = true;
+      }
+      if (!_timesReady) {
+        _timesReady = true;
       }
       _notifyUi();
     }
@@ -113,17 +117,24 @@ class AppRepository extends ChangeNotifier {
     }
 
     _hydrated = true;
-    // Keep splash until cloud finishes (or times out). Marking ready early painted
-    // seed defaults (legacy emblem / stale parsha) as if they were live content.
+    // Keep splash until cloud + zmanim finish (or time out). Early ready painted
+    // seed defaults (legacy emblem / empty Shabbat) as if they were live content.
     try {
       await _pullCloud().timeout(const Duration(seconds: 8));
     } catch (e) {
       debugPrint('Cloud pull failed/timed out: $e');
     }
     _cloudPulled = true;
+
+    try {
+      await refreshTimes().timeout(const Duration(seconds: 12));
+    } catch (e) {
+      debugPrint('Zmanim refresh failed/timed out during boot: $e');
+    }
+    _timesReady = true;
     _notifyUi();
 
-    // Kaddish + live zmanim in background — do not block first real paint.
+    // Cemetery photos can load after first paint.
     unawaited(_loadBackgroundData());
   }
 
@@ -132,12 +143,6 @@ class AppRepository extends ChangeNotifier {
       await _loadKaddishGraves();
     } catch (e) {
       debugPrint('Kaddish graves load failed: $e');
-    }
-
-    try {
-      await refreshTimes();
-    } catch (e) {
-      debugPrint('Failed to refresh times: $e');
     }
     _notifyUi();
   }
@@ -2702,8 +2707,10 @@ class AppRepository extends ChangeNotifier {
     }
     final emblem = '${m['emblemUrl'] ?? ''}'.trim();
     if (emblem.isNotEmpty) {
-      final incomingDefault = _isPackagedEmblem(emblem);
-      if (!incomingDefault || !_hasBytes(emblemBytes)) {
+      // Custom bytes win — never flash packaged default over an admin upload.
+      if (_hasBytes(emblemBytes)) {
+        emblemUrl = null;
+      } else {
         emblemUrl = emblem;
       }
     }

@@ -342,7 +342,8 @@ class _ShabbatCard extends StatelessWidget {
                     fontSize: 14.5),
               ),
               const SizedBox(height: 18),
-              _row(loc.t('zmanim.candle'), candle),
+              if (candle.trim().isNotEmpty && candle != '--:--')
+                _row(loc.t('zmanim.candle'), candle),
               if (havdala.trim().isNotEmpty && havdala != '--:--') ...[
                 const SizedBox(height: 10),
                 _row(loc.t('zmanim.havdala'), havdala),

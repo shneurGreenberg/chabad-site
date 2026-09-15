@@ -19,15 +19,6 @@ class AuthController extends ChangeNotifier {
   static const editorPinKey = 'chabad_editor_pin';
   static const editorEmailsKey = 'chabad_editor_emails';
 
-  static const _rejectCodes = {
-    'invalid-credential',
-    'user-not-found',
-    'wrong-password',
-    'invalid-email',
-    'too-many-requests',
-    'user-disabled',
-  };
-
   bool get isLoggedIn => _loggedIn;
   String get email => _email;
   AdminRole get role => _role;
@@ -74,30 +65,44 @@ class AuthController extends ChangeNotifier {
       return null;
     }
 
-    if (CloudSync.instance.enabled) {
-      final err = await CloudSync.instance.signIn(email, password);
-      if (err != null && _rejectCodes.contains(err)) return err;
-      if (err == null) {
-        _role = _isAdminEmail(trimmed, adminEmails)
-            ? AdminRole.admin
-            : AdminRole.editor;
-        CloudSync.instance.adminSession = true;
-        _loggedIn = true;
-        _email = trimmed;
-        notifyListeners();
-        return null;
-      }
-      // Firebase reachable but Auth failed for a non-credential reason
-      // (network / provider off). Unlock local editor; cloud push stays blocked.
+    if (!CloudSync.instance.enabled) {
+      return 'unavailable';
     }
-    // Local-only fallback: unlock admin UI without Firebase Auth.
-    // Do not set adminSession — cloud writes require signedIn.
-    CloudSync.instance.adminSession = false;
-    _role = AdminRole.admin;
+
+    final err = await CloudSync.instance.signIn(email, password);
+    if (err != null) {
+      // Never unlock admin UI on a failed Firebase Auth attempt.
+      CloudSync.instance.adminSession = false;
+      return err;
+    }
+
+    _role = _isAdminEmail(trimmed, adminEmails)
+        ? AdminRole.admin
+        : AdminRole.editor;
+    CloudSync.instance.adminSession = true;
     _loggedIn = true;
     _email = trimmed;
     notifyListeners();
-    return 'local-only';
+    return null;
+  }
+
+  /// Restore in-memory admin session after a page reload if Firebase Auth
+  /// still has a persisted user.
+  Future<void> restoreFromFirebase({
+    String adminEmails = 'admin@chabad-city.org',
+  }) async {
+    await CloudSync.instance.init();
+    if (!CloudSync.instance.signedIn) return;
+    final userEmail =
+        (CloudSync.instance.currentEmail ?? '').trim().toLowerCase();
+    if (userEmail.isEmpty) return;
+    _role = _isAdminEmail(userEmail, adminEmails)
+        ? AdminRole.admin
+        : AdminRole.editor;
+    CloudSync.instance.adminSession = true;
+    _loggedIn = true;
+    _email = userEmail;
+    notifyListeners();
   }
 
   void logout() {

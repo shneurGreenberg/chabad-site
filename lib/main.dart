@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -68,7 +69,14 @@ class _ChabadAppState extends State<ChabadApp> {
       providers: [
         ChangeNotifierProvider.value(value: _locale),
         ChangeNotifierProvider.value(value: _repo),
-        ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final auth = AuthController();
+            // Restore Firebase Auth session after hard refresh.
+            unawaited(auth.restoreFromFirebase());
+            return auth;
+          },
+        ),
       ],
       child: Consumer2<LocaleController, AppRepository>(
         builder: (context, locale, repo, _) {
