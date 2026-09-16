@@ -45,6 +45,7 @@ class AppRepository extends ChangeNotifier {
 
   String? cloudError;
   DateTime? cloudOkAt;
+  bool cloudPushing = false;
 
   int _seq = 1000;
   String _newId() => 'id${_seq++}';
@@ -56,6 +57,8 @@ class AppRepository extends ChangeNotifier {
   int _diskSeq = 0;
   DateTime? _diskUpdatedAt;
   Timer? _saveDebounce;
+  Future<void> _persistChain = Future<void>.value();
+  bool _zmanimFresh = false;
   void Function(String message)? onPersistWarning;
 
   /// Notify listeners after mutating a field directly (used by admin toggles).
@@ -69,7 +72,8 @@ class AppRepository extends ChangeNotifier {
 
   void _notifyUi() => super.notifyListeners();
 
-  /// Ready when local hydrate, cloud pull, and first zmanim fetch attempt finish.
+  /// Ready when local hydrate and cloud pull finish. Cached/seed zmanim are
+  /// applied during hydrate so the splash does not wait on Hebcal.
   bool get isDataReady => _hydrated && _cloudPulled && _timesReady;
 
   @override
@@ -117,22 +121,23 @@ class AppRepository extends ChangeNotifier {
     }
 
     _hydrated = true;
-    // Keep splash until cloud + zmanim finish (or time out). Early ready painted
-    // seed defaults (legacy emblem / empty Shabbat) as if they were live content.
+    try {
+      await _restoreZmanimCache();
+    } catch (e) {
+      debugPrint('Zmanim cache restore failed: $e');
+    }
+    _timesReady = true;
+    // Keep splash until cloud finishes (or times out). Do not block on Hebcal —
+    // cached/seed times are shown immediately; weekly refresh runs after paint.
     try {
       await _pullCloud().timeout(const Duration(seconds: 8));
     } catch (e) {
       debugPrint('Cloud pull failed/timed out: $e');
     }
     _cloudPulled = true;
-
-    try {
-      await refreshTimes().timeout(const Duration(seconds: 12));
-    } catch (e) {
-      debugPrint('Zmanim refresh failed/timed out during boot: $e');
-    }
-    _timesReady = true;
     _notifyUi();
+
+    unawaited(_refreshTimesIfStale());
 
     // Cemetery photos can load after first paint.
     unawaited(_loadBackgroundData());
@@ -504,6 +509,7 @@ class AppRepository extends ChangeNotifier {
     );
     location = next;
     _persistLocation();
+    _zmanimFresh = false;
     await refreshTimes();
   }
 
@@ -581,6 +587,8 @@ class AppRepository extends ChangeNotifier {
           ..clear()
           ..addAll(data.zmanim);
         _applyShabbatFromNetwork(data.shabbat);
+        await _saveZmanimCache();
+        _zmanimFresh = true;
       }
       debugPrint(
         'Zmanim refreshed: candle=${shabbat['candle']}, havdala=${shabbat['havdala']}, '
@@ -595,6 +603,65 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
+  Future<void> _restoreZmanimCache() async {
+    final raw = await persistGet(CachedZmanim.storageKey);
+    if (raw == null || raw.isEmpty) return;
+    CachedZmanim? cache;
+    try {
+      cache = CachedZmanim.fromJson(jsonDecode(raw));
+    } catch (_) {
+      return;
+    }
+    if (cache == null) return;
+    _applyCachedZmanim(cache);
+    _zmanimFresh = cache.isFreshFor(location);
+  }
+
+  void _applyCachedZmanim(CachedZmanim cache) {
+    if (cache.zmanim.isNotEmpty) {
+      zmanim
+        ..clear()
+        ..addAll(cache.zmanim);
+    }
+    final candle = (cache.shabbat['candle'] ?? '').trim();
+    if (nearNovosibirsk(location.latitude, location.longitude) &&
+        _candleLooksInvalid(candle) &&
+        candle != '--:--') {
+      return;
+    }
+    if (cache.shabbat.isNotEmpty) {
+      shabbat
+        ..clear()
+        ..addAll(cache.shabbat);
+    }
+  }
+
+  Future<void> _saveZmanimCache() async {
+    try {
+      final cache = CachedZmanim(
+        fetchedAt: DateTime.now().toUtc(),
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timezone: location.timezone,
+        zmanim: List.of(zmanim),
+        shabbat: Map.of(shabbat),
+      );
+      await persistPut(CachedZmanim.storageKey, jsonEncode(cache.toJson()));
+      _zmanimFresh = true;
+    } catch (e) {
+      debugPrint('Zmanim cache save failed: $e');
+    }
+  }
+
+  Future<void> _refreshTimesIfStale() async {
+    if (_zmanimFresh) return;
+    try {
+      await refreshTimes();
+    } catch (e) {
+      debugPrint('Weekly zmanim refresh failed: $e');
+    }
+  }
+
   /// Called when the UI locale changes to refresh location name and zmanim.
   Future<void> onLocaleChanged(String lang) async {
     if (location.latitude == 0 && location.longitude == 0) return;
@@ -606,7 +673,8 @@ class AppRepository extends ChangeNotifier {
         lang: lang,
       );
       location.cityName = place.name;
-      await refreshTimes();
+      _notifyUi();
+      // Language switch must not refetch Hebcal; weekly cache still applies.
     } catch (_) {}
   }
 
@@ -2611,9 +2679,16 @@ class AppRepository extends ChangeNotifier {
 
   void _schedulePersist() {
     _saveDebounce?.cancel();
-    _saveDebounce = Timer(const Duration(milliseconds: 300), () {
-      unawaited(_persistNow());
+    _saveDebounce = Timer(const Duration(milliseconds: 400), () {
+      unawaited(_enqueuePersist());
     });
+  }
+
+  Future<void> _enqueuePersist() {
+    _persistChain = _persistChain.then((_) => _persistNow()).catchError((Object e) {
+      debugPrint('persist failed: $e');
+    });
+    return _persistChain;
   }
 
   Map<String, dynamic> _encodeSnapshot() => {
@@ -3609,14 +3684,18 @@ class AppRepository extends ChangeNotifier {
     }
     if (!CloudSync.instance.signedIn) {
       cloudError = CloudSync.instance.enabled ? 'not-signed-in' : cloudError;
+      cloudPushing = false;
       _notifyUi();
       return;
     }
+    cloudPushing = true;
+    _notifyUi();
     final err = await CloudSync.instance.push(
       snapshot: snap,
       images: images,
       prune: _cloudSeen,
     );
+    cloudPushing = false;
     cloudError = err;
     cloudOkAt = err == null ? CloudSync.instance.lastOkAt : null;
     _notifyUi();
@@ -3625,7 +3704,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<String?> publishToCloud() async {
-    await _persistNow();
+    await _enqueuePersist();
     return cloudError;
   }
 }

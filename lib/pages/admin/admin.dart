@@ -145,10 +145,15 @@ class _AdminLoginState extends State<AdminLogin> {
     if (!mounted) return;
     if (err == null) {
       final repo = context.read<AppRepository>();
-      // Signed into Firebase Auth — clear stale local-only banner.
+      final auth = context.read<AuthController>();
+      // Signed into Firebase Auth — clear stale local-only banner and push.
       repo.cloudError = null;
       repo.refresh();
+      if (auth.cloudSignedIn) {
+        await repo.publishToCloud();
+      }
     }
+    if (!mounted) return;
     setState(() {
       _busy = false;
       _error = err;
@@ -165,6 +170,10 @@ class _AdminLoginState extends State<AdminLogin> {
         return loc.t('admin.login.tooMany');
       case 'user-disabled':
         return loc.t('admin.login.disabled');
+      case 'unauthorized-domain':
+        return loc.t('admin.login.unauthorizedDomain');
+      case 'operation-not-allowed':
+        return loc.t('admin.login.operationNotAllowed');
       case 'network-request-failed':
       case 'unknown':
         return loc.t('admin.login.network');
@@ -592,24 +601,49 @@ class _CloudSyncBar extends StatelessWidget {
     final email = auth.email.trim();
 
     if (signedIn) {
-      final label = email.isEmpty
-          ? loc.t('admin.cloud.connected')
-          : "${loc.t('admin.cloud.signedInAs')} $email";
+      final saving = repo.cloudPushing;
+      final pushFailed = repo.cloudError != null &&
+          repo.cloudError != 'not-signed-in';
+      final saved = repo.cloudOkAt != null && !pushFailed;
+      final label = saving
+          ? loc.t('admin.cloud.saving')
+          : pushFailed
+              ? loc.t('admin.cloud.blockedShort')
+              : saved
+                  ? (email.isEmpty
+                      ? loc.t('admin.cloud.ok')
+                      : "${loc.t('admin.cloud.signedInAs')} $email · ${loc.t('admin.cloud.ok')}")
+                  : email.isEmpty
+                      ? loc.t('admin.cloud.connected')
+                      : "${loc.t('admin.cloud.signedInAs')} $email";
       return Material(
-        color: const Color(0xFFF0FDF4),
+        color: saving
+            ? const Color(0xFFEFF6FF)
+            : pushFailed
+                ? const Color(0xFFFFFBEB)
+                : const Color(0xFFF0FDF4),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Row(children: [
-            const PlayfulIcon(Icons.cloud_done_outlined,
-                size: 18, color: Color(0xFF166534)),
+            PlayfulIcon(
+              saving
+                  ? Icons.cloud_sync_outlined
+                  : Icons.cloud_done_outlined,
+              size: 18,
+              color: saving
+                  ? const Color(0xFF1D4ED8)
+                  : const Color(0xFF166534),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: Color(0xFF166534),
+                style: TextStyle(
+                    color: saving
+                        ? const Color(0xFF1D4ED8)
+                        : const Color(0xFF166534),
                     fontWeight: FontWeight.w600,
                     fontSize: 13),
               ),

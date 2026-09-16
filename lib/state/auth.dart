@@ -12,9 +12,14 @@ import '../services/web_prefs.dart';
 /// Firebase Auth is required for cloud writes after Firestore rules lock.
 /// A local editor PIN unlocks content panels without Telegram / settings.
 class AuthController extends ChangeNotifier {
+  AuthController() {
+    CloudSync.instance.onAuthChanged = _onFirebaseAuthChanged;
+  }
+
   bool _loggedIn = false;
   String _email = '';
   AdminRole _role = AdminRole.admin;
+  String _adminEmails = 'admin@chabad-city.org';
 
   static const editorPinKey = 'chabad_editor_pin';
   static const editorEmailsKey = 'chabad_editor_emails';
@@ -36,6 +41,14 @@ class AuthController extends ChangeNotifier {
     } catch (_) {}
   }
 
+  void _onFirebaseAuthChanged() {
+    if (CloudSync.instance.signedIn && !_loggedIn) {
+      unawaited(restoreFromFirebase(adminEmails: _adminEmails));
+      return;
+    }
+    notifyListeners();
+  }
+
   bool _isAdminEmail(String email, String adminEmails) {
     final allow = adminEmails
         .split(RegExp(r'[,;\s]+'))
@@ -52,6 +65,7 @@ class AuthController extends ChangeNotifier {
     String adminEmails = 'admin@chabad-city.org',
   }) async {
     if (email.trim().isEmpty || password.isEmpty) return 'empty';
+    _adminEmails = adminEmails;
     final trimmed = email.trim().toLowerCase();
     final pin = editorPin();
     final editorMail = trimmed.contains('editor@') ||
@@ -65,6 +79,7 @@ class AuthController extends ChangeNotifier {
       return null;
     }
 
+    await CloudSync.instance.init();
     if (!CloudSync.instance.enabled) {
       return 'unavailable';
     }
@@ -91,6 +106,7 @@ class AuthController extends ChangeNotifier {
   Future<void> restoreFromFirebase({
     String adminEmails = 'admin@chabad-city.org',
   }) async {
+    _adminEmails = adminEmails;
     await CloudSync.instance.init();
     if (!CloudSync.instance.signedIn) return;
     final userEmail =
