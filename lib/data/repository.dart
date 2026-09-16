@@ -938,10 +938,57 @@ class AppRepository extends ChangeNotifier {
     ),
   ];
 
+  static const _rosh5787Id = 'gallery-rosh-5787';
+  static const _rosh5787Count = 163;
+
+  List<GalleryShot> _roshHashana5787Shots() => [
+        for (var i = 1; i <= _rosh5787Count; i++)
+          GalleryShot(
+            id: 'rosh-5787-${i.toString().padLeft(3, '0')}',
+            imageUrl:
+                'assets/images/gallery/rosh-hashana-5787/rh5787_${i.toString().padLeft(3, '0')}.jpg',
+          ),
+      ];
+
+  GalleryPhoto _roshHashana5787Album() => GalleryPhoto(
+        id: _rosh5787Id,
+        event: {
+          'he': 'ראש השנה תשפ״ז בבית מנחם',
+          'en': 'Rosh Hashanah 5787 at Beit Menachem',
+          'ru': 'Рош ха-Шана 5787 в Бейт Менахем',
+        },
+        year: 2026,
+        tags: const ['Rabbi Zaklos', 'Rosh Hashanah', 'Beit Menachem'],
+        color: 0xFFF97316,
+        icon: Icons.auto_awesome,
+        photos: _roshHashana5787Shots(),
+      );
+
+  void _ensureRoshHashana5787Album() {
+    final shots = _roshHashana5787Shots();
+    final i = gallery.indexWhere((a) =>
+        a.id == _rosh5787Id ||
+        (a.year == 2026 &&
+            ((a.event['he'] ?? '').contains('ראש השנה') ||
+                (a.event['en'] ?? '').toLowerCase().contains('rosh'))));
+    if (i < 0) {
+      gallery.insert(0, _roshHashana5787Album());
+      return;
+    }
+    final album = gallery[i];
+    if (album.photos.length < shots.length) {
+      final have = {for (final s in album.photos) s.imageUrl};
+      for (final s in shots) {
+        if (!have.contains(s.imageUrl)) album.photos.add(s);
+      }
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Gallery
   // ---------------------------------------------------------------------------
   late final List<GalleryPhoto> gallery = [
+    _roshHashana5787Album(),
     GalleryPhoto(
       id: _newId(),
       event: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'},
@@ -2945,6 +2992,7 @@ class AppRepository extends ChangeNotifier {
       _noteId(g.id);
     }
     _ensureHistoricalFamous();
+    _ensureRoshHashana5787Album();
   }
 
   Future<void> _hydrate() async {
@@ -2968,6 +3016,7 @@ class AppRepository extends ChangeNotifier {
     await _hydrateLocalImages(m);
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
+    _ensureRoshHashana5787Album();
   }
 
   void _rememberDiskMeta(Map<String, dynamic> m) {
@@ -3650,6 +3699,7 @@ class AppRepository extends ChangeNotifier {
       ..addAll(cartKeep);
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
+    _ensureRoshHashana5787Album();
     _cloudPulled = true;
 
     try {
