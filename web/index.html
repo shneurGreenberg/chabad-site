@@ -60,6 +60,12 @@
       height: 100%;
       width: 100%;
     }
+    /* Keep YouTube upright: CanvasKit + html[dir=rtl] can rotate platform views. */
+    iframe[title="YouTube"] {
+      transform: none !important;
+      writing-mode: horizontal-tb !important;
+      direction: ltr !important;
+    }
     .splash {
       position: fixed;
       inset: 0;

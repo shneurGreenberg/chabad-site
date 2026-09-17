@@ -301,7 +301,9 @@ class _ShiurPlayerDialogState extends State<_ShiurPlayerDialog> {
       child: Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      clipBehavior: Clip.hardEdge,
+      // Clip.hardEdge + HtmlElementView/iframe in RTL Flutter web rotates the
+      // player. Overlay iframe is positioned from this box; do not clip it.
+      clipBehavior: Clip.none,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 840),
         child: Column(

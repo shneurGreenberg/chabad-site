@@ -23,6 +23,114 @@ class GeoPlace {
   }
 }
 
+/// Persisted Hebcal payload. Fresh for [ttl] at the same coordinates.
+class CachedZmanim {
+  CachedZmanim({
+    required this.fetchedAt,
+    required this.latitude,
+    required this.longitude,
+    required this.timezone,
+    required this.zmanim,
+    required this.shabbat,
+  });
+
+  static const ttl = Duration(days: 7);
+  static const storageKey = 'chabad_zmanim_cache';
+
+  final DateTime fetchedAt;
+  final double latitude;
+  final double longitude;
+  final String timezone;
+  final List<Zman> zmanim;
+  final Map<String, String> shabbat;
+
+  bool isFreshFor(SiteLocation loc, {DateTime? now}) {
+    final n = (now ?? DateTime.now()).toUtc();
+    final at = fetchedAt.toUtc();
+    if (n.difference(at) > ttl) return false;
+    if (at.difference(n) > const Duration(days: 1)) return false;
+    if ((latitude - loc.latitude).abs() > 0.05) return false;
+    if ((longitude - loc.longitude).abs() > 0.05) return false;
+    if (timezone.trim().isNotEmpty &&
+        loc.timezone.trim().isNotEmpty &&
+        timezone.trim() != loc.timezone.trim()) {
+      return false;
+    }
+    final candle = (shabbat['candle'] ?? '').trim();
+    return candle.isNotEmpty && candle != '--:--';
+  }
+
+  Map<String, dynamic> toJson() => {
+        'fetchedAt': fetchedAt.toUtc().toIso8601String(),
+        'lat': latitude,
+        'lon': longitude,
+        'tz': timezone,
+        'zmanim': [
+          for (final z in zmanim)
+            {
+              'name': z.name,
+              'time': z.time,
+              'kind': z.kind.name,
+              'highlight': z.highlight,
+            },
+        ],
+        'shabbat': shabbat,
+      };
+
+  static CachedZmanim? fromJson(dynamic raw) {
+    if (raw is! Map) return null;
+    final m = Map<String, dynamic>.from(raw);
+    final at = DateTime.tryParse('${m['fetchedAt'] ?? ''}');
+    if (at == null) return null;
+    final lat = (m['lat'] as num?)?.toDouble();
+    final lon = (m['lon'] as num?)?.toDouble();
+    if (lat == null || lon == null) return null;
+    final zRaw = m['zmanim'];
+    final zmanim = <Zman>[];
+    if (zRaw is List) {
+      for (final item in zRaw) {
+        if (item is! Map) continue;
+        final zm = Map<String, dynamic>.from(item);
+        final nameRaw = zm['name'];
+        final name = <String, String>{};
+        if (nameRaw is Map) {
+          for (final e in nameRaw.entries) {
+            name['${e.key}'] = '${e.value}';
+          }
+        }
+        if (name.isEmpty) continue;
+        final kindName = '${zm['kind'] ?? ''}';
+        final kind = ZmanKind.values.firstWhere(
+          (k) => k.name == kindName,
+          orElse: () => ZmanKind.sunrise,
+        );
+        zmanim.add(Zman(
+          name: name,
+          time: '${zm['time'] ?? '--:--'}',
+          highlight: zm['highlight'] == true,
+          kind: kind,
+        ));
+      }
+    }
+    final shabbat = <String, String>{};
+    final sRaw = m['shabbat'];
+    if (sRaw is Map) {
+      for (final e in sRaw.entries) {
+        shabbat['${e.key}'] = '${e.value}';
+      }
+    }
+    if (zmanim.isEmpty || shabbat.isEmpty) return null;
+    return CachedZmanim(
+      fetchedAt: at,
+      latitude: lat,
+      longitude: lon,
+      timezone: '${m['tz'] ?? ''}',
+      zmanim: zmanim,
+      shabbat: shabbat,
+    );
+  }
+}
+
 class LocationZmanimApi {
   static Future<List<GeoPlace>> searchCity(String query, {String lang = 'he'}) async {
     final q = query.trim();
@@ -179,18 +287,22 @@ class LocationZmanimApi {
           '${lg.isEmpty ? '' : '&lg=$lg'}',
         );
 
-    Map<String, dynamic> calEn = const {};
-    Map<String, dynamic> calHe = const {};
-    Map<String, dynamic> calRu = const {};
-    try {
-      calEn = await cal('');
-    } catch (_) {}
-    try {
-      calHe = await cal('h');
-    } catch (_) {}
-    try {
-      calRu = await cal('ru');
-    } catch (_) {}
+    Future<Map<String, dynamic>> safeCal(String lg) async {
+      try {
+        return await cal(lg);
+      } catch (_) {
+        return const <String, dynamic>{};
+      }
+    }
+
+    final calResults = await Future.wait([
+      safeCal(''),
+      safeCal('h'),
+      safeCal('ru'),
+    ]);
+    final calEn = calResults[0];
+    final calHe = calResults[1];
+    final calRu = calResults[2];
 
     DateTime? itemWhen(Map item) => DateTime.tryParse('${item['date'] ?? ''}');
 

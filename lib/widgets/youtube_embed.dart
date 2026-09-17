@@ -15,7 +15,7 @@ class YoutubeEmbed extends StatelessWidget {
   });
 
   /// Key for [YoutubeIFrameState.teardown] — must not use [key] (that stays on this wrapper).
-  final GlobalKey<YoutubeIFrameState>? playerKey;
+  final GlobalKey<impl.YoutubeIFrameState>? playerKey;
   final String videoId;
 
   @override

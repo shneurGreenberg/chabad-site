@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -27,8 +28,12 @@ class CloudSync {
   /// UI hint only — does not authorize Firestore writes (push requires signedIn).
   bool adminSession = false;
 
+  /// Called when Firebase Auth currentUser appears, changes, or clears.
+  void Function()? onAuthChanged;
+
   String? lastError;
   DateTime? lastOkAt;
+  StreamSubscription<User?>? _authSub;
 
   bool get enabled => DefaultFirebaseOptions.isConfigured && !_initFailed;
   bool get signedIn =>
@@ -37,11 +42,27 @@ class CloudSync {
   String? get currentEmail => FirebaseAuth.instance.currentUser?.email;
 
   Future<void> init() async {
-    if (!DefaultFirebaseOptions.isConfigured || _initialized) return;
+    if (!DefaultFirebaseOptions.isConfigured) return;
+    if (_initialized) return;
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+      try {
+        await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+      } catch (_) {}
+      try {
+        // Web restores the persisted user asynchronously; currentUser is null
+        // until the first authStateChanges event. Checking signedIn before this
+        // is why login/save looked flaky after refresh.
+        await FirebaseAuth.instance
+            .authStateChanges()
+            .first
+            .timeout(const Duration(seconds: 8));
+      } catch (_) {}
+      _authSub ??= FirebaseAuth.instance.authStateChanges().listen((_) {
+        onAuthChanged?.call();
+      });
       _initialized = true;
       lastError = null;
     } catch (e) {
@@ -59,6 +80,15 @@ class CloudSync {
         email: email.trim(),
         password: password,
       );
+      try {
+        await FirebaseAuth.instance
+            .authStateChanges()
+            .first
+            .timeout(const Duration(seconds: 8));
+      } catch (_) {}
+      if (FirebaseAuth.instance.currentUser == null) {
+        return 'unknown';
+      }
       return null;
     } on FirebaseAuthException catch (e) {
       return e.code;

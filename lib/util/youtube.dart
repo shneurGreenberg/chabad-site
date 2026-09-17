@@ -25,4 +25,5 @@ String youtubeThumbnail(String id) =>
 String youtubeWatchUrl(String id) => 'https://www.youtube.com/watch?v=$id';
 
 String youtubeEmbedUrl(String id) =>
-    'https://www.youtube-nocookie.com/embed/$id?rel=0&modestbranding=1';
+    'https://www.youtube-nocookie.com/embed/$id'
+    '?rel=0&modestbranding=1&playsinline=1&fs=1';

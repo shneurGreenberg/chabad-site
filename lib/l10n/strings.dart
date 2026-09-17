@@ -618,6 +618,11 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Cloud sync: connected',
     'ru': 'Облако: подключено'
   },
+  'admin.cloud.saving': {
+    'he': 'שומר לשרת…',
+    'en': 'Saving to server…',
+    'ru': 'Сохранение на сервер…'
+  },
   'admin.cloud.signedInAs': {
     'he': 'מחובר כ־',
     'en': 'Signed in as',
@@ -691,6 +696,16 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'שגיאת רשת בכניסה ל-Firebase — בדקו חיבור ו-Authorized domains',
     'en': 'Firebase sign-in network error — check connection and Authorized domains',
     'ru': 'Сетевая ошибка входа Firebase — проверьте сеть и Authorized domains'
+  },
+  'admin.login.unauthorizedDomain': {
+    'he': 'הדומיין לא מורשה ב-Firebase Auth (Authorized domains). זה לא קוד שגוי.',
+    'en': 'This domain is not in Firebase Auth authorized domains. Not a wrong password.',
+    'ru': 'Домен не в Authorized domains Firebase Auth. Это не неверный пароль.'
+  },
+  'admin.login.operationNotAllowed': {
+    'he': 'כניסת אימייל/סיסמה כבויה ב-Firebase Authentication.',
+    'en': 'Email/password sign-in is disabled in Firebase Authentication.',
+    'ru': 'Вход email/пароль выключен в Firebase Authentication.'
   },
   'admin.logout': {'he': 'יציאה', 'en': 'Log out', 'ru': 'Выйти'},
   'admin.dashboard': {'he': 'לוח בקרה', 'en': 'Dashboard', 'ru': 'Панель'},

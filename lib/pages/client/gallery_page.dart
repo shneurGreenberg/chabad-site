@@ -117,7 +117,7 @@ class GalleryAlbumPage extends StatelessWidget {
       children: [
         PageHero(
           title: trLoc(album.event, loc.lang),
-          subtitle: '${album.year} Â· ${shots.length} ${loc.t('gallery.photos')}',
+          subtitle: '${album.year} · ${shots.length} ${loc.t('gallery.photos')}',
           icon: album.icon,
         ),
         Section(
