@@ -236,23 +236,30 @@ class CloudSync {
         snapshot['programs'] = await _loadList(db, 'programs');
         snapshot['products'] = await _loadList(db, 'products');
         snapshot['gallery'] = await _loadList(db, 'gallery');
-        snapshot['leads'] = await _loadList(db, 'leads');
-        snapshot['donations'] = await _loadList(db, 'donations');
-        snapshot['subscribers'] = await _loadList(db, 'subscribers');
         snapshot['events'] = await _loadList(db, 'events');
-        snapshot['orders'] = await _loadList(db, 'orders');
         snapshot['touristInfo'] = await _loadList(db, 'touristInfo');
         snapshot['banners'] = await _loadBanners(db);
+        // CRM collections are admin-read in rules. Skip them for visitors so a
+        // permission error cannot stall the public snapshot, and so first paint
+        // is not waiting on leads/orders the guest UI never shows.
+        if (signedIn) {
+          snapshot['leads'] = await _loadList(db, 'leads');
+          snapshot['donations'] = await _loadList(db, 'donations');
+          snapshot['subscribers'] = await _loadList(db, 'subscribers');
+          snapshot['orders'] = await _loadList(db, 'orders');
+        }
       }
 
       final images = <String, Uint8List>{};
-      final media = await db.collection('media').get();
-      for (final d in media.docs) {
-        final bytes = decodeMedia(d.data());
-        if (bytes != null && bytes.isNotEmpty) {
-          images[mediaKey(d.id)] = bytes;
+      try {
+        final media = await db.collection('media').get();
+        for (final d in media.docs) {
+          final bytes = decodeMedia(d.data());
+          if (bytes != null && bytes.isNotEmpty) {
+            images[mediaKey(d.id)] = bytes;
+          }
         }
-      }
+      } catch (_) {}
       return CloudPull(snapshot: snapshot, images: images);
     } catch (_) {
       return null;
@@ -339,10 +346,14 @@ class CloudSync {
   }
 
   Future<Map<String, dynamic>> _loadBanners(FirebaseFirestore db) async {
-    final snap = await db.collection('banners').get();
-    return {
-      for (final d in snap.docs) bannerRoute(d.id, d.data()): d.data(),
-    };
+    try {
+      final snap = await db.collection('banners').get();
+      return {
+        for (final d in snap.docs) bannerRoute(d.id, d.data()): d.data(),
+      };
+    } catch (_) {
+      return <String, dynamic>{};
+    }
   }
 
   Future<void> _syncList(
