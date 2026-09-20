@@ -225,10 +225,10 @@ class _GravePhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final src = url?.trim() ?? '';
     if (src.isEmpty) return _fallback();
-    
-    final localUrl = resolveKaddishPhotoUrl(src);
+
+    final localUrl = sameOriginKaddishPhoto(src);
     if (localUrl.isEmpty) return _fallback();
-    
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: CrossOriginImage(
@@ -236,7 +236,13 @@ class _GravePhoto extends StatelessWidget {
         width: 72,
         height: 96,
         fit: BoxFit.cover,
-        error: _fallback(),
+        error: CrossOriginImage(
+          url: resolveKaddishPhotoUrl(src),
+          width: 72,
+          height: 96,
+          fit: BoxFit.cover,
+          error: _fallback(),
+        ),
       ),
     );
   }

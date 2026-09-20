@@ -3025,8 +3025,12 @@ class AppRepository extends ChangeNotifier {
     _diskUpdatedAt = DateTime.tryParse('${m['updatedAt'] ?? ''}');
   }
 
-  /// Local edits win over a stale cloud snapshot (compare updatedAt, then seq).
+  /// Local admin edits win over a stale cloud snapshot (compare updatedAt, then seq).
+  /// Anonymous visitors must always take the published cloud copy so they see
+  /// the last admin save without signing in. Persist-after-pull used to stamp
+  /// IndexedDB with `updatedAt: now`, which then beat Firestore on the next visit.
   bool _localSnapshotFresherThan(Map<String, dynamic> cloud) {
+    if (!CloudSync.instance.signedIn) return false;
     if (!_diskHadSnapshot) return false;
     final cloudAt = DateTime.tryParse('${cloud['updatedAt'] ?? ''}');
     final cloudSeq = (cloud['seq'] as num?)?.toInt() ?? 0;

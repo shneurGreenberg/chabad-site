@@ -53,9 +53,22 @@ String photoUrlFromKaddish(String filename, dynamic crop) {
   return '$kaddishPhotoBase$name?${query.join('&')}';
 }
 
+/// Same-origin cemetery thumb so CanvasKit can paint it.
+/// GitHub Pages ships files under `kaddish-photos/`; Amvera nginx proxies that
+/// path to the live kaddish host (which does not send CORS).
+String sameOriginKaddishPhoto(String? url) {
+  final src = url?.trim() ?? '';
+  if (src.isEmpty) return '';
+  final name = src.split('?').first.split('/').last;
+  if (name.isEmpty || !name.contains('.')) return resolveKaddishPhotoUrl(src);
+  final path = Uri.base.path;
+  final prefix = path.endsWith('/') ? path : '$path/';
+  return Uri.parse('${Uri.base.origin}${prefix}kaddish-photos/$name').toString();
+}
+
 /// Resolves a kaddish photo URL for web.
-/// Amvera Docker builds skip bundling photos (too slow / stuck builds);
-/// use the live kaddish host. GitHub Pages may still ship local copies.
+/// Prefer [sameOriginKaddishPhoto] for CanvasKit; this keeps the absolute host
+/// URL for fallbacks and non-image uses.
 String resolveKaddishPhotoUrl(String? url) {
   final src = url?.trim() ?? '';
   if (src.isEmpty) return '';
