@@ -9,6 +9,7 @@ import '../models.dart';
 import '../theme.dart';
 import '../util/youtube.dart';
 import '../services/cloud_sync.dart';
+import '../services/content_freshness.dart';
 import '../services/image_compress.dart';
 import '../services/location_zmanim.dart';
 import '../services/persist.dart';
@@ -56,7 +57,10 @@ class AppRepository extends ChangeNotifier {
   bool _diskHadSnapshot = false;
   int _diskSeq = 0;
   DateTime? _diskUpdatedAt;
+  String? _appliedCloudUpdatedAt;
   Timer? _saveDebounce;
+  Timer? _publishPoll;
+  AppLifecycleListener? _lifecycle;
   Future<void> _persistChain = Future<void>.value();
   bool _zmanimFresh = false;
   void Function(String message)? onPersistWarning;
@@ -72,13 +76,18 @@ class AppRepository extends ChangeNotifier {
 
   void _notifyUi() => super.notifyListeners();
 
-  /// Ready when local hydrate and cloud pull finish. Cached/seed zmanim are
-  /// applied during hydrate so the splash does not wait on Hebcal.
-  bool get isDataReady => _hydrated && _cloudPulled && _timesReady;
+  /// Local hydrate + zmanim are enough to paint. New visitors also wait until
+  /// the first cloud content pull (or a short timeout) so they are not stuck on
+  /// empty seed when Firestore already has the admin snapshot.
+  bool get isDataReady =>
+      _hydrated && _timesReady && (_cloudPulled || _diskHadSnapshot);
 
   @override
   void dispose() {
     _saveDebounce?.cancel();
+    _publishPoll?.cancel();
+    _lifecycle?.dispose();
+    CloudSync.instance.stopWatchPublished();
     super.dispose();
   }
 
@@ -108,12 +117,7 @@ class AppRepository extends ChangeNotifier {
       debugPrint('Telegram service load failed: $e');
     }
 
-    try {
-      await CloudSync.instance.init();
-    } catch (e) {
-      debugPrint('CloudSync init failed: $e');
-    }
-
+    final init = CloudSync.instance.init();
     try {
       await _hydrate();
     } catch (e) {
@@ -127,16 +131,29 @@ class AppRepository extends ChangeNotifier {
       debugPrint('Zmanim cache restore failed: $e');
     }
     _timesReady = true;
-    // Keep splash until cloud finishes (or times out). Do not block on Hebcal —
-    // cached/seed times are shown immediately; weekly refresh runs after paint.
+    if (_diskHadSnapshot) {
+      _notifyUi();
+    }
+
     try {
-      await _pullCloud().timeout(const Duration(seconds: 8));
+      await init;
+    } catch (e) {
+      debugPrint('CloudSync init failed: $e');
+    }
+
+    // New visitors: wait briefly for published text (not media). Then paint
+    // even if Firestore is slow; a late pull still applies without a refresh.
+    try {
+      await _pullCloud(includeMedia: false)
+          .timeout(const Duration(milliseconds: 2500));
     } catch (e) {
       debugPrint('Cloud pull failed/timed out: $e');
     }
     _cloudPulled = true;
     _notifyUi();
 
+    unawaited(_pullCloud(includeMedia: true));
+    _listenForPublishedUpdates();
     unawaited(_refreshTimesIfStale());
 
     // Cemetery photos can load after first paint.
@@ -2738,11 +2755,11 @@ class AppRepository extends ChangeNotifier {
     return _persistChain;
   }
 
-  Map<String, dynamic> _encodeSnapshot() => {
+  Map<String, dynamic> _encodeSnapshot({String? updatedAt}) => {
         'v': 3,
         'seed': _contentSeed,
         'seq': _seq,
-        'updatedAt': DateTime.now().toIso8601String(),
+        'updatedAt': updatedAt ?? DateTime.now().toIso8601String(),
         'mapsKey': googleMapsApiKey,
         'paletteId': paletteId,
         'location': locationToJson(location),
@@ -3030,20 +3047,14 @@ class AppRepository extends ChangeNotifier {
   /// the last admin save without signing in. Persist-after-pull used to stamp
   /// IndexedDB with `updatedAt: now`, which then beat Firestore on the next visit.
   bool _localSnapshotFresherThan(Map<String, dynamic> cloud) {
-    if (!CloudSync.instance.signedIn) return false;
-    if (!_diskHadSnapshot) return false;
-    final cloudAt = DateTime.tryParse('${cloud['updatedAt'] ?? ''}');
-    final cloudSeq = (cloud['seq'] as num?)?.toInt() ?? 0;
-    final localAt = _diskUpdatedAt;
-    if (localAt != null && cloudAt != null) {
-      final delta = localAt.difference(cloudAt);
-      if (delta.abs() > const Duration(seconds: 2)) {
-        return localAt.isAfter(cloudAt);
-      }
-    } else if (localAt != null && cloudAt == null) {
-      return true;
-    }
-    return _diskSeq > cloudSeq;
+    return localAdminSnapshotWins(
+      signedIn: CloudSync.instance.signedIn,
+      diskHadSnapshot: _diskHadSnapshot,
+      localUpdatedAt: _diskUpdatedAt,
+      cloudUpdatedAt: DateTime.tryParse('${cloud['updatedAt'] ?? ''}'),
+      localSeq: _diskSeq,
+      cloudSeq: (cloud['seq'] as num?)?.toInt() ?? 0,
+    );
   }
 
   void _ensureTouristDefaults() {
@@ -3643,13 +3654,22 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
-  Future<void> _pullCloud() async {
-    final cloud = await CloudSync.instance.pull();
+  Future<void> _pullCloud({bool includeMedia = true}) async {
+    final cloud = await CloudSync.instance.pull(includeMedia: includeMedia);
     if (cloud == null) {
       _cloudPulled = true;
       return;
     }
     _cloudSeen = true;
+
+    final cloudAt = '${cloud.snapshot['updatedAt'] ?? ''}';
+    if (cloudAt.isNotEmpty &&
+        cloudAt == _appliedCloudUpdatedAt &&
+        cloud.images.isEmpty &&
+        !includeMedia) {
+      _cloudPulled = true;
+      return;
+    }
 
     final cartKeep = Map<String, int>.from(_cart);
     final emblemKeep = emblemBytes;
@@ -3696,6 +3716,7 @@ class AppRepository extends ChangeNotifier {
         ...cloud.snapshot,
         'seq': cloud.snapshot['seq'] ?? _seq,
       });
+      if (cloudAt.isNotEmpty) _appliedCloudUpdatedAt = cloudAt;
     }
 
     _cart
@@ -3707,7 +3728,8 @@ class AppRepository extends ChangeNotifier {
     _cloudPulled = true;
 
     try {
-      await persistPut(_snapKey, jsonEncode(_encodeSnapshot()));
+      final stamp = !localWins && cloudAt.isNotEmpty ? cloudAt : null;
+      await persistPut(_snapKey, jsonEncode(_encodeSnapshot(updatedAt: stamp)));
       await _persistCart();
       if (!localWins) {
         for (final e in cloud.images.entries) {
@@ -3719,6 +3741,26 @@ class AppRepository extends ChangeNotifier {
       }
     } catch (_) {}
     if (_hydrated) notifyListeners();
+  }
+
+  void _listenForPublishedUpdates() {
+    CloudSync.instance.watchPublished((at) {
+      if (at == _appliedCloudUpdatedAt) return;
+      if (CloudSync.instance.signedIn) return;
+      unawaited(_pullCloud(includeMedia: true));
+    });
+    _publishPoll?.cancel();
+    _publishPoll = Timer.periodic(const Duration(seconds: 90), (_) {
+      if (CloudSync.instance.signedIn) return;
+      unawaited(_pullCloud(includeMedia: false));
+    });
+    _lifecycle?.dispose();
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        if (CloudSync.instance.signedIn) return;
+        unawaited(_pullCloud(includeMedia: true));
+      },
+    );
   }
 
   Future<void> _persistNow() async {

@@ -20,7 +20,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Construct router only after HashUrlStrategy so deep links (#/tourist, #/history) match.
   createAppRouter();
-  await CloudSync.instance.init();
+  unawaited(CloudSync.instance.init());
   runApp(const ChabadApp());
 }
 

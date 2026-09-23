@@ -34,6 +34,7 @@ class CloudSync {
   String? lastError;
   DateTime? lastOkAt;
   StreamSubscription<User?>? _authSub;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _contentWatch;
 
   bool get enabled => DefaultFirebaseOptions.isConfigured && !_initFailed;
   bool get signedIn =>
@@ -53,12 +54,12 @@ class CloudSync {
       } catch (_) {}
       try {
         // Web restores the persisted user asynchronously; currentUser is null
-        // until the first authStateChanges event. Checking signedIn before this
-        // is why login/save looked flaky after refresh.
+        // until the first authStateChanges event. Guests resolve as null quickly
+        // — do not block first paint for 8s.
         await FirebaseAuth.instance
             .authStateChanges()
             .first
-            .timeout(const Duration(seconds: 8));
+            .timeout(const Duration(seconds: 2));
       } catch (_) {}
       _authSub ??= FirebaseAuth.instance.authStateChanges().listen((_) {
         onAuthChanged?.call();
@@ -220,7 +221,8 @@ class CloudSync {
     }
   }
 
-  Future<CloudPull?> pull() async {
+  /// Published site content. [includeMedia] is the slow path (base64 docs).
+  Future<CloudPull?> pull({bool includeMedia = true}) async {
     await init();
     if (!enabled) return null;
     try {
@@ -232,38 +234,71 @@ class CloudSync {
       final split = snapshot['v'] == 3 || snapshot['news'] is! List;
 
       if (split) {
-        snapshot['news'] = await _loadList(db, 'news');
-        snapshot['programs'] = await _loadList(db, 'programs');
-        snapshot['products'] = await _loadList(db, 'products');
-        snapshot['gallery'] = await _loadList(db, 'gallery');
-        snapshot['events'] = await _loadList(db, 'events');
-        snapshot['touristInfo'] = await _loadList(db, 'touristInfo');
-        snapshot['banners'] = await _loadBanners(db);
-        // CRM collections are admin-read in rules. Skip them for visitors so a
-        // permission error cannot stall the public snapshot, and so first paint
-        // is not waiting on leads/orders the guest UI never shows.
+        final news = _loadList(db, 'news');
+        final programs = _loadList(db, 'programs');
+        final products = _loadList(db, 'products');
+        final gallery = _loadList(db, 'gallery');
+        final events = _loadList(db, 'events');
+        final tourist = _loadList(db, 'touristInfo');
+        final banners = _loadBanners(db);
+        snapshot['news'] = await news;
+        snapshot['programs'] = await programs;
+        snapshot['products'] = await products;
+        snapshot['gallery'] = await gallery;
+        snapshot['events'] = await events;
+        snapshot['touristInfo'] = await tourist;
+        snapshot['banners'] = await banners;
+        // CRM collections are admin-read in rules. Skip them for visitors.
         if (signedIn) {
-          snapshot['leads'] = await _loadList(db, 'leads');
-          snapshot['donations'] = await _loadList(db, 'donations');
-          snapshot['subscribers'] = await _loadList(db, 'subscribers');
-          snapshot['orders'] = await _loadList(db, 'orders');
+          final leads = _loadList(db, 'leads');
+          final donations = _loadList(db, 'donations');
+          final subscribers = _loadList(db, 'subscribers');
+          final orders = _loadList(db, 'orders');
+          snapshot['leads'] = await leads;
+          snapshot['donations'] = await donations;
+          snapshot['subscribers'] = await subscribers;
+          snapshot['orders'] = await orders;
         }
       }
 
       final images = <String, Uint8List>{};
-      try {
-        final media = await db.collection('media').get();
-        for (final d in media.docs) {
-          final bytes = decodeMedia(d.data());
-          if (bytes != null && bytes.isNotEmpty) {
-            images[mediaKey(d.id)] = bytes;
+      if (includeMedia) {
+        try {
+          final media = await db.collection('media').get();
+          for (final d in media.docs) {
+            final bytes = decodeMedia(d.data());
+            if (bytes != null && bytes.isNotEmpty) {
+              images[mediaKey(d.id)] = bytes;
+            }
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
       return CloudPull(snapshot: snapshot, images: images);
     } catch (_) {
       return null;
     }
+  }
+
+  /// Live publish signal. [onChange] gets `updatedAt` whenever Firestore
+  /// `site/content` changes (admin save). First event is the current doc.
+  void watchPublished(void Function(String updatedAt) onChange) {
+    if (!enabled) return;
+    _contentWatch?.cancel();
+    try {
+      _contentWatch = FirebaseFirestore.instance
+          .collection('site')
+          .doc('content')
+          .snapshots()
+          .listen((doc) {
+        final at = '${doc.data()?['updatedAt'] ?? ''}';
+        if (at.isNotEmpty) onChange(at);
+      }, onError: (_) {});
+    } catch (_) {}
+  }
+
+  void stopWatchPublished() {
+    _contentWatch?.cancel();
+    _contentWatch = null;
   }
 
   static String mediaDocId(String key) => key.replaceAll('/', '__');
