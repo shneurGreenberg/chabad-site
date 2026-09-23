@@ -349,20 +349,27 @@ class _CemeteryPersonPageState extends State<CemeteryPersonPage> {
                       _person!.photoUrl!.isNotEmpty) ...[
                     Builder(
                       builder: (context) {
-                        final sameOriginUrl = resolveKaddishPhotoUrl(_person!.photoUrl);
-                        if (sameOriginUrl != null && sameOriginUrl.isNotEmpty) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: CrossOriginImage(
-                              url: sameOriginUrl,
+                        final sameOriginUrl =
+                            sameOriginKaddishPhoto(_person!.photoUrl);
+                        if (sameOriginUrl.isEmpty) {
+                          return _photoFallback(160, 210);
+                        }
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: CrossOriginImage(
+                            url: sameOriginUrl,
+                            width: 160,
+                            height: 210,
+                            fit: BoxFit.cover,
+                            error: CrossOriginImage(
+                              url: resolveKaddishPhotoUrl(_person!.photoUrl),
                               width: 160,
                               height: 210,
                               fit: BoxFit.cover,
                               error: _photoFallback(160, 210),
                             ),
-                          );
-                        }
-                        return _photoFallback(160, 210);
+                          ),
+                        );
                       },
                     ),
                   ] else
