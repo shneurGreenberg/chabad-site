@@ -35,6 +35,7 @@ class CloudSync {
   DateTime? lastOkAt;
   StreamSubscription<User?>? _authSub;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _contentWatch;
+  Future<CloudPull?>? _warmFuture;
 
   bool get enabled => DefaultFirebaseOptions.isConfigured && !_initFailed;
   bool get signedIn =>
@@ -219,6 +220,29 @@ class CloudSync {
       lastError = 'unknown';
       return 'unknown';
     }
+  }
+
+  /// Start Firebase + public content fetch during Flutter/CanvasKit boot.
+  Future<void> warmPublic() async {
+    _warmFuture ??= () async {
+      await init();
+      return pull(includeMedia: false);
+    }();
+    try {
+      await _warmFuture;
+    } catch (_) {}
+  }
+
+  Future<CloudPull?> takeWarmOrPull({required bool includeMedia}) async {
+    if (!includeMedia && _warmFuture != null) {
+      final pending = _warmFuture;
+      _warmFuture = null;
+      try {
+        final warmed = await pending;
+        if (warmed != null) return warmed;
+      } catch (_) {}
+    }
+    return pull(includeMedia: includeMedia);
   }
 
   /// Published site content. [includeMedia] is the slow path (base64 docs).

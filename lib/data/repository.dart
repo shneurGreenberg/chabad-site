@@ -117,7 +117,8 @@ class AppRepository extends ChangeNotifier {
       debugPrint('Telegram service load failed: $e');
     }
 
-    final init = CloudSync.instance.init();
+    // Firebase init + public pull start in main() via warmPublic, overlapping
+    // CanvasKit. Do not await Auth here — that used to add up to 8s of splash.
     try {
       await _hydrate();
     } catch (e) {
@@ -133,12 +134,6 @@ class AppRepository extends ChangeNotifier {
     _timesReady = true;
     if (_diskHadSnapshot) {
       _notifyUi();
-    }
-
-    try {
-      await init;
-    } catch (e) {
-      debugPrint('CloudSync init failed: $e');
     }
 
     // New visitors: wait briefly for published text (not media). Then paint
@@ -3655,7 +3650,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> _pullCloud({bool includeMedia = true}) async {
-    final cloud = await CloudSync.instance.pull(includeMedia: includeMedia);
+    final cloud = await CloudSync.instance.takeWarmOrPull(includeMedia: includeMedia);
     if (cloud == null) {
       _cloudPulled = true;
       return;
