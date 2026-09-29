@@ -1,26 +1,29 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repository.dart';
 import 'l10n/strings.dart';
 import 'router.dart';
 import 'services/cloud_sync.dart';
+import 'services/url_strategy.dart';
 import 'state/auth.dart';
 import 'theme.dart';
+import 'widgets/boot_splash.dart';
 
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> main() async {
   // Hash URLs so GitHub Pages / Amvera can open /#/cemetery without a server 404.
   // MUST run before GoRouter is constructed (see createAppRouter in router.dart).
-  setUrlStrategy(HashUrlStrategy());
+  useHashUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   // Construct router only after HashUrlStrategy so deep links (#/tourist, #/history) match.
   createAppRouter();
   unawaited(CloudSync.instance.warmPublic());
+  // Logo doc only — do not wait for the rest of the media collection.
+  unawaited(CloudSync.instance.warmEmblem());
   runApp(const ChabadApp());
 }
 
@@ -60,6 +63,8 @@ class _ChabadAppState extends State<ChabadApp> {
   @override
   void dispose() {
     _locale.removeListener(_onLocaleChanged);
+    _locale.dispose();
+    _repo.dispose();
     super.dispose();
   }
 
@@ -97,31 +102,8 @@ class _ChabadAppState extends State<ChabadApp> {
               ],
               home: Directionality(
                 textDirection: locale.direction,
-                child: Scaffold(
-                  body: Container(
-                    decoration: BoxDecoration(gradient: AppColors.heroGradient),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(color: AppColors.accent),
-                          const SizedBox(height: 24),
-                          Text(
-                            locale.lang == 'he'
-                                ? 'טוען...'
-                                : locale.lang == 'ru'
-                                    ? 'Загрузка...'
-                                    : 'Loading...',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                child: const Scaffold(
+                  body: CommunityBootSplash(),
                 ),
               ),
             );

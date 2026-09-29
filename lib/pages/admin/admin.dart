@@ -1507,6 +1507,9 @@ class _GalleryEditorState extends State<_GalleryEditor> {
   };
   late final _year =
       TextEditingController(text: '${widget.photo.year}');
+  bool _uploading = false;
+  int _uploadDone = 0;
+  int _uploadTotal = 0;
 
   @override
   void dispose() {
@@ -1523,7 +1526,9 @@ class _GalleryEditorState extends State<_GalleryEditor> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 620, maxHeight: 680),
-        child: Column(
+        child: Stack(
+          children: [
+            Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(20),
@@ -1575,23 +1580,52 @@ class _GalleryEditorState extends State<_GalleryEditor> {
             ),
           ],
         ),
+            if (_uploading)
+              Positioned.fill(
+                child: GalleryUploadOverlay(
+                  done: _uploadDone,
+                  total: _uploadTotal,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _addPhotos() async {
+    if (_uploading) return;
     final picked = await ImagePicker().pickMultiImage(
       maxWidth: 1800,
       imageQuality: 86,
     );
-    if (picked.isEmpty) return;
+    if (picked.isEmpty || !mounted) return;
+    setState(() {
+      _uploading = true;
+      _uploadDone = 0;
+      _uploadTotal = picked.length;
+    });
     final files = <Uint8List>[];
     for (final f in picked) {
-      files.add(await f.readAsBytes());
+      final bytes = await f.readAsBytes();
+      files.add(bytes);
+      // Yield so the progress card can paint while files are read.
+      await Future<void>.delayed(const Duration(milliseconds: 1));
+      if (!mounted) return;
     }
+    await widget.repo.addGalleryShots(
+      widget.photo,
+      files,
+      onProgress: (done, total) {
+        if (!mounted) return;
+        setState(() {
+          _uploadDone = done;
+          _uploadTotal = total;
+        });
+      },
+    );
     if (!mounted) return;
-    widget.repo.addGalleryShots(widget.photo, files);
-    setState(() {});
+    setState(() => _uploading = false);
   }
 
   void _save() {

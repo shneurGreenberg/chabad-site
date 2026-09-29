@@ -36,6 +36,12 @@ class CloudSync {
   StreamSubscription<User?>? _authSub;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _contentWatch;
   Future<CloudPull?>? _warmFuture;
+  Future<void>? _initGate;
+  Future<void>? _emblemFuture;
+
+  /// Community logo (`media/emblem:logo`) fetched on its own, ahead of the
+  /// full media collection. Null until [warmEmblem] finishes.
+  Uint8List? earlyEmblem;
 
   bool get enabled => DefaultFirebaseOptions.isConfigured && !_initFailed;
   bool get signedIn =>
@@ -43,7 +49,18 @@ class CloudSync {
 
   String? get currentEmail => FirebaseAuth.instance.currentUser?.email;
 
-  Future<void> init() async {
+  Future<void> init() {
+    if (_initialized || _initFailed) return Future<void>.value();
+    final pending = _initGate;
+    if (pending != null) return pending;
+    final run = _initOnce();
+    _initGate = run;
+    return run.whenComplete(() {
+      if (!_initialized) _initGate = null;
+    });
+  }
+
+  Future<void> _initOnce() async {
     if (!DefaultFirebaseOptions.isConfigured) return;
     if (_initialized) return;
     try {
@@ -220,6 +237,26 @@ class CloudSync {
       lastError = 'unknown';
       return 'unknown';
     }
+  }
+
+  /// One Firestore read for the super-admin's community logo. The full media
+  /// collection is dozens of base64 docs and used to delay the header emblem
+  /// until long after first paint.
+  Future<void> warmEmblem() {
+    _emblemFuture ??= () async {
+      await init();
+      if (!enabled) return;
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('media')
+            .doc(mediaDocId('emblem:logo'))
+            .get();
+        if (!doc.exists || doc.data() == null) return;
+        final bytes = decodeMedia(doc.data()!);
+        if (bytes != null && bytes.isNotEmpty) earlyEmblem = bytes;
+      } catch (_) {}
+    }();
+    return _emblemFuture!;
   }
 
   /// Start Firebase + public content fetch during Flutter/CanvasKit boot.

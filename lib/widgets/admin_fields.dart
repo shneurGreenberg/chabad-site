@@ -468,3 +468,112 @@ class AlbumPhotosPicker extends StatelessWidget {
     );
   }
 }
+
+/// Progress card shown while a batch of gallery photos is compressed and added.
+class GalleryUploadOverlay extends StatefulWidget {
+  const GalleryUploadOverlay({
+    super.key,
+    required this.done,
+    required this.total,
+  });
+  final int done;
+  final int total;
+
+  @override
+  State<GalleryUploadOverlay> createState() => _GalleryUploadOverlayState();
+}
+
+class _GalleryUploadOverlayState extends State<GalleryUploadOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    final done = widget.done;
+    final total = widget.total;
+    final progress =
+        total <= 0 ? null : (done / total).clamp(0.0, 1.0).toDouble();
+    final label = loc
+        .t('admin.gallery.uploadProgress')
+        .replaceAll('{done}', '$done')
+        .replaceAll('{total}', '$total');
+    return ColoredBox(
+      key: const ValueKey('gallery-upload-progress'),
+      color: const Color(0xCC0B1C3A),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 24,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedBuilder(
+                    animation: _pulse,
+                    builder: (context, child) => Transform.translate(
+                      offset: Offset(0, -6 * _pulse.value),
+                      child: child,
+                    ),
+                    child: Icon(
+                      Icons.cloud_upload_outlined,
+                      size: 36,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    loc.t('admin.gallery.uploading'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    label,
+                    key: const ValueKey('gallery-upload-count'),
+                    style: TextStyle(color: AppColors.muted, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 14),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: LinearProgressIndicator(
+                      minHeight: 8,
+                      value: progress,
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
