@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository.dart';
+import '../../services/gallery_viewer_history.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
 import '../../widgets/cards.dart';
@@ -194,9 +195,17 @@ class _AlbumShotTile extends StatelessWidget {
 }
 
 class GalleryLightbox extends StatefulWidget {
-  const GalleryLightbox({super.key, required this.shots, required this.initialIndex});
+  const GalleryLightbox({
+    super.key,
+    required this.shots,
+    required this.initialIndex,
+    this.history,
+  });
   final List<GalleryShot> shots;
   final int initialIndex;
+
+  /// Injected in tests. The browser build pushes a history entry itself.
+  final GalleryViewerHistory? history;
 
   @override
   State<GalleryLightbox> createState() => _GalleryLightboxState();
@@ -206,12 +215,40 @@ class _GalleryLightboxState extends State<GalleryLightbox> {
   late final _page = PageController(initialPage: widget.initialIndex);
   late final _thumbs = ScrollController();
   late int _index = widget.initialIndex;
+  late final GalleryViewerHistory _history =
+      widget.history ?? GalleryViewerHistory.platform();
+  bool _closing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _history.bindClose(_popViewer);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _closing) return;
+      _history.open();
+    });
+  }
 
   @override
   void dispose() {
+    _history.abandonIfStillOpen();
+    _history.detach();
     _page.dispose();
     _thumbs.dispose();
     super.dispose();
+  }
+
+  void _popViewer() {
+    if (_closing || !mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
+    _closing = true;
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
+  void _requestClose() {
+    final waitForPop = _history.closeFromUi();
+    if (!waitForPop) _popViewer();
   }
 
   void _go(int index) {
@@ -243,12 +280,12 @@ class _GalleryLightboxState extends State<GalleryLightbox> {
       bindings: {
         const SingleActivator(LogicalKeyboardKey.arrowLeft): () => _go(_index - 1),
         const SingleActivator(LogicalKeyboardKey.arrowRight): () => _go(_index + 1),
-        const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.pop(context),
+        const SingleActivator(LogicalKeyboardKey.escape): _requestClose,
       },
       child: Focus(
         autofocus: true,
         child: GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: _requestClose,
           child: Stack(
             children: [
               PageView.builder(
@@ -281,7 +318,7 @@ class _GalleryLightboxState extends State<GalleryLightbox> {
                   key: const ValueKey('gallery-close'),
                   tooltip: loc.t('common.close'),
                   style: IconButton.styleFrom(backgroundColor: Colors.black54),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _requestClose,
                   icon: const PlayfulIcon(Icons.close, color: Colors.white),
                 ),
               ),

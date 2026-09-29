@@ -914,12 +914,6 @@ class _SiteFooter extends StatelessWidget {
                                 ? _socialWhatsApp(s.url)
                                 : _social(s.icon, s.url),
                           ),
-                        // If WhatsApp not in links but contact.phone can form wa.me URL
-                        if (repo.links.whatsapp.trim().isEmpty &&
-                            waMeUrl(repo.contact.phone) != null)
-                          HoverScale(
-                            child: _socialWhatsApp(waMeUrl(repo.contact.phone)!),
-                          ),
                       ]),
                     ],
                   ),
@@ -1097,25 +1091,20 @@ class _FloatContact extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final phone = repo.links.whatsapp.trim().isEmpty
-        ? repo.contact.phone
-        : repo.links.whatsapp;
-    final wa = waMeUrl(phone);
+    final wa = whatsAppChatUrl(repo.links.whatsapp);
     final tel = telUrl(repo.contact.phone);
-    if (wa == null && tel == null) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (wa != null)
-          FloatingActionButton(
-            heroTag: 'wa',
-            backgroundColor: const Color(0xFF25D366),
-            foregroundColor: Colors.white,
-            tooltip: loc.t('social.whatsapp'),
-            onPressed: () => openUrl(wa),
-            child: const WhatsAppIcon(size: 28, color: Colors.white),
-          ),
-        if (wa != null && tel != null) const SizedBox(height: 10),
+        FloatingActionButton(
+          heroTag: 'wa',
+          backgroundColor: const Color(0xFF25D366),
+          foregroundColor: Colors.white,
+          tooltip: loc.t('social.whatsapp'),
+          onPressed: () => openUrl(wa),
+          child: const WhatsAppIcon(size: 28, color: Colors.white),
+        ),
+        if (tel != null) const SizedBox(height: 10),
         if (tel != null)
           FloatingActionButton.small(
             heroTag: 'tel',

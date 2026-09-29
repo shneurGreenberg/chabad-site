@@ -77,6 +77,92 @@ void main() {
       );
     });
 
+    test('upcoming parasha skips past and undated portions', () {
+      final items = [
+        {
+          'category': 'parashat',
+          'title': 'Parashat Kedoshim',
+          'hebrew': 'פרשת קדושים',
+          'date': '2026-05-09',
+        },
+        {
+          'category': 'parashat',
+          'title': 'Parashat Kedoshim',
+          'hebrew': 'פרשת קדושים',
+        },
+        {
+          'category': 'parashat',
+          'title': 'Parashat Bereshit',
+          'hebrew': 'פרשת בראשית',
+          'date': '2026-10-10',
+        },
+        {
+          'category': 'parashat',
+          'title': 'Parashat Noach',
+          'hebrew': 'פרשת נח',
+          'date': '2026-10-17',
+        },
+      ];
+      final today = DateTime(2026, 9, 29);
+      final item = upcomingParashaItem(items, today: today);
+      expect(parashaTitle(item), 'Parashat Bereshit');
+      expect(parashaTitle(item, hebrew: true), 'פרשת בראשית');
+      expect(parashaDateKey(item), '2026-10-10');
+      expect(parashaTitle(item), isNot(contains('Kedoshim')));
+    });
+
+    test('only a past parasha yields nothing to display', () {
+      final items = [
+        {
+          'category': 'parashat',
+          'title': 'Parashat Kedoshim',
+          'hebrew': 'פרשת קדושים',
+          'date': '2026-05-09',
+        },
+      ];
+      expect(
+        upcomingParashaItem(items, today: DateTime(2026, 9, 29)),
+        isNull,
+      );
+    });
+
+    test('cached parasha without a current date is stale', () {
+      expect(
+        parashaCacheIsCurrent(
+          {'parasha_he': 'פרשת קדושים', 'parasha_en': 'Parashat Kedoshim'},
+          DateTime(2026, 9, 29),
+        ),
+        isFalse,
+      );
+      expect(
+        parashaCacheIsCurrent(
+          {
+            'parasha_he': 'פרשת קדושים',
+            'parasha_date': '2026-05-09',
+          },
+          DateTime(2026, 9, 29),
+        ),
+        isFalse,
+      );
+      expect(
+        parashaCacheIsCurrent(
+          {
+            'parasha_he': 'פרשת בראשית',
+            'parasha_date': '2026-10-10',
+          },
+          DateTime(2026, 9, 29),
+        ),
+        isTrue,
+      );
+      expect(
+        parashaCacheIsCurrent(
+          {'candle': '18:42'},
+          DateTime(2026, 9, 29),
+        ),
+        isTrue,
+      );
+    });
+
     test('rejects placeholder candle times', () {
       final loc = SiteLocation.novosibirsk();
       final cache = sample(

@@ -649,7 +649,15 @@ class AppRepository extends ChangeNotifier {
     }
     if (cache == null) return;
     _applyCachedZmanim(cache);
-    _zmanimFresh = cache.isFreshFor(location);
+    if (!parashaCacheIsCurrent(shabbat, DateTime.now())) {
+      shabbat['parasha_he'] = '';
+      shabbat['parasha_en'] = '';
+      shabbat['parasha_ru'] = '';
+      shabbat['parasha_date'] = '';
+      _zmanimFresh = false;
+    } else {
+      _zmanimFresh = cache.isFreshFor(location);
+    }
   }
 
   void _applyCachedZmanim(CachedZmanim cache) {

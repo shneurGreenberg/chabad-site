@@ -24,6 +24,15 @@ void main() {
     test('telUrl keeps country code', () {
       expect(telUrl('+7 (383) 222-20-23'), 'tel:+73832222023');
     });
+
+    test('WhatsApp chat opens Zoya, not the synagogue landline', () {
+      expect(communityWhatsAppUrl, 'https://wa.me/79039004320');
+      expect(whatsAppChatUrl(''), communityWhatsAppUrl);
+      expect(whatsAppChatUrl('+7 (383) 222-20-23'), communityWhatsAppUrl);
+      expect(whatsAppChatUrl('https://wa.me/73832222023'), communityWhatsAppUrl);
+      expect(whatsAppChatUrl('+7 903 900-43-20'), communityWhatsAppUrl);
+      expect(waMeUrl('+7 903 900-43-20'), 'https://wa.me/79039004320');
+    });
   });
 
   group('static maps', () {

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../services/links.dart';
 
 Loc locFrom(dynamic v) {
   if (v is! Map) return {};
@@ -737,7 +738,9 @@ void linksFromJson(SiteLinks target, dynamic raw) {
   if (m['website'] != null) target.website = '${m['website']}';
   if (m['donateUrl'] != null) target.donateUrl = '${m['donateUrl']}';
   if (m['bankDetails'] != null) target.bankDetails = '${m['bankDetails']}';
-  if (m['whatsapp'] != null) target.whatsapp = '${m['whatsapp']}';
+  if (m['whatsapp'] != null) {
+    target.whatsapp = whatsAppChatUrl('${m['whatsapp']}');
+  }
   if (m['notifyChatId'] != null) target.notifyChatId = '${m['notifyChatId']}';
   if (m['adminEmails'] != null) target.adminEmails = '${m['adminEmails']}';
 }

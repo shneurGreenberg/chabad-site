@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import 'services/links.dart';
+
 /// A piece of text available in the three supported languages.
 ///
 /// Keys are locale codes: `he`, `en`, `ru`.
@@ -593,7 +595,7 @@ class SiteLinks {
     this.website = 'http://jewishsib.com',
     this.donateUrl = '',
     this.bankDetails = '',
-    this.whatsapp = '',
+    this.whatsapp = communityWhatsAppUrl,
     this.notifyChatId = '',
     this.adminEmails = 'admin@chabad-city.org',
   });
@@ -632,8 +634,11 @@ class SiteLinks {
         ),
       if (website.trim().isNotEmpty)
         (icon: Icons.language, url: website.trim(), labelKey: 'social.website'),
-      if (whatsapp.trim().isNotEmpty)
-        (icon: Icons.chat, url: whatsapp.trim(), labelKey: 'social.whatsapp'),
+      (
+        icon: Icons.chat,
+        url: whatsAppChatUrl(whatsapp),
+        labelKey: 'social.whatsapp',
+      ),
     ];
   }
 }

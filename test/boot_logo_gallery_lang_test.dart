@@ -11,7 +11,9 @@ import 'package:flutter_app/data/repository.dart';
 import 'package:flutter_app/l10n/strings.dart';
 import 'package:flutter_app/models.dart';
 import 'package:flutter_app/pages/client/gallery_page.dart';
+import 'package:flutter_app/pages/client/library_page.dart';
 import 'package:flutter_app/services/emblem_cache.dart';
+import 'package:flutter_app/services/gallery_viewer_history.dart';
 import 'package:flutter_app/services/web_prefs.dart';
 import 'package:flutter_app/widgets/admin_fields.dart';
 import 'package:flutter_app/widgets/boot_splash.dart';
@@ -235,5 +237,132 @@ void main() {
     expect(album.photos, hasLength(2));
     expect(seen.last, 2);
     repo.dispose();
+  });
+
+  test('browser back closes only the open gallery viewer', () {
+    var pushed = 0;
+    var backs = 0;
+    final history = GalleryViewerHistory(
+      pushState: () => pushed++,
+      historyBack: () => backs++,
+      backEmitsPop: true,
+    );
+    history.open();
+    expect(pushed, 1);
+    expect(history.viewerOpen, isTrue);
+    expect(history.onPopState(), isTrue);
+    expect(history.viewerOpen, isFalse);
+    expect(backs, 0);
+    expect(history.onPopState(), isFalse);
+
+    history.open();
+    expect(history.closeFromUi(), isTrue);
+    expect(backs, 1);
+    expect(history.onPopState(), isTrue);
+    expect(history.onPopState(), isFalse);
+  });
+
+  testWidgets('gallery back removes the viewer and leaves the page', (tester) async {
+    final shots = [
+      GalleryShot(id: 'a', imageBytes: png),
+      GalleryShot(id: 'b', imageBytes: png),
+    ];
+    late GalleryViewerHistory history;
+    history = GalleryViewerHistory(
+      pushState: () {},
+      historyBack: () => history.onPopState(),
+      backEmitsPop: true,
+    );
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => LocaleController('ru'),
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Column(
+                children: [
+                  const Text('gallery-page'),
+                  TextButton(
+                    onPressed: () {
+                      showDialog<void>(
+                        context: context,
+                        builder: (_) => GalleryLightbox(
+                          shots: shots,
+                          initialIndex: 0,
+                          history: history,
+                        ),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.byType(GalleryLightbox), findsOneWidget);
+    expect(find.text('gallery-page'), findsOneWidget);
+
+    expect(history.onPopState(), isTrue);
+    await tester.pumpAndSettle();
+    expect(find.byType(GalleryLightbox), findsNothing);
+    expect(find.text('gallery-page'), findsOneWidget);
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('gallery-close')));
+    await tester.pumpAndSettle();
+    expect(find.byType(GalleryLightbox), findsNothing);
+    expect(find.text('gallery-page'), findsOneWidget);
+  });
+
+  testWidgets('shiur player closes without crashing', (tester) async {
+    final shiur = Shiur(
+      id: 'lesson-1',
+      title: const {'he': 'שיעור', 'en': 'Lesson', 'ru': 'Урок'},
+      rabbi: const {'he': 'רב', 'en': 'Rabbi', 'ru': 'Раввин'},
+      topic: const {'he': 'תורה', 'en': 'Torah', 'ru': 'Тора'},
+      durationMinutes: 20,
+      date: DateTime(2026, 9, 1),
+      youtubeUrl: 'https://www.youtube.com/watch?v=OVKQe9fiNu8',
+    );
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => LocaleController('ru'),
+        child: MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => ShiurPlayerDialog(shiur: shiur),
+                  );
+                },
+                child: const Text('open-lesson'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.tap(find.text('open-lesson'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShiurPlayerDialog), findsOneWidget);
+    expect(find.text('Урок'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const ValueKey('shiur-close')));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShiurPlayerDialog), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 }
