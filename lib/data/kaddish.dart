@@ -1,11 +1,96 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 import '../models.dart';
+import '../services/yahrzeit.dart';
 
 /// Live Novosibirsk kaddish registry used by the cemetery page.
 const kaddishHost = 'https://synagogue-kadish-shneur.amvera.io';
-const kaddishPeopleApi = '$kaddishHost/s/novosibirsk/api/people';
 const kaddishBoardApi = '$kaddishHost/s/novosibirsk/api/board';
+const kaddishBoardFullApi = '$kaddishBoardApi?slim=0';
 const kaddishBoardPersonApi = '$kaddishHost/s/novosibirsk/api/board/person';
 const kaddishPhotoBase = '$kaddishHost/photos/';
+
+/// Direct board call. Long enough for a slow phone, short of the old 22s proxy.
+const kaddishDirectTimeout = Duration(seconds: 8);
+
+/// One CORS fallback after the real URL fails to connect. Not a retry chain.
+const kaddishProxyTimeout = Duration(seconds: 5);
+
+/// HTTP result for the board loader. A null return means the call did not
+/// connect (CORS or network), which is the only case that may use a proxy.
+class KaddishResponse {
+  const KaddishResponse(this.statusCode, this.body);
+  final int statusCode;
+  final String body;
+}
+
+typedef KaddishGet = Future<KaddishResponse?> Function(
+  String url,
+  Duration timeout,
+);
+
+String kaddishProxyUrl(String target) =>
+    'https://corsproxy.io/?${Uri.encodeComponent(target)}';
+
+/// True when the short board omitted biography text.
+bool boardDropsText(List<Map<String, dynamic>> people) {
+  if (people.isEmpty) return false;
+  return people.every((person) => !person.containsKey('text'));
+}
+
+Future<KaddishResponse?> kaddishHttpGet(String url, Duration timeout) async {
+  try {
+    final res = await http
+        .get(Uri.parse(url), headers: const {'Accept': 'application/json'})
+        .timeout(timeout);
+    return KaddishResponse(res.statusCode, res.body);
+  } catch (_) {
+    return null;
+  }
+}
+
+/// Loads graves from the public board. The people collection URL is never
+/// requested. `?slim=0` is used only when the short board drops `text`.
+/// A connecting failure uses one short proxy attempt after the real URL.
+Future<List<Grave>> fetchKaddishBoardGraves({KaddishGet? get}) async {
+  final fetch = get ?? kaddishHttpGet;
+  var usedProxy = false;
+
+  Future<List<Map<String, dynamic>>?> load(String url) async {
+    final direct = await fetch(url, kaddishDirectTimeout);
+    final directPeople = _peopleIfOk(direct);
+    if (directPeople != null) return directPeople;
+    if (direct != null) return null;
+    if (usedProxy) return null;
+    usedProxy = true;
+    return _peopleIfOk(await fetch(kaddishProxyUrl(url), kaddishProxyTimeout));
+  }
+
+  final short = await load(kaddishBoardApi);
+  if (short == null || short.isEmpty) return const [];
+  if (!boardDropsText(short)) {
+    return [for (final person in short) graveFromKaddish(person)];
+  }
+  final full = await load(kaddishBoardFullApi);
+  final people = (full != null && full.isNotEmpty) ? full : short;
+  return [for (final person in people) graveFromKaddish(person)];
+}
+
+List<Map<String, dynamic>>? _peopleIfOk(KaddishResponse? res) {
+  if (res == null) return null;
+  if (res.statusCode < 200 || res.statusCode >= 300 || res.body.isEmpty) {
+    return null;
+  }
+  try {
+    final people = peopleFromKaddishJson(jsonDecode(res.body));
+    if (people.isEmpty) return null;
+    return people;
+  } catch (_) {
+    return null;
+  }
+}
 
 /// Files that exist on the photo host even when the board record has no photo.
 const kaddishExtraPhotos = {193: '193.jpg'};
@@ -63,7 +148,8 @@ String sameOriginKaddishPhoto(String? url) {
   if (name.isEmpty || !name.contains('.')) return resolveKaddishPhotoUrl(src);
   final path = Uri.base.path;
   final prefix = path.endsWith('/') ? path : '$path/';
-  return Uri.parse('${Uri.base.origin}${prefix}kaddish-photos/$name').toString();
+  return Uri.parse('${Uri.base.origin}${prefix}kaddish-photos/$name')
+      .toString();
 }
 
 /// Resolves a kaddish photo URL for web.
@@ -138,6 +224,14 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
 
   final title = '${m['title'] ?? ''}'.trim();
   final bioText = '${m['text'] ?? ''}'.trim();
+  final storedHebrew = hebrewDeathLabelFromKaddish(m['hebrewDateOfDeath']);
+  final yahrzeit = (deathYear != null && deathMonth != null && deathDay != null)
+      ? hebrewYahrzeitFromGregorian(
+          year: deathYear,
+          month: deathMonth,
+          day: deathDay,
+        )
+      : null;
   return Grave(
     id: 'kaddish-$id',
     name: '${m['name'] ?? ''}'.trim(),
@@ -150,38 +244,9 @@ Grave graveFromKaddish(Map<String, dynamic> m) {
     row: '${m['row'] ?? ''}'.trim(),
     notes: title.isEmpty ? const {} : {'he': title, 'en': title, 'ru': title},
     photoUrl: photoUrl,
-    hebrewDeathLabel: hebrewDeathLabelFromKaddish(m['hebrewDateOfDeath']),
+    hebrewDeathLabel: (yahrzeit != null && yahrzeit.label.isNotEmpty)
+        ? yahrzeit.label
+        : storedHebrew,
     biographyHtml: bioText.isEmpty ? null : bioText,
   );
-}
-
-List<Grave> mergeKaddishGraves(List<Grave> live, List<Grave> bundled) {
-  if (live.isEmpty) return bundled;
-  final extras = {for (final g in bundled) g.id: g};
-  return [
-    for (final g in live) _withLocalExtras(g, extras[g.id]),
-  ];
-}
-
-Grave _withLocalExtras(Grave live, Grave? bundled) {
-  if (bundled == null) return live;
-  if (live.hebrewName.isEmpty && bundled.hebrewName.isNotEmpty) {
-    live.hebrewName = bundled.hebrewName;
-  }
-  if (live.section.isEmpty && bundled.section.isNotEmpty) {
-    live.section = bundled.section;
-  }
-  if (live.row.isEmpty && bundled.row.isNotEmpty) {
-    live.row = bundled.row;
-  }
-  live.birthYear ??= bundled.birthYear;
-  if ((live.photoUrl == null || live.photoUrl!.trim().isEmpty) &&
-      bundled.photoUrl != null &&
-      bundled.photoUrl!.trim().isNotEmpty) {
-    live.photoUrl = bundled.photoUrl;
-  }
-  if (live.hebrewDeathLabel.isEmpty && bundled.hebrewDeathLabel.isNotEmpty) {
-    live.hebrewDeathLabel = bundled.hebrewDeathLabel;
-  }
-  return live;
 }

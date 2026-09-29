@@ -18,7 +18,6 @@ import '../services/notify.dart';
 import '../services/telegram.dart';
 import '../services/web_prefs.dart';
 import '../services/yahrzeit.dart';
-import '../services/cors_proxy.dart';
 import 'holidays.dart';
 import 'kaddish.dart';
 import 'snapshot.dart';
@@ -180,7 +179,7 @@ class AppRepository extends ChangeNotifier {
 
   Future<void> _loadBackgroundData() async {
     try {
-      await _loadKaddishGraves();
+      await refreshKaddishGraves();
     } catch (e) {
       debugPrint('Kaddish graves load failed: $e');
     }
@@ -1237,7 +1236,20 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   late final List<Grave> graves = [];
 
-  Future<void> refreshKaddishGraves() => _loadKaddishGraves();
+  /// True until the board request (or its bundled fallback) has finished.
+  bool kaddishLoading = true;
+
+  Future<void>? _kaddishFlight;
+
+  Future<void> refreshKaddishGraves() {
+    final current = _kaddishFlight;
+    if (current != null) return current;
+    final flight = _loadKaddishGraves();
+    _kaddishFlight = flight;
+    return flight.whenComplete(() {
+      if (identical(_kaddishFlight, flight)) _kaddishFlight = null;
+    });
+  }
 
   Grave? graveById(String id) {
     try {
@@ -1247,56 +1259,46 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
-  /// Fetch full person details from the kaddish API, including biography.
-  /// Tries /api/board/person/:id first (live endpoint), then /api/people/:id as fallback.
-  /// CORS is allowed (Access-Control-Allow-Origin: *), so no proxy needed.
+  /// One person from the public board. The people collection is not requested.
   Future<Grave?> fetchPersonDetail(String id) async {
-    // Extract numeric ID from kaddish-XXX format
     final numericId = id.replaceFirst('kaddish-', '');
-    
-    // Try /api/board/person/:id first (live endpoint with biographies)
     try {
       final boardUrl = '$kaddishBoardPersonApi/$numericId';
-      final res = await http.get(Uri.parse(boardUrl)).timeout(const Duration(seconds: 10));
+      final res = await http
+          .get(Uri.parse(boardUrl))
+          .timeout(kaddishDirectTimeout);
       if (res.statusCode >= 200 && res.statusCode < 300) {
         final json = jsonDecode(res.body);
         final person = personFromApiResponse(json);
-        if (person != null) {
-          return graveFromKaddish(person);
-        }
+        if (person != null) return graveFromKaddish(person);
       }
-    } catch (_) {
-      // Continue to people API fallback
-    }
-    
-    // Fallback to /api/people/:id (currently 404, will be available later)
-    try {
-      final peopleUrl = '$kaddishPeopleApi/$numericId';
-      final res = await http.get(Uri.parse(peopleUrl)).timeout(const Duration(seconds: 10));
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        final json = jsonDecode(res.body);
-        final person = personFromApiResponse(json);
-        if (person != null) {
-          return graveFromKaddish(person);
-        }
-      }
-    } catch (_) {
-      // API not available or error
-    }
-    
-    // Final fallback to existing grave data
+    } catch (_) {}
     return graveById(id);
   }
 
   Future<void> _loadKaddishGraves() async {
-    final bundled = await _loadBundledKaddishGraves();
-    if (bundled.isNotEmpty) {
-      _applyKaddishGraves(bundled);
+    if (!kaddishLoading) {
+      kaddishLoading = true;
+      _notifyUi();
     }
-    final live = await _fetchLiveKaddishGraves();
-    final fromFile = mergeKaddishGraves(live, bundled);
-    if (fromFile.isEmpty) return;
-    _applyKaddishGraves(fromFile);
+    try {
+      final live = await fetchKaddishBoardGraves();
+      if (live.isNotEmpty) {
+        _applyKaddishGraves(live);
+        return;
+      }
+      final bundled = await _loadBundledKaddishGraves();
+      if (bundled.isNotEmpty) _applyKaddishGraves(bundled);
+    } catch (e) {
+      debugPrint('Kaddish graves load failed: $e');
+      try {
+        final bundled = await _loadBundledKaddishGraves();
+        if (bundled.isNotEmpty) _applyKaddishGraves(bundled);
+      } catch (_) {}
+    } finally {
+      kaddishLoading = false;
+      _notifyUi();
+    }
   }
 
   void _applyKaddishGraves(List<Grave> fromFile) {
@@ -1319,19 +1321,6 @@ class AppRepository extends ChangeNotifier {
     } catch (_) {
       return const [];
     }
-  }
-
-  Future<List<Grave>> _fetchLiveKaddishGraves() async {
-    for (final url in [kaddishPeopleApi, kaddishBoardApi]) {
-      try {
-        final res = await CorsProxy.getDirectOrProxy(url);
-        if (res.statusCode < 200 || res.statusCode >= 300) continue;
-        final people = peopleFromKaddishJson(jsonDecode(res.body));
-        if (people.isEmpty) continue;
-        return [for (final person in people) graveFromKaddish(person)];
-      } catch (_) {}
-    }
-    return const [];
   }
 
   // ---------------------------------------------------------------------------

@@ -2,8 +2,8 @@ import json
 import urllib.request
 from pathlib import Path
 
-PEOPLE_API = "https://synagogue-kadish-shneur.amvera.io/s/novosibirsk/api/people"
 BOARD_API = "https://synagogue-kadish-shneur.amvera.io/s/novosibirsk/api/board"
+BOARD_FULL_API = f"{BOARD_API}?slim=0"
 PHOTO_BASE = "https://synagogue-kadish-shneur.amvera.io/photos/"
 EXTRA_PHOTOS = {193: "193.jpg"}
 
@@ -50,19 +50,27 @@ def absolute_url(value):
     return f"{PHOTO_BASE}{url}"
 
 
-people = []
-for url in (PEOPLE_API, BOARD_API):
+try:
+    people = people_from_payload(fetch_json(BOARD_API))
+except Exception as err:
+    raise SystemExit(f"{BOARD_API} failed: {err}") from err
+
+if people and all(isinstance(person, dict) and "text" not in person for person in people):
     try:
-        people = people_from_payload(fetch_json(url))
+        full = people_from_payload(fetch_json(BOARD_FULL_API))
     except Exception as err:
-        print(f"{url} failed: {err}")
-        continue
-    if people:
-        print(f"loaded {len(people)} people from {url}")
-        break
+        print(f"{BOARD_FULL_API} failed: {err}")
+        full = []
+    if full:
+        people = full
+        print(f"loaded {len(people)} people from {BOARD_FULL_API}")
+    else:
+        print(f"loaded {len(people)} people from {BOARD_API}")
+elif people:
+    print(f"loaded {len(people)} people from {BOARD_API}")
 
 if not people:
-    raise SystemExit("no people from kaddish APIs")
+    raise SystemExit("no people from kaddish board")
 
 root = Path(__file__).resolve().parents[1]
 local_path = root / "assets/data/kaddish_novosibirsk.json"

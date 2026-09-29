@@ -14,6 +14,53 @@ import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/playful_icons.dart';
 
+/// Loading covers the board request. Empty is only for a finished request
+/// that produced no rows (or a search that matches none).
+bool showCemeteryLoading({required bool loading, required bool sourceEmpty}) =>
+    loading && sourceEmpty;
+
+class CemeteryRosterSlot extends StatelessWidget {
+  const CemeteryRosterSlot({
+    super.key,
+    required this.loading,
+    required this.sourceEmpty,
+    required this.filteredEmpty,
+    required this.child,
+  });
+
+  final bool loading;
+  final bool sourceEmpty;
+  final bool filteredEmpty;
+  final Widget child;
+
+  static const loadingKey = Key('cemetery-loading');
+  static const emptyKey = Key('cemetery-empty');
+
+  @override
+  Widget build(BuildContext context) {
+    if (showCemeteryLoading(loading: loading, sourceEmpty: sourceEmpty)) {
+      final loc = context.locWatch;
+      return Padding(
+        key: loadingKey,
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(color: AppColors.primary),
+              const SizedBox(height: 12),
+              Text(loc.t('common.loading')),
+            ],
+          ),
+        ),
+      );
+    }
+    if (filteredEmpty) {
+      return const EmptyHint(key: emptyKey, icon: Icons.search_off);
+    }
+    return child;
+  }
+}
+
 class CemeteryPage extends StatefulWidget {
   const CemeteryPage({super.key, this.highlightId});
   final String? highlightId;
@@ -101,9 +148,11 @@ class _CemeteryPageState extends State<CemeteryPage> {
         ),
         Section(
           padTop: 16,
-          child: graves.isEmpty
-              ? const EmptyHint(icon: Icons.search_off)
-              : ResponsiveGrid(
+          child: CemeteryRosterSlot(
+            loading: repo.kaddishLoading,
+            sourceEmpty: repo.graves.isEmpty,
+            filteredEmpty: graves.isEmpty,
+            child: ResponsiveGrid(
                   columns: gridColumns(context, max: 2),
                   // Note: GridView.builder(shrinkWrap: true, physics: NeverScrollableScrollPhysics())
                   // would still build all cells to measure extent (not virtualized).
@@ -117,6 +166,7 @@ class _CemeteryPageState extends State<CemeteryPage> {
                       ),
                   ],
                 ),
+          ),
         ),
       ],
     );

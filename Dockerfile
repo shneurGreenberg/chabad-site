@@ -1,7 +1,7 @@
 # Amvera Flutter web build. Pin SDK 3.47.4 (matches Amvera guidance).
 # Clone official Flutter tag (cirruslabs GHCR may lack 3.47.4).
 # Do NOT download kaddish photos here ? that hung prior rebuilds.
-# 2026-09-29: GitHub→Amvera rebuild so jewishsib-shneur serves main 8ae29fe (PR #37).
+# 2026-09-29: GitHub→Amvera rebuild so jewishsib-shneur serves the cemetery board (v35).
 
 FROM debian:bookworm-slim AS build
 
@@ -27,7 +27,7 @@ RUN cp assets/images/community-emblem.png build/web/favicon.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-192.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-512.png \
  && mkdir -p build/web/kaddish-photos \
- && BUILD_ID="v34-$(date -u +%Y%m%dT%H%M%SZ)" \
+ && BUILD_ID="v35-$(date -u +%Y%m%dT%H%M%SZ)" \
  && echo "$BUILD_ID" > build/web/build-id.txt \
  && echo "<!-- $BUILD_ID -->" >> build/web/index.html \
  && cp build/web/index.html build/web/404.html \
