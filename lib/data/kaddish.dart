@@ -123,9 +123,17 @@ String absoluteKaddishUrl(String value) {
   return '$kaddishPhotoBase$v';
 }
 
-String photoUrlFromKaddish(String filename, dynamic crop) {
+/// Kaddish app photo route: `GET /photos/<filename>` on [kaddishHost].
+/// An empty filename is not a photo.
+String kaddishPhotoFileUrl(String filename) {
   final name = filename.trim();
-  if (name.isEmpty) return '';
+  if (name.isEmpty || name.contains('/') || name.contains('..')) return '';
+  return '$kaddishPhotoBase$name';
+}
+
+String photoUrlFromKaddish(String filename, dynamic crop) {
+  final fileUrl = kaddishPhotoFileUrl(filename);
+  if (fileUrl.isEmpty) return '';
   final query = <String>['w=280'];
   if (crop is Map) {
     final x = crop['x'];
@@ -135,21 +143,28 @@ String photoUrlFromKaddish(String filename, dynamic crop) {
     if (y is num && y != 50) query.add('cy=$y');
     if (z is num && z != 1) query.add('cz=$z');
   }
-  return '$kaddishPhotoBase$name?${query.join('&')}';
+  return '$fileUrl?${query.join('&')}';
 }
 
 /// Same-origin cemetery thumb so CanvasKit can paint it.
 /// GitHub Pages ships files under `kaddish-photos/`; Amvera nginx proxies that
-/// path to the live kaddish host (which does not send CORS).
+/// path to the kaddish `/photos/` route (which does not send CORS).
 String sameOriginKaddishPhoto(String? url) {
   final src = url?.trim() ?? '';
   if (src.isEmpty) return '';
-  final name = src.split('?').first.split('/').last;
+  final parsed = Uri.tryParse(src);
+  final path = parsed?.path.isNotEmpty == true ? parsed!.path : src.split('?').first;
+  final name = path.split('/').last;
   if (name.isEmpty || !name.contains('.')) return resolveKaddishPhotoUrl(src);
-  final path = Uri.base.path;
-  final prefix = path.endsWith('/') ? path : '$path/';
-  return Uri.parse('${Uri.base.origin}${prefix}kaddish-photos/$name')
-      .toString();
+  final basePath = Uri.base.path;
+  final prefix = basePath.endsWith('/') ? basePath : '$basePath/';
+  return Uri(
+    scheme: Uri.base.scheme,
+    host: Uri.base.host,
+    port: Uri.base.hasPort ? Uri.base.port : null,
+    path: '${prefix}kaddish-photos/$name',
+    query: parsed != null && parsed.hasQuery ? parsed.query : null,
+  ).toString();
 }
 
 /// Resolves a kaddish photo URL for web.

@@ -10,6 +10,34 @@ import 'package:flutter_app/services/yahrzeit.dart';
 const _peopleUrl = '/s/novosibirsk/api/people';
 
 void main() {
+  test('non-empty photo uses the kaddish /photos/ file', () {
+    expect(kaddishPhotoFileUrl(''), '');
+    expect(kaddishPhotoFileUrl('   '), '');
+    expect(
+      kaddishPhotoFileUrl('148.jpg'),
+      'https://synagogue-kadish-shneur.amvera.io/photos/148.jpg',
+    );
+    final served = photoUrlFromKaddish('148.jpg', {
+      'x': 44.74,
+      'y': 29.23,
+      'zoom': 2,
+    });
+    expect(
+      served,
+      'https://synagogue-kadish-shneur.amvera.io/photos/148.jpg?w=280&cx=44.74&cy=29.23&cz=2',
+    );
+    final requested = Uri.parse(sameOriginKaddishPhoto(served));
+    expect(requested.path, endsWith('/kaddish-photos/148.jpg'));
+    expect(requested.query, 'w=280&cx=44.74&cy=29.23&cz=2');
+    final empty = graveFromKaddish({
+      'id': 1,
+      'name': 'Брусиловский Виктор сын Александра',
+      'photo': '',
+      'gregorianDateOfDeath': {'month': 8, 'date': 15, 'year': 2009},
+    });
+    expect(empty.photoUrl, isNull);
+  });
+
   test('board load never requests the people URL', () async {
     final urls = <String>[];
     final graves = await fetchKaddishBoardGraves(
