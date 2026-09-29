@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../data/public_content.dart';
 import '../data/repository.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
@@ -912,7 +913,12 @@ class _SiteFooter extends StatelessWidget {
                           HoverScale(
                             child: s.labelKey == 'social.whatsapp'
                                 ? _socialWhatsApp(s.url)
-                                : _social(s.icon, s.url),
+                                : _social(
+                                    s.icon,
+                                    s.labelKey == 'social.website'
+                                        ? publicWebsiteUrl(s.url)
+                                        : s.url,
+                                  ),
                           ),
                       ]),
                     ],

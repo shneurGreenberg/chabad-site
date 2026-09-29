@@ -29,11 +29,13 @@ class SiteNotify {
     required String notifyChatId,
   }) {
     final topic = trLoc(lead.topic, 'he');
+    final note = lead.message.trim();
     return send(
       notifyChatId: notifyChatId,
       email: email,
       title: 'פנייה חדשה מהאתר',
-      body: '${lead.name}\n${lead.phone}\n${lead.email}\n$topic',
+      body: '${lead.name}\n${lead.phone}\n${lead.email}\n$topic'
+          '${note.isEmpty ? '' : '\n$note'}',
     );
   }
 
@@ -63,7 +65,7 @@ class SiteNotify {
       email: email,
       title: 'הזמנה מהחנות הכשרה',
       body:
-          '${order.name} · ${order.phone}\n${order.fulfillment}\n$lines\n\$${order.total.toStringAsFixed(0)}',
+          '${order.name} · ${order.phone}\n${order.fulfillment}\n$lines\n₽${order.total.toStringAsFixed(0)}',
     );
   }
 

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../data/public_content.dart';
 import '../../data/repository.dart';
 import '../../l10n/strings.dart';
 import '../../models.dart';
@@ -21,15 +22,17 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
+    final homeNews =
+        featuredHomeNews(repo.news, loc.lang, DateTime.now()).take(6).toList();
     return SiteScaffold(
       currentRoute: '/',
       children: [
         const _Hero(),
-        if (repo.news.isNotEmpty)
+        if (homeNews.isNotEmpty)
           Section(
             padTop: 12,
             padBottom: 0,
-            child: HomeNewsTicker(articles: repo.news.take(6).toList()),
+            child: HomeNewsTicker(articles: homeNews),
           ),
         Section(
           padTop: 24,
@@ -74,21 +77,22 @@ class HomePage extends StatelessWidget {
           ),
         ),
         Section(child: _ZmanimStrip(repo: repo)),
-        Section(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _headerRow(context, loc.t('home.programs.title'), '/programs'),
-              const SizedBox(height: 18),
-              ResponsiveGrid(
-                columns: gridColumns(context, max: 3),
-                children: [
-                  for (final p in repo.programs.take(3)) ProgramCard(p),
-                ],
-              ),
-            ],
+        if (repo.publicPrograms.isNotEmpty)
+          Section(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _headerRow(context, loc.t('home.programs.title'), '/programs'),
+                const SizedBox(height: 18),
+                ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [
+                    for (final p in repo.publicPrograms.take(3)) ProgramCard(p),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
         const Section(child: _ReconnectBand()),
         const Section(
           padTop: 8,
@@ -577,7 +581,7 @@ class _ZmanimStrip extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         fontSize: 14)),
               Pill(
-                '${loc.t('zmanim.forCity')} ${repo.location.cityName}',
+                '${loc.t('zmanim.forCity')} ${displayCityName(repo.location.cityName, loc.lang)}',
                 icon: Icons.place_outlined,
               ),
               TextButton.icon(

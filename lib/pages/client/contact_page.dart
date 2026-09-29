@@ -285,6 +285,7 @@ class _ContactPageState extends State<ContactPage> {
       email: _email.text.trim(),
       phone: _phone.text.trim(),
       topic: topic,
+      message: _message.text.trim(),
     );
     _name.clear();
     _email.clear();

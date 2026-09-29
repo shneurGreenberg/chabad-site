@@ -1243,7 +1243,7 @@ class ManageStorePanel extends StatelessWidget {
                 icon: p.icon,
               ),
               title: Text(trLoc(p.name, loc.lang)),
-              subtitle: Text('\$${p.price.toStringAsFixed(0)}'),
+              subtitle: Text('₽${p.price.toStringAsFixed(0)}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(
                   icon: const PlayfulIcon(Icons.edit_outlined, size: 20),
@@ -1755,6 +1755,10 @@ class CrmPanel extends StatelessWidget {
                                         style: TextStyle(fontSize: 13)),
                                   ],
                                 ),
+                                if (lead.message.trim().isNotEmpty)
+                                  Text(lead.message,
+                                      style: const TextStyle(
+                                          fontSize: 13, height: 1.35)),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [

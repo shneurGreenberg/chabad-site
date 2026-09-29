@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../data/public_content.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
@@ -37,7 +38,7 @@ class ZmanimPage extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Pill(
-              '${loc.t('zmanim.forCity')} ${repo.location.cityName}',
+              '${loc.t('zmanim.forCity')} ${displayCityName(repo.location.cityName, loc.lang)}',
               icon: Icons.place_outlined,
             ),
           ),

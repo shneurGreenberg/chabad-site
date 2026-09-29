@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../data/public_content.dart';
 import '../../data/repository.dart';
 import '../../services/gallery_viewer_history.dart';
 import '../../l10n/strings.dart';
@@ -25,9 +26,9 @@ class _GalleryPageState extends State<GalleryPage> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final years = <int>{for (final p in repo.gallery) p.year}.toList()
+    final years = <int>{for (final p in repo.publicGallery) p.year}.toList()
       ..sort((a, b) => b.compareTo(a));
-    final albums = repo.gallery.where((p) {
+    final albums = repo.publicGallery.where((p) {
       final yearOk = _year == null || p.year == _year;
       return yearOk;
     }).toList();
@@ -93,7 +94,7 @@ class GalleryAlbumPage extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final album = repo.galleryById(id);
-    if (album == null) {
+    if (album == null || !galleryAlbumIsPublic(album)) {
       return SiteScaffold(
         currentRoute: '/gallery',
         children: [

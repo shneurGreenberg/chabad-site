@@ -24,7 +24,7 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
-    final products = repo.products
+    final products = repo.publicProducts
         .where((p) =>
             (widget.highlightId != null && p.id == widget.highlightId) ||
             _cat == null ||
@@ -133,7 +133,7 @@ class _CartPanel extends StatelessWidget {
               Text(loc.t('store.total'),
                   style: const TextStyle(fontWeight: FontWeight.w700)),
               const Spacer(),
-              Text('\$${repo.cartTotal.toStringAsFixed(0)}',
+              Text('₽${repo.cartTotal.toStringAsFixed(0)}',
                   style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
@@ -200,7 +200,7 @@ class _CartPanel extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '${loc.t('store.total')}: \$${repo.cartTotal.toStringAsFixed(0)}',
+                    '${loc.t('store.total')}: ₽${repo.cartTotal.toStringAsFixed(0)}',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),

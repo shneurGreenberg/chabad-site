@@ -20,6 +20,7 @@ import '../services/web_prefs.dart';
 import '../services/yahrzeit.dart';
 import 'holidays.dart';
 import 'kaddish.dart';
+import 'public_content.dart';
 import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
@@ -1878,6 +1879,7 @@ class AppRepository extends ChangeNotifier {
     required String phone,
     required Loc topic,
     String source = 'website',
+    String message = '',
   }) {
     final lead = Lead(
       id: _newId(),
@@ -1887,6 +1889,7 @@ class AppRepository extends ChangeNotifier {
       topic: topic,
       date: DateTime.now(),
       source: source,
+      message: message.trim(),
     );
     leads.insert(0, lead);
     notifyListeners();
@@ -2428,6 +2431,19 @@ class AppRepository extends ChangeNotifier {
     return null;
   }
 
+  List<Program> get publicPrograms =>
+      [for (final p in programs) if (programIsPublic(p)) p];
+
+  List<Product> get publicProducts =>
+      [for (final p in products) if (productIsPublic(p)) p];
+
+  List<GalleryPhoto> get publicGallery =>
+      [for (final a in gallery) if (galleryAlbumIsPublic(a)) a];
+
+  List<Shiur> get publicShiurim => visibleShiurim(shiurim);
+
+  List<Donation> get publicDonations => visibleDonations(donations);
+
   Program? programById(String id) {
     for (final p in programs) {
       if (p.id == id) return p;
@@ -2699,7 +2715,7 @@ class AppRepository extends ChangeNotifier {
         ));
       }
     }
-    for (final p in programs) {
+    for (final p in publicPrograms) {
       if (_locHas(p.title, q) ||
           _locHas(p.description, q) ||
           _locHas(p.audience, q)) {
@@ -2712,7 +2728,7 @@ class AppRepository extends ChangeNotifier {
         ));
       }
     }
-    for (final p in products) {
+    for (final p in publicProducts) {
       if (_locHas(p.name, q) || _locHas(p.description, q)) {
         hits.add(SearchHit(
           groupKey: 'search.group.products',
@@ -2736,7 +2752,7 @@ class AppRepository extends ChangeNotifier {
         ));
       }
     }
-    for (final a in gallery) {
+    for (final a in publicGallery) {
       if (_locHas(a.event, q) ||
           a.tags.any((t) => t.toLowerCase().contains(q))) {
         hits.add(SearchHit(
@@ -2774,7 +2790,7 @@ class AppRepository extends ChangeNotifier {
         ));
       }
     }
-    for (final s in shiurim) {
+    for (final s in publicShiurim) {
       if (_locHas(s.title, q) || _locHas(s.rabbi, q) || _locHas(s.topic, q)) {
         hits.add(SearchHit(
           groupKey: 'search.group.library',
@@ -2990,11 +3006,11 @@ class AppRepository extends ChangeNotifier {
           ..addAll(loaded);
       }
     }
-    if (m['shiurim'] is List && (m['shiurim'] as List).isNotEmpty) {
-      shiurim
-        ..clear()
-        ..addAll((m['shiurim'] as List).map(shiurFromJson));
-    }
+    final publishedShiurim = shiurimAfterSnapshot(shiurim, m['shiurim']);
+    shiurim
+      ..clear()
+      ..addAll(publishedShiurim);
+    donations.removeWhere(donationIsSeededDemo);
     final loadedCampaigns = campaignsFromJson(m['campaigns']);
     if (loadedCampaigns.isNotEmpty) {
       campaigns

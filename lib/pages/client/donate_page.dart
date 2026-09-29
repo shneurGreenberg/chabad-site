@@ -102,54 +102,56 @@ class _DonatePageState extends State<DonatePage> {
             SelectableText(repo.links.bankDetails,
                 style: TextStyle(color: AppColors.muted, height: 1.4)),
           ],
-          const SizedBox(height: 18),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              for (final p in _presets)
-                ChoiceChip(
-                  label: Text('\$$p'),
-                  selected: _amount.text == '$p',
-                  onSelected: (_) => setState(() => _amount.text = '$p'),
-                ).hoverScale(scale: 1.04),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _amount,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: loc.t('common.amount'),
-              prefixText: '\$ ',
+          if (repo.links.donateUrl.trim().isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final p in _presets)
+                  ChoiceChip(
+                    label: Text('\$$p'),
+                    selected: _amount.text == '$p',
+                    onSelected: (_) => setState(() => _amount.text = '$p'),
+                  ).hoverScale(scale: 1.04),
+              ],
             ),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 14),
-          DropdownButtonFormField<Loc>(
-            initialValue: _campaign,
-            decoration: InputDecoration(labelText: loc.t('donate.campaign')),
-            items: [
-              for (final c in repo.campaigns)
-                DropdownMenuItem(value: c, child: Text(trLoc(c, loc.lang))),
-            ],
-            onChanged: (v) => setState(() => _campaign = v),
-          ),
-          const SizedBox(height: 14),
-          TextField(
-            controller: _name,
-            decoration: InputDecoration(labelText: loc.t('common.name')),
-          ),
-          const SizedBox(height: 18),
-          FilledButton.icon(
-            onPressed: () => _submit(context, repo, loc),
-            style: FilledButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                foregroundColor: AppColors.primaryDark,
-                minimumSize: const Size.fromHeight(50)),
-            icon: const PlayfulIcon(Icons.favorite),
-            label: Text('${loc.t('donate.give')}  \$${_amount.text}'),
-          ).hoverLift(),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _amount,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: loc.t('common.amount'),
+                prefixText: '\$ ',
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<Loc>(
+              initialValue: _campaign,
+              decoration: InputDecoration(labelText: loc.t('donate.campaign')),
+              items: [
+                for (final c in repo.campaigns)
+                  DropdownMenuItem(value: c, child: Text(trLoc(c, loc.lang))),
+              ],
+              onChanged: (v) => setState(() => _campaign = v),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _name,
+              decoration: InputDecoration(labelText: loc.t('common.name')),
+            ),
+            const SizedBox(height: 18),
+            FilledButton.icon(
+              onPressed: () => _submit(context, repo, loc),
+              style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  foregroundColor: AppColors.primaryDark,
+                  minimumSize: const Size.fromHeight(50)),
+              icon: const PlayfulIcon(Icons.favorite),
+              label: Text('${loc.t('donate.give')}  \$${_amount.text}'),
+            ).hoverLift(),
+          ],
         ],
       ),
     );
@@ -169,7 +171,10 @@ class _DonatePageState extends State<DonatePage> {
           Text(loc.t('admin.stats.donations'),
               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
           const Divider(height: 22),
-          for (final d in repo.donations.take(8))
+          if (repo.publicDonations.isEmpty)
+            const EmptyHint(icon: Icons.volunteer_activism_outlined)
+          else
+            for (final d in repo.publicDonations.take(8))
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(children: [

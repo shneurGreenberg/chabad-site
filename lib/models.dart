@@ -498,6 +498,7 @@ class Lead {
     required this.date,
     this.status = LeadStatus.fresh,
     this.source = 'website',
+    this.message = '',
   });
   final String id;
   String name;
@@ -507,6 +508,7 @@ class Lead {
   DateTime date;
   LeadStatus status;
   String source;
+  String message;
 }
 
 class Donation {

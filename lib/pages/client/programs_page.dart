@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../data/public_content.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
@@ -25,17 +26,19 @@ class ProgramsPage extends StatelessWidget {
           icon: Icons.groups_outlined,
         ),
         Section(
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 3),
-            children: [
-              for (final p in repo.programs)
-                HighlightAnchor(
-                  id: p.id,
-                  highlightId: highlightId,
-                  child: ProgramCard(p),
+          child: repo.publicPrograms.isEmpty
+              ? const EmptyHint(icon: Icons.groups_outlined)
+              : ResponsiveGrid(
+                  columns: gridColumns(context, max: 3),
+                  children: [
+                    for (final p in repo.publicPrograms)
+                      HighlightAnchor(
+                        id: p.id,
+                        highlightId: highlightId,
+                        child: ProgramCard(p),
+                      ),
+                  ],
                 ),
-            ],
-          ),
         ),
       ],
     );
@@ -51,7 +54,7 @@ class ProgramDetailPage extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final program = repo.programById(id);
-    if (program == null) {
+    if (program == null || !programIsPublic(program)) {
       return SiteScaffold(
         currentRoute: '/programs',
         children: [

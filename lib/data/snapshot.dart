@@ -287,6 +287,7 @@ Map<String, dynamic> leadToJson(Lead l) => {
       'date': l.date.toIso8601String(),
       'status': l.status.name,
       'source': l.source,
+      'message': l.message,
     };
 
 Lead leadFromJson(dynamic raw) {
@@ -303,6 +304,7 @@ Lead leadFromJson(dynamic raw) {
       orElse: () => LeadStatus.fresh,
     ),
     source: '${m['source'] ?? 'website'}',
+    message: '${m['message'] ?? ''}',
   );
 }
 

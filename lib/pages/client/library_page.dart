@@ -18,6 +18,7 @@ class LibraryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
+    final lessons = repo.publicShiurim;
     return SiteScaffold(
       currentRoute: '/library',
       children: [
@@ -26,21 +27,25 @@ class LibraryPage extends StatelessWidget {
           subtitle: loc.t('library.subtitle'),
           icon: Icons.menu_book_outlined,
         ),
-        if (repo.shiurim.any((s) => s.isWeekly))
-          Section(child: _WeeklyBoard(repo.shiurim, loc)),
-        Section(
-          child: ResponsiveGrid(
-            columns: gridColumns(context, max: 2),
-            children: [
-              for (final s in repo.shiurim)
-                HighlightAnchor(
-                  id: s.id,
-                  highlightId: highlightId,
-                  child: _ShiurCard(s),
-                ),
-            ],
+        if (lessons.isEmpty)
+          const Section(child: EmptyHint(icon: Icons.menu_book_outlined))
+        else ...[
+          if (lessons.any((s) => s.isWeekly))
+            Section(child: _WeeklyBoard(lessons, loc)),
+          Section(
+            child: ResponsiveGrid(
+              columns: gridColumns(context, max: 2),
+              children: [
+                for (final s in lessons)
+                  HighlightAnchor(
+                    id: s.id,
+                    highlightId: highlightId,
+                    child: _ShiurCard(s),
+                  ),
+              ],
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
