@@ -495,19 +495,6 @@ class _AdminShellState extends State<AdminShell> {
     );
   }
 
-  Future<void> _publish(BuildContext context, LocaleController loc) async {
-    final err = await context.read<AppRepository>().publishToCloud();
-    if (!context.mounted) return;
-    final msg = err == null
-        ? loc.t('admin.cloud.ok')
-        : (err == 'not-signed-in'
-            ? loc.t('admin.cloud.localOnly')
-            : loc.t('admin.cloud.blocked'));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
-  }
-
   Widget _topBar(BuildContext context, LocaleController loc, String title,
       bool narrow) {
     final auth = context.read<AuthController>();
@@ -533,21 +520,6 @@ class _AdminShellState extends State<AdminShell> {
                 style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
           ),
           const LanguageSwitcher(),
-          const SizedBox(width: 8),
-          if (!narrow)
-            HoverLift(
-              child: FilledButton.icon(
-                onPressed: () => _publish(context, loc),
-                icon: const PlayfulIcon(Icons.cloud_upload_outlined, size: 16),
-                label: Text(loc.t('admin.cloud.publish')),
-              ),
-            )
-          else
-            IconButton(
-              tooltip: loc.t('admin.cloud.publish'),
-              onPressed: () => _publish(context, loc),
-              icon: const PlayfulIcon(Icons.cloud_upload_outlined),
-            ).hoverScale(),
           const SizedBox(width: 8),
           if (!narrow)
             OutlinedButton.icon(
@@ -1037,7 +1009,7 @@ class _NewsEditorState extends State<_NewsEditor> {
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     for (final l in supportedLangs) {
       widget.article.title[l] = _title[l]!.text;
       widget.article.body[l] = _body[l]!.text;
@@ -1048,6 +1020,8 @@ class _NewsEditorState extends State<_NewsEditor> {
     } else {
       widget.repo.updateNews();
     }
+    await widget.repo.persistAdminConfirm();
+    if (!mounted) return;
     Navigator.pop(context);
   }
 }
@@ -1216,7 +1190,7 @@ class _ProgramEditorState extends State<_ProgramEditor> {
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     for (final l in supportedLangs) {
       widget.program.title[l] = _title[l]!.text;
       widget.program.description[l] = _desc[l]!.text;
@@ -1228,6 +1202,8 @@ class _ProgramEditorState extends State<_ProgramEditor> {
     } else {
       widget.repo.refresh();
     }
+    await widget.repo.persistAdminConfirm();
+    if (!mounted) return;
     Navigator.pop(context);
   }
 }
@@ -1411,7 +1387,7 @@ class _ProductEditorState extends State<_ProductEditor> {
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     for (final l in supportedLangs) {
       widget.product.name[l] = _name[l]!.text;
       widget.product.description[l] = _desc[l]!.text;
@@ -1423,6 +1399,8 @@ class _ProductEditorState extends State<_ProductEditor> {
     } else {
       widget.repo.refresh();
     }
+    await widget.repo.persistAdminConfirm();
+    if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.loc.t('admin.settings.saved'))),
@@ -1628,7 +1606,7 @@ class _GalleryEditorState extends State<_GalleryEditor> {
     setState(() => _uploading = false);
   }
 
-  void _save() {
+  Future<void> _save() async {
     for (final l in supportedLangs) {
       widget.photo.event[l] = _event[l]!.text;
     }
@@ -1638,6 +1616,8 @@ class _GalleryEditorState extends State<_GalleryEditor> {
     } else {
       widget.repo.refresh();
     }
+    await widget.repo.persistAdminConfirm();
+    if (!mounted) return;
     Navigator.pop(context);
   }
 }

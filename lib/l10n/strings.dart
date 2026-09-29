@@ -597,9 +597,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Сохранено в Firestore'
   },
   'admin.cloud.blocked': {
-    'he': 'השרת חוסם כתיבה. זה לא Storage ולא תשלום — רק כללי Firestore. בקונסול, טאב Rules, מחקו הכל, הדביקו את הטקסט למטה, Publish, ואז «שמור לשרת».',
-    'en': 'The server is blocking writes. Not Storage and not a paid plan — just Firestore rules. Rules tab: replace with the text below, Publish, then Save to server.',
-    'ru': 'Сервер блокирует запись. Не Storage и не оплата — правила Firestore. Вкладка Rules, вставьте текст ниже, Publish, затем «Сохранить на сервер».'
+    'he': 'השרת חוסם כתיבה. זה לא Storage ולא תשלום — רק כללי Firestore. בקונסול, טאב Rules, מחקו הכל, הדביקו את הטקסט למטה, ואז Publish. אחרי אישור העלאה השמירה עולה לשרת כשהכללים מאפשרים.',
+    'en': 'The server is blocking writes. Not Storage and not a paid plan — just Firestore rules. Rules tab: replace with the text below, then Publish. After you confirm an upload, it is saved to the server when the rules allow it.',
+    'ru': 'Сервер блокирует запись. Не Storage и не оплата — правила Firestore. Вкладка Rules: вставьте текст ниже и Publish. После подтверждения загрузка сохраняется на сервер, когда правила разрешают запись.'
   },
   'admin.cloud.rulesTitle': {
     'he': 'הדביקו ב-Firestore → Rules ואז Publish:',
@@ -622,9 +622,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Открыть консоль Firestore'
   },
   'admin.cloud.localOnly': {
-    'he': 'ענן: מקומי בלבד — התחברו עם משתמש Firebase Auth ואז «שמור לשרת»',
-    'en': 'Cloud: local only — sign in with a Firebase Auth user, then Save to server',
-    'ru': 'Облако: только локально — войдите через Firebase Auth, затем «Сохранить на сервер»'
+    'he': 'ענן: מקומי בלבד — התחברו עם משתמש Firebase Auth כדי שהאישור ישמור לשרת',
+    'en': 'Cloud: local only — sign in with a Firebase Auth user so confirm saves to the server',
+    'ru': 'Облако: только локально — войдите через Firebase Auth, чтобы подтверждение сохранялось на сервер'
   },
   'admin.cloud.connected': {
     'he': 'סנכרון ענן: מחובר',
@@ -675,9 +675,9 @@ const Map<String, Map<String, String>> _strings = {
     'ru': 'Локальное редактирование в браузере. Для сервера нужен Firebase Auth.'
   },
   'admin.login.firebaseHint': {
-    'he': 'ל«שמור לשרת» חובה משתמש Firebase Authentication (Authentication → Users). בלי זה נשמר רק בדפדפן זה. אחרי כניסה מוצלחת — גם Publish לכללי Firestore אם הכתיבה נחסמת.',
-    'en': 'Save-to-server requires a Firebase Authentication user (Authentication → Users). Without it, edits stay in this browser only. After a successful sign-in, Publish Firestore rules if writes are still blocked.',
-    'ru': '«Сохранить на сервер» требует пользователя Firebase Authentication (Authentication → Users). Иначе правки только в этом браузере. После входа — Publish правил Firestore, если запись блокируется.'
+    'he': 'כדי שהאישור ישמור לשרת חובה משתמש Firebase Authentication (Authentication → Users). בלי זה נשמר רק בדפדפן זה. אחרי כניסה מוצלחת — גם Publish לכללי Firestore אם הכתיבה נחסמת.',
+    'en': 'Saving a confirmed upload to the server requires a Firebase Authentication user (Authentication → Users). Without it, edits stay in this browser only. After a successful sign-in, Publish Firestore rules if writes are still blocked.',
+    'ru': 'Чтобы подтверждение сохранялось на сервер, нужен пользователь Firebase Authentication (Authentication → Users). Иначе правки только в этом браузере. После входа — Publish правил Firestore, если запись блокируется.'
   },
   'admin.login.button': {'he': 'כניסה', 'en': 'Log in', 'ru': 'Войти'},
   'admin.login.error': {

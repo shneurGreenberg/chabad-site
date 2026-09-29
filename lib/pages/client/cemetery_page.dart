@@ -253,6 +253,26 @@ class _GraveCard extends StatelessWidget {
   }
 }
 
+/// Same-origin (or direct) photo URL at the frame's device-pixel size.
+String _sharpGravePhoto(
+  BuildContext context,
+  String? url,
+  double logicalWidth,
+  double logicalHeight, {
+  bool sameOrigin = true,
+}) {
+  final src = url?.trim() ?? '';
+  if (src.isEmpty) return '';
+  final px = sharpPhotoPixels(
+    logicalWidth,
+    logicalHeight,
+    MediaQuery.devicePixelRatioOf(context),
+  );
+  final sized = kaddishPhotoAtPixels(src, px);
+  if (!sameOrigin) return resolveKaddishPhotoUrl(sized);
+  return sameOriginKaddishPhoto(sized);
+}
+
 class _GravePhoto extends StatelessWidget {
   const _GravePhoto({this.url});
   final String? url;
@@ -276,7 +296,7 @@ class _GravePhoto extends StatelessWidget {
     final src = url?.trim() ?? '';
     if (src.isEmpty) return _fallback();
 
-    final localUrl = sameOriginKaddishPhoto(src);
+    final localUrl = _sharpGravePhoto(context, src, 72, 96);
     if (localUrl.isEmpty) return _fallback();
 
     return ClipRRect(
@@ -287,7 +307,7 @@ class _GravePhoto extends StatelessWidget {
         height: 96,
         fit: BoxFit.cover,
         error: CrossOriginImage(
-          url: resolveKaddishPhotoUrl(src),
+          url: _sharpGravePhoto(context, src, 72, 96, sameOrigin: false),
           width: 72,
           height: 96,
           fit: BoxFit.cover,
@@ -400,7 +420,7 @@ class _CemeteryPersonPageState extends State<CemeteryPersonPage> {
                     Builder(
                       builder: (context) {
                         final sameOriginUrl =
-                            sameOriginKaddishPhoto(_person!.photoUrl);
+                            _sharpGravePhoto(context, _person!.photoUrl, 160, 210);
                         if (sameOriginUrl.isEmpty) {
                           return _photoFallback(160, 210);
                         }
@@ -412,7 +432,13 @@ class _CemeteryPersonPageState extends State<CemeteryPersonPage> {
                             height: 210,
                             fit: BoxFit.cover,
                             error: CrossOriginImage(
-                              url: resolveKaddishPhotoUrl(_person!.photoUrl),
+                              url: _sharpGravePhoto(
+                                context,
+                                _person!.photoUrl,
+                                160,
+                                210,
+                                sameOrigin: false,
+                              ),
                               width: 160,
                               height: 210,
                               fit: BoxFit.cover,

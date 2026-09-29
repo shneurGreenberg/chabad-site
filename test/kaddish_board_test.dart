@@ -6,6 +6,7 @@ import 'package:flutter_app/data/kaddish.dart';
 import 'package:flutter_app/l10n/strings.dart';
 import 'package:flutter_app/pages/client/cemetery_page.dart';
 import 'package:flutter_app/services/yahrzeit.dart';
+import 'package:flutter_app/widgets/cross_origin_image.dart';
 
 const _peopleUrl = '/s/novosibirsk/api/people';
 
@@ -22,13 +23,30 @@ void main() {
       'y': 29.23,
       'zoom': 2,
     });
-    expect(
-      served,
-      'https://synagogue-kadish-shneur.amvera.io/photos/148.jpg?w=280&cx=44.74&cy=29.23&cz=2',
-    );
-    final requested = Uri.parse(sameOriginKaddishPhoto(served));
+    expect(served, isNot(contains('w=280')));
+    expect(Uri.parse(served).queryParameters['w'], isNull);
+    expect(Uri.parse(served).queryParameters['cx'], '44.74');
+    expect(Uri.parse(served).queryParameters['cy'], '29.23');
+    expect(Uri.parse(served).queryParameters['cz'], '2');
+    // Detail frame 160×210 at 2 device pixels per logical pixel.
+    final detailPx = sharpPhotoPixels(160, 210, 2);
+    expect(detailPx, 420);
+    expect(detailPx, greaterThan(280));
+    expect(sharpPhotoPixels(72, 96, 3), 288);
+    final sized = kaddishPhotoAtPixels(served, detailPx);
+    expect(Uri.parse(sized).queryParameters['w'], '420');
+    expect(Uri.parse(sized).queryParameters['cz'], '2');
+    final requested = Uri.parse(sameOriginKaddishPhoto(sized));
     expect(requested.path, endsWith('/kaddish-photos/148.jpg'));
-    expect(requested.query, 'w=280&cx=44.74&cy=29.23&cz=2');
+    expect(requested.queryParameters['w'], '420');
+    expect(int.parse(requested.queryParameters['w']!), greaterThan(280));
+    expect(requested.queryParameters['cx'], '44.74');
+    final legacy = kaddishPhotoAtPixels(
+      'https://synagogue-kadish-shneur.amvera.io/photos/148.jpg?w=280&cx=44.74&cy=29.23&cz=2',
+      detailPx,
+    );
+    expect(Uri.parse(legacy).queryParameters['w'], '420');
+    expect(legacy.contains('w=280'), isFalse);
     final empty = graveFromKaddish({
       'id': 1,
       'name': 'Брусиловский Виктор сын Александра',
@@ -36,6 +54,32 @@ void main() {
       'gregorianDateOfDeath': {'month': 8, 'date': 15, 'year': 2009},
     });
     expect(empty.photoUrl, isNull);
+  });
+
+  testWidgets('photo frame decodes at screen pixels without stretching',
+      (tester) async {
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Center(
+          child: CrossOriginImage(
+            url: 'https://example.test/kaddish-photos/148.jpg?w=420',
+            width: 160,
+            height: 210,
+          ),
+        ),
+      ),
+    );
+    final image = tester.widget<Image>(find.byType(Image));
+    final resized = image.image;
+    expect(resized, isA<ResizeImage>());
+    final decode = resized as ResizeImage;
+    expect(decode.width, sharpPhotoPixels(160, 210, 2));
+    expect(decode.width, 420);
+    expect(decode.height, isNull);
+    expect(decode.allowUpscaling, isFalse);
+    expect(image.filterQuality, FilterQuality.high);
   });
 
   test('board load never requests the people URL', () async {

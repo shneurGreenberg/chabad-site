@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../data/kaddish.dart';
+
 /// Remote photo optimized for canvas rendering on web.
 class CrossOriginImage extends StatelessWidget {
   const CrossOriginImage({
@@ -22,18 +24,22 @@ class CrossOriginImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dpr = MediaQuery.devicePixelRatioOf(context);
-    final cacheW = width != null ? (width! * dpr * 2).round() : null;
-    final cacheH = height != null ? (height! * dpr * 2).round() : null;
-    
+    // Decode on one axis only. Setting both cacheWidth and cacheHeight uses
+    // ResizeImagePolicy.exact, which squashes the bitmap into the frame and
+    // looks smeared. The width matches the longer on-screen edge so a small
+    // jpeg is not scaled up past the file.
+    final cacheW = (width != null || height != null)
+        ? sharpPhotoPixels(width ?? height!, height ?? width!, dpr)
+        : null;
+
     return Image.network(
       url,
       width: width,
       height: height,
       fit: fit,
       alignment: alignment,
-      filterQuality: FilterQuality.medium,
+      filterQuality: FilterQuality.high,
       cacheWidth: cacheW,
-      cacheHeight: cacheH,
       errorBuilder: (_, error, stackTrace) =>
           this.error ?? const SizedBox.shrink(),
     );

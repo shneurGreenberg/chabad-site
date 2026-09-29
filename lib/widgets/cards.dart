@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../data/repository.dart';
+import '../services/image_compress.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
@@ -403,7 +404,7 @@ class ShotImage extends StatelessWidget {
         gaplessPlayback: true,
         width: double.infinity,
         height: double.infinity,
-        cacheWidth: imageDecodePx(context, 480),
+        cacheWidth: _shotDecodePx(context, fit),
       );
     }
     final url = shot.imageUrl;
@@ -413,7 +414,7 @@ class ShotImage extends StatelessWidget {
         child: Center(child: PlayfulIcon(Icons.photo, color: Colors.white54)),
       );
     }
-    final cacheW = imageDecodePx(context, fit == BoxFit.contain ? 1200 : 480);
+    final cacheW = _shotDecodePx(context, fit);
     if (url.startsWith('assets/')) {
       return Image.asset(url,
           fit: fit,
@@ -426,6 +427,15 @@ class ShotImage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         cacheWidth: cacheW,
-        filterQuality: FilterQuality.medium);
+        filterQuality: FilterQuality.high);
   }
+}
+
+int _shotDecodePx(BuildContext context, BoxFit fit) {
+  final size = MediaQuery.sizeOf(context);
+  final logical = fit == BoxFit.contain
+      ? (size.width > size.height ? size.width : size.height)
+      : size.width;
+  final px = imageDecodePx(context, logical);
+  return px > kMaxImageSide ? kMaxImageSide : px;
 }

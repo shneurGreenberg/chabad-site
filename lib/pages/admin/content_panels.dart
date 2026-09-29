@@ -196,9 +196,10 @@ Future<void> _showEditor({
                   ),
                   const SizedBox(width: 8),
                   FilledButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       onSave();
-                      Navigator.pop(ctx);
+                      await ctx.read<AppRepository>().persistAdminConfirm();
+                      if (ctx.mounted) Navigator.pop(ctx);
                     },
                     icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                     label: Text(ctx.loc.t('common.save')),
@@ -274,7 +275,7 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     final repo = context.read<AppRepository>();
     _applyLoc(repo.siteCopy.name, _name);
     _applyLoc(repo.siteCopy.city, _city);
@@ -306,6 +307,8 @@ class _SiteContentPanelState extends State<SiteContentPanel> {
           ),
       ]);
     repo.refresh();
+    await repo.persistAdminConfirm();
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.loc.t('admin.settings.saved'))),
     );
@@ -937,7 +940,7 @@ class _TourEditorState extends State<_TourEditor> {
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     _applyLoc(widget.stop.name, _name);
                     _applyLoc(widget.stop.description, _desc);
                     if (widget.isNew) {
@@ -945,7 +948,8 @@ class _TourEditorState extends State<_TourEditor> {
                     } else {
                       widget.repo.refresh();
                     }
-                    Navigator.pop(context);
+                    await widget.repo.persistAdminConfirm();
+                    if (context.mounted) Navigator.pop(context);
                   },
                   icon: const PlayfulIcon(Icons.save_outlined, size: 18),
                   label: Text(loc.t('common.save')),

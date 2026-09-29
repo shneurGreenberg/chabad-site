@@ -47,7 +47,9 @@ class _EmblemEditor extends StatelessWidget {
     if (picked == null) return;
     final bytes = await picked.readAsBytes();
     if (!context.mounted) return;
-    context.read<AppRepository>().setEmblemImage(bytes);
+    final repo = context.read<AppRepository>();
+    repo.setEmblemImage(bytes);
+    await repo.persistAdminConfirm();
   }
 
   @override
@@ -114,6 +116,7 @@ class _BannerEditor extends StatelessWidget {
     final bytes = await picked.readAsBytes();
     if (!context.mounted) return;
     repo.addBannerSlide(slot.route, bytes);
+    await repo.persistAdminConfirm();
   }
 
   @override

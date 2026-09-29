@@ -3904,10 +3904,16 @@ class AppRepository extends ChangeNotifier {
     // undo that save — status lives in cloudError for admin chrome.
   }
 
-  Future<String?> publishToCloud() async {
+  /// Writes the edit the admin just confirmed — including an upload already
+  /// applied on this repository — to local storage and, when Firebase Auth is
+  /// signed in, to Firestore. This replaces the separate «שמור לשרת» button.
+  Future<String?> persistAdminConfirm() async {
+    _saveDebounce?.cancel();
     await _enqueuePersist();
     return cloudError;
   }
+
+  Future<String?> publishToCloud() => persistAdminConfirm();
 }
 
 class _UploadKeep {

@@ -8,6 +8,7 @@ import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../data/repository.dart';
+import '../services/image_compress.dart';
 import '../services/links.dart';
 import '../services/web_prefs.dart';
 import 'playful_icons.dart';
@@ -40,6 +41,13 @@ bool navIsActive(String current, String route) {
 int imageDecodePx(BuildContext context, double logical) {
   final dpr = MediaQuery.devicePixelRatioOf(context);
   return (logical * dpr).round().clamp(48, 1600);
+}
+
+/// Decode size for an admin-compressed jpeg. Do not ask the codec for more
+/// pixels than [kMaxImageSide], or a small file is stretched soft.
+int _memoryDecodePx(BuildContext context, double logical) {
+  final px = imageDecodePx(context, logical);
+  return px > kMaxImageSide ? kMaxImageSide : px;
 }
 
 /// Keeps phone numbers in reading order under RTL (Hebrew) layout.
@@ -303,7 +311,7 @@ class GradientImage extends StatelessWidget {
                 fit: BoxFit.cover,
                 alignment: alignment,
                 gaplessPlayback: true,
-                cacheWidth: imageDecodePx(
+                cacheWidth: _memoryDecodePx(
                     context, MediaQuery.sizeOf(context).width.clamp(200, 900)),
               ),
               if (badge != null)
@@ -323,7 +331,7 @@ class GradientImage extends StatelessWidget {
               fit: BoxFit.cover,
               alignment: alignment,
               cacheWidth: cacheW,
-              filterQuality: FilterQuality.low,
+              filterQuality: FilterQuality.high,
             );
       return ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
@@ -690,7 +698,10 @@ class _BannerFillState extends State<BannerFill> {
   Widget _image(BannerSlide slide) {
     final bytes = slide.bytes;
     final url = slide.imageUrl;
-    final w = imageDecodePx(context, MediaQuery.sizeOf(context).width);
+    final screenW = imageDecodePx(context, MediaQuery.sizeOf(context).width);
+    final w = bytes != null && bytes.isNotEmpty && screenW > kMaxImageSide
+        ? kMaxImageSide
+        : screenW;
     if (bytes != null && bytes.isNotEmpty) {
       return Image.memory(
         bytes,
@@ -720,7 +731,7 @@ class _BannerFillState extends State<BannerFill> {
         width: double.infinity,
         height: double.infinity,
         cacheWidth: w,
-        filterQuality: FilterQuality.medium,
+        filterQuality: FilterQuality.high,
       );
     }
     return const SizedBox.expand();

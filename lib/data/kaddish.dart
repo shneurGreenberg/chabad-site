@@ -134,7 +134,7 @@ String kaddishPhotoFileUrl(String filename) {
 String photoUrlFromKaddish(String filename, dynamic crop) {
   final fileUrl = kaddishPhotoFileUrl(filename);
   if (fileUrl.isEmpty) return '';
-  final query = <String>['w=280'];
+  final query = <String>[];
   if (crop is Map) {
     final x = crop['x'];
     final y = crop['y'];
@@ -143,7 +143,39 @@ String photoUrlFromKaddish(String filename, dynamic crop) {
     if (y is num && y != 50) query.add('cy=$y');
     if (z is num && z != 1) query.add('cz=$z');
   }
+  if (query.isEmpty) return fileUrl;
   return '$fileUrl?${query.join('&')}';
+}
+
+/// Device pixels along the longer side of a photo frame.
+/// One source pixel per screen pixel. A fixed `w=280` jpeg is smaller than a
+/// retina detail frame, and painting it into that frame smears the photo.
+int sharpPhotoPixels(
+  double logicalWidth,
+  double logicalHeight,
+  double devicePixelRatio,
+) {
+  final dpr = devicePixelRatio.isFinite && devicePixelRatio > 0
+      ? devicePixelRatio
+      : 1.0;
+  final edge = logicalWidth > logicalHeight ? logicalWidth : logicalHeight;
+  final px = (edge * dpr).ceil();
+  if (px < 1) return 1;
+  if (px > 1600) return 1600;
+  return px;
+}
+
+/// Same photo URL with `w` set to the on-screen pixel size.
+/// Replaces a baked-in tiny width (such as `w=280`) so the jpeg is not
+/// stretched up to the frame.
+String kaddishPhotoAtPixels(String? url, int pixelWidth) {
+  final src = url?.trim() ?? '';
+  if (src.isEmpty || pixelWidth <= 0) return src;
+  final uri = Uri.tryParse(src);
+  if (uri == null) return src;
+  final params = Map<String, String>.from(uri.queryParameters);
+  params['w'] = '$pixelWidth';
+  return uri.replace(queryParameters: params).toString();
 }
 
 /// Same-origin cemetery thumb so CanvasKit can paint it.
