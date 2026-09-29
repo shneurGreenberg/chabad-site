@@ -1,5 +1,26 @@
 String digitsPhone(String raw) => raw.replaceAll(RegExp(r'\D'), '');
 
+/// Zoya, the community secretary. Public WhatsApp buttons use this number.
+const communityWhatsAppDigits = '79039004320';
+const communityWhatsAppUrl = 'https://wa.me/$communityWhatsAppDigits';
+
+bool _isSynagogueLandline(String raw) {
+  final d = digitsPhone(raw);
+  return d == '73832222023' || d == '3832222023';
+}
+
+/// Chat link for WhatsApp buttons and the footer icon.
+///
+/// A blank value, or the synagogue landline, is not a WhatsApp number — those
+/// open Zoya's chat. An explicit http(s) link that is already a different
+/// WhatsApp URL is kept.
+String whatsAppChatUrl(String raw) {
+  final v = raw.trim();
+  if (v.isEmpty || _isSynagogueLandline(v)) return communityWhatsAppUrl;
+  if (v.startsWith('http://') || v.startsWith('https://')) return v;
+  return waMeUrl(v) ?? communityWhatsAppUrl;
+}
+
 /// Unicode LTR isolate so phone digits keep visual order inside RTL (Hebrew) text.
 String isolateLtr(String raw) => '\u2066$raw\u2069';
 

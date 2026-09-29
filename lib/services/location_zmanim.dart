@@ -131,6 +131,68 @@ class CachedZmanim {
   }
 }
 
+DateTime? hebcalItemDay(Map item) {
+  final at = DateTime.tryParse('${item['date'] ?? ''}');
+  if (at == null) return null;
+  return DateTime(at.year, at.month, at.day);
+}
+
+/// Soonest `parashat` on or after [today].
+///
+/// Undated items and dates before [today] are ignored, so a stale name such
+/// as an earlier week's portion cannot win just because it appears first.
+Map<String, dynamic>? upcomingParashaItem(
+  List<Map<String, dynamic>> items, {
+  required DateTime today,
+}) {
+  final start = DateTime(today.year, today.month, today.day);
+  Map<String, dynamic>? best;
+  DateTime? bestDay;
+  for (final item in items) {
+    if (item['category'] != 'parashat') continue;
+    final day = hebcalItemDay(item);
+    if (day == null || day.isBefore(start)) continue;
+    if (bestDay == null || day.isBefore(bestDay)) {
+      best = item;
+      bestDay = day;
+    }
+  }
+  return best;
+}
+
+String parashaTitle(Map<String, dynamic>? item, {bool hebrew = false}) {
+  if (item == null) return '';
+  if (hebrew) {
+    final h = '${item['hebrew'] ?? ''}'.trim();
+    if (h.isNotEmpty) return h;
+  }
+  return '${item['title'] ?? ''}'.trim();
+}
+
+String parashaDateKey(Map<String, dynamic>? item) {
+  final day = item == null ? null : hebcalItemDay(item);
+  if (day == null) return '';
+  final y = day.year.toString().padLeft(4, '0');
+  final m = day.month.toString().padLeft(2, '0');
+  final d = day.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
+
+/// A cached parasha may be shown only when its date is still today or later.
+///
+/// A name with no date is stale: older clients stored a portion and kept it
+/// for the whole cache TTL. An empty name is fine (a holiday week).
+bool parashaCacheIsCurrent(Map<String, String> shabbat, DateTime now) {
+  final named = ['parasha_he', 'parasha_en', 'parasha_ru']
+      .any((k) => (shabbat[k] ?? '').trim().isNotEmpty);
+  if (!named) return true;
+  final at = DateTime.tryParse((shabbat['parasha_date'] ?? '').trim());
+  if (at == null) return false;
+  final day = DateTime(at.year, at.month, at.day);
+  final today = DateTime(now.year, now.month, now.day);
+  return !day.isBefore(today);
+}
+
 class LocationZmanimApi {
   static Future<List<GeoPlace>> searchCity(String query, {String lang = 'he'}) async {
     final q = query.trim();
@@ -276,7 +338,8 @@ class LocationZmanimApi {
 
     final today = DateTime.now();
     final startDay = DateTime(today.year, today.month, today.day);
-    final endDay = startDay.add(const Duration(days: 16));
+    // Long enough to reach the next parasha across a holiday gap.
+    final endDay = startDay.add(const Duration(days: 28));
     String ymd(DateTime d) =>
         '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
     final range = 'start=${ymd(startDay)}&end=${ymd(endDay)}';
@@ -359,19 +422,6 @@ class LocationZmanimApi {
       return !DateTime(at.year, at.month, at.day).isBefore(startDay);
     });
 
-    String parashaOf(List<Map<String, dynamic>> items, {bool hebrew = false}) {
-      for (final item in items) {
-        if (item['category'] != 'parashat') continue;
-        if (hebrew) {
-          final h = '${item['hebrew'] ?? ''}'.trim();
-          if (h.isNotEmpty) return h;
-        }
-        final title = '${item['title'] ?? ''}'.trim();
-        if (title.isNotEmpty) return title;
-      }
-      return '';
-    }
-
     String holidayOf(List<Map<String, dynamic>> items, {bool hebrew = false}) {
       for (final item in items) {
         if (item['category'] != 'holiday') continue;
@@ -419,10 +469,15 @@ class LocationZmanimApi {
       } catch (_) {}
     }
 
-    final heName = parashaOf(heItems, hebrew: true);
-    final enName = parashaOf(enItems);
-    final ruName = parashaOf(ruItems);
-    final hebrewFromEn = parashaOf(enItems, hebrew: true);
+    final enParasha = upcomingParashaItem(enItems, today: startDay);
+    final heParasha = upcomingParashaItem(heItems, today: startDay);
+    final ruParasha = upcomingParashaItem(ruItems, today: startDay);
+    final heName = parashaTitle(heParasha, hebrew: true);
+    final enName = parashaTitle(enParasha);
+    final ruName = parashaTitle(ruParasha);
+    final hebrewFromEn = parashaTitle(enParasha, hebrew: true);
+    final parashaDate =
+        parashaDateKey(enParasha ?? heParasha ?? ruParasha);
 
     final holidayHe = holidayOf(heItems, hebrew: true);
     final holidayEn = holidayOf(enItems);
@@ -439,6 +494,7 @@ class LocationZmanimApi {
         'parasha_he': heName.isNotEmpty ? heName : hebrewFromEn,
         'parasha_en': enName,
         'parasha_ru': ruName.isNotEmpty ? ruName : enName,
+        'parasha_date': parashaDate,
         'holiday_he': holidayHe.isNotEmpty ? holidayHe : holidayEn,
         'holiday_en': holidayEn,
         'holiday_ru': holidayRu.isNotEmpty ? holidayRu : holidayEn,

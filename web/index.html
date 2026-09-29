@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ru" dir="ltr">
 <head>
   <base href="$FLUTTER_BASE_HREF">
 
@@ -41,6 +41,7 @@
 
   <title>בית חב״ד בית מנחם — נובוסיבירסק</title>
   <link rel="manifest" href="manifest.json?v=33">
+  <link rel="preload" as="image" href="community-emblem.png?v=34">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -84,16 +85,14 @@
       opacity: 0;
       pointer-events: none;
     }
-    .splash .mark {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #16356F, #1E4A8C);
-      border: 1px solid rgba(232, 212, 138, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
+    .splash .logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #16356F;
+      border: 2px solid rgba(232, 212, 138, 0.75);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
     .splash p { margin: 0; color: #F6F1E8; font-weight: 700; font-size: 18px; }
     .splash span { color: rgba(232, 212, 138, 0.8); font-size: 13px; }
@@ -101,9 +100,9 @@
 </head>
 <body>
   <div class="splash" id="splash">
-    <div class="mark">✡</div>
-    <p>בית חב״ד בית מנחם</p>
-    <span>טוען…</span>
+    <img id="splash-logo" class="logo" src="community-emblem.png?v=34" alt="" width="96" height="96">
+    <p id="splash-title">Хабад Бейт Менахем</p>
+    <span id="splash-status">Загрузка…</span>
   </div>
   <script>
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -126,6 +125,50 @@
     window.addEventListener('popstate', resetWindowScroll);
     window.addEventListener('flutter-first-frame', hideSplash);
     setTimeout(hideSplash, 4000);
+  </script>
+  <script>
+    (function () {
+      var titles = {
+        he: 'בית חב״ד בית מנחם',
+        en: 'Chabad Beit Menachem',
+        ru: 'Хабад Бейт Менахем'
+      };
+      var status = { he: 'טוען…', en: 'Loading…', ru: 'Загрузка…' };
+      var lang = 'ru';
+      try {
+        var saved = localStorage.getItem('lang');
+        if (saved === 'he' || saved === 'en' || saved === 'ru') lang = saved;
+      } catch (e) {}
+      var root = document.documentElement;
+      root.lang = lang;
+      root.dir = lang === 'he' ? 'rtl' : 'ltr';
+      var title = document.getElementById('splash-title');
+      var label = document.getElementById('splash-status');
+      if (title) title.textContent = titles[lang];
+      if (label) label.textContent = status[lang];
+
+      var cacheKey = 'chabad_emblem_cache';
+      var logo = document.getElementById('splash-logo');
+      function applyLogo(dataUrl) {
+        if (logo && dataUrl) logo.src = dataUrl;
+      }
+      try {
+        var cached = localStorage.getItem(cacheKey);
+        if (cached) applyLogo(cached);
+      } catch (e) {}
+      // Single public doc — the logo configured for this community — instead of
+      // waiting until Flutter downloads every gallery image.
+      var emblemUrl = 'https://firestore.googleapis.com/v1/projects/chabad-site-c60ae/databases/(default)/documents/media/' +
+        encodeURIComponent('emblem:logo');
+      fetch(emblemUrl).then(function (r) { return r.json(); }).then(function (doc) {
+        var fields = doc && doc.fields;
+        var raw = fields && fields.dataUrl && fields.dataUrl.stringValue;
+        if (!raw) return;
+        var dataUrl = raw.indexOf('data:') === 0 ? raw : ('data:image/jpeg;base64,' + raw);
+        applyLogo(dataUrl);
+        try { localStorage.setItem(cacheKey, dataUrl); } catch (e) {}
+      }).catch(function () {});
+    })();
   </script>
   <script>
     (function () {

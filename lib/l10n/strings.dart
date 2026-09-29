@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/web_prefs.dart';
 
-/// Supported UI languages. Hebrew is the primary (RTL) language.
+/// Supported UI languages. Russian is the default until the visitor chooses.
 const supportedLangs = ['he', 'en', 'ru'];
 
 const langNames = {
@@ -14,7 +14,7 @@ const langNames = {
 String _savedLang() {
   final saved = readPref('lang');
   if (saved != null && supportedLangs.contains(saved)) return saved;
-  return 'he';
+  return 'ru';
 }
 
 /// Holds the currently selected language and exposes translation lookup.
@@ -164,6 +164,7 @@ const Map<String, Map<String, String>> _strings = {
   'common.viewAll': {'he': 'לכל', 'en': 'View all', 'ru': 'Смотреть все'},
   'common.search': {'he': 'חיפוש', 'en': 'Search', 'ru': 'Поиск'},
   'common.all': {'he': 'הכל', 'en': 'All', 'ru': 'Все'},
+  'common.loading': {'he': 'טוען...', 'en': 'Loading...', 'ru': 'Загрузка...'},
   'common.required': {
     'he': 'שדה חובה',
     'en': 'Required',
@@ -300,6 +301,8 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'No photos in this album yet',
     'ru': 'В этом альбоме пока нет фото'
   },
+  'gallery.prev': {'he': 'הקודמת', 'en': 'Previous', 'ru': 'Назад'},
+  'gallery.next': {'he': 'הבאה', 'en': 'Next', 'ru': 'Далее'},
   'admin.gallery.addPhotos': {
     'he': 'הוספת תמונות',
     'en': 'Add photos',
@@ -309,6 +312,16 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'תמונות האלבום',
     'en': 'Album photos',
     'ru': 'Фото альбома'
+  },
+  'admin.gallery.uploading': {
+    'he': 'מעלים תמונות…',
+    'en': 'Uploading photos…',
+    'ru': 'Загрузка фото…',
+  },
+  'admin.gallery.uploadProgress': {
+    'he': '{done} מתוך {total}',
+    'en': '{done} of {total}',
+    'ru': '{done} из {total}',
   },
 
   // Cemetery

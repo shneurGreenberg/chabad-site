@@ -26,21 +26,23 @@ class YoutubeIFrameState extends State<YoutubeIFrame> {
   Timer? _sync;
   bool _tornDown = false;
 
-  Future<void> teardown() async {
-    if (_tornDown) return;
+  void _stop() {
     _tornDown = true;
     _sync?.cancel();
     _sync = null;
     final iframe = _iframe;
     _iframe = null;
+    if (iframe == null) return;
     try {
-      if (iframe != null) {
-        iframe.style.pointerEvents = 'none';
-        iframe.style.display = 'none';
-        iframe.src = 'about:blank';
-        iframe.remove();
-      }
+      iframe.style.pointerEvents = 'none';
+      iframe.style.display = 'none';
+      iframe.src = 'about:blank';
+      iframe.remove();
     } catch (_) {}
+  }
+
+  Future<void> teardown() async {
+    _stop();
     await Future<void>.delayed(const Duration(milliseconds: 40));
   }
 
@@ -71,7 +73,7 @@ class YoutubeIFrameState extends State<YoutubeIFrame> {
 
   @override
   void dispose() {
-    unawaited(teardown());
+    _stop();
     super.dispose();
   }
 
@@ -106,30 +108,81 @@ class YoutubeIFrameState extends State<YoutubeIFrame> {
     web.document.body?.append(iframe);
     _iframe = iframe;
     _positionOverlay();
-    _sync = Timer.periodic(const Duration(milliseconds: 32), (_) {
+    _sync = Timer.periodic(const Duration(milliseconds: 32), (timer) {
+      if (!mounted || _tornDown) {
+        timer.cancel();
+        return;
+      }
       _positionOverlay();
     });
   }
 
   void _positionOverlay() {
     final iframe = _iframe;
-    if (iframe == null || _tornDown) return;
-    final ctx = _slotKey.currentContext;
-    if (ctx == null) return;
-    final box = ctx.findRenderObject();
-    if (box is! RenderBox || !box.hasSize) return;
-    final origin = box.localToGlobal(Offset.zero);
-    final size = box.size;
-    if (size.width < 2 || size.height < 2) {
-      iframe.style.display = 'none';
-      return;
+    if (iframe == null || _tornDown || !mounted) return;
+    try {
+      final ctx = _slotKey.currentContext;
+      if (ctx == null || !ctx.mounted) return;
+      final box = ctx.findRenderObject();
+      if (box is! RenderBox || !box.attached || !box.hasSize) return;
+      final origin = box.localToGlobal(Offset.zero);
+      final size = box.size;
+      if (size.width < 2 || size.height < 2) {
+        iframe.style.display = 'none';
+        return;
+      }
+      final css = _cssRect(ctx, origin, size);
+      iframe.style
+        ..display = 'block'
+        ..left = '${css.left.toStringAsFixed(1)}px'
+        ..top = '${css.top.toStringAsFixed(1)}px'
+        ..width = '${css.width.toStringAsFixed(1)}px'
+        ..height = '${css.height.toStringAsFixed(1)}px';
+    } catch (_) {}
+  }
+
+  /// Maps the Flutter slot into CSS pixels.
+  ///
+  /// On a phone, logical pixels and the glass-pane's CSS box can disagree
+  /// (device pixel ratio, visual viewport). `position:fixed` must use the
+  /// pane's box or the video sits off-screen or over the close button.
+  ({double left, double top, double width, double height}) _cssRect(
+    BuildContext context,
+    Offset origin,
+    Size size,
+  ) {
+    final view = View.of(context);
+    final dpr = view.devicePixelRatio == 0 ? 1.0 : view.devicePixelRatio;
+    final logicalW = view.physicalSize.width / dpr;
+    final logicalH = view.physicalSize.height / dpr;
+    var scaleX = 1.0;
+    var scaleY = 1.0;
+    var originX = 0.0;
+    var originY = 0.0;
+    final pane = web.document.querySelector('flt-glass-pane');
+    if (pane != null && logicalW > 1 && logicalH > 1) {
+      final rect = pane.getBoundingClientRect();
+      if (rect.width > 1 && rect.height > 1) {
+        scaleX = rect.width / logicalW;
+        scaleY = rect.height / logicalH;
+        originX = rect.left;
+        originY = rect.top;
+      }
+    } else {
+      final viewport = web.window.visualViewport;
+      final cssW = viewport?.width ?? web.window.innerWidth.toDouble();
+      final cssH = viewport?.height ?? web.window.innerHeight.toDouble();
+      if (logicalW > 1 && cssW > 1) scaleX = cssW / logicalW;
+      if (logicalH > 1 && cssH > 1) scaleY = cssH / logicalH;
+      originX = viewport?.offsetLeft ?? 0;
+      originY = viewport?.offsetTop ?? 0;
     }
-    iframe.style
-      ..display = 'block'
-      ..left = '${origin.dx.toStringAsFixed(1)}px'
-      ..top = '${origin.dy.toStringAsFixed(1)}px'
-      ..width = '${size.width.toStringAsFixed(1)}px'
-      ..height = '${size.height.toStringAsFixed(1)}px';
+    return (
+      left: originX + origin.dx * scaleX,
+      top: originY + origin.dy * scaleY,
+      width: size.width * scaleX,
+      height: size.height * scaleY,
+    );
   }
 
   @override

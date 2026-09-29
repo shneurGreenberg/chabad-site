@@ -10,6 +10,7 @@ import '../theme.dart';
 import '../util/youtube.dart';
 import '../services/cloud_sync.dart';
 import '../services/content_freshness.dart';
+import '../services/emblem_cache.dart';
 import '../services/image_compress.dart';
 import '../services/location_zmanim.dart';
 import '../services/persist.dart';
@@ -32,6 +33,8 @@ class AppRepository extends ChangeNotifier {
   AppRepository() {
     TelegramService.instance.loadSaved();
     _restoreLocation();
+    _adoptSplashEmblem();
+    unawaited(_adoptWarmEmblem());
     Future<void>.microtask(_boot);
   }
 
@@ -63,18 +66,27 @@ class AppRepository extends ChangeNotifier {
   AppLifecycleListener? _lifecycle;
   Future<void> _persistChain = Future<void>.value();
   bool _zmanimFresh = false;
+  bool _closed = false;
   void Function(String message)? onPersistWarning;
+  bool _localEmblemReady = false;
+  bool _hadLocalEmblem = false;
+  Uint8List? _cloudEmblem;
+  Future<void>? _remainingImages;
 
   /// Notify listeners after mutating a field directly (used by admin toggles).
   void refresh() => notifyListeners();
 
   @override
   void notifyListeners() {
+    if (_closed) return;
     super.notifyListeners();
     if (_hydrated) _schedulePersist();
   }
 
-  void _notifyUi() => super.notifyListeners();
+  void _notifyUi() {
+    if (_closed) return;
+    super.notifyListeners();
+  }
 
   /// Local hydrate + zmanim are enough to paint. New visitors also wait until
   /// the first cloud content pull (or a short timeout) so they are not stuck on
@@ -84,6 +96,7 @@ class AppRepository extends ChangeNotifier {
 
   @override
   void dispose() {
+    _closed = true;
     _saveDebounce?.cancel();
     _publishPoll?.cancel();
     _lifecycle?.dispose();
@@ -132,9 +145,18 @@ class AppRepository extends ChangeNotifier {
       debugPrint('Zmanim cache restore failed: $e');
     }
     _timesReady = true;
+    // Paint from the local snapshot before the rest of IndexedDB images
+    // finish. The community logo was already applied inside _hydrate.
     if (_diskHadSnapshot) {
       _notifyUi();
     }
+    try {
+      await (_remainingImages ?? Future<void>.value());
+    } catch (e) {
+      debugPrint('Image hydrate failed: $e');
+    }
+    if (_closed) return;
+    if (_diskHadSnapshot) _notifyUi();
 
     // New visitors: wait briefly for published text (not media). Then paint
     // even if Firestore is slow; a late pull still applies without a refresh.
@@ -144,6 +166,7 @@ class AppRepository extends ChangeNotifier {
     } catch (e) {
       debugPrint('Cloud pull failed/timed out: $e');
     }
+    if (_closed) return;
     _cloudPulled = true;
     _notifyUi();
 
@@ -626,7 +649,15 @@ class AppRepository extends ChangeNotifier {
     }
     if (cache == null) return;
     _applyCachedZmanim(cache);
-    _zmanimFresh = cache.isFreshFor(location);
+    if (!parashaCacheIsCurrent(shabbat, DateTime.now())) {
+      shabbat['parasha_he'] = '';
+      shabbat['parasha_en'] = '';
+      shabbat['parasha_ru'] = '';
+      shabbat['parasha_date'] = '';
+      _zmanimFresh = false;
+    } else {
+      _zmanimFresh = cache.isFreshFor(location);
+    }
   }
 
   void _applyCachedZmanim(CachedZmanim cache) {
@@ -2434,21 +2465,48 @@ class AppRepository extends ChangeNotifier {
     }
   }
 
-  void addGalleryShots(GalleryPhoto album, List<Uint8List> files) {
+  /// Adds album photos one at a time, yielding between files so the admin UI
+  /// can paint upload progress. Compression stays on this isolate (Flutter web
+  /// has no worker for `compute`), but it no longer runs as one blocking batch.
+  Future<void> addGalleryShots(
+    GalleryPhoto album,
+    List<Uint8List> files, {
+    void Function(int done, int total)? onProgress,
+    Future<Uint8List> Function(Uint8List bytes)? compress,
+    Future<void> Function()? yieldFrame,
+  }) async {
     _ensureAlbumPhotos(album);
-    for (final raw in files) {
-      if (raw.isEmpty) continue;
-      album.photos.add(GalleryShot(
-        id: _newId(),
-        imageBytes: compressSiteImage(raw),
-      ));
-    }
-    if (!_hasBytes(album.imageBytes) && album.photos.isNotEmpty) {
-      album.imageBytes = album.photos.first.imageBytes;
-      album.imageUrl = album.photos.first.imageUrl;
+    final encode = compress ?? _compressGalleryShot;
+    final pause = yieldFrame ?? _yieldUiFrame;
+    final batch = [for (final raw in files) if (raw.isNotEmpty) raw];
+    var done = 0;
+    onProgress?.call(done, batch.length);
+    for (final raw in batch) {
+      await pause();
+      final encoded = await encode(raw);
+      if (encoded.isEmpty) {
+        done++;
+        onProgress?.call(done, batch.length);
+        continue;
+      }
+      album.photos.add(GalleryShot(id: _newId(), imageBytes: encoded));
+      if (!_hasBytes(album.imageBytes)) {
+        album.imageBytes = encoded;
+        album.imageUrl = null;
+      }
+      done++;
+      onProgress?.call(done, batch.length);
     }
     notifyListeners();
   }
+
+  Future<Uint8List> _compressGalleryShot(Uint8List bytes) async {
+    await _yieldUiFrame();
+    return compressSiteImage(bytes);
+  }
+
+  Future<void> _yieldUiFrame() =>
+      Future<void>.delayed(const Duration(milliseconds: 16));
 
   void deleteGalleryShot(GalleryPhoto album, String shotId) {
     album.photos.removeWhere((s) => s.id == shotId);
@@ -2572,6 +2630,7 @@ class AppRepository extends ChangeNotifier {
   void setEmblemImage(Uint8List bytes) {
     emblemBytes = compressSiteImage(bytes);
     emblemUrl = null;
+    if (_hasBytes(emblemBytes)) writeEmblemSplashCache(emblemBytes!);
     unawaited(_persistEmblemNow());
     notifyListeners();
   }
@@ -2594,6 +2653,7 @@ class AppRepository extends ChangeNotifier {
   void clearEmblem() {
     emblemBytes = null;
     emblemUrl = _defaultEmblemAsset;
+    clearEmblemSplashCache();
     unawaited(persistDelete('${_imgPrefix}emblem:logo'));
     notifyListeners();
   }
@@ -2790,7 +2850,7 @@ class AppRepository extends ChangeNotifier {
         'subscribers': [for (final s in subscribers) subscriberToJson(s)],
         'telegramBot': botToJson(telegramBot),
         'socialBot': botToJson(socialBot),
-        'lang': readPref('lang') ?? 'he',
+        'lang': readPref('lang') ?? 'ru',
         'imageKeys': _collectImages().keys.toList(),
       };
 
@@ -3025,10 +3085,70 @@ class AppRepository extends ChangeNotifier {
       }
     }
     await _loadCart(m);
-    await _hydrateLocalImages(m);
+    await _loadStoredImage('emblem:logo');
+    if (_hasBytes(emblemBytes)) {
+      _hadLocalEmblem = true;
+      writeEmblemSplashCache(emblemBytes!);
+    }
+    _localEmblemReady = true;
+    _maybeApplyCloudEmblem();
+    _notifyUi();
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    // Other photos stay off the critical path so the header logo and first
+    // paint are not stuck behind every gallery file in IndexedDB.
+    _remainingImages = _hydrateLocalImages(m);
+  }
+
+  void _adoptSplashEmblem() {
+    final bytes = readEmblemSplashCache();
+    if (!_hasBytes(bytes)) return;
+    _hadLocalEmblem = true;
+    emblemBytes = bytes;
+    emblemUrl = null;
+  }
+
+  Future<void> _adoptWarmEmblem() async {
+    try {
+      await CloudSync.instance.warmEmblem();
+    } catch (_) {
+      return;
+    }
+    final bytes = CloudSync.instance.earlyEmblem;
+    if (!_hasBytes(bytes)) return;
+    _cloudEmblem = bytes;
+    _maybeApplyCloudEmblem();
+  }
+
+  void _maybeApplyCloudEmblem() {
+    final bytes = _cloudEmblem;
+    if (!_localEmblemReady || !_hasBytes(bytes)) return;
+    // A signed-in admin may have a newer local logo that is not published yet.
+    if (CloudSync.instance.signedIn && _hadLocalEmblem) return;
+    if (_bytesEq(emblemBytes, bytes)) return;
+    final persist = !_hadLocalEmblem;
+    emblemBytes = bytes;
+    emblemUrl = null;
+    writeEmblemSplashCache(bytes!);
+    if (persist) unawaited(_persistEmblemNow());
+    _notifyUi();
+  }
+
+  bool _bytesEq(Uint8List? a, Uint8List? b) {
+    if (identical(a, b)) return true;
+    if (a == null || b == null || a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  Future<void> _loadStoredImage(String key) async {
+    if (key.isEmpty) return;
+    final raw = await persistGet('$_imgPrefix$key');
+    final bytes = b64ToBytes(raw);
+    if (bytes != null) _applyLocalImage(key, bytes);
   }
 
   void _rememberDiskMeta(Map<String, dynamic> m) {
@@ -3456,10 +3576,8 @@ class AppRepository extends ChangeNotifier {
       ]);
     }
     for (final key in keys.toSet()) {
-      if (key.isEmpty) continue;
-      final raw = await persistGet('$_imgPrefix$key');
-      final bytes = b64ToBytes(raw);
-      if (bytes != null) _applyLocalImage(key, bytes);
+      if (key.isEmpty || key == 'emblem:logo') continue;
+      await _loadStoredImage(key);
     }
   }
 
@@ -3532,6 +3650,8 @@ class AppRepository extends ChangeNotifier {
         }
       case 'emblem':
         emblemBytes = bytes;
+        emblemUrl = null;
+        writeEmblemSplashCache(bytes);
       case 'famous':
         final existing = famous.where((p) => p.id == id);
         if (existing.isNotEmpty) {
@@ -3739,6 +3859,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   void _listenForPublishedUpdates() {
+    if (_closed) return;
     CloudSync.instance.watchPublished((at) {
       if (at == _appliedCloudUpdatedAt) return;
       if (CloudSync.instance.signedIn) return;
