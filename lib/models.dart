@@ -762,28 +762,33 @@ class OrderLine {
   double price;
 }
 
-/// One photo in a page banner (home can rotate through several).
+/// One photo or video in a page banner (the home hero rotates through several).
 class BannerSlide {
   BannerSlide({
     this.bytes,
     this.imageUrl,
+    this.videoUrl = '',
     this.alignX = 0,
     this.alignY = 0,
   });
   Uint8List? bytes;
   String? imageUrl;
+  String videoUrl;
   double alignX;
   double alignY;
 
   bool get hasImage =>
       (bytes != null && bytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty);
+  bool get hasVideo => videoUrl.trim().isNotEmpty;
+  bool get hasMedia => hasImage || hasVideo;
   /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
   Alignment get alignment => Alignment(0, alignY);
 
   BannerSlide copy() => BannerSlide(
         bytes: bytes,
         imageUrl: imageUrl,
+        videoUrl: videoUrl,
         alignX: alignX,
         alignY: alignY,
       );
@@ -794,12 +799,14 @@ class PageBanner {
   PageBanner({
     this.bytes,
     this.imageUrl,
+    this.videoUrl = '',
     this.alignX = 0,
     this.alignY = 0,
     List<BannerSlide>? extra,
   }) : extra = extra ?? [];
   Uint8List? bytes;
   String? imageUrl;
+  String videoUrl;
   double alignX;
   double alignY;
   List<BannerSlide> extra;
@@ -808,6 +815,10 @@ class PageBanner {
       (bytes != null && bytes!.isNotEmpty) ||
       (imageUrl != null && imageUrl!.isNotEmpty) ||
       extra.any((s) => s.hasImage);
+  bool get hasMedia =>
+      hasImage ||
+      videoUrl.trim().isNotEmpty ||
+      extra.any((s) => s.hasMedia);
   /// Horizontal focus is unused — crop is vertical-only (top ↔ bottom).
   Alignment get alignment => Alignment(0, alignY);
 
@@ -816,11 +827,12 @@ class PageBanner {
     final first = BannerSlide(
       bytes: bytes,
       imageUrl: imageUrl,
+      videoUrl: videoUrl,
       alignX: alignX,
       alignY: alignY,
     );
-    if (first.hasImage) out.add(first);
-    out.addAll(extra.where((s) => s.hasImage));
+    if (first.hasMedia) out.add(first);
+    out.addAll(extra.where((s) => s.hasMedia));
     return out;
   }
 }

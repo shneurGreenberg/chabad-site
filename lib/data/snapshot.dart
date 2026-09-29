@@ -236,6 +236,7 @@ GalleryPhoto galleryFromJson(dynamic raw) {
 
 Map<String, dynamic> bannerToJson(PageBanner b) => {
       'url': compactImageUrl(b.imageUrl),
+      if (b.videoUrl.trim().isNotEmpty) 'video': b.videoUrl.trim(),
       'x': b.alignX,
       'y': b.alignY,
       if (b.extra.isNotEmpty)
@@ -243,6 +244,7 @@ Map<String, dynamic> bannerToJson(PageBanner b) => {
           for (final s in b.extra)
             {
               'url': compactImageUrl(s.imageUrl),
+              if (s.videoUrl.trim().isNotEmpty) 'video': s.videoUrl.trim(),
               'x': s.alignX,
               'y': s.alignY,
             },
@@ -260,6 +262,7 @@ PageBanner bannerFromJson(dynamic raw) {
       extra.add(BannerSlide(
         bytes: b64ToBytes(s['image']),
         imageUrl: compactImageUrl(s['url'] is String ? '${s['url']}' : null),
+        videoUrl: '${s['video'] ?? ''}'.trim(),
         alignX: (s['x'] as num?)?.toDouble() ?? 0,
         alignY: (s['y'] as num?)?.toDouble() ?? 0,
       ));
@@ -268,6 +271,7 @@ PageBanner bannerFromJson(dynamic raw) {
   return PageBanner(
     bytes: b64ToBytes(m['image']),
     imageUrl: compactImageUrl(m['url'] is String ? '${m['url']}' : null),
+    videoUrl: '${m['video'] ?? ''}'.trim(),
     alignX: (m['x'] as num?)?.toDouble() ?? 0,
     alignY: (m['y'] as num?)?.toDouble() ?? 0,
     extra: extra,

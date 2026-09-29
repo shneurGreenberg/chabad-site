@@ -11,6 +11,7 @@ import '../data/repository.dart';
 import '../services/image_compress.dart';
 import '../services/links.dart';
 import '../services/web_prefs.dart';
+import '../util/youtube.dart';
 import 'playful_icons.dart';
 
 String copyOf(BuildContext context, Loc map, String fallbackKey) {
@@ -37,6 +38,9 @@ bool navIsActive(String current, String route) {
   if (route != '/' && current.startsWith('$route/')) return true;
   return false;
 }
+
+/// Home hero (and any multi-slide banner) advances on this interval.
+const heroSlideshowInterval = Duration(seconds: 3);
 
 int imageDecodePx(BuildContext context, double logical) {
   final dpr = MediaQuery.devicePixelRatioOf(context);
@@ -568,13 +572,13 @@ class PageHero extends StatelessWidget {
     final banner = context.watch<AppRepository>().bannerFor(path);
     return Container(
       width: double.infinity,
-      decoration: banner.hasImage
+      decoration: banner.hasMedia
           ? BoxDecoration(color: AppColors.primaryDark)
           : BoxDecoration(gradient: AppColors.heroGradient),
       child: Stack(
         children: [
           BannerFill(banner: banner),
-          if (!banner.hasImage) ...[
+          if (!banner.hasMedia) ...[
             PositionedDirectional(
               start: -40,
               top: -50,
@@ -689,13 +693,32 @@ class _BannerFillState extends State<BannerFill> {
   void _arm() {
     _timer?.cancel();
     if (_slides.length < 2) return;
-    _timer = Timer.periodic(const Duration(milliseconds: 3500), (_) {
+    _timer = Timer.periodic(heroSlideshowInterval, (_) {
       if (!mounted) return;
       setState(() => _index = (_index + 1) % _slides.length);
     });
   }
 
   Widget _image(BannerSlide slide) {
+    if (slide.hasVideo && !slide.hasImage) {
+      final id = youtubeIdFrom(slide.videoUrl);
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          if (id != null)
+            Image.network(
+              youtubeThumbnail(id),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              filterQuality: FilterQuality.high,
+              errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF0B1C3A)),
+            )
+          else
+            const ColoredBox(color: Color(0xFF0B1C3A)),
+        ],
+      );
+    }
     final bytes = slide.bytes;
     final url = slide.imageUrl;
     final screenW = imageDecodePx(context, MediaQuery.sizeOf(context).width);
@@ -739,7 +762,7 @@ class _BannerFillState extends State<BannerFill> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.banner.hasImage) return const SizedBox.shrink();
+    if (!widget.banner.hasMedia) return const SizedBox.shrink();
     final slides = _slides;
     if (slides.isEmpty) return const SizedBox.shrink();
     final i = _index.clamp(0, slides.length - 1);
@@ -760,8 +783,7 @@ class _BannerFillState extends State<BannerFill> {
             );
           },
           child: KeyedSubtree(
-            key: ValueKey(
-                '${i}_${slides[i].imageUrl}_${slides[i].bytes?.length}_${slides[i].alignX}_${slides[i].alignY}'),
+            key: ValueKey('banner-slide-$i'),
             child: _image(slides[i]),
           ),
         ),
@@ -777,6 +799,12 @@ class _BannerFillState extends State<BannerFill> {
             ),
           ),
         ),
+        if (slides[i].hasVideo)
+          const PositionedDirectional(
+            bottom: 18,
+            start: 18,
+            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
+          ),
       ],
     );
     if (!widget.positioned) return body;

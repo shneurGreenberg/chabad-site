@@ -108,6 +108,24 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Latest News',
     'ru': 'Последние новости'
   },
+  'home.register.title': {
+    'he': 'שורשים יהודיים',
+    'en': 'Jewish roots',
+    'ru': 'Еврейские корни'
+  },
+  'home.register.body': {
+    'he':
+        'אם יש לכם מוצא יהודי או שורשים יהודיים — בואו להירשם ולגלות את התוכניות והשירותים שאנחנו יכולים להציע.',
+    'en':
+        'If you have Jewish origins or Jewish roots, come register to discover the programs and services we can offer.',
+    'ru':
+        'Если у вас еврейское происхождение или еврейские корни — зарегистрируйтесь и узнайте, какие программы и услуги мы можем предложить.'
+  },
+  'home.register.cta': {
+    'he': 'להירשם',
+    'en': 'Register',
+    'ru': 'Зарегистрироваться'
+  },
   'home.programs.title': {
     'he': 'תוכניות הקהילה',
     'en': 'Community Programs',
@@ -854,6 +872,21 @@ const Map<String, Map<String, String>> _strings = {
     'he': 'באנר כחול כברירת מחדל',
     'en': 'Default blue banner',
     'ru': 'Синий баннер по умолчанию'
+  },
+  'admin.banners.video': {
+    'he': 'קישור וידאו (YouTube)',
+    'en': 'Video link (YouTube)',
+    'ru': 'Ссылка на видео (YouTube)'
+  },
+  'admin.banners.addVideo': {
+    'he': 'הוספת וידאו',
+    'en': 'Add video',
+    'ru': 'Добавить видео'
+  },
+  'admin.banners.heroHint': {
+    'he': 'התמונות והסרטונים בעמוד הבית מתחלפים כל 3 שניות. בלי תוספת נשארות שתי תמונות הבית.',
+    'en': 'Home photos and videos rotate every 3 seconds. With nothing added, the two building photos stay.',
+    'ru': 'Фото и видео на главной сменяются каждые 3 секунды. Если ничего не добавить, остаются два фото здания.'
   },
   'admin.banners.hint': {
     'he': 'גררו את התמונה למעלה או למטה כדי לבחור את המיקוד האנכי — בכל עמוד באתר. אפשר גם כמה תמונות שמתחלפות לבד.',

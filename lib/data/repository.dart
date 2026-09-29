@@ -2521,11 +2521,21 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   final Map<String, PageBanner> banners = {
     for (final slot in bannerSlots)
-      slot.route: PageBanner(
-        imageUrl: slot.route == '/' || slot.route == '/about'
-            ? 'assets/images/beit-menachem-1.jpg'
-            : 'assets/images/beit-menachem-2.jpg',
-      ),
+      slot.route: slot.route == '/'
+          ? PageBanner(
+              imageUrl: 'assets/images/beit-menachem-1.jpg',
+              extra: [
+                BannerSlide(
+                  imageUrl: 'assets/images/beit-menachem-2.jpg',
+                  alignY: -0.1,
+                ),
+              ],
+            )
+          : PageBanner(
+              imageUrl: slot.route == '/about'
+                  ? 'assets/images/beit-menachem-1.jpg'
+                  : 'assets/images/beit-menachem-2.jpg',
+            ),
   };
 
   PageBanner bannerFor(String route) {
@@ -2545,12 +2555,29 @@ class AppRepository extends ChangeNotifier {
   void addBannerSlide(String route, Uint8List bytes) {
     final current = banners.putIfAbsent(route, PageBanner.new);
     final compressed = compressSiteImage(bytes);
-    if (!current.hasImage) {
+    final primaryOpen =
+        !current.hasImage && current.videoUrl.trim().isEmpty;
+    if (primaryOpen) {
       current.bytes = compressed;
       current.imageUrl = null;
       current.alignY = -0.2;
     } else {
       current.extra.add(BannerSlide(bytes: compressed, alignY: -0.2));
+    }
+    notifyListeners();
+  }
+
+  /// Adds a video (YouTube link) to the hero slideshow for [route].
+  void addBannerVideo(String route, String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return;
+    final current = banners.putIfAbsent(route, PageBanner.new);
+    final primaryOpen =
+        !current.hasImage && current.videoUrl.trim().isEmpty;
+    if (primaryOpen) {
+      current.videoUrl = trimmed;
+    } else {
+      current.extra.add(BannerSlide(videoUrl: trimmed));
     }
     notifyListeners();
   }
@@ -2563,11 +2590,13 @@ class AppRepository extends ChangeNotifier {
         final next = current.extra.removeAt(0);
         current.bytes = next.bytes;
         current.imageUrl = next.imageUrl;
+        current.videoUrl = next.videoUrl;
         current.alignX = next.alignX;
         current.alignY = next.alignY;
       } else {
         current.bytes = null;
         current.imageUrl = null;
+        current.videoUrl = '';
       }
     } else {
       final i = index - 1;
@@ -3054,6 +3083,23 @@ class AppRepository extends ChangeNotifier {
     }
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureHomeSlideshow();
+  }
+
+  /// The packaged home hero is two building photos, not one still frame.
+  /// A saved custom slideshow is left as the admin set it.
+  void _ensureHomeSlideshow() {
+    final home = banners.putIfAbsent('/', PageBanner.new);
+    final slides = home.allSlides;
+    const first = 'assets/images/beit-menachem-1.jpg';
+    const second = 'assets/images/beit-menachem-2.jpg';
+    final onlyPackaged = slides.isNotEmpty &&
+        slides.every((s) => s.imageUrl == first || s.imageUrl == second) &&
+        !slides.any((s) => s.hasVideo);
+    final hasSecond = slides.any((s) => s.imageUrl == second);
+    if (onlyPackaged && !hasSecond) {
+      home.extra.add(BannerSlide(imageUrl: second, alignY: -0.1));
+    }
   }
 
   Future<void> _hydrate() async {
@@ -3085,6 +3131,7 @@ class AppRepository extends ChangeNotifier {
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureHomeSlideshow();
     // Other photos stay off the critical path so the header logo and first
     // paint are not stuck behind every gallery file in IndexedDB.
     _remainingImages = _hydrateLocalImages(m);
@@ -3350,6 +3397,9 @@ class AppRepository extends ChangeNotifier {
             !incoming.imageUrl!.startsWith('assets/')) {
           current.imageUrl = incoming.imageUrl;
         }
+        if (incoming.videoUrl.trim().isNotEmpty) {
+          current.videoUrl = incoming.videoUrl;
+        }
         if (incoming.alignX != 0) current.alignX = incoming.alignX;
         if (incoming.alignY != 0) current.alignY = incoming.alignY;
         for (var i = 0; i < incoming.extra.length; i++) {
@@ -3364,6 +3414,9 @@ class AppRepository extends ChangeNotifier {
               src.imageUrl!.isNotEmpty &&
               !src.imageUrl!.startsWith('assets/')) {
             current.extra[i].imageUrl = src.imageUrl;
+          }
+          if (src.videoUrl.trim().isNotEmpty) {
+            current.extra[i].videoUrl = src.videoUrl;
           }
           current.extra[i].alignX = src.alignX;
           current.extra[i].alignY = src.alignY;
@@ -3386,10 +3439,11 @@ class AppRepository extends ChangeNotifier {
         ],
         banners: {
           for (final e in banners.entries)
-            if (e.value.hasImage)
+            if (e.value.hasMedia)
               e.key: PageBanner(
                 bytes: e.value.bytes,
                 imageUrl: e.value.imageUrl,
+                videoUrl: e.value.videoUrl,
                 alignX: e.value.alignX,
                 alignY: e.value.alignY,
                 extra: [for (final s in e.value.extra) s.copy()],
@@ -3829,6 +3883,7 @@ class AppRepository extends ChangeNotifier {
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureHomeSlideshow();
     _cloudPulled = true;
 
     try {

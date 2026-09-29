@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +25,12 @@ class HomePage extends StatelessWidget {
       currentRoute: '/',
       children: [
         const _Hero(),
+        if (repo.news.isNotEmpty)
+          Section(
+            padTop: 12,
+            padBottom: 0,
+            child: HomeNewsTicker(articles: repo.news.take(6).toList()),
+          ),
         Section(
           padTop: 24,
           padBottom: 0,
@@ -70,21 +78,6 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _headerRow(context, loc.t('home.news.title'), '/news'),
-              const SizedBox(height: 18),
-              ResponsiveGrid(
-                columns: gridColumns(context, max: 3),
-                children: [
-                  for (final a in repo.news.take(3)) NewsCard(a),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Section(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
               _headerRow(context, loc.t('home.programs.title'), '/programs'),
               const SizedBox(height: 18),
               ResponsiveGrid(
@@ -127,23 +120,6 @@ class _Hero extends StatelessWidget {
     final loc = context.locWatch;
     final repo = context.watch<AppRepository>();
     final wide = MediaQuery.sizeOf(context).width >= 980;
-    final holidayHe = (repo.shabbat['holiday_he'] ?? '').trim();
-    final holidayEn = (repo.shabbat['holiday_en'] ?? '').trim();
-    final holidayRu = (repo.shabbat['holiday_ru'] ?? '').trim();
-    // RU: prefer holiday_ru, then EN/HE memo titles (e.g. Rosh Hashana / Рош а-Шана).
-    final holiday = switch (loc.lang) {
-      'he' => holidayHe.isNotEmpty ? holidayHe : holidayEn,
-      'ru' => holidayRu.isNotEmpty
-          ? holidayRu
-          : (holidayEn.isNotEmpty ? holidayEn : holidayHe),
-      _ => holidayEn.isNotEmpty ? holidayEn : holidayHe,
-    }.trim();
-    final parasha = switch (loc.lang) {
-      'he' => repo.shabbat['parasha_he'] ?? '',
-      'ru' => repo.shabbat['parasha_ru'] ?? '',
-      _ => repo.shabbat['parasha_en'] ?? '',
-    }.trim();
-    final isHoliday = repo.shabbat['is_holiday'] == '1' && holiday.isNotEmpty;
 
     final copy = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,26 +182,18 @@ class _Hero extends StatelessWidget {
       ],
     );
 
-    final shabbatCard = _ShabbatCard(
-      parasha: parasha.trim().isEmpty ? loc.t('zmanim.shabbat') : parasha,
-      candle: repo.shabbat['candle'] ?? '--:--',
-      havdala: repo.shabbat['havdala'] ?? '--:--',
-      holiday: holiday,
-      holidayCandle: repo.shabbat['holiday_candle'] ?? '',
-      holidayHavdala: repo.shabbat['holiday_havdala'] ?? '',
-      isHoliday: isHoliday && holiday.isNotEmpty,
-    );
+    final register = const HomeRegisterBanner();
 
     final banner = repo.bannerFor('/');
     return Container(
-      decoration: banner.hasImage
+      decoration: banner.hasMedia
           ? BoxDecoration(color: AppColors.primaryDark)
           : BoxDecoration(gradient: AppColors.heroGradient),
       width: double.infinity,
       child: Stack(
         children: [
           BannerFill(banner: banner),
-          if (!banner.hasImage) ...[
+          if (!banner.hasMedia) ...[
           PositionedDirectional(
             end: -80,
             top: -70,
@@ -259,8 +227,8 @@ class _Hero extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(flex: 6, child: copy),
-                      const SizedBox(width: 40),
-                      Expanded(flex: 4, child: shabbatCard),
+                      const SizedBox(width: 28),
+                      Expanded(flex: 5, child: register),
                     ],
                   )
                 : Column(
@@ -268,7 +236,7 @@ class _Hero extends StatelessWidget {
                     children: [
                       copy,
                       const SizedBox(height: 28),
-                      shabbatCard,
+                      register,
                     ],
                   ),
           ),
@@ -278,135 +246,222 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _ShabbatCard extends StatelessWidget {
-  const _ShabbatCard({
-    required this.parasha,
-    required this.candle,
-    required this.havdala,
-    this.holiday = '',
-    this.holidayCandle = '',
-    this.holidayHavdala = '',
-    this.isHoliday = false,
-  });
-  final String parasha;
-  final String candle;
-  final String havdala;
-  final String holiday;
-  final String holidayCandle;
-  final String holidayHavdala;
-  final bool isHoliday;
+class HomeRegisterBanner extends StatelessWidget {
+  const HomeRegisterBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final showHolidayTimes = isHoliday ||
-        holidayCandle.trim().isNotEmpty ||
-        holidayHavdala.trim().isNotEmpty;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xF20B1C3A),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: const ValueKey('home-register-banner'),
+        onTap: () => context.go('/contact'),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-            color: AppColors.accent.withValues(alpha: 0.7), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                PlayfulIcon(Icons.local_fire_department, color: AppColors.accentSoft),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    loc.t('zmanim.shabbat'),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 8),
-              Text(
-                parasha.trim().isEmpty ? loc.t('zmanim.nextShabbat') : parasha,
-                style: TextStyle(
-                    color: AppColors.accentSoft.withValues(alpha: 0.95),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14.5),
-              ),
-              const SizedBox(height: 18),
-              if (candle.trim().isNotEmpty && candle != '--:--')
-                _row(loc.t('zmanim.candle'), candle),
-              if (havdala.trim().isNotEmpty && havdala != '--:--') ...[
-                const SizedBox(height: 10),
-                _row(loc.t('zmanim.havdala'), havdala),
-              ],
-              if (showHolidayTimes && holiday.trim().isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Text(
-                  '${loc.t('zmanim.holiday')}: $holiday',
-                  style: TextStyle(
-                      color: AppColors.accentSoft.withValues(alpha: 0.95),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14),
-                ),
-                if (holidayCandle.trim().isNotEmpty &&
-                    holidayCandle != '--:--') ...[
-                  const SizedBox(height: 10),
-                  _row(loc.t('zmanim.candle'), holidayCandle),
-                ],
-                if (holidayHavdala.trim().isNotEmpty &&
-                    holidayHavdala != '--:--') ...[
-                  const SizedBox(height: 10),
-                  _row(loc.t('zmanim.motzeiChag'), holidayHavdala),
-                ],
-              ],
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => context.go('/zmanim'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.45)),
-                  ),
-                  icon: const PlayfulIcon(Icons.schedule, size: 18),
-                  label: Text(loc.t('home.zmanim.title')),
-                ).hoverLift(),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 26),
+          decoration: BoxDecoration(
+            gradient: AppColors.goldGradient,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                PlayfulIcon(Icons.group_add, color: AppColors.primaryDark),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    loc.t('home.register.title'),
+                    style: const TextStyle(
+                      color: Color(0xFF0B1C3A),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 22,
+                      height: 1.15,
+                    ),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              Text(
+                loc.t('home.register.body'),
+                style: const TextStyle(
+                  color: Color(0xFF0B1C3A),
+                  fontSize: 16.5,
+                  height: 1.45,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 18),
+              FilledButton.icon(
+                onPressed: () => context.go('/contact'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primaryDark,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                ),
+                icon: const PlayfulIcon(Icons.app_registration, size: 18),
+                label: Text(loc.t('home.register.cta')),
+              ).hoverLift(),
+            ],
+          ),
+        ),
+      ),
     );
   }
+}
 
-  Widget _row(String label, String time) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-      ),
-      child: Row(children: [
-        Expanded(
-          child: Text(label,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+/// Compact latest-news strip. One item is visible; the next slides in from the side.
+const homeNewsInterval = Duration(seconds: 5);
+
+class HomeNewsTicker extends StatefulWidget {
+  const HomeNewsTicker({
+    super.key,
+    required this.articles,
+    this.interval = homeNewsInterval,
+  });
+  final List<NewsArticle> articles;
+  final Duration interval;
+
+  @override
+  State<HomeNewsTicker> createState() => _HomeNewsTickerState();
+}
+
+class _HomeNewsTickerState extends State<HomeNewsTicker> {
+  int _index = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _arm();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeNewsTicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_index >= widget.articles.length) _index = 0;
+    _arm();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _arm() {
+    _timer?.cancel();
+    if (widget.articles.length < 2) return;
+    _timer = Timer.periodic(widget.interval, (_) {
+      if (!mounted) return;
+      setState(() => _index = (_index + 1) % widget.articles.length);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final articles = widget.articles;
+    if (articles.isEmpty) return const SizedBox.shrink();
+    final loc = context.locWatch;
+    final i = _index.clamp(0, articles.length - 1);
+    final article = articles[i];
+    final fromSide = Directionality.of(context) == TextDirection.rtl ? -1.0 : 1.0;
+    return Material(
+      color: AppColors.card,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      child: InkWell(
+        key: const ValueKey('home-news-ticker'),
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.go('/news/${article.id}'),
+        child: Container(
+          height: 72,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: AppColors.cardShadow,
+            border: Border.all(color: AppColors.ink.withValues(alpha: 0.06)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: PlayfulIcon(Icons.article_outlined,
+                    color: AppColors.primary, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ClipRect(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 450),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (current, previous) => Stack(
+                      alignment: AlignmentDirectional.centerStart,
+                      children: [...previous, if (current != null) current],
+                    ),
+                    transitionBuilder: (child, anim) {
+                      final incoming = child.key == ValueKey('home-news-${article.id}');
+                      final begin = incoming ? Offset(fromSide, 0) : Offset(-fromSide, 0);
+                      return SlideTransition(
+                        position: Tween<Offset>(begin: begin, end: Offset.zero)
+                            .animate(anim),
+                        child: FadeTransition(opacity: anim, child: child),
+                      );
+                    },
+                    child: Align(
+                      key: ValueKey('home-news-${article.id}'),
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            loc.t('home.news.title'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            trLoc(article.title, loc.lang),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/news'),
+                child: Text(loc.t('common.viewAll')),
+              ),
+            ],
+          ),
         ),
-        Text(time,
-            style: const TextStyle(
-                color: Color(0xFFFFF6D8),
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-                letterSpacing: 0.3)),
-      ]),
+      ),
     );
   }
 }
@@ -481,6 +536,12 @@ class _ZmanimStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    final parasha = switch (loc.lang) {
+      'he' => repo.shabbat['parasha_he'] ?? '',
+      'ru' => repo.shabbat['parasha_ru'] ?? '',
+      _ => repo.shabbat['parasha_en'] ?? '',
+    }.trim();
+    final havdala = (repo.shabbat['havdala'] ?? '').trim();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -504,11 +565,17 @@ class _ZmanimStrip extends StatelessWidget {
                 ),
                 child: PlayfulIcon(Icons.schedule, color: AppColors.primary),
               ),
-              Text(loc.t('home.zmanim.title'),
+              Text(loc.t('zmanim.shabbat'),
                   style: Theme.of(context)
                       .textTheme
                       .titleLarge
                       ?.copyWith(fontSize: 20)),
+              if (parasha.isNotEmpty)
+                Text(parasha,
+                    style: TextStyle(
+                        color: AppColors.muted,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14)),
               Pill(
                 '${loc.t('zmanim.forCity')} ${repo.location.cityName}',
                 icon: Icons.place_outlined,
@@ -531,6 +598,9 @@ class _ZmanimStrip extends StatelessWidget {
               _zmanChip(loc.t('zmanim.candle'), repo.shabbat['candle']!,
                   AppColors.accent,
                   icon: Icons.local_fire_department, kind: PlayfulKind.flame),
+              if (havdala.isNotEmpty && havdala != '--:--')
+                _zmanChip(loc.t('zmanim.havdala'), havdala, AppColors.primary,
+                    icon: Icons.nightlight_round, kind: PlayfulKind.flame),
             ],
           ),
         ],

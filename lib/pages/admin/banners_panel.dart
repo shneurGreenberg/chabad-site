@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../theme.dart';
+import '../../util/youtube.dart';
 import '../../widgets/brand.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
@@ -155,7 +156,7 @@ class _BannerEditor extends StatelessWidget {
                     ? loc.t('admin.banners.upload')
                     : loc.t('admin.banners.addSlide')),
               ).hoverLift(),
-              if (banner.hasImage)
+              if (banner.hasMedia)
                 OutlinedButton.icon(
                   onPressed: () => repo.clearBanner(slot.route),
                   icon: const PlayfulIcon(Icons.delete_outline, size: 18),
@@ -164,6 +165,13 @@ class _BannerEditor extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
+          if (slot.route == '/') ...[
+            Text(loc.t('admin.banners.heroHint'),
+                style: TextStyle(color: AppColors.muted, fontSize: 13, height: 1.4)),
+            const SizedBox(height: 10),
+            _HeroVideoField(route: slot.route),
+            const SizedBox(height: 8),
+          ],
           Text(loc.t('admin.banners.preview'),
               style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
           if (slides.isNotEmpty) ...[
@@ -189,22 +197,26 @@ class _BannerEditor extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            _BannerCropPreview(
-              slide: slides[i],
-              height: previewH,
-              label: loc.t(slot.labelKey),
-              onPan: (y) => repo.setSlideAlign(slot.route, i, x: 0, y: y),
-            ),
-            Text(loc.t('admin.banners.alignY'),
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-            Slider(
-              value: slides[i].alignY,
-              min: -1,
-              max: 1,
-              label: slides[i].alignY.toStringAsFixed(2),
-              onChanged: (v) =>
-                  repo.setSlideAlign(slot.route, i, x: 0, y: v),
-            ),
+            if (slides[i].hasVideo && !slides[i].hasImage)
+              _VideoSlidePreview(slide: slides[i], height: previewH)
+            else ...[
+              _BannerCropPreview(
+                slide: slides[i],
+                height: previewH,
+                label: loc.t(slot.labelKey),
+                onPan: (y) => repo.setSlideAlign(slot.route, i, x: 0, y: y),
+              ),
+              Text(loc.t('admin.banners.alignY'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              Slider(
+                value: slides[i].alignY,
+                min: -1,
+                max: 1,
+                label: slides[i].alignY.toStringAsFixed(2),
+                onChanged: (v) =>
+                    repo.setSlideAlign(slot.route, i, x: 0, y: v),
+              ),
+            ],
           ],
           if (slides.isEmpty)
             ClipRRect(
@@ -221,6 +233,95 @@ class _BannerEditor extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeroVideoField extends StatefulWidget {
+  const _HeroVideoField({required this.route});
+  final String route;
+
+  @override
+  State<_HeroVideoField> createState() => _HeroVideoFieldState();
+}
+
+class _HeroVideoFieldState extends State<_HeroVideoField> {
+  final _url = TextEditingController();
+
+  @override
+  void dispose() {
+    _url.dispose();
+    super.dispose();
+  }
+
+  Future<void> _add() async {
+    final text = _url.text.trim();
+    if (text.isEmpty) return;
+    final repo = context.read<AppRepository>();
+    repo.addBannerVideo(widget.route, text);
+    await repo.persistAdminConfirm();
+    if (!mounted) return;
+    _url.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _url,
+            decoration: InputDecoration(
+              labelText: loc.t('admin.banners.video'),
+              hintText: 'https://www.youtube.com/watch?v=…',
+              isDense: true,
+            ),
+            onSubmitted: (_) => _add(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        FilledButton.icon(
+          onPressed: _add,
+          icon: const PlayfulIcon(Icons.movie_outlined, size: 18),
+          label: Text(loc.t('admin.banners.addVideo')),
+        ).hoverLift(),
+      ],
+    );
+  }
+}
+
+class _VideoSlidePreview extends StatelessWidget {
+  const _VideoSlidePreview({required this.slide, required this.height});
+  final BannerSlide slide;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = youtubeIdFrom(slide.videoUrl);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (id != null)
+              Image.network(
+                youtubeThumbnail(id),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) =>
+                    const ColoredBox(color: Color(0xFF0B1C3A)),
+              )
+            else
+              const ColoredBox(color: Color(0xFF0B1C3A)),
+            const Center(
+              child: Icon(Icons.play_circle_fill, color: Colors.white, size: 48),
+            ),
+          ],
+        ),
       ),
     );
   }
