@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import '../l10n/strings.dart';
 import '../models.dart';
 import '../theme.dart';
 import '../util/youtube.dart';
@@ -2698,10 +2699,46 @@ class AppRepository extends ChangeNotifier {
   bool _locHas(Loc map, String q) =>
       map.values.any((v) => v.toLowerCase().contains(q));
 
+  /// Menu sections a visitor can open by name (header, drawer, and footer).
+  static const _menuSections = <_MenuSection>[
+    _MenuSection('/', 'nav.home', Icons.home_outlined),
+    _MenuSection('/news', 'nav.news', Icons.article_outlined),
+    _MenuSection('/zmanim', 'nav.zmanim', Icons.schedule),
+    _MenuSection('/programs', 'nav.programs', Icons.groups_outlined),
+    _MenuSection('/gallery', 'nav.gallery', Icons.photo_library_outlined),
+    _MenuSection('/store', 'nav.store', Icons.storefront_outlined),
+    _MenuSection('/events', 'nav.events', Icons.event_outlined),
+    _MenuSection('/cemetery', 'nav.cemetery', Icons.grid_view_outlined),
+    _MenuSection('/famous', 'nav.famous', Icons.star_outline),
+    _MenuSection('/history', 'nav.history', Icons.account_balance_outlined),
+    _MenuSection('/library', 'nav.library', Icons.menu_book_outlined),
+    _MenuSection('/tourist', 'nav.tourist', Icons.explore_outlined),
+    _MenuSection('/about', 'nav.about', Icons.info_outline),
+    _MenuSection('/donate', 'nav.donate', Icons.favorite_outline),
+    _MenuSection('/contact', 'nav.contact', Icons.app_registration),
+  ];
+
+  void _addMenuSections(List<SearchHit> hits, String q, String lang) {
+    for (final section in _menuSections) {
+      final matched = supportedLangs.any(
+        (code) => uiText(section.labelKey, code).toLowerCase().contains(q),
+      );
+      if (!matched) continue;
+      hits.add(SearchHit(
+        groupKey: 'nav.menu',
+        title: uiText(section.labelKey, lang),
+        subtitle: '',
+        route: section.route,
+        icon: section.icon,
+      ));
+    }
+  }
+
   List<SearchHit> searchSite(String query, String lang) {
     final q = query.trim().toLowerCase();
     if (q.length < 2) return const [];
     final hits = <SearchHit>[];
+    _addMenuSections(hits, q, lang);
 
     for (final a in news) {
       if (!a.published) continue;
@@ -4004,4 +4041,11 @@ class _UploadKeep {
   final Map<String, PageBanner> banners;
   final Uint8List? emblemBytes;
   final List<FamousPerson> famous;
+}
+
+class _MenuSection {
+  const _MenuSection(this.route, this.labelKey, this.icon);
+  final String route;
+  final String labelKey;
+  final IconData icon;
 }

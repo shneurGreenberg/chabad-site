@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
+import '../section_heading.dart';
 import '../theme.dart';
 import '../data/repository.dart';
 import '../services/image_compress.dart';
@@ -241,15 +242,23 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context)
+        .textTheme
+        .headlineMedium
+        ?.copyWith(fontSize: 32, height: 1.2, letterSpacing: -0.4);
+    final subtitleStyle = Theme.of(context)
+        .textTheme
+        .titleMedium
+        ?.copyWith(color: AppColors.muted, height: 1.4);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            textAlign: TextAlign.start,
-            style: Theme.of(context)
-                .textTheme
-                .headlineMedium
-                ?.copyWith(fontSize: 32, height: 1.2, letterSpacing: -0.4)),
+        linkIfSectionHeading(
+          context,
+          title,
+          textAlign: TextAlign.start,
+          style: titleStyle,
+        ),
         const SizedBox(height: 12),
         Container(
           width: 72,
@@ -261,17 +270,66 @@ class SectionHeader extends StatelessWidget {
         ),
         if (subtitle != null) ...[
           const SizedBox(height: 12),
-          Text(
+          linkIfSectionHeading(
+            context,
             subtitle!,
             textAlign: TextAlign.start,
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(color: AppColors.muted, height: 1.4),
+            style: subtitleStyle,
           ),
         ],
       ],
     );
+  }
+}
+
+/// Renders [text] as a link when it names a real page.
+Widget linkIfSectionHeading(
+  BuildContext context,
+  String text, {
+  TextStyle? style,
+  TextAlign? textAlign,
+  int? maxLines,
+  TextOverflow? overflow,
+}) {
+  final child = Text(
+    text,
+    textAlign: textAlign,
+    maxLines: maxLines,
+    overflow: overflow,
+    style: style,
+  );
+  final route = sectionHeadingRoute(text);
+  if (route == null || _onSectionPage(context, route)) return child;
+  return TextButton(
+    style: TextButton.styleFrom(
+      foregroundColor: style?.color,
+      padding: EdgeInsets.zero,
+      minimumSize: Size.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      alignment: AlignmentDirectional.centerStart,
+      textStyle: style,
+      visualDensity: VisualDensity.compact,
+    ),
+    onPressed: () => context.go(route),
+    child: child,
+  );
+}
+
+bool _onSectionPage(BuildContext context, String route) {
+  final path = _sectionPath(context);
+  if (path == null) return false;
+  if (route == '/') return path == '/';
+  return path == route || path.startsWith('$route/');
+}
+
+/// Current route when this widget sits under a GoRouter page. Tests and
+/// previews that mount a heading alone have no route.
+String? _sectionPath(BuildContext context) {
+  if (ModalRoute.of(context) == null) return null;
+  try {
+    return GoRouterState.of(context).uri.path;
+  } catch (_) {
+    return null;
   }
 }
 
