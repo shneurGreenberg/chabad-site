@@ -394,16 +394,23 @@ class AdminImageCountLine extends StatelessWidget {
 }
 
 /// Pick several photos at once for a gallery album.
+///
+/// Every shot is in the list. The dialog scrolls through them. A star or a
+/// drag to the first row chooses the cover.
 class AlbumPhotosPicker extends StatelessWidget {
   const AlbumPhotosPicker({
     super.key,
     required this.photos,
     required this.onAdd,
     required this.onRemove,
+    this.onMakeCover,
+    this.onReorder,
   });
   final List<GalleryShot> photos;
   final Future<void> Function() onAdd;
   final ValueChanged<String> onRemove;
+  final ValueChanged<String>? onMakeCover;
+  final void Function(int oldIndex, int newIndex)? onReorder;
 
   @override
   Widget build(BuildContext context) {
@@ -414,50 +421,24 @@ class AlbumPhotosPicker extends StatelessWidget {
         Text(loc.t('admin.gallery.photos'),
             style: const TextStyle(fontWeight: FontWeight.w700)),
         const SizedBox(height: 10),
-        if (photos.isNotEmpty)
-          SizedBox(
-            height: 112,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: photos.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (context, i) {
-                final shot = photos[i];
-                return Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: SizedBox(
-                        width: 112,
-                        height: 112,
-                        child: ShotImage(shot),
-                      ),
-                    ),
-                    PositionedDirectional(
-                      top: 4,
-                      end: 4,
-                      child: Material(
-                        color: Colors.black54,
-                        shape: const CircleBorder(),
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: () => onRemove(shot.id),
-                          child: const Padding(
-                            padding: EdgeInsets.all(4),
-                            child: PlayfulIcon(Icons.close,
-                                size: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          )
-        else
+        if (photos.isEmpty)
           Text(loc.t('gallery.emptyAlbum'),
-              style: TextStyle(color: AppColors.muted, fontSize: 13)),
+              style: TextStyle(color: AppColors.muted, fontSize: 13))
+        else
+          ReorderableListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            buildDefaultDragHandles: false,
+            onReorder: (oldIndex, newIndex) {
+              var target = newIndex;
+              if (target > oldIndex) target -= 1;
+              onReorder?.call(oldIndex, target);
+            },
+            children: [
+              for (var i = 0; i < photos.length; i++)
+                _albumShotRow(loc, photos[i], i),
+            ],
+          ),
         const SizedBox(height: 10),
         FilledButton.icon(
           onPressed: onAdd,
@@ -465,6 +446,61 @@ class AlbumPhotosPicker extends StatelessWidget {
           label: Text(loc.t('admin.gallery.addPhotos')),
         ).hoverLift(),
       ],
+    );
+  }
+
+  Widget _albumShotRow(LocaleController loc, GalleryShot shot, int index) {
+    final cover = index == 0;
+    return Material(
+      key: ValueKey('album-shot-${shot.id}'),
+      color: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: 64,
+                height: 64,
+                child: ShotImage(shot),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                cover ? loc.t('admin.gallery.cover') : '${index + 1}',
+                style: TextStyle(
+                  fontWeight: cover ? FontWeight.w800 : FontWeight.w600,
+                  color: cover ? AppColors.primary : AppColors.muted,
+                ),
+              ),
+            ),
+            IconButton(
+              key: ValueKey('album-cover-${shot.id}'),
+              tooltip: loc.t('admin.gallery.makeCover'),
+              onPressed: () => onMakeCover?.call(shot.id),
+              icon: Icon(
+                cover ? Icons.star : Icons.star_border,
+                color: cover ? const Color(0xFFC9A227) : AppColors.muted,
+              ),
+            ),
+            IconButton(
+              key: ValueKey('album-delete-${shot.id}'),
+              tooltip: loc.t('common.delete'),
+              onPressed: () => onRemove(shot.id),
+              icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
+            ),
+            ReorderableDragStartListener(
+              index: index,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(Icons.drag_handle),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -475,9 +511,11 @@ class GalleryUploadOverlay extends StatefulWidget {
     super.key,
     required this.done,
     required this.total,
+    this.preparing = false,
   });
   final int done;
   final int total;
+  final bool preparing;
 
   @override
   State<GalleryUploadOverlay> createState() => _GalleryUploadOverlayState();
@@ -499,6 +537,49 @@ class _GalleryUploadOverlayState extends State<GalleryUploadOverlay>
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
+    if (widget.preparing) {
+      return ColoredBox(
+        key: const ValueKey('gallery-upload-preparing'),
+        color: const Color(0xCC0B1C3A),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 320),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 24,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 14),
+                    Text(
+                      loc.t('admin.gallery.preparing'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     final done = widget.done;
     final total = widget.total;
     final progress =

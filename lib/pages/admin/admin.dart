@@ -1020,9 +1020,13 @@ class _NewsEditorState extends State<_NewsEditor> {
     } else {
       widget.repo.updateNews();
     }
-    await widget.repo.persistAdminConfirm();
-    if (!mounted) return;
+    final pending = widget.repo.persistAdminConfirm();
+    if (!mounted) {
+      await pending;
+      return;
+    }
     Navigator.pop(context);
+    await pending;
   }
 }
 
@@ -1202,9 +1206,13 @@ class _ProgramEditorState extends State<_ProgramEditor> {
     } else {
       widget.repo.refresh();
     }
-    await widget.repo.persistAdminConfirm();
-    if (!mounted) return;
+    final pending = widget.repo.persistAdminConfirm();
+    if (!mounted) {
+      await pending;
+      return;
+    }
     Navigator.pop(context);
+    await pending;
   }
 }
 
@@ -1486,6 +1494,7 @@ class _GalleryEditorState extends State<_GalleryEditor> {
   late final _year =
       TextEditingController(text: '${widget.photo.year}');
   bool _uploading = false;
+  bool _preparing = false;
   int _uploadDone = 0;
   int _uploadTotal = 0;
 
@@ -1530,6 +1539,16 @@ class _GalleryEditorState extends State<_GalleryEditor> {
                     onRemove: (id) => setState(
                       () => widget.repo.deleteGalleryShot(widget.photo, id),
                     ),
+                    onMakeCover: (id) => setState(
+                      () => widget.repo.setGalleryCover(widget.photo, id),
+                    ),
+                    onReorder: (oldIndex, newIndex) => setState(
+                      () => widget.repo.moveGalleryShot(
+                        widget.photo,
+                        oldIndex,
+                        newIndex,
+                      ),
+                    ),
                   ),
                   LocFieldGroup(label: loc.t('common.name'), controllers: _event),
                   TextField(
@@ -1563,6 +1582,7 @@ class _GalleryEditorState extends State<_GalleryEditor> {
                 child: GalleryUploadOverlay(
                   done: _uploadDone,
                   total: _uploadTotal,
+                  preparing: _preparing,
                 ),
               ),
           ],
@@ -1580,17 +1600,24 @@ class _GalleryEditorState extends State<_GalleryEditor> {
     if (picked.isEmpty || !mounted) return;
     setState(() {
       _uploading = true;
+      _preparing = true;
       _uploadDone = 0;
       _uploadTotal = picked.length;
     });
+    // Paint «מכין תמונות» before reading a large batch, which blocks the UI.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
     final files = <Uint8List>[];
     for (final f in picked) {
       final bytes = await f.readAsBytes();
       files.add(bytes);
-      // Yield so the progress card can paint while files are read.
-      await Future<void>.delayed(const Duration(milliseconds: 1));
+      await Future<void>.delayed(Duration.zero);
       if (!mounted) return;
     }
+    if (!mounted) return;
+    setState(() => _preparing = false);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
     await widget.repo.addGalleryShots(
       widget.photo,
       files,
@@ -1603,7 +1630,10 @@ class _GalleryEditorState extends State<_GalleryEditor> {
       },
     );
     if (!mounted) return;
-    setState(() => _uploading = false);
+    setState(() {
+      _uploading = false;
+      _preparing = false;
+    });
   }
 
   Future<void> _save() async {
@@ -1616,9 +1646,13 @@ class _GalleryEditorState extends State<_GalleryEditor> {
     } else {
       widget.repo.refresh();
     }
-    await widget.repo.persistAdminConfirm();
-    if (!mounted) return;
+    final pending = widget.repo.persistAdminConfirm();
+    if (!mounted) {
+      await pending;
+      return;
+    }
     Navigator.pop(context);
+    await pending;
   }
 }
 

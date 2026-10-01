@@ -2515,14 +2515,41 @@ class AppRepository extends ChangeNotifier {
 
   void deleteGalleryShot(GalleryPhoto album, String shotId) {
     album.photos.removeWhere((s) => s.id == shotId);
+    _applyGalleryCover(album);
+    notifyListeners();
+  }
+
+  /// The first photo is the album cover (the main image on the public card).
+  void setGalleryCover(GalleryPhoto album, String shotId) {
+    final i = album.photos.indexWhere((s) => s.id == shotId);
+    if (i < 0) return;
+    if (i > 0) {
+      final shot = album.photos.removeAt(i);
+      album.photos.insert(0, shot);
+    }
+    _applyGalleryCover(album);
+    notifyListeners();
+  }
+
+  /// Drag-to-reorder. Moving a photo to index 0 makes it the cover.
+  void moveGalleryShot(GalleryPhoto album, int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= album.photos.length) return;
+    if (newIndex < 0 || newIndex >= album.photos.length) return;
+    if (oldIndex == newIndex) return;
+    final shot = album.photos.removeAt(oldIndex);
+    album.photos.insert(newIndex, shot);
+    _applyGalleryCover(album);
+    notifyListeners();
+  }
+
+  void _applyGalleryCover(GalleryPhoto album) {
     if (album.photos.isEmpty) {
       album.imageBytes = null;
       album.imageUrl = null;
-    } else {
-      album.imageBytes = album.photos.first.imageBytes;
-      album.imageUrl = album.photos.first.imageUrl;
+      return;
     }
-    notifyListeners();
+    album.imageBytes = album.photos.first.imageBytes;
+    album.imageUrl = album.photos.first.imageUrl;
   }
 
   /// Simulates the social bot pushing the latest news to social networks.
