@@ -36,11 +36,14 @@ class LocaleController extends ChangeNotifier {
   }
 
   /// Translate a UI [key].
-  String t(String key) {
-    final entry = _strings[key];
-    if (entry == null) return key;
-    return entry[_lang] ?? entry['en'] ?? entry.values.first;
-  }
+  String t(String key) => uiText(key, _lang);
+}
+
+/// Translation for [key] in [lang]. Does not change the active locale.
+String uiText(String key, String lang) {
+  final entry = _strings[key];
+  if (entry == null) return key;
+  return entry[lang] ?? entry['en'] ?? entry.values.first;
 }
 
 /// All UI chrome strings keyed by string id, then locale code.

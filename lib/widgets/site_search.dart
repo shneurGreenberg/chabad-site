@@ -10,6 +10,9 @@ import '../theme.dart';
 import 'common.dart';
 import 'hover.dart';
 
+/// Results panel is wider than the compact header field so titles can be read.
+const headerSearchPreviewWidth = 520.0;
+
 /// Compact header search: field on desktop, icon that expands on mobile.
 class HeaderSearch extends StatefulWidget {
   const HeaderSearch({super.key});
@@ -22,6 +25,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
   final _layerLink = LayerLink();
+  final _fieldKey = GlobalKey();
   final _portal = OverlayPortalController();
   List<SearchHit> _hits = const [];
 
@@ -66,6 +70,26 @@ class _HeaderSearchState extends State<HeaderSearch> {
 
   static const _tapGroup = Object();
 
+  /// Shift the wide preview so it stays on screen and opens toward free space.
+  double _previewDx(BuildContext overlayContext, double fieldWidth, double preview) {
+    final box = _fieldKey.currentContext?.findRenderObject() as RenderBox?;
+    final screen = MediaQuery.sizeOf(overlayContext).width;
+    if (box == null || !box.attached || !box.hasSize) {
+      final rtl = Directionality.of(overlayContext) == TextDirection.rtl;
+      return rtl ? 0 : fieldWidth - preview;
+    }
+    final fieldLeft = box.localToGlobal(Offset.zero).dx;
+    final spaceLeft = fieldLeft;
+    final spaceRight = screen - fieldLeft - fieldWidth;
+    var left = spaceLeft >= spaceRight
+        ? fieldLeft + fieldWidth - preview
+        : fieldLeft;
+    if (left < 8) left = 8;
+    final maxLeft = screen - preview - 8;
+    if (maxLeft >= 8 && left > maxLeft) left = maxLeft;
+    return left - fieldLeft;
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
@@ -83,7 +107,11 @@ class _HeaderSearchState extends State<HeaderSearch> {
     return OverlayPortal(
       controller: _portal,
       overlayChildBuilder: (context) {
-        final rtl = Directionality.of(context) == TextDirection.rtl;
+        final screen = MediaQuery.sizeOf(context).width;
+        final available = screen - 16;
+        final preview =
+            available < headerSearchPreviewWidth ? available : headerSearchPreviewWidth;
+        final dx = _previewDx(context, width, preview);
         // Positioned overlay only — must not expand or dim the header.
         return Align(
           alignment: Alignment.topLeft,
@@ -92,16 +120,16 @@ class _HeaderSearchState extends State<HeaderSearch> {
           child: CompositedTransformFollower(
             link: _layerLink,
             showWhenUnlinked: false,
-            targetAnchor: rtl ? Alignment.bottomRight : Alignment.bottomLeft,
-            followerAnchor: rtl ? Alignment.topRight : Alignment.topLeft,
-            offset: const Offset(0, 6),
+            targetAnchor: Alignment.bottomLeft,
+            followerAnchor: Alignment.topLeft,
+            offset: Offset(dx, 6),
             child: TapRegion(
               groupId: _tapGroup,
               onTapOutside: (_) {
                 if (_portal.isShowing) _portal.hide();
               },
               child: _SearchResults(
-                width: width,
+                width: preview,
                 hits: _hits,
                 onOpen: _open,
               ),
@@ -114,6 +142,7 @@ class _HeaderSearchState extends State<HeaderSearch> {
         child: TapRegion(
           groupId: _tapGroup,
           child: SizedBox(
+            key: _fieldKey,
             width: width,
             height: 30,
             child: TextField(
@@ -308,7 +337,7 @@ class _SearchResults extends StatelessWidget {
                               color: AppColors.primary, size: 20),
                           title: Text(
                             hit.title,
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
@@ -316,7 +345,7 @@ class _SearchResults extends StatelessWidget {
                               ? null
                               : Text(
                                   hit.subtitle,
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                           onTap: () => onOpen(hit),

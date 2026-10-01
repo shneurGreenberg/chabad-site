@@ -432,7 +432,8 @@ class _HomeNewsTickerState extends State<HomeNewsTicker> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          linkIfSectionHeading(
+                            context,
                             loc.t('home.news.title'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
