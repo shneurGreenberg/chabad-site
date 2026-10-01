@@ -236,18 +236,18 @@ WidgetStateProperty<Color?> _goldOverlay() {
         states.contains(WidgetState.focused)) {
       return AppColors.gold.withValues(alpha: 0.16);
     }
-    return null;
+    // Null falls back to the theme highlight for one frame on the way out,
+    // and that highlight is a square. Transparent keeps the button's shape.
+    return Colors.transparent;
   });
 }
 
 const _clickCursor = WidgetStatePropertyAll(SystemMouseCursors.click);
 
-WidgetStateProperty<double?> _hoverElevation({double rest = 0, double hover = 3}) {
-  return WidgetStateProperty.resolveWith((states) {
-    if (states.contains(WidgetState.hovered)) return hover;
-    if (states.contains(WidgetState.pressed)) return rest;
-    return rest;
-  });
+/// Elevation stays put. Animating it down to zero makes [Material] swap
+/// shape clips, and the corners flash square as the pointer leaves.
+WidgetStateProperty<double?> _steadyElevation(double value) {
+  return WidgetStatePropertyAll(value);
 }
 
 ThemeData buildAppTheme([SitePalette? palette]) {
@@ -315,8 +315,9 @@ ThemeData buildAppTheme([SitePalette? palette]) {
       ).copyWith(
         overlayColor: _goldOverlay(),
         mouseCursor: _clickCursor,
-        elevation: _hoverElevation(),
-        shadowColor: WidgetStatePropertyAll(p.accent.withValues(alpha: 0.35)),
+        elevation: _steadyElevation(0),
+        shadowColor: const WidgetStatePropertyAll(Colors.transparent),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -328,8 +329,9 @@ ThemeData buildAppTheme([SitePalette? palette]) {
       ).copyWith(
         overlayColor: _goldOverlay(),
         mouseCursor: _clickCursor,
-        elevation: _hoverElevation(rest: 1, hover: 4),
+        elevation: _steadyElevation(1),
         shadowColor: WidgetStatePropertyAll(p.accent.withValues(alpha: 0.35)),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(

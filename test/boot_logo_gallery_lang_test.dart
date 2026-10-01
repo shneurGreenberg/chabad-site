@@ -81,15 +81,20 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   });
 
-  testWidgets('WhatsApp icon uses the brand asset', (tester) async {
+  testWidgets('WhatsApp icon is a mark without a background plate', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: WhatsAppIcon(size: 32))),
     );
     expect(find.bySemanticsLabel('WhatsApp'), findsOneWidget);
-    final image = tester.widget<Image>(find.byType(Image));
-    final provider = image.image;
-    expect(provider, isA<AssetImage>());
-    expect((provider as AssetImage).assetName, 'assets/images/whatsapp.png');
+    expect(find.byType(Image), findsNothing);
+    expect(find.byType(ClipOval), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(WhatsAppIcon),
+        matching: find.byType(ColoredBox),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('gallery lightbox arrows, thumbnails, and keyboard', (tester) async {

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -156,7 +154,10 @@ class _PlayfulIconCore extends StatelessWidget {
     final on = hovering && !reduce;
     final target = on ? 1.0 : 0.0;
     final painted = switch (kind) {
-      PlayfulKind.clock => _ClockIcon(size: size, color: color, t: target),
+      // The schedule glyph is the zmanim mark. A spinning custom clock kept a
+      // white face, so a palette change left it a different color than the
+      // other icons. A plain [Icon] follows [color] and [IconTheme].
+      PlayfulKind.clock => Icon(icon, size: size, color: color),
       PlayfulKind.heart => _HeartIcon(size: size, color: color, hovering: on),
       _ => Icon(icon, size: size, color: color),
     };
@@ -272,61 +273,3 @@ class _HeartIcon extends StatelessWidget {
   }
 }
 
-class _ClockIcon extends StatelessWidget {
-  const _ClockIcon({required this.size, required this.t, this.color});
-  final double size;
-  final Color? color;
-  final double t;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: t),
-      duration: const Duration(milliseconds: 900),
-      curve: Curves.easeInOutCubic,
-      builder: (context, value, _) => SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(
-          painter: _ClockPainter(color: color ?? Colors.black87, t: value),
-        ),
-      ),
-    );
-  }
-}
-
-class _ClockPainter extends CustomPainter {
-  const _ClockPainter({required this.color, required this.t});
-  final Color color;
-  final double t;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.shortestSide / 2 - 1.2;
-    final ring = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = math.max(1.4, size.shortestSide * 0.08);
-    canvas.drawCircle(c, r, Paint()..color = Colors.white);
-    canvas.drawCircle(c, r, ring);
-    canvas.drawCircle(c, 1.3, Paint()..color = color);
-
-    final hour = -math.pi / 2 + t * math.pi * 2;
-    final minute = -math.pi / 2 + t * math.pi * 4;
-    final hand = Paint()
-      ..color = color
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = math.max(1.3, size.shortestSide * 0.08);
-    canvas.drawLine(c, Offset(c.dx + math.cos(hour) * r * 0.45, c.dy + math.sin(hour) * r * 0.45), hand);
-    canvas.drawLine(
-      c,
-      Offset(c.dx + math.cos(minute) * r * 0.72, c.dy + math.sin(minute) * r * 0.72),
-      hand..strokeWidth = math.max(1.1, size.shortestSide * 0.06),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _ClockPainter oldDelegate) =>
-      oldDelegate.t != t || oldDelegate.color != color;
-}

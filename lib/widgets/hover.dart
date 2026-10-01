@@ -16,6 +16,7 @@ class HoverLift extends StatefulWidget {
     this.lift = true,
     this.underline = false,
     this.enabled = true,
+    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
   });
 
   final Widget child;
@@ -23,6 +24,10 @@ class HoverLift extends StatefulWidget {
   final bool lift;
   final bool underline;
   final bool enabled;
+
+  /// Corner radius of the hover shadow. Kept on the way in and the way out
+  /// so a rounded control does not flash square corners when the pointer leaves.
+  final BorderRadius borderRadius;
 
   @override
   State<HoverLift> createState() => _HoverLiftState();
@@ -76,6 +81,9 @@ class _HoverLiftState extends State<HoverLift> {
       );
     }
 
+    // The radius stays on both sides of the animation. Dropping it when the
+    // shadow fades lerps the corners through a square.
+    final radius = widget.lift ? widget.borderRadius : null;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => _set(true),
@@ -88,7 +96,9 @@ class _HoverLiftState extends State<HoverLift> {
         child: AnimatedContainer(
           duration: duration,
           curve: Curves.easeOutCubic,
+          clipBehavior: Clip.none,
           decoration: BoxDecoration(
+            borderRadius: radius,
             boxShadow: widget.lift && on
                 ? [
                     BoxShadow(
