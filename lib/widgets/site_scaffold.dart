@@ -653,11 +653,12 @@ class LanguageSwitcher extends StatelessWidget {
     const cream = Color(0xFFF6F1E8);
     final fg = onDark ? cream : AppColors.ink;
     return HoverScale(
-      child: PopupMenuButton<String>(
+        child: PopupMenuButton<String>(
         tooltip: loc.t('common.language'),
         onSelected: loc.setLang,
         position: PopupMenuPosition.under,
         padding: EdgeInsets.zero,
+        borderRadius: BorderRadius.circular(8),
         itemBuilder: (context) => [
           for (final code in supportedLangs)
             PopupMenuItem(
@@ -924,8 +925,13 @@ class _SiteFooter extends StatelessWidget {
                     ],
                   ),
                 ),
-                _footerLinks(context, loc.t('footer.quicklinks'), primaryNav),
-                _footerLinks(context, loc.t('nav.menu'), moreNav),
+                // The phone header already lists every route. Repeating that
+                // list under the page makes a second menu. Desktop keeps a
+                // short row of the same links beside the contact block.
+                if (!isMobile(context))
+                  _footerLinks(context, loc.t('footer.quicklinks'), primaryNav),
+                if (!isMobile(context))
+                  _footerLinks(context, loc.t('nav.menu'), moreNav),
                 SizedBox(
                   width: 260,
                   child: Column(

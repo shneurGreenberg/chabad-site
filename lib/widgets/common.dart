@@ -184,11 +184,16 @@ class LinkedContactText extends StatelessWidget {
   }
 }
 
-/// Physical-right drawer: Flutter web's [Scaffold.drawer] always slides from
-/// the left, even in RTL. Use [endDrawer] when the hamburger sits on the right.
+/// Whether the menu should use [Scaffold.endDrawer] so it slides in from the
+/// same side as the button that opens it.
+///
+/// [Scaffold.drawer] is the start edge and [Scaffold.endDrawer] is the end
+/// edge, following [Directionality]. The public hamburger is the last child
+/// of the header row, so it sits on the end edge in both Hebrew and English.
+/// A leading control (the admin rail button) sits on the start edge.
 bool menuDrawerFromEnd(BuildContext context, {required bool leadingButton}) {
-  final rtl = Directionality.of(context) == TextDirection.rtl;
-  return leadingButton ? rtl : !rtl;
+  Directionality.of(context);
+  return !leadingButton;
 }
 
 void openMenuDrawer(BuildContext context, {required bool leadingButton}) {
