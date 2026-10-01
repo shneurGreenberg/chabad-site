@@ -341,6 +341,21 @@ const Map<String, Map<String, String>> _strings = {
     'en': '{done} of {total}',
     'ru': '{done} из {total}',
   },
+  'admin.gallery.preparing': {
+    'he': 'מכין תמונות',
+    'en': 'Preparing photos',
+    'ru': 'Готовим фото',
+  },
+  'admin.gallery.cover': {
+    'he': 'תמונת שער',
+    'en': 'Cover',
+    'ru': 'Обложка',
+  },
+  'admin.gallery.makeCover': {
+    'he': 'קבע כתמונת שער',
+    'en': 'Set as cover',
+    'ru': 'Сделать обложкой',
+  },
 
   // Cemetery
   'cemetery.subtitle': {
