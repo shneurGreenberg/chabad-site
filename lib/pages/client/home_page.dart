@@ -76,7 +76,6 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
-        Section(child: _ZmanimStrip(repo: repo)),
         if (repo.publicPrograms.isNotEmpty)
           Section(
             child: Column(
@@ -470,19 +469,59 @@ class _HomeNewsTickerState extends State<HomeNewsTicker> {
   }
 }
 
+class _ExploreTile {
+  const _ExploreTile({
+    required this.icon,
+    required this.label,
+    required this.route,
+    required this.color,
+    this.body,
+    this.tileKey,
+  });
+
+  final IconData icon;
+  final String label;
+  final String route;
+  final Color color;
+  final String? body;
+  final Key? tileKey;
+}
+
+/// One cube per main-menu page, plus donate and the kaddish screen.
 class _QuickLinks extends StatelessWidget {
   const _QuickLinks();
 
   @override
   Widget build(BuildContext context) {
     final loc = context.locWatch;
-    final items = [
-      (Icons.schedule, loc.t('nav.zmanim'), '/zmanim', const Color(0xFF1D4ED8)),
-      (Icons.groups_outlined, loc.t('nav.programs'), '/programs', const Color(0xFF0F766E)),
-      (Icons.photo_library_outlined, loc.t('nav.gallery'), '/gallery', const Color(0xFF7C3AED)),
-      (Icons.storefront_outlined, loc.t('nav.store'), '/store', const Color(0xFFC2410C)),
-      (Icons.menu_book_outlined, loc.t('nav.library'), '/library', const Color(0xFF0E7490)),
-      (Icons.favorite_outline, loc.t('nav.donate'), '/donate', AppColors.accent),
+    final items = <_ExploreTile>[
+      for (final nav in [...primaryNav, ...moreNav])
+        if (nav.route != '/')
+          _ExploreTile(
+            icon: nav.icon,
+            label: loc.t(nav.labelKey),
+            route: nav.route,
+            color: _exploreColor(nav.route),
+            tileKey: switch (nav.route) {
+              '/cemetery' => const ValueKey('home-cemetery-tile'),
+              '/tourist' => const ValueKey('home-tourist-tile'),
+              _ => null,
+            },
+          ),
+      _ExploreTile(
+        icon: Icons.favorite_outline,
+        label: loc.t('nav.donate'),
+        route: '/donate',
+        color: AppColors.accent,
+      ),
+      _ExploreTile(
+        icon: Icons.tv_outlined,
+        label: loc.t('home.kaddish.title'),
+        route: '/cemetery',
+        color: const Color(0xFF312E81),
+        body: loc.t('home.kaddish.body'),
+        tileKey: const ValueKey('home-kaddish-tile'),
+      ),
     ];
     return ResponsiveGrid(
       columns: () {
@@ -494,152 +533,86 @@ class _QuickLinks extends StatelessWidget {
       spacing: 12,
       runSpacing: 12,
       children: [
-        for (final item in items)
-          HoverLift(
-            child: InkWell(
-            onTap: () => context.go(item.$3),
-            borderRadius: BorderRadius.circular(18),
-            mouseCursor: SystemMouseCursors.click,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-              decoration: BoxDecoration(
-                color: AppColors.card,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: AppColors.cardShadow,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: item.$4.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: PlayfulIcon(item.$1, color: item.$4),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(item.$2,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 13.5)),
-                ],
-              ),
-            ),
-          ),
-          ),
+        for (final item in items) _ExploreTileCard(item: item),
       ],
     );
   }
 }
 
-class _ZmanimStrip extends StatelessWidget {
-  const _ZmanimStrip({required this.repo});
-  final AppRepository repo;
+class _ExploreTileCard extends StatelessWidget {
+  const _ExploreTileCard({required this.item});
+  final _ExploreTile item;
+
   @override
   Widget build(BuildContext context) {
-    final loc = context.locWatch;
-    final parasha = switch (loc.lang) {
-      'he' => repo.shabbat['parasha_he'] ?? '',
-      'ru' => repo.shabbat['parasha_ru'] ?? '',
-      _ => repo.shabbat['parasha_en'] ?? '',
-    }.trim();
-    final havdala = (repo.shabbat['havdala'] ?? '').trim();
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: AppColors.cardShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
+    final body = item.body;
+    return HoverLift(
+      child: InkWell(
+        key: item.tileKey,
+        onTap: () => context.go(item.route),
+        borderRadius: BorderRadius.circular(18),
+        mouseCursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: AppColors.cardShadow,
+          ),
+          child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  color: item.color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
                 ),
-                child: PlayfulIcon(Icons.schedule, color: AppColors.primary),
+                child: PlayfulIcon(item.icon, color: item.color),
               ),
-              Text(loc.t('zmanim.shabbat'),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontSize: 20)),
-              if (parasha.isNotEmpty)
-                Text(parasha,
-                    style: TextStyle(
-                        color: AppColors.muted,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14)),
-              Pill(
-                '${loc.t('zmanim.forCity')} ${displayCityName(repo.location.cityName, loc.lang)}',
-                icon: Icons.place_outlined,
-              ),
-              TextButton.icon(
-                onPressed: () => context.go('/zmanim'),
-                icon: const PlayfulIcon(Icons.arrow_forward, size: 16),
-                label: Text(loc.t('common.viewAll')),
-              ).hoverLift(),
+              const SizedBox(height: 10),
+              Text(item.label,
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 13.5)),
+              if (body != null && body.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(
+                  body,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 12.5,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              for (final z in repo.zmanim.take(5))
-                _zmanChip(trLoc(z.name, loc.lang), z.time, AppColors.primary,
-                    icon: zmanIconOf(z.kind), kind: playfulKindForZman(z.kind)),
-              _zmanChip(loc.t('zmanim.candle'), repo.shabbat['candle']!,
-                  AppColors.accent,
-                  icon: Icons.local_fire_department, kind: PlayfulKind.flame),
-              if (havdala.isNotEmpty && havdala != '--:--')
-                _zmanChip(loc.t('zmanim.havdala'), havdala, AppColors.primary,
-                    icon: Icons.nightlight_round, kind: PlayfulKind.flame),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
+}
 
-  Widget _zmanChip(String name, String time, Color color,
-      {IconData? icon, PlayfulKind? kind}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.16)),
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        if (icon != null) ...[
-          PlayfulIcon(icon, size: 16, color: AppColors.primary, kind: kind),
-          const SizedBox(width: 6),
-        ],
-        Text(name,
-            style: TextStyle(
-                color: AppColors.ink.withValues(alpha: 0.72),
-                fontSize: 13,
-                fontWeight: FontWeight.w600)),
-        const SizedBox(width: 10),
-        Text(time,
-            style: const TextStyle(
-                color: Color(0xFF0B1C3A),
-                fontWeight: FontWeight.w900,
-                fontSize: 17)),
-      ]),
-    );
-  }
+Color _exploreColor(String route) {
+  return switch (route) {
+    '/news' => const Color(0xFF0369A1),
+    '/zmanim' => const Color(0xFF1D4ED8),
+    '/programs' => const Color(0xFF0F766E),
+    '/gallery' => const Color(0xFF7C3AED),
+    '/store' => const Color(0xFFC2410C),
+    '/events' => const Color(0xFFB45309),
+    '/cemetery' => const Color(0xFF334155),
+    '/famous' => const Color(0xFFCA8A04),
+    '/history' => const Color(0xFF1E3A5F),
+    '/library' => const Color(0xFF0E7490),
+    '/tourist' => const Color(0xFF047857),
+    '/about' => const Color(0xFF475569),
+    _ => AppColors.primary,
+  };
 }
 
 class _ReconnectBand extends StatelessWidget {

@@ -161,6 +161,19 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Explore',
     'ru': 'Разделы'
   },
+  'home.kaddish.title': {
+    'he': 'פרויקט הקדיש',
+    'en': 'Kaddish project',
+    'ru': 'Проект «Кадиш»'
+  },
+  'home.kaddish.body': {
+    'he':
+        'בבית הכנסת יש מסך שבו מזכירים וזוכרים את הנפטרים היהודים של הקהילה ושל העיר.',
+    'en':
+        'The synagogue has a screen where they mention and remember the Jewish deceased of the community and of the city.',
+    'ru':
+        'В синагоге есть экран, на котором поминают и вспоминают усопших евреев общины и города.'
+  },
   'home.reach.title': {
     'he': 'יהודי נובוסיבירסק בעולם?',
     'en': 'Novosibirsk Jews abroad?',

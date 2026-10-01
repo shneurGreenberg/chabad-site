@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_app/data/repository.dart';
 import 'package:flutter_app/data/snapshot.dart';
 import 'package:flutter_app/l10n/strings.dart';
 import 'package:flutter_app/models.dart';
@@ -143,5 +144,86 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('home-register-banner')));
     await tester.pumpAndSettle();
     expect(find.text('registration-page'), findsOneWidget);
+  });
+
+  testWidgets('home page hides the large times block and shows cemetery and kaddish tiles',
+      (tester) async {
+    final repo = AppRepository();
+
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => const Scaffold(
+            body: SingleChildScrollView(child: HomePage()),
+          ),
+        ),
+        GoRoute(
+          path: '/cemetery',
+          builder: (_, _) => const Scaffold(body: Text('cemetery-page')),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => LocaleController('ru')),
+          ChangeNotifierProvider.value(value: repo),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Суббота'), findsNothing);
+    expect(find.text('Зажигание свечей'), findsNothing);
+    expect(find.text('04:52'), findsNothing);
+    expect(find.text('Времена'), findsOneWidget);
+
+    expect(find.byKey(const ValueKey('home-cemetery-tile')), findsOneWidget);
+    expect(find.text('Кладбище'), findsOneWidget);
+    expect(find.byKey(const ValueKey('home-tourist-tile')), findsOneWidget);
+    expect(find.text('Информация для туристов'), findsOneWidget);
+    expect(find.byKey(const ValueKey('home-kaddish-tile')), findsOneWidget);
+    expect(find.text('Проект «Кадиш»'), findsOneWidget);
+    expect(
+      find.text(
+        'В синагоге есть экран, на котором поминают и вспоминают усопших евреев общины и города.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      LocaleController('he').t('home.kaddish.body'),
+      'בבית הכנסת יש מסך שבו מזכירים וזוכרים את הנפטרים היהודים של הקהילה ושל העיר.',
+    );
+    expect(
+      LocaleController('en').t('home.kaddish.body'),
+      'The synagogue has a screen where they mention and remember the Jewish deceased of the community and of the city.',
+    );
+
+    final kaddish = find.byKey(const ValueKey('home-kaddish-tile'));
+    await tester.ensureVisible(kaddish);
+    await tester.pump();
+    await tester.tap(kaddish);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(
+      find.text('cemetery-page'),
+      findsOneWidget,
+      reason: 'uri=${router.routeInformationProvider.value.uri}',
+    );
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 4));
+    repo.dispose();
+    await tester.pump();
   });
 }
