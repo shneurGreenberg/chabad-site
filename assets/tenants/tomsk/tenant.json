@@ -1,0 +1,43 @@
+{
+  "id": "tomsk",
+  "name": {
+    "ru": "Томская еврейская община",
+    "he": "הקהילה היהודית טומסק",
+    "en": "Tomsk Jewish Community"
+  },
+  "city": {
+    "ru": "Томск",
+    "he": "טומסק",
+    "en": "Tomsk"
+  },
+  "address": {
+    "ru": "634009, г. Томск, ул. Розы Люксембург, 38",
+    "he": "רחוב רוזה לוקסמבורג 38, טומסק",
+    "en": "38 Rosa Luxemburg St, Tomsk 634009"
+  },
+  "phone": "+7 (3822) 60-97-83",
+  "email": "syntero@inbox.ru",
+  "about": {
+    "ru": "Томская еврейская община входит в Федерацию еврейских общин России с 2001 года. С 2004 года её духовный руководитель — посланник Любавичского Ребе раввин Леви Каминецкий. Отреставрированная Хоральная синагога на ул. Розы Люксембург, 38 была торжественно открыта в декабре 2010 года.",
+    "he": "הקהילה היהודית בטומסק חברה בפדרציית הקהילות היהודיות ברוסיה משנת 2001. מאז 2004 עומד בראשה שליח הרבי מליובאוויטש, הרב לוי קמינצקי. בית הכנסת הכוראלי המשוחזר ברחוב רוזה לוקסמבורג 38 נחנך בדצמבר 2010.",
+    "en": "The Tomsk Jewish Community has been part of the Federation of Jewish Communities of Russia since 2001. Since 2004 its spiritual leader has been Rabbi Levi Kaminetsky, emissary of the Lubavitcher Rebbe. The restored Choral Synagogue at 38 Rosa Luxemburg St reopened in December 2010."
+  },
+  "languages": ["ru", "he", "en"],
+  "adminEmail": "admin+tomsk@example.invalid",
+  "colors": {
+    "primary": "#1B3A6B",
+    "accent": "#C9A227"
+  },
+  "logo": "tomsk-synagogue-facade.png",
+  "photos": [
+    "tomsk-synagogue-facade.png",
+    "tomsk-synagogue-interior.png",
+    "tomsk-synagogue-building.jpg"
+  ],
+  "sourceCredit": "Источник: jewtomsk.ru, feor.ru",
+  "sourceUrls": [
+    "https://jewtomsk.ru/",
+    "https://jewtomsk.ru/contacts",
+    "https://feor.ru/administrative-units/tomsk/"
+  ]
+}

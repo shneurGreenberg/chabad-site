@@ -316,6 +316,9 @@ class _AdminShellState extends State<AdminShell> {
       _AdminSection(loc.t('admin.settings'), Icons.settings_outlined,
           const SettingsPanel(),
           adminOnly: true),
+      _AdminSection(loc.t('admin.communities.title'), Icons.apartment_outlined,
+          const _CommunitiesNavPanel(),
+          adminOnly: true),
       _AdminSection(loc.t('admin.banners'), Icons.image_outlined,
           const BannersPanel(),
           jump: AdminJump.banners),
@@ -1955,4 +1958,32 @@ class _BotCard extends StatelessWidget {
           Text(b, style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
         ],
       );
+}
+
+class _CommunitiesNavPanel extends StatelessWidget {
+  const _CommunitiesNavPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.locWatch;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(loc.t('admin.communities.blurb'),
+            style: TextStyle(color: AppColors.muted, height: 1.45)),
+        const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: () => context.go('/admin/communities'),
+          icon: const Icon(Icons.apartment_outlined),
+          label: Text(loc.t('admin.communities.openList')),
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/admin/communities/new'),
+          icon: const Icon(Icons.add),
+          label: Text(loc.t('admin.communities.new')),
+        ),
+      ],
+    );
+  }
 }

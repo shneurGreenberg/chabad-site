@@ -33,6 +33,8 @@ import 'snapshot.dart';
 /// an external CRM / backend. Here everything lives in memory so the admin and
 /// client sides can be demonstrated end-to-end. Admin edits update the same
 /// store the client reads, so changes appear live.
+bool _repoNskSeed() => TenantRuntime.instance.tenantId == 'nsk';
+
 class AppRepository extends ChangeNotifier {
   AppRepository() {
     _applyTenantDefaults();
@@ -46,7 +48,9 @@ class AppRepository extends ChangeNotifier {
   static const _contentSeed = 9;
   static const _imgSynagogue = 'assets/images/beit-menachem-1.jpg';
   static const _imgHall = 'assets/images/beit-menachem-2.jpg';
-  static const _snapKey = 'chabad_site_snapshot';
+  String get _snapKey => _repoNskSeed()
+      ? 'chabad_site_snapshot'
+      : 'chabad_site_snapshot_${TenantRuntime.instance.tenantId}';
   static const _imgPrefix = 'chabad_img:';
   static const _cartKey = 'chabad_cart';
   static const _quotaHe =
@@ -144,6 +148,7 @@ class AppRepository extends ChangeNotifier {
     }
 
     _hydrated = true;
+    await _applyTenantSeedPresentation();
     try {
       await _restoreZmanimCache();
     } catch (e) {
@@ -165,14 +170,18 @@ class AppRepository extends ChangeNotifier {
 
     // New visitors: wait briefly for published text (not media). Then paint
     // even if Firestore is slow; a late pull still applies without a refresh.
-    try {
-      await _pullCloud(includeMedia: false)
-          .timeout(const Duration(milliseconds: 2500));
-    } catch (e) {
-      debugPrint('Cloud pull failed/timed out: $e');
+    if (!_repoNskSeed() && !CloudSync.instance.enabled) {
+      _cloudPulled = true;
+    } else {
+      try {
+        await _pullCloud(includeMedia: false)
+            .timeout(const Duration(milliseconds: 2500));
+      } catch (e) {
+        debugPrint('Cloud pull failed/timed out: $e');
+      }
+      if (_closed) return;
+      _cloudPulled = true;
     }
-    if (_closed) return;
-    _cloudPulled = true;
     _notifyUi();
 
     unawaited(_pullCloud(includeMedia: true));
@@ -184,6 +193,10 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<void> _loadBackgroundData() async {
+    if (!_repoNskSeed()) {
+      kaddishLoading = false;
+      return;
+    }
     try {
       await refreshKaddishGraves();
     } catch (e) {
@@ -235,7 +248,7 @@ class AppRepository extends ChangeNotifier {
       'ru': 'Места, шофар и трапезы Высоких праздников',
     },
   ];
-  late final List<CommunityEvent> events = [
+  late final List<CommunityEvent> events = _repoNskSeed() ? [
     CommunityEvent(
       id: _newId(),
       title: {
@@ -276,7 +289,7 @@ class AppRepository extends ChangeNotifier {
       startsAt: DateTime(DateTime.now().year, 9, 11, 18, 30),
       capacity: 200,
     ),
-  ];
+  ] : <CommunityEvent>[];
   final List<StoreOrder> orders = [];
 
   String googleMapsApiKey = '';
@@ -284,7 +297,8 @@ class AppRepository extends ChangeNotifier {
   late String paletteId;
   bool _gravesEdited = false;
 
-  SitePalette get palette => SitePalettes.byId(paletteId);
+  SitePalette get palette =>
+      TenantRuntime.instance.customPalette ?? SitePalettes.byId(paletteId);
 
   void setPaletteId(String id) {
     paletteId = SitePalettes.byId(id).id;
@@ -299,7 +313,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // News
   // ---------------------------------------------------------------------------
-  late final List<NewsArticle> news = [
+  late final List<NewsArticle> news = _repoNskSeed() ? [
     NewsArticle(
       id: _newId(),
       title: {
@@ -403,7 +417,7 @@ class AppRepository extends ChangeNotifier {
       icon: Icons.volunteer_activism,
       imageUrl: _imgHall,
     ),
-  ];
+  ] : <NewsArticle>[];
 
   // ---------------------------------------------------------------------------
   // Location + live zmanim / parasha
@@ -737,7 +751,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // Programs
   // ---------------------------------------------------------------------------
-  late final List<Program> programs = [
+  late final List<Program> programs = _repoNskSeed() ? [
     Program(
       id: _newId(),
       title: {'he': 'בית הכנסת בית מנחם', 'en': 'Beit Menachem synagogue', 'ru': 'Синагога Бейт Менахем'},
@@ -895,7 +909,7 @@ class AppRepository extends ChangeNotifier {
       color: 0xFF1D4ED8,
       imageUrl: _imgSynagogue,
     ),
-  ];
+  ] : <Program>[];
 
   static const _rosh5787Id = 'gallery-rosh-5787';
   static const _rosh5787Count = 163;
@@ -924,6 +938,7 @@ class AppRepository extends ChangeNotifier {
       );
 
   void _ensureNsknewsContent() {
+    if (!_repoNskSeed()) return;
     NsknewsSeed.ensure(
       news: news,
       gallery: gallery,
@@ -933,6 +948,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   void _ensureRoshHashana5787Album() {
+    if (!_repoNskSeed()) return;
     final shots = _roshHashana5787Shots();
     final i = gallery.indexWhere((a) =>
         a.id == _rosh5787Id ||
@@ -955,7 +971,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // Gallery
   // ---------------------------------------------------------------------------
-  late final List<GalleryPhoto> gallery = [
+  late final List<GalleryPhoto> gallery = _repoNskSeed() ? [
     _roshHashana5787Album(),
     GalleryPhoto(
       id: _newId(),
@@ -973,17 +989,17 @@ class AppRepository extends ChangeNotifier {
     GalleryPhoto(id: _newId(), event: {'he': 'ראש השנה בבית מנחם', 'en': 'Rosh Hashanah at Beit Menachem', 'ru': 'Рош ха-Шана в Бейт Менахем'}, year: 2024, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam'], color: 0xFFF97316, icon: Icons.music_note),
     GalleryPhoto(id: _newId(), event: {'he': 'ילדי אור אבנר בחג', 'en': 'Or Avner children at a holiday', 'ru': 'Дети Ор Авнер на празднике'}, year: 2023, tags: ['Rebbetzin Miriam'], color: 0xFF10B981, icon: Icons.child_care),
     GalleryPhoto(id: _newId(), event: {'he': 'סדר פסח קהילתי', 'en': 'Community Passover Seder', 'ru': 'Общинный седер Песаха'}, year: 2024, tags: ['Rabbi Zaklos', 'Rebbetzin Miriam', 'Sender Kruglov'], color: 0xFF9333EA, icon: Icons.wine_bar),
-  ];
+  ] : <GalleryPhoto>[];
 
   // ---------------------------------------------------------------------------
   // Famous Jews
   // ---------------------------------------------------------------------------
-  late final List<FamousPerson> famous = [
+  late final List<FamousPerson> famous = _repoNskSeed() ? [
     FamousPerson(id: _newId(), name: {'he': 'הרב שניאור זלמן זקלס', 'en': 'Rabbi Shneur Zalman Zaklos', 'ru': 'Раввин Шнеур Залман Заклос'}, profession: {'he': 'רב העיר ושליח חב״ד', 'en': 'Chief Rabbi & Chabad emissary', 'ru': 'Главный раввин и посланник Хабада'}, bio: {'he': 'נולד בקריית מלאכי. למד בישיבות בניו יורק, מילאנו וברזיל, והגיע לשליחות בנובוסיבירסק ב־1999. רב העיר והמחוז, יוזם בית ספר אור אבנר ובית מנחם.', 'en': 'Born in Kiryat Malachi. Studied in New York, Milan and Brazil, and arrived on shlichut in 1999. Chief Rabbi of the city and region; founded Or Avner and Beit Menachem.', 'ru': 'Родился в Кирьят-Малахи. Учился в Нью-Йорке, Милане и Бразилии, прибыл в 1999. Главный раввин города и области, инициатор «Ор Авнер» и «Бейт Менахем».'}, era: Era.present, color: 0xFF1D4ED8, initials: 'SZ'),
     FamousPerson(id: _newId(), name: {'he': 'הרבנית מרים זקלס', 'en': 'Rebbetzin Miriam Zaklos', 'ru': 'Раббанит Мириам Заклос'}, profession: {'he': 'שליחת חב״ד', 'en': 'Chabad emissary', 'ru': 'Посланница Хабада'}, bio: {'he': 'שותפה לשליחות בנובוסיבירסק מאז 1999. מובילה חינוך, חגים וחיי הקהילה לצד הרב.', 'en': 'Partner in the Novosibirsk shlichut since 1999. Leads education, holidays and community life alongside the Rabbi.', 'ru': 'Вместе с раввином на миссии с 1999 года. Образование, праздники и жизнь общины.'}, era: Era.present, color: 0xFFDB2777, initials: 'MZ'),
     FamousPerson(id: _newId(), name: {'he': 'אלכסנדר (סנדר) קרוגלוב', 'en': 'Alexander (Sender) Kruglov', 'ru': 'Александр (Сендер) Круглов'}, profession: {'he': 'נשיא הקהילה', 'en': 'President of the community', 'ru': 'Президент общины'}, bio: {'he': 'נולד ב־1990 באוסט־קמנוגורסק. מאז 2015 בנובוסיבירסק: מנהיג נוער, משגיח במסעדה הכשרה, ומיוני 2019 נשיא קהילת בית מנחם.', 'en': 'Born 1990 in Ust-Kamenogorsk. In Novosibirsk since 2015: youth leader, kosher restaurant mashgiach, and since June 2019 president of the Beit Menachem community.', 'ru': 'Родился в 1990 в Усть-Каменогорске. С 2015 в Новосибирске: лидер молодёжи, машгиах, с июня 2019 президент общины «Бейт Менахем».'}, era: Era.present, color: 0xFF0D9488, initials: 'SK'),
     ...historicalFamous(),
-  ];
+  ] : <FamousPerson>[];
 
   static List<FamousPerson> historicalFamous() => [
         FamousPerson(
@@ -1142,6 +1158,7 @@ class AppRepository extends ChangeNotifier {
       ];
 
   void _ensureHistoricalFamous() {
+    if (!_repoNskSeed()) return;
     final have = {for (final p in famous) p.id: p};
     for (final p in historicalFamous()) {
       final existing = have[p.id];
@@ -1237,6 +1254,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   Future<List<Grave>> _loadBundledKaddishGraves() async {
+    if (!_repoNskSeed()) return const [];
     try {
       final raw =
           await rootBundle.loadString('assets/data/kaddish_novosibirsk.json');
@@ -1252,7 +1270,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // History + tour
   // ---------------------------------------------------------------------------
-  final List<HistoryEvent> history = [
+  final List<HistoryEvent> history = _repoNskSeed() ? [
     HistoryEvent(year: '1893', title: {'he': 'ראשית הקהילה', 'en': 'Community founded', 'ru': 'Основание общины'}, description: {'he': 'הקהילה היהודית בנובו־ניקולאייבסק (לימים נובוסיבירסק) נוסדת. בין החברים: סוחרים, בעלי מלאכה וגולים.', 'en': 'The Jewish community of Novo-Nikolayevsk (later Novosibirsk) is formed — merchants, craftsmen and exiles.', 'ru': 'Еврейская община Новониколаевска (затем Новосибирск) образована: купцы, мастеровые и ссыльные.'}),
     HistoryEvent(year: '1926', title: {'he': 'נובוסיבירסק', 'en': 'The city is renamed', 'ru': 'Город переименован'}, description: {'he': 'שם העיר משתנה לנובוסיבירסק. החיים היהודיים ממשיכים תחת לחץ סובייטי גובר.', 'en': 'The city is renamed Novosibirsk. Jewish life continues under growing Soviet pressure.', 'ru': 'Город получает имя Новосибирск. Еврейская жизнь — под нарастающим советским давлением.'}),
     HistoryEvent(year: '1990s', title: {'he': 'התחדשות', 'en': 'Revival', 'ru': 'Возрождение'}, description: {'he': 'עם הפשרה הפוליטית הקהילה מתחדשת ומצטרפת לפדרציית הקהילות היהודיות ברוסיה (FEOR). פועלים גם הסוכנות היהודית וחסד «אתיקווה».', 'en': 'With political thaw the community revives and joins FEOR. The Jewish Agency and Hesed Atikva also operate in the city.', 'ru': 'С оттепелью община возрождается и входит в ФЕОР. Работают Сохнут и хесед «Атиква».'}),
@@ -1260,9 +1278,9 @@ class AppRepository extends ChangeNotifier {
     HistoryEvent(year: '2000', title: {'he': 'אור אבנר', 'en': 'Or Avner', 'ru': 'Ор Авнер'}, description: {'he': 'נפתח בית הספר היהודי אור אבנר עם גן לגיל הרך.', 'en': 'Or Avner Jewish school and preschool open.', 'ru': 'Открывается еврейский лицей «Ор Авнер» с дошкольной группой.'}),
     HistoryEvent(year: '2013', title: {'he': 'חנוכת בית מנחם', 'en': 'Beit Menachem opens', 'ru': 'Открытие Бейт Менахем'}, description: {'he': 'ב־28 באוגוסט נחנך המרכז (~3,400 מ״ר) ברחוב שצ׳טינקינה 68, על שם הרבי. בטקס: הרב ברל לזר, ראש העיר גורודצקי, ויותר מאלף אורחים. הבנייה נמשכה כ־13 שנה מתרומות.', 'en': 'On 28 August the ~3,400 m² center at 68 Shchetinkina St. opens, named for the Rebbe. Chief Rabbi Berel Lazar, Mayor Gorodetsky and 1,000+ guests attend. Construction took about 13 years, funded by donations.', 'ru': '28 августа открыт центр (~3400 м²) на ул. Щетинкина, 68, в честь Ребе. Берл Лазар, мэр Городецкий и более тысячи гостей. Строительство около 13 лет на пожертвования.'}),
     HistoryEvent(year: 'today', title: {'he': 'קהילה חיה בסיביר', 'en': 'A living community in Siberia', 'ru': 'Живая община Сибири'}, description: {'he': 'תפילות יומיות, מקווה, חנות כשרה, נוער, אור אבנר ומרכז לב. באזור כ־12,000 יהודים. בית מנחם הוא הבית הרוחני של יהדות נובוסיבירסק.', 'en': 'Daily prayers, mikveh, kosher shop, youth, Or Avner and Lev. About 12,000 Jews in the region. Beit Menachem is the spiritual home of Novosibirsk Jewry.', 'ru': 'Ежедневные молитвы, миква, кошерный магазин, молодёжь, «Ор Авнер» и «Лев». Около 12 000 евреев в регионе. Бейт Менахем — духовный дом евреев Новосибирска.'}),
-  ];
+  ] : <HistoryEvent>[];
 
-  late final List<TourStop> tour = [
+  late final List<TourStop> tour = _repoNskSeed() ? [
     TourStop(
       id: _newId(), 
       name: {'he': 'בית מנחם', 'en': 'Beit Menachem', 'ru': 'Бейт Менахем'}, 
@@ -1308,12 +1326,12 @@ class AppRepository extends ChangeNotifier {
         GalleryShot(id: _newId(), imageUrl: _imgHall),
       ],
     ),
-  ];
+  ] : <TourStop>[];
 
   // ---------------------------------------------------------------------------
   // Tourist Info
   // ---------------------------------------------------------------------------
-  late final List<TouristInfo> touristInfo = [
+  late final List<TouristInfo> touristInfo = _repoNskSeed() ? [
     TouristInfo(
       id: _newId(),
       title: {'he': 'תפילות והשתתפות בחיי הקהילה', 'en': 'Prayer services and community participation', 'ru': 'Молитвы и участие в жизни общины'},
@@ -1459,12 +1477,12 @@ class AppRepository extends ChangeNotifier {
       icon: Icons.water,
       color: 0xFF0EA5E9,
     ),
-  ];
+  ] : <TouristInfo>[];
 
   // ---------------------------------------------------------------------------
   // Store
   // ---------------------------------------------------------------------------
-  late final List<Product> products = [
+  late final List<Product> products = _repoNskSeed() ? [
     Product(id: _newId(), name: {'he': 'זוג פמוטים מכסף', 'en': 'Silver candlesticks (pair)', 'ru': 'Серебряные подсвечники'}, description: {'he': 'פמוטי שבת מהודרים.', 'en': 'Elegant Shabbat candlesticks.', 'ru': 'Элегантные субботние подсвечники.'}, price: 89, category: ProductCategory.judaica, color: 0xFF6366F1, icon: Icons.light),
     Product(id: _newId(), name: {'he': 'מזוזה מהודרת', 'en': 'Mezuzah scroll & case', 'ru': 'Мезуза со свитком'}, description: {'he': 'קלף כשר עם בית מעוצב.', 'en': 'Kosher scroll with a designer case.', 'ru': 'Кошерный свиток с корпусом.'}, price: 45, category: ProductCategory.judaica, color: 0xFF8B5CF6, icon: Icons.door_front_door),
     Product(id: _newId(), name: {'he': 'סידור תהילת השם', 'en': 'Tehillat Hashem Siddur', 'ru': 'Сидур Теилат Ашем'}, description: {'he': 'נוסח האר"י, כריכה קשה.', 'en': 'Nusach Ari, hardcover.', 'ru': 'Нусах Ари, твёрдый переплёт.'}, price: 22, category: ProductCategory.books, color: 0xFF0D9488, icon: Icons.menu_book),
@@ -1473,12 +1491,12 @@ class AppRepository extends ChangeNotifier {
     Product(id: _newId(), name: {'he': 'מצות שמורות', 'en': 'Shmurah Matzah', 'ru': 'Маца шмура'}, description: {'he': 'אפייה בעבודת יד לפסח.', 'en': 'Handmade for Passover.', 'ru': 'Ручной выпечки к Песаху.'}, price: 35, category: ProductCategory.food, color: 0xFFF59E0B, icon: Icons.bakery_dining),
     Product(id: _newId(), name: {'he': 'טלית צמר', 'en': 'Wool Tallit', 'ru': 'Талит шерстяной'}, description: {'he': 'טלית גדול איכותית.', 'en': 'Quality full-size tallit.', 'ru': 'Качественный большой талит.'}, price: 120, category: ProductCategory.judaica, color: 0xFF334155, icon: Icons.checkroom),
     Product(id: _newId(), name: {'he': 'עוגיות דבש כשרות', 'en': 'Kosher honey cookies', 'ru': 'Кошерное медовое печенье'}, description: {'he': 'מארז מתנה לראש השנה.', 'en': 'Gift box for Rosh Hashanah.', 'ru': 'Подарочный набор к Рош ха-Шана.'}, price: 15, category: ProductCategory.food, color: 0xFFEA580C, icon: Icons.cookie),
-  ];
+  ] : <Product>[];
 
   // ---------------------------------------------------------------------------
   // Torah library
   // ---------------------------------------------------------------------------
-  late final List<Shiur> shiurim = [
+  late final List<Shiur> shiurim = _repoNskSeed() ? [
     Shiur(
       id: _newId(),
       title: {
@@ -1603,34 +1621,34 @@ class AppRepository extends ChangeNotifier {
       date: DateTime(2021, 12, 1),
       youtubeUrl: 'https://www.youtube.com/watch?v=nQlfH43G1mg',
     ),
-  ];
+  ] : <Shiur>[];
 
   // ---------------------------------------------------------------------------
   // CRM leads (from external system - mock)
   // ---------------------------------------------------------------------------
-  late final List<Lead> leads = [
+  late final List<Lead> leads = _repoNskSeed() ? [
     Lead(id: _newId(), name: 'Daniel Berman', email: 'daniel.b@example.com', phone: '+972-52-111-2233', topic: {'he': 'ארוחות שבת', 'en': 'Shabbat meals', 'ru': 'Субботние трапезы'}, date: DateTime.now().subtract(const Duration(days: 1)), status: LeadStatus.fresh, source: 'website'),
     Lead(id: _newId(), name: 'Anna Fishman', email: 'anna.f@example.com', phone: '+7-926-555-0110', topic: {'he': 'שיעורי תורה', 'en': 'Torah classes', 'ru': 'Уроки Торы'}, date: DateTime.now().subtract(const Duration(days: 2)), status: LeadStatus.contacted, source: 'telegram'),
     Lead(id: _newId(), name: 'Michael Roth', email: 'michael.r@example.com', phone: '+1-347-555-0192', topic: {'he': 'יוצאי העיר', 'en': 'City alumni', 'ru': 'Земляки'}, date: DateTime.now().subtract(const Duration(days: 3)), status: LeadStatus.member, source: 'website'),
     Lead(id: _newId(), name: 'Rachel Weiss', email: 'rachel.w@example.com', phone: '+972-54-777-8899', topic: {'he': 'ארגון נשים', 'en': "Women's Circle", 'ru': 'Женский клуб'}, date: DateTime.now().subtract(const Duration(days: 5)), status: LeadStatus.contacted, source: 'website'),
-  ];
+  ] : <Lead>[];
 
   // ---------------------------------------------------------------------------
   // Donations
   // ---------------------------------------------------------------------------
-  final List<Loc> campaigns = [
+  final List<Loc> campaigns = _repoNskSeed() ? [
     {'he': 'החזקת בית מנחם', 'en': 'Beit Menachem upkeep', 'ru': 'Содержание Бейт Менахем'},
     {'he': 'בית ספר אור אבנר', 'en': 'Or Avner school', 'ru': 'Лицей Ор Авнер'},
     {'he': 'מרכז לב', 'en': 'Lev special-needs center', 'ru': 'Центр Лев'},
     {'he': 'חסד ומצות לפסח', 'en': 'Chesed & Passover matzah', 'ru': 'Хесед и маца к Песаху'},
     {'he': 'הימים הנוראים תשפ״ז', 'en': 'High Holidays 5787', 'ru': 'Высокие праздники 5787'},
-  ];
+  ] : <Loc>[];
 
-  late final List<Donation> donations = [
+  late final List<Donation> donations = _repoNskSeed() ? [
     Donation(id: _newId(), donor: 'Anonymous', amount: 360, campaign: campaigns[0], date: DateTime.now().subtract(const Duration(days: 1))),
     Donation(id: _newId(), donor: 'M. Roth', amount: 1000, campaign: campaigns[2], date: DateTime.now().subtract(const Duration(days: 2))),
     Donation(id: _newId(), donor: 'A. Fishman', amount: 180, campaign: campaigns[1], date: DateTime.now().subtract(const Duration(days: 4))),
-  ];
+  ] : <Donation>[];
 
   final List<NewsletterSubscriber> subscribers = [];
 
@@ -3091,9 +3109,38 @@ class AppRepository extends ChangeNotifier {
     _ensureHomeSlideshow();
   }
 
+  Future<void> _applyTenantSeedPresentation() async {
+    if (_repoNskSeed()) return;
+    final runtime = TenantRuntime.instance;
+    final emblemPath = runtime.config.emblemAssetPath;
+    if (emblemPath.startsWith('assets/')) {
+      try {
+        final data = await rootBundle.load(emblemPath);
+        emblemBytes = data.buffer.asUint8List();
+        emblemUrl = null;
+        writeEmblemSplashCache(emblemBytes!);
+        _hadLocalEmblem = true;
+      } catch (_) {}
+    }
+    final photos = runtime.presentation.photoAssetPaths
+        .where((p) => p.startsWith('assets/'))
+        .toList();
+    if (photos.isNotEmpty) {
+      final home = banners.putIfAbsent('/', PageBanner.new);
+      home.imageUrl = photos.first;
+      home.extra
+        ..clear()
+        ..addAll([
+          for (var i = 1; i < photos.length; i++)
+            BannerSlide(imageUrl: photos[i]),
+        ]);
+    }
+  }
+
   /// The packaged home hero is two building photos, not one still frame.
   /// A saved custom slideshow is left as the admin set it.
   void _ensureHomeSlideshow() {
+    if (!_repoNskSeed()) return;
     final home = banners.putIfAbsent('/', PageBanner.new);
     final slides = home.allSlides;
     const first = 'assets/images/beit-menachem-1.jpg';
@@ -3215,6 +3262,7 @@ class AppRepository extends ChangeNotifier {
   }
 
   void _ensureTouristDefaults() {
+    if (!_repoNskSeed()) return;
     for (final extra in _touristExtras()) {
       final i = touristInfo.indexWhere((e) =>
           e.id == extra.id ||

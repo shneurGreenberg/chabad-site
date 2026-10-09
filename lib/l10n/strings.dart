@@ -1545,4 +1545,159 @@ const Map<String, Map<String, String>> _strings = {
     'en': 'Drag or use the arrows to arrange the items.',
     'ru': 'Перетащите или используйте стрелки, чтобы расположить элементы.',
   },
+  'tenant.notFound.title': {
+    'he': 'הקהילה לא נמצאה',
+    'en': 'Community not found',
+    'ru': 'Община не найдена',
+  },
+  'tenant.notFound.body': {
+    'he': 'אין תצורה מקומית או מוטמעת לקהילה הזו.',
+    'en': 'There is no bundled or saved configuration for this community.',
+    'ru': 'Нет встроенной или сохранённой конфигурации для этой общины.',
+  },
+  'tenant.notFound.home': {
+    'he': 'חזרה לדף הבית',
+    'en': 'Back to home',
+    'ru': 'На главную',
+  },
+  'admin.communities.title': {
+    'he': 'קהילות',
+    'en': 'Communities',
+    'ru': 'Общины',
+  },
+  'admin.communities.new': {
+    'he': 'קהילה חדשה',
+    'en': 'New community',
+    'ru': 'Новая община',
+  },
+  'admin.communities.preview': {
+    'he': 'תצוגה מקדימה',
+    'en': 'Preview',
+    'ru': 'Просмотр',
+  },
+  'admin.communities.openList': {
+    'he': 'רשימת קהילות',
+    'en': 'Open communities list',
+    'ru': 'Открыть список общин',
+  },
+  'admin.communities.blurb': {
+    'he': 'נהלו קהילות מוטמעות, מקומיות ובענן. תצוגה מקדימה עם ?tenant=',
+    'en': 'Manage bundled, local, and cloud communities. Preview with ?tenant=',
+    'ru': 'Управление встроенными, локальными и облачными общинами. Просмотр: ?tenant=',
+  },
+  'admin.communities.saved': {
+    'he': 'הקהילה נשמרה',
+    'en': 'Community saved',
+    'ru': 'Община сохранена',
+  },
+  'admin.communities.downloadPackage': {
+    'he': 'הורדת חבילת tenant',
+    'en': 'Download tenant package',
+    'ru': 'Скачать пакет tenant',
+  },
+  'admin.communities.status.bundled': {
+    'he': 'מוטמע',
+    'en': 'Bundled',
+    'ru': 'В сборке',
+  },
+  'admin.communities.status.local': {
+    'he': 'מקומי',
+    'en': 'Local',
+    'ru': 'Локально',
+  },
+  'admin.communities.status.cloud': {
+    'he': 'ענן',
+    'en': 'Cloud',
+    'ru': 'Облако',
+  },
+  'admin.communities.onboarding.title': {
+    'he': 'פתיחת קהילה חדשה',
+    'en': 'Open a new community',
+    'ru': 'Открыть новую общину',
+  },
+  'admin.communities.onboarding.subtitle': {
+    'he': 'מלאו פרטי הקהילה. עם Firebase — שמירה לענן; אחרת שמירה מקומית וחבילה להורדה.',
+    'en': 'Fill in community details. With Firebase, saves to cloud; otherwise local + downloadable package.',
+    'ru': 'Заполните данные общины. С Firebase — в облако; иначе локально и пакет для скачивания.',
+  },
+  'admin.communities.onboarding.submit': {
+    'he': 'שמירה',
+    'en': 'Save',
+    'ru': 'Сохранить',
+  },
+  'admin.communities.field.name': {
+    'he': 'שם הקהילה',
+    'en': 'Community name',
+    'ru': 'Название общины',
+  },
+  'admin.communities.field.city': {
+    'he': 'עיר',
+    'en': 'City',
+    'ru': 'Город',
+  },
+  'admin.communities.field.slug': {
+    'he': 'מזהה (slug)',
+    'en': 'Slug / id',
+    'ru': 'Идентификатор (slug)',
+  },
+  'admin.communities.field.slugHint': {
+    'he': 'אותיות קטנות, מספרים ומקף. לא nsk.',
+    'en': 'Lowercase letters, numbers, hyphens. Not nsk.',
+    'ru': 'Строчные буквы, цифры, дефис. Не nsk.',
+  },
+  'admin.communities.field.primary': {
+    'he': 'צבע ראשי (hex)',
+    'en': 'Primary color (hex)',
+    'ru': 'Основной цвет (hex)',
+  },
+  'admin.communities.field.accent': {
+    'he': 'צבע הדגשה (hex)',
+    'en': 'Accent color (hex)',
+    'ru': 'Акцентный цвет (hex)',
+  },
+  'admin.communities.field.logo': {
+    'he': 'לוגו',
+    'en': 'Logo',
+    'ru': 'Логотип',
+  },
+  'admin.communities.field.photos': {
+    'he': 'תמונות (אופציונלי)',
+    'en': 'Photos (optional)',
+    'ru': 'Фото (необязательно)',
+  },
+  'admin.communities.field.contact': {
+    'he': 'יצירת קשר',
+    'en': 'Contact',
+    'ru': 'Контакты',
+  },
+  'admin.communities.field.phone': {
+    'he': 'טלפון',
+    'en': 'Phone',
+    'ru': 'Телефон',
+  },
+  'admin.communities.field.email': {
+    'he': 'אימייל',
+    'en': 'Email',
+    'ru': 'Email',
+  },
+  'admin.communities.field.adminEmail': {
+    'he': 'אימייל מנהל',
+    'en': 'Admin email',
+    'ru': 'Email администратора',
+  },
+  'admin.communities.field.languages': {
+    'he': 'שפות',
+    'en': 'Languages',
+    'ru': 'Языки',
+  },
+  'admin.communities.field.about': {
+    'he': 'אודות',
+    'en': 'About',
+    'ru': 'О нас',
+  },
+  'admin.communities.field.sourceCredit': {
+    'he': 'קרדיט מקור',
+    'en': 'Source credit',
+    'ru': 'Источник данных',
+  },
 };

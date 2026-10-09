@@ -30,6 +30,9 @@ class TenantConfig {
     required this.defaultLanguage,
     required this.telegramChannelHint,
     required this.landlineDigits,
+    this.primaryColorHex,
+    this.accentColorHex,
+    this.sourceCredit = '',
   });
 
   final String tenantId;
@@ -60,6 +63,9 @@ class TenantConfig {
   final String telegramChannelHint;
   /// Synagogue landline digits (no +) — WhatsApp buttons fall back to secretary.
   final String landlineDigits;
+  final String? primaryColorHex;
+  final String? accentColorHex;
+  final String sourceCredit;
 
   String get whatsAppUrl => 'https://wa.me/$whatsAppDigits';
 
@@ -136,6 +142,9 @@ class TenantConfig {
       defaultLanguage: defaultLanguage,
       telegramChannelHint: telegramChannelHint,
       landlineDigits: landlineDigits,
+      primaryColorHex: primaryColorHex,
+      accentColorHex: accentColorHex,
+      sourceCredit: sourceCredit,
     );
   }
 
@@ -174,6 +183,9 @@ class TenantConfig {
         'defaultLanguage': defaultLanguage,
         'telegramChannelHint': telegramChannelHint,
         'landlineDigits': landlineDigits,
+        if (primaryColorHex != null) 'primaryColorHex': primaryColorHex,
+        if (accentColorHex != null) 'accentColorHex': accentColorHex,
+        if (sourceCredit.isNotEmpty) 'sourceCredit': sourceCredit,
       };
 
   static TenantConfig fromMap(
@@ -227,6 +239,13 @@ class TenantConfig {
       telegramChannelHint:
           _str(raw['telegramChannelHint'], fallback.telegramChannelHint),
       landlineDigits: _str(raw['landlineDigits'], fallback.landlineDigits),
+      primaryColorHex: raw['primaryColorHex'] != null
+          ? _str(raw['primaryColorHex'], '')
+          : fallback.primaryColorHex,
+      accentColorHex: raw['accentColorHex'] != null
+          ? _str(raw['accentColorHex'], '')
+          : fallback.accentColorHex,
+      sourceCredit: _str(raw['sourceCredit'], fallback.sourceCredit),
     );
   }
 
