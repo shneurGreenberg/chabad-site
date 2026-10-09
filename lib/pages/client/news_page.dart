@@ -9,6 +9,7 @@ import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/site_scaffold.dart';
 import '../../widgets/playful_icons.dart';
+import '../../widgets/news_body.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key, this.highlightId});
@@ -155,9 +156,7 @@ class NewsArticlePage extends StatelessWidget {
                       .headlineSmall
                       ?.copyWith(fontWeight: FontWeight.w800, height: 1.25)),
               const SizedBox(height: 16),
-              Text(trLoc(article.body, loc.lang),
-                  style: TextStyle(
-                      color: AppColors.ink, height: 1.6, fontSize: 16.5)),
+              NewsBody(text: trLoc(article.body, loc.lang)),
             ],
           ),
         ),
