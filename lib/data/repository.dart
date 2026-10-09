@@ -170,7 +170,8 @@ class AppRepository extends ChangeNotifier {
 
     // New visitors: wait briefly for published text (not media). Then paint
     // even if Firestore is slow; a late pull still applies without a refresh.
-    if (!_repoNskSeed() && !CloudSync.instance.enabled) {
+    // Alternate tenants use bundled/local seeds — do not block first paint on NSK cloud.
+    if (!_repoNskSeed()) {
       _cloudPulled = true;
     } else {
       try {

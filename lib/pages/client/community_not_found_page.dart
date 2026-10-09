@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../tenant/tenant_runtime.dart';
-import '../../widgets/common.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 
