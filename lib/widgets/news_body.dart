@@ -15,7 +15,7 @@ class NewsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(
+    final style = TextStyle(
       color: AppColors.ink,
       height: 1.6,
       fontSize: 16.5,
