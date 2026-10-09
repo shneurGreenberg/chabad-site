@@ -120,11 +120,10 @@ TenantConfig tenantConfigFromSeed(
     tenantId: id,
     communityName: name,
     cityName: city,
-    tagline: _loc(seed['tagline'], {
-      'he': trLoc(name, 'he'),
-      'en': trLoc(name, 'en'),
-      'ru': trLoc(name, 'ru'),
-    }),
+    tagline: _loc(seed['tagline'], blank.tagline),
+    homeStats: seed['homeStats'] != null
+        ? TenantHomeStat.listFromJson(seed['homeStats'])
+        : blank.homeStats,
     aboutSubtitle: _loc(seed['aboutSubtitle'], address),
     aboutBody: about,
     address: address,
