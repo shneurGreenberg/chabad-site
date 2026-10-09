@@ -7,6 +7,7 @@ TenantConfig blankTenantConfig(String tenantId) => TenantConfig(
       communityName: {'he': '', 'en': '', 'ru': ''},
       cityName: {'he': '', 'en': '', 'ru': ''},
       tagline: {'he': '', 'en': '', 'ru': ''},
+      homeStats: const [],
       aboutSubtitle: {'he': '', 'en': '', 'ru': ''},
       aboutBody: {'he': '', 'en': '', 'ru': ''},
       address: {'he': '', 'en': '', 'ru': ''},

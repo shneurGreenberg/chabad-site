@@ -1,4 +1,101 @@
+import 'package:flutter/material.dart';
+
 import '../models.dart';
+
+/// One stat tile on the home page (value is locale-neutral; label is localized).
+class TenantHomeStat {
+  const TenantHomeStat({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.colorArgb,
+  });
+
+  final String value;
+  final Loc label;
+  final IconData icon;
+  final int colorArgb;
+
+  Color get color => Color(colorArgb);
+
+  Map<String, dynamic> toMap() => {
+        'value': value,
+        'label': label,
+        'icon': tenantHomeStatIconName(icon),
+        'color': _colorToHex(colorArgb),
+      };
+
+  static TenantHomeStat? fromMap(dynamic raw) {
+    if (raw is! Map) return null;
+    final value = '${raw['value'] ?? ''}'.trim();
+    if (value.isEmpty) return null;
+    final labelRaw = raw['label'];
+    if (labelRaw is! Map) return null;
+    final label = Map<String, String>.from(labelRaw.cast<String, dynamic>());
+    if (label.values.every((s) => s.trim().isEmpty)) return null;
+    final icon = tenantHomeStatIconFromName('${raw['icon'] ?? 'insights'}');
+    final color = _colorFromDynamic(raw['color'], 0xFF1D4ED8);
+    return TenantHomeStat(
+      value: value,
+      label: label,
+      icon: icon,
+      colorArgb: color,
+    );
+  }
+
+  static List<TenantHomeStat> listFromJson(dynamic raw) {
+    if (raw is! List) return const [];
+    final out = <TenantHomeStat>[];
+    for (final item in raw) {
+      final stat = fromMap(item);
+      if (stat != null) out.add(stat);
+    }
+    return out;
+  }
+
+  static String _colorToHex(int argb) {
+    final rgb = argb & 0xFFFFFF;
+    return '#${rgb.toRadixString(16).padLeft(6, '0').toUpperCase()}';
+  }
+
+  static int _colorFromDynamic(dynamic v, int fallback) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    final s = '$v'.trim();
+    if (s.isEmpty) return fallback;
+    var hex = s;
+    if (hex.startsWith('#')) hex = hex.substring(1);
+    if (hex.length == 6) hex = 'FF$hex';
+    final parsed = int.tryParse(hex, radix: 16);
+    return parsed ?? fallback;
+  }
+}
+
+String tenantHomeStatIconName(IconData icon) {
+  return switch (icon) {
+    Icons.family_restroom => 'family_restroom',
+    Icons.synagogue => 'synagogue',
+    Icons.verified => 'verified',
+    Icons.school => 'school',
+    Icons.history => 'history',
+    Icons.groups => 'groups',
+    Icons.calendar_today => 'calendar_today',
+    _ => 'insights',
+  };
+}
+
+IconData tenantHomeStatIconFromName(String name) {
+  return switch (name.trim()) {
+    'family_restroom' => Icons.family_restroom,
+    'synagogue' => Icons.synagogue,
+    'verified' => Icons.verified,
+    'school' => Icons.school,
+    'history' => Icons.history,
+    'groups' => Icons.groups,
+    'calendar_today' => Icons.calendar_today,
+    _ => Icons.insights,
+  };
+}
 
 /// Per-community branding, contacts, integrations, and defaults.
 class TenantConfig {
@@ -7,6 +104,7 @@ class TenantConfig {
     required this.communityName,
     required this.cityName,
     required this.tagline,
+    required this.homeStats,
     required this.aboutSubtitle,
     required this.aboutBody,
     required this.address,
@@ -38,7 +136,9 @@ class TenantConfig {
   final String tenantId;
   final Loc communityName;
   final Loc cityName;
+  /// Hero + footer subtitle; empty hides the hero subtitle line.
   final Loc tagline;
+  final List<TenantHomeStat> homeStats;
   final Loc aboutSubtitle;
   final Loc aboutBody;
   final Loc address;
@@ -119,6 +219,7 @@ class TenantConfig {
       communityName: communityName ?? this.communityName,
       cityName: cityName,
       tagline: tagline,
+      homeStats: homeStats,
       aboutSubtitle: aboutSubtitle,
       aboutBody: aboutBody,
       address: address,
@@ -153,6 +254,7 @@ class TenantConfig {
         'communityName': communityName,
         'cityName': cityName,
         'tagline': tagline,
+        'homeStats': [for (final s in homeStats) s.toMap()],
         'aboutSubtitle': aboutSubtitle,
         'aboutBody': aboutBody,
         'address': address,
@@ -197,6 +299,9 @@ class TenantConfig {
       communityName: _loc(raw['communityName'], fallback.communityName),
       cityName: _loc(raw['cityName'], fallback.cityName),
       tagline: _loc(raw['tagline'], fallback.tagline),
+      homeStats: raw['homeStats'] != null
+          ? TenantHomeStat.listFromJson(raw['homeStats'])
+          : fallback.homeStats,
       aboutSubtitle: _loc(raw['aboutSubtitle'], fallback.aboutSubtitle),
       aboutBody: _loc(raw['aboutBody'], fallback.aboutBody),
       address: _loc(raw['address'], fallback.address),

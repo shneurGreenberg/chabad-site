@@ -2,7 +2,7 @@
 # Clone official Flutter tag (cirruslabs GHCR may lack 3.47.4).
 # Do NOT download kaddish photos here ? that hung prior rebuilds.
 # 2026-10-09: nsknews Beit Menachem news article + gallery (v41).
-# 2026-10-09: multi-tenant phase 2 onboarding + communities page (v43).
+# 2026-10-09: tenant home stats + subtitle in TenantConfig (v44).
 
 FROM debian:bookworm-slim AS build
 
@@ -28,7 +28,7 @@ RUN cp assets/images/community-emblem.png build/web/favicon.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-192.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-512.png \
  && mkdir -p build/web/kaddish-photos \
- && BUILD_ID="v43-$(date -u +%Y%m%dT%H%M%SZ)" \
+ && BUILD_ID="v44-$(date -u +%Y%m%dT%H%M%SZ)" \
  && echo "$BUILD_ID" > build/web/build-id.txt \
  && echo "<!-- $BUILD_ID -->" >> build/web/index.html \
  && cp build/web/index.html build/web/404.html \

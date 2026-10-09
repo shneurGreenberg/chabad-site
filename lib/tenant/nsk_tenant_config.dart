@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../models.dart';
 import '../theme.dart';
 import 'tenant_config.dart';
@@ -23,6 +25,48 @@ final TenantConfig nskTenantConfig = TenantConfig(
     'ru':
         'Синагога и еврейский общинный центр Новосибирска — дом для каждого еврея Сибири',
   },
+  homeStats: [
+    TenantHomeStat(
+      value: '12,000+',
+      label: {
+        'he': 'יהודים באזור',
+        'en': 'Jews in the region',
+        'ru': 'Евреев в регионе',
+      },
+      icon: Icons.family_restroom,
+      colorArgb: 0xFF132A5C,
+    ),
+    TenantHomeStat(
+      value: '2013',
+      label: {
+        'he': 'חנוכת בית מנחם',
+        'en': 'Beit Menachem opened',
+        'ru': 'Открытие Бейт Менахем',
+      },
+      icon: Icons.synagogue,
+      colorArgb: 0xFFC2410C,
+    ),
+    TenantHomeStat(
+      value: '27',
+      label: {
+        'he': 'שנות שליחות חב״ד',
+        'en': 'Years of Chabad shlichut',
+        'ru': 'Лет миссии Хабада',
+      },
+      icon: Icons.verified,
+      colorArgb: 0xFF0F766E,
+    ),
+    TenantHomeStat(
+      value: '2000',
+      label: {
+        'he': 'בית ספר אור אבנר',
+        'en': 'Or Avner school since',
+        'ru': 'Лицей Ор Авнер с',
+      },
+      icon: Icons.school,
+      colorArgb: 0xFFC9A227,
+    ),
+  ],
   aboutSubtitle: {
     'he': 'בית הכנסת בית מנחם, רחוב שצ׳טינקינה 68, נובוסיבירסק',
     'en': 'Beit Menachem synagogue, 68 Shchetinkina St., Novosibirsk',

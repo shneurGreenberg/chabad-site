@@ -13,6 +13,7 @@ import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
 import '../../widgets/newsletter.dart';
 import '../../widgets/playful_icons.dart';
+import '../../tenant/tenant_runtime.dart';
 import '../../widgets/site_scaffold.dart';
 
 class HomePage extends StatelessWidget {
@@ -24,6 +25,7 @@ class HomePage extends StatelessWidget {
     final repo = context.watch<AppRepository>();
     final homeNews =
         featuredHomeNews(repo.news, loc.lang, DateTime.now()).take(6).toList();
+    final homeStats = TenantRuntime.instance.config.homeStats;
     return SiteScaffold(
       currentRoute: '/',
       children: [
@@ -34,37 +36,25 @@ class HomePage extends StatelessWidget {
             padBottom: 0,
             child: HomeNewsTicker(articles: homeNews),
           ),
-        Section(
-          padTop: 24,
-          padBottom: 0,
-          child: ResponsiveGrid(
+        if (homeStats.isNotEmpty)
+          Section(
+            padTop: 24,
+            padBottom: 0,
+            child: ResponsiveGrid(
               columns: gridColumns(context, max: 4) < 2
                   ? 2
                   : gridColumns(context, max: 4),
               children: [
-                StatCard(
-                    value: '12,000+',
-                    label: loc.t('home.stats.families'),
-                    icon: Icons.family_restroom,
-                    color: AppColors.primary),
-                StatCard(
-                    value: '2013',
-                    label: loc.t('home.stats.events'),
-                    icon: Icons.synagogue,
-                    color: const Color(0xFFC2410C)),
-                StatCard(
-                    value: '27',
-                    label: loc.t('home.stats.years'),
-                    icon: Icons.verified,
-                    color: const Color(0xFF0F766E)),
-                StatCard(
-                    value: '2000',
-                    label: loc.t('home.stats.meals'),
-                    icon: Icons.school,
-                    color: AppColors.accent),
+                for (final stat in homeStats)
+                  StatCard(
+                    value: stat.value,
+                    label: trLoc(stat.label, loc.lang),
+                    icon: stat.icon,
+                    color: stat.color,
+                  ),
               ],
             ),
-        ),
+          ),
         Section(
           padTop: 8,
           child: Column(
@@ -143,18 +133,22 @@ class _Hero extends StatelessWidget {
                 shadows: const [Shadow(color: Colors.black54, blurRadius: 14)]),
           ),
         ),
-        const SizedBox(height: 16),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Text(
-            copyOf(context, repo.siteCopy.tagline, 'site.tagline'),
-            style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.92),
-                fontSize: 19,
-                height: 1.55,
-                shadows: const [Shadow(color: Colors.black45, blurRadius: 10)]),
+        if (trLoc(repo.siteCopy.tagline, loc.lang).isNotEmpty) ...[
+          const SizedBox(height: 16),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Text(
+              trLoc(repo.siteCopy.tagline, loc.lang),
+              style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.92),
+                  fontSize: 19,
+                  height: 1.55,
+                  shadows: const [
+                    Shadow(color: Colors.black45, blurRadius: 10)
+                  ]),
+            ),
           ),
-        ),
+        ],
         const SizedBox(height: 28),
         Wrap(
           spacing: 12,

@@ -10,6 +10,11 @@
     "he": "טומסק",
     "en": "Tomsk"
   },
+  "tagline": {
+    "ru": "Восстановленная Хоральная синагога на ул. Розы Люксембург — духовный дом томской еврейской общины",
+    "en": "The restored Choral Synagogue on Rosa Luxemburg St. — spiritual home of Tomsk Jewry",
+    "he": "בית הכנסת הכוראלי המשוחזר ברחוב רוזה לוקסמבורג — הבית הרוחני של יהדות טומסק"
+  },
   "address": {
     "ru": "634009, г. Томск, ул. Розы Люксембург, 38",
     "he": "רחוב רוזה לוקסמבורג 38, טומסק",
@@ -22,6 +27,48 @@
     "he": "הקהילה היהודית בטומסק חברה בפדרציית הקהילות היהודיות ברוסיה משנת 2001. מאז 2004 עומד בראשה שליח הרבי מליובאוויטש, הרב לוי קמינצקי. בית הכנסת הכוראלי המשוחזר ברחוב רוזה לוקסמבורג 38 נחנך בדצמבר 2010.",
     "en": "The Tomsk Jewish Community has been part of the Federation of Jewish Communities of Russia since 2001. Since 2004 its spiritual leader has been Rabbi Levi Kaminetsky, emissary of the Lubavitcher Rebbe. The restored Choral Synagogue at 38 Rosa Luxemburg St reopened in December 2010."
   },
+  "homeStats": [
+    {
+      "value": "1902",
+      "label": {
+        "ru": "Построена Хоральная синагога",
+        "en": "Choral synagogue built",
+        "he": "בניין בית הכנסת הכוראלי"
+      },
+      "icon": "history",
+      "color": "#132A5C"
+    },
+    {
+      "value": "2010",
+      "label": {
+        "ru": "Открытие после реставрации",
+        "en": "Reopened after restoration",
+        "he": "נחנך מחדש אחרי שיקום"
+      },
+      "icon": "synagogue",
+      "color": "#C2410C"
+    },
+    {
+      "value": "2004",
+      "label": {
+        "ru": "Раввин Л. Каминецкий с",
+        "en": "Rabbi L. Kaminetsky since",
+        "he": "הרב ל. קמינצקי מאז"
+      },
+      "icon": "verified",
+      "color": "#0F766E"
+    },
+    {
+      "value": "2001",
+      "label": {
+        "ru": "В составе ФЕОР с",
+        "en": "Member of FEOR since",
+        "he": "חברה בפדרציה מאז"
+      },
+      "icon": "groups",
+      "color": "#C9A227"
+    }
+  ],
   "languages": ["ru", "he", "en"],
   "adminEmail": "admin+tomsk@example.invalid",
   "colors": {

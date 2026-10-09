@@ -898,11 +898,13 @@ class _SiteFooter extends StatelessWidget {
                                   fontSize: 16)),
                         ),
                       ]),
-                      const SizedBox(height: 12),
-                      Text(copyOf(context, repo.siteCopy.tagline, 'site.tagline'),
-                          style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              height: 1.5)),
+                      if (trLoc(repo.siteCopy.tagline, loc.lang).isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(trLoc(repo.siteCopy.tagline, loc.lang),
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                height: 1.5)),
+                      ],
                       const SizedBox(height: 14),
                       Text(loc.t('footer.follow'),
                           style: const TextStyle(
