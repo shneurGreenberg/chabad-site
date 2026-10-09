@@ -22,6 +22,7 @@ import '../services/yahrzeit.dart';
 import 'holidays.dart';
 import 'kaddish.dart';
 import 'public_content.dart';
+import 'nsknews_seed.dart';
 import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
@@ -39,7 +40,7 @@ class AppRepository extends ChangeNotifier {
     Future<void>.microtask(_boot);
   }
 
-  static const _contentSeed = 8;
+  static const _contentSeed = 9;
   static const _imgSynagogue = 'assets/images/beit-menachem-1.jpg';
   static const _imgHall = 'assets/images/beit-menachem-2.jpg';
   static const _snapKey = 'chabad_site_snapshot';
@@ -1007,6 +1008,15 @@ class AppRepository extends ChangeNotifier {
         icon: Icons.auto_awesome,
         photos: _roshHashana5787Shots(),
       );
+
+  void _ensureNsknewsContent() {
+    NsknewsSeed.ensure(
+      news: news,
+      gallery: gallery,
+      history: history,
+      siteCopy: siteCopy,
+    );
+  }
 
   void _ensureRoshHashana5787Album() {
     final shots = _roshHashana5787Shots();
@@ -3163,6 +3173,7 @@ class AppRepository extends ChangeNotifier {
     }
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureNsknewsContent();
     _ensureHomeSlideshow();
   }
 
@@ -3211,6 +3222,7 @@ class AppRepository extends ChangeNotifier {
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureNsknewsContent();
     _ensureHomeSlideshow();
     // Other photos stay off the critical path so the header logo and first
     // paint are not stuck behind every gallery file in IndexedDB.
@@ -3963,6 +3975,7 @@ class AppRepository extends ChangeNotifier {
     _ensureTouristDefaults();
     _ensureHistoricalFamous();
     _ensureRoshHashana5787Album();
+    _ensureNsknewsContent();
     _ensureHomeSlideshow();
     _cloudPulled = true;
 
