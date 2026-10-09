@@ -9,6 +9,7 @@ import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/map_embed.dart';
 import '../../widgets/site_scaffold.dart';
+import '../../tenant/tenant_runtime.dart';
 import '../../widgets/playful_icons.dart';
 
 class AboutPage extends StatelessWidget {
@@ -33,6 +34,13 @@ class AboutPage extends StatelessWidget {
                 style: const TextStyle(height: 1.55, fontSize: 15.5)),
           ),
         ),
+        if (TenantRuntime.instance.config.sourceCredit.isNotEmpty)
+          Section(
+            child: Text(
+              TenantRuntime.instance.config.sourceCredit,
+              style: TextStyle(color: AppColors.muted, fontSize: 13, height: 1.45),
+            ),
+          ),
         Section(
           child: LayoutBuilder(builder: (context, c) {
             final info = _infoCards(context, repo, loc);

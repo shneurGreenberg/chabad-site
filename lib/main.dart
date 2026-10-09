@@ -11,6 +11,7 @@ import 'services/url_strategy.dart';
 import 'state/auth.dart';
 import 'theme.dart';
 import 'tenant/tenant_runtime.dart';
+import 'pages/client/community_not_found_page.dart';
 import 'widgets/boot_splash.dart';
 
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -21,6 +22,7 @@ Future<void> main() async {
   useHashUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   TenantRuntime.bootstrap();
+  await TenantRuntime.ensureReady();
   // Construct router only after HashUrlStrategy so deep links (#/tourist, #/history) match.
   createAppRouter();
   unawaited(CloudSync.instance.warmPublic());
@@ -87,15 +89,36 @@ class _ChabadAppState extends State<ChabadApp> {
       ],
       child: Consumer2<LocaleController, AppRepository>(
         builder: (context, locale, repo, _) {
-          AppColors.bind(repo.palette);
-          final appTitle = TenantRuntime.instance.config.seoTitle;
+          final tenant = TenantRuntime.instance;
+          if (tenant.isNotFound) {
+            return MaterialApp(
+              title: 'Chabad',
+              debugShowCheckedModeBanner: false,
+              theme: buildAppTheme(SitePalettes.classic),
+              locale: locale.locale,
+              supportedLocales: const [Locale('he'), Locale('en'), Locale('ru')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              home: Directionality(
+                textDirection: locale.direction,
+                child: const CommunityNotFoundPage(),
+              ),
+            );
+          }
+          final palette =
+              tenant.customPalette ?? repo.palette;
+          AppColors.bind(palette);
+          final appTitle = tenant.config.seoTitle;
 
           // Show loading screen until data is fully loaded from localStorage + Firebase
           if (!repo.isDataReady) {
             return MaterialApp(
               title: appTitle,
               debugShowCheckedModeBanner: false,
-              theme: buildAppTheme(repo.palette),
+              theme: buildAppTheme(palette),
               locale: locale.locale,
               supportedLocales: const [Locale('he'), Locale('en'), Locale('ru')],
               localizationsDelegates: const [
@@ -115,7 +138,7 @@ class _ChabadAppState extends State<ChabadApp> {
           return MaterialApp.router(
             title: appTitle,
             debugShowCheckedModeBanner: false,
-            theme: buildAppTheme(repo.palette),
+            theme: buildAppTheme(palette),
             routerConfig: appRouter,
             scaffoldMessengerKey: appMessengerKey,
             locale: locale.locale,

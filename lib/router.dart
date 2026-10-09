@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'pages/admin/admin.dart';
+import 'pages/admin/communities_page.dart';
+import 'pages/admin/community_onboarding_page.dart';
 import 'pages/client/about_page.dart';
 import 'pages/client/cemetery_page.dart';
 import 'pages/client/contact_page.dart';
@@ -134,6 +136,8 @@ GoRouter createAppRouter() {
         ],
       ),
       _route('/admin', (_) => const AdminPage()),
+      _route('/admin/communities', (_) => const CommunitiesAdminPage()),
+      _route('/admin/communities/new', (_) => const CommunityOnboardingPage()),
     ],
   );
 }

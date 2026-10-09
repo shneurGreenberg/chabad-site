@@ -94,6 +94,8 @@ flutter:
     - assets/images/famous/vaksberg.jpg
     - assets/images/gallery/rosh-hashana-5787/
     - assets/images/nsknews-2024/
+    - assets/tenants/tomsk/
+    - assets/tenants/tomsk/tenant.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

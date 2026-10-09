@@ -8,6 +8,7 @@ import '../data/repository.dart';
 import '../l10n/strings.dart';
 import '../models.dart';
 import '../services/links.dart';
+import '../tenant/tenant_runtime.dart';
 import '../services/web_prefs.dart';
 import '../theme.dart';
 import 'brand.dart';
@@ -970,6 +971,18 @@ class _SiteFooter extends StatelessWidget {
               '© ${DateTime.now().year} ${copyOf(context, repo.siteCopy.name, 'site.name')} · ${loc.t('footer.rights')}',
               style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12.5),
             ),
+            if (TenantRuntime.instance.config.sourceCredit.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                TenantRuntime.instance.config.sourceCredit,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.55),
+                  fontSize: 11.5,
+                  height: 1.35,
+                ),
+              ),
+            ],
           ],
         ),
             ),
