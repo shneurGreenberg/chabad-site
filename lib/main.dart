@@ -10,6 +10,7 @@ import 'services/cloud_sync.dart';
 import 'services/url_strategy.dart';
 import 'state/auth.dart';
 import 'theme.dart';
+import 'tenant/tenant_runtime.dart';
 import 'widgets/boot_splash.dart';
 
 final appMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -19,6 +20,7 @@ Future<void> main() async {
   // MUST run before GoRouter is constructed (see createAppRouter in router.dart).
   useHashUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
+  TenantRuntime.bootstrap();
   // Construct router only after HashUrlStrategy so deep links (#/tourist, #/history) match.
   createAppRouter();
   unawaited(CloudSync.instance.warmPublic());
@@ -86,11 +88,12 @@ class _ChabadAppState extends State<ChabadApp> {
       child: Consumer2<LocaleController, AppRepository>(
         builder: (context, locale, repo, _) {
           AppColors.bind(repo.palette);
-          
+          final appTitle = TenantRuntime.instance.config.seoTitle;
+
           // Show loading screen until data is fully loaded from localStorage + Firebase
           if (!repo.isDataReady) {
             return MaterialApp(
-              title: 'בית חב״ד בית מנחם — נובוסיבירסק',
+              title: appTitle,
               debugShowCheckedModeBanner: false,
               theme: buildAppTheme(repo.palette),
               locale: locale.locale,
@@ -110,7 +113,7 @@ class _ChabadAppState extends State<ChabadApp> {
           }
           
           return MaterialApp.router(
-            title: 'בית חב״ד בית מנחם — נובוסיבירסק',
+            title: appTitle,
             debugShowCheckedModeBanner: false,
             theme: buildAppTheme(repo.palette),
             routerConfig: appRouter,

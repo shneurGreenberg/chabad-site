@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.superAdmin == true;
+    }
+
+    function isTenantAdmin(tenantId) {
+      return isSuperAdmin() || (
+        isSignedIn() && request.auth.token.tenantId == tenantId
+      );
+    }
+
+    // Legacy NSK prefix (unchanged until clients use tenants/nsk/...).
+    match /site/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /tenants/{tenantId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+  }
+}

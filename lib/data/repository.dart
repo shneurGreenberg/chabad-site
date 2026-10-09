@@ -21,7 +21,9 @@ import '../services/web_prefs.dart';
 import '../services/yahrzeit.dart';
 import 'holidays.dart';
 import 'kaddish.dart';
+import 'kaddish_endpoints.dart';
 import 'public_content.dart';
+import '../tenant/tenant_runtime.dart';
 import 'snapshot.dart';
 
 /// In-memory data store with mock content for the whole site.
@@ -32,6 +34,7 @@ import 'snapshot.dart';
 /// store the client reads, so changes appear live.
 class AppRepository extends ChangeNotifier {
   AppRepository() {
+    _applyTenantDefaults();
     TelegramService.instance.loadSaved();
     _restoreLocation();
     _adoptSplashEmblem();
@@ -191,108 +194,19 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // Contact / about
   // ---------------------------------------------------------------------------
-  final ContactInfo contact = ContactInfo(
-    name: {
-      'he': 'בית חב״ד בית מנחם',
-      'en': 'Chabad Beit Menachem',
-      'ru': 'Хабад Бейт Менахем',
-    },
-    address: {
-      'he': 'רחוב שצ׳טינקינה 68, נובוסיבירסק, רוסיה 630099',
-      'en': '68 Shchetinkina St., Novosibirsk, Russia 630099',
-      'ru': 'ул. Щетинкина, 68, Новосибирск, 630099',
-    },
-    phone: '+7 (383) 222-20-23',
-    email: 'chabad.nsk@gmail.com',
-    hours: [
-      MapEntry(
-        {'he': 'שני וחמישי', 'en': 'Monday & Thursday', 'ru': 'Понедельник и четверг'},
-        {
-          'he': 'תפילה בבית הכנסת 09:30',
-          'en': 'Synagogue prayer 09:30',
-          'ru': 'Молитва в синагоге 09:30',
-        },
-      ),
-      MapEntry(
-        {'he': 'שבת', 'en': 'Shabbat', 'ru': 'Суббота'},
-        {
-          'he': 'תפילה 10:00 · סעודת שבת 13:00',
-          'en': 'Prayer 10:00 · Shabbat meal 13:00',
-          'ru': 'Молитва 10:00 · субботняя трапеза 13:00',
-        },
-      ),
-      MapEntry(
-        {'he': 'המבנה', 'en': 'Building', 'ru': 'Здание'},
-        {
-          'he': 'פתוח כל יום 09:00–17:00',
-          'en': 'Open daily 09:00–17:00',
-          'ru': 'Открыто каждый день 09:00–17:00',
-        },
-      ),
-      MapEntry(
-        {'he': 'סיורים', 'en': 'Tours', 'ru': 'Экскурсии'},
-        {
-          'he': 'בתיאום מראש',
-          'en': 'By appointment',
-          'ru': 'По предварительной записи',
-        },
-      ),
-      MapEntry(
-        {'he': 'יום ראשון', 'en': 'Sunday', 'ru': 'Воскресенье'},
-        {
-          'he': 'פעילות ילדים בבית הכנסת',
-          'en': 'Children\'s program at the synagogue',
-          'ru': 'Детская программа в синагоге',
-        },
-      ),
-      MapEntry(
-        {'he': 'מקווה גברים', 'en': "Men's mikveh", 'ru': 'Мужская миква'},
-        {
-          'he': 'בבוקר',
-          'en': 'In the morning',
-          'ru': 'Утром',
-        },
-      ),
-      MapEntry(
-        {'he': 'מקווה נשים', 'en': "Women's mikveh", 'ru': 'Женская миква'},
-        {
-          'he': 'בתיאום מראש',
-          'en': 'By appointment',
-          'ru': 'По предварительной записи',
-        },
-      ),
-    ],
-    staff: [
-      StaffContact(
-        name: {
-          'he': 'סנדר קרוגלוב',
-          'en': 'Sender Kruglov',
-          'ru': 'Сендер Круглов',
-        },
-        role: {
-          'he': 'נשיא הקהילה',
-          'en': 'President of the community',
-          'ru': 'Президент общины',
-        },
-        phone: '+7 913 770-79-78',
-      ),
-      StaffContact(
-        name: {
-          'he': 'זויה',
-          'en': 'Zoya',
-          'ru': 'Зоя',
-        },
-        role: {
-          'he': 'מזכירה',
-          'en': 'Secretary',
-          'ru': 'Секретарь',
-        },
-        phone: '+7 903 900-43-20',
-      ),
-    ],
-  );
+  late ContactInfo contact;
+  late SiteLinks links;
 
-  final SiteLinks links = SiteLinks();
+  void _applyTenantDefaults() {
+    final tc = TenantRuntime.instance.config;
+    contact = tc.toContactInfo();
+    links = tc.toSiteLinks();
+    siteCopy = tc.toSiteCopy();
+    paletteId = tc.defaultPaletteId;
+    location = tc.toSiteLocation();
+  }
+
+  String _defaultTimezone() => TenantRuntime.instance.config.timezone;
   final List<Loc> campaignNotes = [
     {
       'he': 'החזקת הבניין, תפילות וקהילה יומיומית',
@@ -365,8 +279,8 @@ class AppRepository extends ChangeNotifier {
   final List<StoreOrder> orders = [];
 
   String googleMapsApiKey = '';
-  final SiteCopy siteCopy = SiteCopy.defaults();
-  String paletteId = SitePalettes.classic.id;
+  late SiteCopy siteCopy;
+  late String paletteId;
   bool _gravesEdited = false;
 
   SitePalette get palette => SitePalettes.byId(paletteId);
@@ -493,7 +407,7 @@ class AppRepository extends ChangeNotifier {
   // ---------------------------------------------------------------------------
   // Location + live zmanim / parasha
   // ---------------------------------------------------------------------------
-  SiteLocation location = SiteLocation.novosibirsk();
+  late SiteLocation location;
 
   void _restoreLocation() {
     final raw = readPref('chabad_site_location');
@@ -541,7 +455,7 @@ class AppRepository extends ChangeNotifier {
       next.timezone,
       next.latitude,
       next.longitude,
-      SiteLocation.novosibirsk().timezone,
+      _defaultTimezone(),
     );
     location = next;
     _persistLocation();
@@ -569,7 +483,7 @@ class AppRepository extends ChangeNotifier {
         location.timezone,
         location.latitude,
         location.longitude,
-        SiteLocation.novosibirsk().timezone,
+        _defaultTimezone(),
       );
     }
     if (location.timezone != before) {
@@ -2964,7 +2878,7 @@ class AppRepository extends ChangeNotifier {
         location.timezone,
         location.latitude,
         location.longitude,
-        SiteLocation.novosibirsk().timezone,
+        _defaultTimezone(),
       );
     }
     _persistLocation();

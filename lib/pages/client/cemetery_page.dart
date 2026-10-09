@@ -3,6 +3,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/kaddish.dart';
+import '../../data/kaddish_endpoints.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../services/web_prefs.dart';
@@ -72,8 +73,7 @@ class _CemeteryPageState extends State<CemeteryPage> {
   String _query = '';
   bool _upcomingOnly = false;
 
-  static const _kaddishUrl =
-      'https://synagogue-kadish-shneur.amvera.io/s/novosibirsk';
+  String get _kaddishUrl => kaddishPublicBoardUrl;
 
   @override
   void initState() {

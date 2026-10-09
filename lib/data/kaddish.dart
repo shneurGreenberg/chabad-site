@@ -5,12 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models.dart';
 import '../services/yahrzeit.dart';
 
-/// Live Novosibirsk kaddish registry used by the cemetery page.
-const kaddishHost = 'https://synagogue-kadish-shneur.amvera.io';
-const kaddishBoardApi = '$kaddishHost/s/novosibirsk/api/board';
-const kaddishBoardFullApi = '$kaddishBoardApi?slim=0';
-const kaddishBoardPersonApi = '$kaddishHost/s/novosibirsk/api/board/person';
-const kaddishPhotoBase = '$kaddishHost/photos/';
+import 'kaddish_endpoints.dart';
 
 /// Direct board call. Long enough for a slow phone, short of the old 22s proxy.
 const kaddishDirectTimeout = Duration(seconds: 8);

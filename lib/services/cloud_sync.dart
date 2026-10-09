@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import '../firebase_options.dart';
+import '../tenant/tenant_paths.dart';
+import '../tenant/tenant_runtime.dart';
 import 'image_compress.dart';
 
 class CloudPull {
@@ -48,6 +50,8 @@ class CloudSync {
       enabled && FirebaseAuth.instance.currentUser != null;
 
   String? get currentEmail => FirebaseAuth.instance.currentUser?.email;
+
+  TenantPaths _paths() => TenantRuntime.instance.paths;
 
   Future<void> init() {
     if (_initialized || _initFailed) return Future<void>.value();
@@ -146,7 +150,7 @@ class CloudSync {
       final now = DateTime.now().toIso8601String();
       final mediaIds = [for (final k in images.keys) mediaDocId(k)];
 
-      await db.collection('site').doc('content').set({
+      await _paths().siteContentDoc(db).set({
         'v': 3,
         'seed': snapshot['seed'],
         'seq': snapshot['seq'],
@@ -247,8 +251,8 @@ class CloudSync {
       await init();
       if (!enabled) return;
       try {
-        final doc = await FirebaseFirestore.instance
-            .collection('media')
+        final doc = await _paths()
+            .collection(FirebaseFirestore.instance, 'media')
             .doc(mediaDocId('emblem:logo'))
             .get();
         if (!doc.exists || doc.data() == null) return;
@@ -288,7 +292,7 @@ class CloudSync {
     if (!enabled) return null;
     try {
       final db = FirebaseFirestore.instance;
-      final content = await db.collection('site').doc('content').get();
+      final content = await _paths().siteContentDoc(db).get();
       if (!content.exists || content.data() == null) return null;
 
       final snapshot = Map<String, dynamic>.from(content.data()!);
@@ -325,7 +329,7 @@ class CloudSync {
       final images = <String, Uint8List>{};
       if (includeMedia) {
         try {
-          final media = await db.collection('media').get();
+          final media = await _paths().collection(db, 'media').get();
           for (final d in media.docs) {
             final bytes = decodeMedia(d.data());
             if (bytes != null && bytes.isNotEmpty) {
@@ -346,9 +350,8 @@ class CloudSync {
     if (!enabled) return;
     _contentWatch?.cancel();
     try {
-      _contentWatch = FirebaseFirestore.instance
-          .collection('site')
-          .doc('content')
+      _contentWatch = _paths()
+          .siteContentDoc(FirebaseFirestore.instance)
           .snapshots()
           .listen((doc) {
         final at = '${doc.data()?['updatedAt'] ?? ''}';
@@ -420,7 +423,10 @@ class CloudSync {
     const allowed = {'leads', 'subscribers', 'donations', 'orders', 'rsvps'};
     if (!allowed.contains(collection) || id.trim().isEmpty) return 'denied';
     try {
-      await FirebaseFirestore.instance.collection(collection).doc(id).set(data);
+      await _paths()
+          .collection(FirebaseFirestore.instance, collection)
+          .doc(id)
+          .set(data);
       return null;
     } on FirebaseException catch (e) {
       return e.code;
@@ -434,7 +440,7 @@ class CloudSync {
     String name,
   ) async {
     try {
-      final snap = await db.collection(name).get();
+      final snap = await _paths().collection(db, name).get();
       return [for (final d in snap.docs) {'id': d.id, ...d.data()}];
     } catch (_) {
       return [];
@@ -443,7 +449,7 @@ class CloudSync {
 
   Future<Map<String, dynamic>> _loadBanners(FirebaseFirestore db) async {
     try {
-      final snap = await db.collection('banners').get();
+      final snap = await _paths().collection(db, 'banners').get();
       return {
         for (final d in snap.docs) bannerRoute(d.id, d.data()): d.data(),
       };
@@ -460,7 +466,7 @@ class CloudSync {
     String? imageKind, {
     bool prune = false,
   }) async {
-    final col = db.collection(name);
+    final col = _paths().collection(db, name);
     final existing = await col.get();
     final keep = <String>{};
     for (final item in items) {
@@ -480,7 +486,10 @@ class CloudSync {
       if (prune && !keep.contains(d.id)) {
         await d.reference.delete();
         if (imageKind != null) {
-          await db.collection('media').doc(mediaDocId('$imageKind:${d.id}')).delete();
+          await _paths()
+              .collection(db, 'media')
+              .doc(mediaDocId('$imageKind:${d.id}'))
+              .delete();
         }
       }
     }
@@ -491,7 +500,7 @@ class CloudSync {
     List<Map<String, dynamic>> items, {
     bool prune = false,
   }) async {
-    final col = db.collection('subscribers');
+    final col = _paths().collection(db, 'subscribers');
     final existing = await col.get();
     final keep = <String>{};
     for (final item in items) {
@@ -512,7 +521,7 @@ class CloudSync {
     Map<String, Uint8List> images, {
     bool prune = false,
   }) async {
-    final col = db.collection('banners');
+    final col = _paths().collection(db, 'banners');
     final existing = await col.get();
     final keep = <String>{};
     if (raw is Map) {
@@ -535,7 +544,10 @@ class CloudSync {
       if (prune && !keep.contains(d.id)) {
         await d.reference.delete();
         final route = bannerRoute(d.id, d.data());
-        await db.collection('media').doc(mediaDocId('banner:$route')).delete();
+        await _paths()
+            .collection(db, 'media')
+            .doc(mediaDocId('banner:$route'))
+            .delete();
       }
     }
   }
@@ -546,7 +558,7 @@ class CloudSync {
     String now, {
     bool prune = false,
   }) async {
-    final col = db.collection('media');
+    final col = _paths().collection(db, 'media');
     final existing = await col.get();
     final keep = <String>{};
     for (final e in images.entries) {

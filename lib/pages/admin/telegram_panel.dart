@@ -6,6 +6,7 @@ import '../../widgets/playful_icons.dart';
 import '../../data/repository.dart';
 import '../../models.dart';
 import '../../services/telegram.dart';
+import '../../tenant/tenant_runtime.dart';
 import '../../theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/hover.dart';
@@ -36,7 +37,8 @@ class _TelegramWizardState extends State<TelegramWizard> {
     await _tg.loadSavedAsync();
     if (!mounted) return;
     setState(() {
-      _channel.text = _tg.channel.isEmpty ? '@jewishsib' : '@${_tg.channel}';
+      final hint = TenantRuntime.instance.config.telegramChannelHint;
+      _channel.text = _tg.channel.isEmpty ? '@$hint' : '@${_tg.channel}';
       if (_tg.hasToken) {
         _token.text = _tg.maskedToken;
       }

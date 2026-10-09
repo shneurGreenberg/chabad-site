@@ -1,11 +1,17 @@
+import '../tenant/tenant_runtime.dart';
+
 String digitsPhone(String raw) => raw.replaceAll(RegExp(r'\D'), '');
 
 /// Zoya, the community secretary. Public WhatsApp buttons use this number.
-const communityWhatsAppDigits = '79039004320';
-const communityWhatsAppUrl = 'https://wa.me/$communityWhatsAppDigits';
+String get communityWhatsAppDigits =>
+    TenantRuntime.instance.config.whatsAppDigits;
+
+String get communityWhatsAppUrl => TenantRuntime.instance.config.whatsAppUrl;
 
 bool _isSynagogueLandline(String raw) {
   final d = digitsPhone(raw);
+  final land = TenantRuntime.instance.config.landlineDigits;
+  if (land.isNotEmpty && d == land) return true;
   return d == '73832222023' || d == '3832222023';
 }
 

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_app/data/kaddish.dart';
+import 'package:flutter_app/data/kaddish_endpoints.dart';
 import 'package:flutter_app/l10n/strings.dart';
 import 'package:flutter_app/pages/client/cemetery_page.dart';
 import 'package:flutter_app/services/yahrzeit.dart';
