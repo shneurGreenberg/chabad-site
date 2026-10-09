@@ -27,7 +27,7 @@ RUN cp assets/images/community-emblem.png build/web/favicon.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-192.png \
  && cp assets/images/community-emblem.png build/web/icons/Icon-maskable-512.png \
  && mkdir -p build/web/kaddish-photos \
- && BUILD_ID="v41-$(date -u +%Y%m%dT%H%M%SZ)" \
+ && BUILD_ID="v42-$(date -u +%Y%m%dT%H%M%SZ)" \
  && echo "$BUILD_ID" > build/web/build-id.txt \
  && echo "<!-- $BUILD_ID -->" >> build/web/index.html \
  && cp build/web/index.html build/web/404.html \

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../services/web_prefs.dart';
+import '../tenant/tenant_runtime.dart';
 
-/// Supported UI languages. Russian is the default until the visitor chooses.
-const supportedLangs = ['he', 'en', 'ru'];
+/// Supported UI languages for the active tenant.
+List<String> get supportedLangs =>
+    List<String>.from(TenantRuntime.instance.config.enabledLanguages);
+
+/// Russian is the default until the visitor chooses (per-tenant default).
 
 const langNames = {
   'he': 'עברית',
@@ -13,8 +17,11 @@ const langNames = {
 
 String _savedLang() {
   final saved = readPref('lang');
-  if (saved != null && supportedLangs.contains(saved)) return saved;
-  return 'ru';
+  final langs = supportedLangs;
+  if (saved != null && langs.contains(saved)) return saved;
+  final def = TenantRuntime.instance.config.defaultLanguage;
+  if (langs.contains(def)) return def;
+  return langs.isNotEmpty ? langs.first : 'ru';
 }
 
 /// Holds the currently selected language and exposes translation lookup.

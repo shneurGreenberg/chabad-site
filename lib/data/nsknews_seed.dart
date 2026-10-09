@@ -180,6 +180,13 @@ class NsknewsSeed {
       cur.imageUrl = article.imageUrl;
       cur.published = true;
     }
+    // Firestore lists this doc last; keep it near the top like packaged seed.
+    const target = 1;
+    final j = news.indexWhere((a) => a.id == newsId);
+    if (j >= 0 && j != target) {
+      final item = news.removeAt(j);
+      news.insert(target.clamp(0, news.length), item);
+    }
   }
 
   static void _ensureGallery(List<GalleryPhoto> gallery) {

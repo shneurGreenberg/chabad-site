@@ -597,7 +597,7 @@ class SiteLinks {
     this.website = 'http://jewishsib.com',
     this.donateUrl = '',
     this.bankDetails = '',
-    this.whatsapp = communityWhatsAppUrl,
+    this.whatsapp = 'https://wa.me/79039004320',
     this.notifyChatId = '',
     this.adminEmails = 'admin@chabad-city.org',
   });

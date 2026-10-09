@@ -1,0 +1,184 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.superAdmin == true;
+    }
+
+    function isTenantAdmin(tenantId) {
+      return isSuperAdmin() || (
+        isSignedIn() && (
+          request.auth.token.tenantId == tenantId ||
+          exists(/databases/$(database)/documents/tenants/$(tenantId)/admins/$(request.auth.uid))
+        )
+      );
+    }
+
+    // Legacy NSK top-level layout (until tenants/nsk.migrated == true).
+    function isAdmin() {
+      return isSignedIn();
+    }
+
+    match /site/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /news/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /programs/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /gallery/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /banners/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /media/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /shiurim/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /famous/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /history/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /tour/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /touristInfo/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /leads/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /subscribers/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /donations/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /orders/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+    match /rsvps/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if true;
+    }
+
+    // Tenant metadata (config, migrated flag).
+    match /tenants/{tenantId} {
+      allow read: if true;
+      allow write: if isSuperAdmin() || isTenantAdmin(tenantId);
+    }
+
+    match /tenants/{tenantId}/admins/{uid} {
+      allow read: if isTenantAdmin(tenantId) || isSuperAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // Per-tenant published content (new tenants + migrated NSK).
+    match /tenants/{tenantId}/site/{doc} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/news/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/programs/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/products/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/gallery/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/banners/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/media/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/events/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/shiurim/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/famous/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/history/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/tour/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/touristInfo/{id} {
+      allow read: if true;
+      allow write: if isTenantAdmin(tenantId);
+    }
+    match /tenants/{tenantId}/leads/{id} {
+      allow read, update, delete: if isTenantAdmin(tenantId);
+      allow create: if true;
+    }
+    match /tenants/{tenantId}/subscribers/{id} {
+      allow read, update, delete: if isTenantAdmin(tenantId);
+      allow create: if true;
+    }
+    match /tenants/{tenantId}/donations/{id} {
+      allow read, update, delete: if isTenantAdmin(tenantId);
+      allow create: if true;
+    }
+    match /tenants/{tenantId}/orders/{id} {
+      allow read, update, delete: if isTenantAdmin(tenantId);
+      allow create: if true;
+    }
+    match /tenants/{tenantId}/rsvps/{id} {
+      allow read, update, delete: if isTenantAdmin(tenantId);
+      allow create: if true;
+    }
+  }
+}
