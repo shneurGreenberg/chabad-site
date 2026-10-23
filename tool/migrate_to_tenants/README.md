@@ -6,7 +6,7 @@ Copies top-level Firestore collections into `tenants/nsk/{collection}` and sets 
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 24+ (see repo root `.nvmrc` for the pinned LTS)
 - A Firebase **service account** JSON with read/write access to the project
 - **Do not** point this at production until you have reviewed backups and rules
 
