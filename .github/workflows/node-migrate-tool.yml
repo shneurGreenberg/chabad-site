@@ -1,0 +1,39 @@
+name: Node migrate tool
+
+on:
+  push:
+    paths:
+      - 'tool/migrate_to_tenants/**'
+      - '.nvmrc'
+      - '.github/workflows/node-migrate-tool.yml'
+  pull_request:
+    paths:
+      - 'tool/migrate_to_tenants/**'
+      - '.nvmrc'
+      - '.github/workflows/node-migrate-tool.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tool/migrate_to_tenants
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: tool/migrate_to_tenants/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (syntax check)
+        run: npm run build
+
+      - name: npm audit (high and critical)
+        run: npm audit --audit-level=high
